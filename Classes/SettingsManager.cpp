@@ -1,8 +1,126 @@
-/*#include "SettingsManager.h"
+#include "SettingsManager.h"
+
+SettingsManager::SettingsManager()
+{
+
+}
+
+SettingsManager::~SettingsManager()
+{
+
+}
+
+int SettingsManager::Load(bool defaults)
+{
+	int error = 0;
+	std::string fileName;
+
+	if(!defaults) fileName = "Data/settings.xml";
+	else fileName = "Data/defaultsettings.xml";
+
+	//First load the settings.xml, and populate settings objects from here
+	// Create an empty property tree object
+    using boost::property_tree::ptree;
+    ptree pt;
+
+    // Load the XML file into the property tree. If reading fails
+    // (cannot open file, parse error), an exception is thrown.
+    read_xml(fileName, pt);
+
+    BOOST_FOREACH(ptree::value_type &cat,pt.get_child("settings"))
+	{
+		BOOST_FOREACH(ptree::value_type &set,pt.get_child("settings").get_child(cat.first))
+		{
+			//Create a setting
+			Setting* x = new Setting();
+
+			//Populate it with properties from the XML
+			x->Type = set.first;
+			x->Category = cat.first;
+			x->Code = set.second.get<int>("<xmlattr>.code");
+			x->Detect = set.second.get<bool>("<xmlattr>.detect",false);
+			x->Dev = set.second.get<bool>("<xmlattr>.dev",false);
+			x->DisplayText = set.second.get<std::string>("displaytext","");
+			x->Enabled = set.second.get<bool>("<xmlattr>.enabled",true);
+			x->Key = set.second.get<std::string>("key","");
+			x->Range[0] = set.second.get<int>("min",0);
+			x->Range[1] = set.second.get<int>("max",0);
+			x->Tooltip = set.second.get<std::string>("tooltip","");
+			x->Value = set.second.get<std::string>("value","");
+			//loop through 'arg' keys
+			if(set.second.count("arg") > 0) //if there are any
+			{
+				BOOST_FOREACH(ptree::value_type &arg,set.second.get_child("arg"))
+				{
+					x->Args.push_back(arg.second.data());
+				}
+			}
+			//loop through 'option' keys
+			if(set.second.count("option") > 0) //if there are any
+			{
+				BOOST_FOREACH(ptree::value_type &opt,set.second.get_child("option"))
+				{
+					x->Options.push_back(opt.second.data());
+				}
+			}
+
+			//add to the Settings Map, with a Key for lookups
+			SetMap["key"] = *x;
+		}
+	}
+
+	return error;
+	
+	// Get the filename and store it in the m_fil variable.
+    // Note that we construct the path to the value by separating
+    // the individual keys with dots. If dots appear in the keys,
+    // a path type with a different separator can be used.
+    // If the debug.filename key is not found, an exception is thrown.
+    
+	//settingsFile = pt.get<std::string>("debug.filename");
+
+    // Get the debug level and store it in the m_level variable.
+    // This is another version of the get method: if the value is
+    // not found, the default value (specified by the second
+    // parameter) is returned instead. The type of the value
+    // extracted is determined by the type of the second parameter,
+    // so we can simply write get(...) instead of get<int>(...).
+    
+	//m_level = pt.get("debug.level", 0);
+
+    // Iterate over the debug.modules section and store all found
+    // modules in the m_modules set. The get_child() function
+    // returns a reference to the child at the specified path; if
+    // there is no such child, it throws. Property tree iterators
+    // are models of BidirectionalIterator.
+    
+	/*BOOST_FOREACH(ptree::value_type &v,
+            pt.get_child("debug.modules"))
+        m_modules.insert(v.second.data());*/
+
+
+	//populate valid arguments list
+
+	//check command line arguments against the valid list (arguments should be an object so we can assess type; only as simply as whether or not it takes a second param)
+}
+
+
+//Setting class
+Setting::Setting()
+{
+
+}
+
+Setting::~Setting()
+{
+
+}
+
+/*
 
 //setup our acceptable switches
   //map<string,int> numberWang; //used to convert the typed switches to numbers for the switch statement below //this is now part of the class.
-  /* This data should now be populated from settings.xml
+  //This data should now be populated from settings.xml
   //program settings
   numberWang["/i"] = 1;
   numberWang["/o"] = 2;
@@ -18,16 +136,7 @@
   //30+ Synapse settings
   numberWang["/e"] = 31;
   numberWang["/env"] = 31;
-  numberWang["/environment"] = 31;*/
-
-/*void Load()
-{
-	//First load the settings.xml, and populate settings objects from here
-
-	//populate valid arguments list
-
-	//check command line arguments against the valid list (arguments should be an object so we can assess type; only as simply as whether or not it takes a second param)
-}
+  numberWang["/environment"] = 31;
 
 map<string,string> ProcessArgs(int argc, char *argv[]) //simply processes the command line arguments against a valid list
 {
