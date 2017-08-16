@@ -31,59 +31,53 @@
 
 using boost::property_tree::ptree;
 
-class LevelView : public ScrollingView {
+class LevelView : public ScrollingView
+{
 public:
-	
 	// Methods
 	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
 	void draw(std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *);
-	void acceptEvent(Event *);
 	
 };
 
 class Level : public GameState
 {
 public:
+	Level(Game *, sf::RenderWindow *, std::string path);
+	~Level();
+	
 	// Methods
+	
+	// GameState overrides
+	void reset();
+	void pause();
+	void resume();
+	void handleEvent(Event *);
+	void update();
+	void draw();
+	
+	// Top-level-object stuff
 	Unit* createUnit(int atX, int atY);
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
-	// Top-level-object methods
 	void updateObjects();
 	void destroyThings();
 	void destroyAllThings();
-
-	// GameState methods
-	void init(sf::RenderWindow *_window, EventHandler *);
-	void reset();
-	void pause();
-	void resume();
-	void handleEvents(Game* g,Event* event);
-	void update(Game* g);
-	void draw(Game* g);
-
-	static Level* instance() {
-		return &level_instance;
-	}
 	
 	// Properties
 	int columns, rows;
 	std::vector<Building*> buildings;
 	std::vector<Placeable*> placeables;
 	std::vector<Unit*> units;
-
+	
 protected:
-	Level() { } // Singleton Constructor
-
 	// Methods
 	ptree readLevel(std::string fileName);
 	void buildLevel(ptree level_tree);
 	
 	// Properties
 	int w, h; 					// Blocks wide/tall.
-	sf::RenderWindow *window;
-	EventHandler *eventHandler;
 	
 	NavMap *navmap;
 	LevelView *levelview;
@@ -91,8 +85,6 @@ protected:
 	
 	int framecount;
 
-private:
-	static Level level_instance;
 };
 
 #endif

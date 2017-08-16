@@ -22,4 +22,6 @@ int main(int argc, char *argv[], char *envp[])
 	// Start game
 	Game g(&dbt_window, &dbt_settings);
 	g.run();
+	
+	dbt_window.Close();
 }

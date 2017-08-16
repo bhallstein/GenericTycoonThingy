@@ -1,7 +1,6 @@
 #include "Building.hpp"
 
-Building::Building(NavMap *_navmap, EventHandler *_eventHandler, int posX, int posY) {
-	eventHandler = _eventHandler;
+Building::Building(NavMap *_navmap, int posX, int posY) {
 	x = posX, y = posY;
 	w = 6, h = 4;
 	clicked = false;

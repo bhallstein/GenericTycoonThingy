@@ -9,7 +9,7 @@ EventHandler::~EventHandler() {
 
 
 void EventHandler::subscribe(View *v) {
-	unsubscribe(v);			
+	unsubscribe(v);
 	subscribed_views.push_back(v);
 	std::cout << "View " << v << " subscribed to receive mouse events" << std::endl;
 }

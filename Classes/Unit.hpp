@@ -26,7 +26,7 @@ public:
 	~Unit();
 
 	// Methods
-	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);	// Override to handle events
+	void receiveEvent(Event *);	// Override to handle events
 	char col();
 	void update();
 

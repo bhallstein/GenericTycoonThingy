@@ -16,15 +16,15 @@
 class EventResponder
 {
 public:
-	EventResponder();
-	~EventResponder();
+	EventResponder() { };
+	~EventResponder() { };
 
 	// Methods
-	virtual void receiveEvent(Event *ev);
+	virtual void receiveEvent(Event *) = 0;
 	
 	// Properties
 	int x, y;		// Integer block coordinates
-	int w, h;		//
+	int w, h;		// 
 
 protected:
 	

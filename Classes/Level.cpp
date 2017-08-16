@@ -1,17 +1,46 @@
 #include "Level.hpp"
 
-Level Level::level_instance;
-
-void Level::init(sf::RenderWindow *_window, EventHandler *_eventHandler)
+Level::Level(Game *_game, sf::RenderWindow *_window, std::string levelpath) :
+	GameState(_game, _window), framecount(0)
 {	
-	window = _window;
-	eventHandler = _eventHandler;
 	uiview = new View(_window, 16, 3, 0, -80, 0, 0);
-
-	buildLevel(readLevel("Data/level1.xml"));
+	uiview->createEventResponderMap();
+	eventHandler.subscribe(uiview);
 	
-	framecount = 0;
+	buildLevel(readLevel(levelpath));
 }
+
+Level::~Level() {
+	
+}
+
+ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
+{
+	ptree pt;
+	read_xml(fileName, pt);
+	return pt;
+}
+void Level::buildLevel(ptree levelFile)
+{
+	w = levelFile.get<int>("level.<xmlattr>.width");
+	h = levelFile.get<int>("level.<xmlattr>.height");
+	std::cout << "level dimensions: " << w << " x " << h << std::endl;
+	
+	// Create map
+	navmap = new NavMap(w, h);
+	
+	// Create levelview
+	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
+	levelview->createEventResponderMap();					// Make levelview respond to mouse events
+	eventHandler.subscribe(levelview);						// 
+
+	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
+	{
+		if(obj.first == "building")
+			createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
+	}
+}
+
 
 void Level::reset()
 {
@@ -26,22 +55,19 @@ void Level::reset()
 void Level::pause() { }
 void Level::resume() { }
 
-void Level::update(Game* g)
+void Level::update()
 {
 	updateObjects();
 	destroyThings();	// Removed destroyed objects.
 }
 
-void Level::handleEvents(Game* g,Event* event)
-{			
+void Level::handleEvent(Event* event)
+{
 	// Keys
 	if (event->type == KEYPRESS) { 
 		if (event->key == K_P)
 			createPlaceable();
 	}
-	
-	// Mouse events sent via eventhandler
-	eventHandler->dispatchEvent(event);
 }
 
 Unit* Level::createUnit(int atX, int atY) {
@@ -51,10 +77,10 @@ Unit* Level::createUnit(int atX, int atY) {
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
-	Building *b = new Building(navmap, eventHandler, atX, atY);
+	Building *b = new Building(navmap, atX, atY);
 	buildings.push_back(b);
 	levelview->addResponder(b);
-	eventHandler->subscribe(b, K_L);
+	eventHandler.subscribe(b, K_L);
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
@@ -77,7 +103,7 @@ void Level::destroyThings() {
 			i = placeables.erase(i);
 		}
 		else i++;
-	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end();)
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
 		if ((*i)->destroyed) {
 			levelview->removeResponder(*i);
 			navmap->removeImpassableObject(*i);
@@ -106,37 +132,10 @@ void Level::updateObjects() {
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();
 }
-void Level::draw(Game* g)
+void Level::draw()
 {
 	levelview->draw(&buildings, &placeables, &units);
 	uiview->draw();
-}
-
-ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
-{
-	ptree pt;
-	read_xml(fileName, pt);
-	return pt;
-}
-void Level::buildLevel(ptree levelFile)
-{
-	w = levelFile.get<int>("level.<xmlattr>.width");
-	h = levelFile.get<int>("level.<xmlattr>.height");
-	std::cout << "level dimensions: " << w << " x " << h << std::endl;
-	
-	// Create map
-	navmap = new NavMap(w, h);
-	
-	// Create levelview
-	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
-	levelview->createEventResponderMap();					// Make levelview respond to mouse events
-	eventHandler->subscribe(levelview);						// 
-
-	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
-	{
-		if(obj.first == "building")
-			createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
-	}
 }
 
 
@@ -144,12 +143,6 @@ LevelView::LevelView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, in
 	ScrollingView(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
 {
 	// oh hai
-}
-
-void LevelView::acceptEvent(Event *ev) {
-	std::list<EventResponder*> *resps = &responderMap[ev->y * blocks_w + ev->x];
-	for (std::list<EventResponder*>::iterator i = resps->begin(); i != resps->end(); i++)
-		(*i)->receiveEvent(ev);
 }
 
 void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> *placeables, std::vector<Unit*> *units) {

@@ -14,43 +14,40 @@
 
 #include "types.h"
 #include "Event.hpp"
-#include "EventHandler.hpp"
 #include "SettingsManager.hpp"
 
-//Forward Declarations
+// Forward Declarations
 class GameState;
 
 class Game
 {
 public:
-	Game(sf::RenderWindow *,SettingsManager *);
+	Game(sf::RenderWindow *, SettingsManager *);
 	~Game();
 
 	// Methods
 	void run();
 	
-	void cleanStates();
-	void changeState(GameState *);
 	void pushState(GameState *);
 	void popState();
+	void popAllStates();
 	
 	// Events/Update/Drawing - passed to active State
-	void handleEvents();
+	void sendEvents();
 	void update();
 	void draw();
 	
-	bool running() { return is_running; }
 	void quit();
 	
 	SettingsManager* settings;
 
 protected:
-	bool is_running;
-
-	std::vector<GameState*> states; //the stack of states
-
+	// Properties
+	std::vector<GameState *> states;
+	bool should_quit;
+	
 	sf::RenderWindow *window;
-	EventHandler eventHandler;
+	
 };
 
 #endif

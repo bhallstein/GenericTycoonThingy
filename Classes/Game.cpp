@@ -1,7 +1,7 @@
 #include "Game.hpp"
-#include "Level.hpp"
+#include "Menu.hpp"
 
-Game::Game(sf::RenderWindow *_window, SettingsManager* _settings)
+Game::Game(sf::RenderWindow *_window, SettingsManager* _settings) : should_quit(false)
 {
 	//point our settings property to the SettingsManager instance
 	settings = _settings;
@@ -23,7 +23,7 @@ Game::Game(sf::RenderWindow *_window, SettingsManager* _settings)
 	 * more flexible: the game should be able most excellent-like to switch graphics modes on the fly.
 	 */
 	int windowStyle = (settings->Windowed.value ? sf::Style::Close : sf::Style::Fullscreen);
-	std::string window_name = game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon";
+	std::string window_name = (game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
  	window->Create(sf::VideoMode(settings->Screen_Width.value, settings->Screen_Height.value), window_name, windowStyle);
 	window->SetFramerateLimit(settings->FramerateLimit.value);
 }
@@ -33,117 +33,98 @@ Game::~Game()
 	
 }
 
-void Game::cleanStates()
-{
-	// Clean up all the states
-	while ( !states.empty() ) {
-		states.back()->reset();
-		states.pop_back();
-	}
-}
-
-//Events/Update/Draw - usually passed to active State
-void Game::handleEvents()
+void Game::sendEvents()
 {
 	Event event;
 	sf::Event sf_event;
 	
+	// Generate our own mousemoves
 	event.loadFromMousePos(sf::Mouse::GetPosition(*window));
 	if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
-		eventHandler.dispatchEvent(&event);
+		states.back()->_handleEvent(&event);
 		
 	while (window->PollEvent(sf_event)) {
 		event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
 		
-		if (event.type == MOUSEMOVE) ;			// Ignore actual mouse moves
+		if (event.type == MOUSEMOVE) ;			// Ignore sfml mouse moves
 		
 		// Close window : exit
-		if (event.type == CLOSED || event.key == K_Q)
+		else if (event.type == CLOSED || event.key == K_Q)
 			quit();
 		
 		else
-			states.back()->handleEvents(this, &event);	// Pass keys to active state
+			states.back()->_handleEvent(&event);	// Send keys to active state
 	}
 }
-
 void Game::update()
 {
-	//let the current active state perform updates
-	states.back()->update(this);
+	// Update the active state
+	states.back()->update();
 }
 void Game::draw()
 {
-	//Clear screen
+	// Clear screen
 	window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
 
-	//let the current active state draw
-	states.back()->draw(this);
+	// Draw state(s)
+	int i, n = states.size(), first_to_draw = n - 1;
+	for (i = n-1; i >= 0; i--)
+		if (states[i]->translucent)
+			first_to_draw = (i ? i-1 : 0);
+	for (i = first_to_draw; i < n; i++)
+		states[i]->draw();
 
-	//Display shizzle
-	window->Display();	// Refresh the window
+	// Refresh the window
+	window->Display();
 }
 
-void Game::changeState(GameState *state)
+void Game::pushState(GameState *st)
 {
-	// Destroy the current state
-	if ( !states.empty() ) {
-		states.back()->reset();
-		states.pop_back();
-	}
+	for (int i=0, n = states.size(); i < n; i++)
+		if (states[i] == st)
+			; 										// Throw exception if state already in stack
+		
+	if (!states.empty()) states.back()->pause();	// Pause current state
 
 	// Add the new state
-	states.push_back(state);
-	states.back()->init(window, &eventHandler);
-}
-
-void Game::pushState(GameState* state)
-{
-	// Pause current state
-	if ( !states.empty() ) {
-		states.back()->pause();
-	}
-
-	// Add the new state
-	states.push_back(state);
-	states.back()->init(window, &eventHandler);
+	states.push_back(st);
 }
 
 void Game::popState()
 {
-	// Clean up the current state
+	// Clean up current state
 	if ( !states.empty() ) {
 		states.back()->reset();
 		states.pop_back();
 	}
 
 	// Resume previous state
-	if ( !states.empty() ) {
+	if (!states.empty())
 		states.back()->resume();
-	}
+}
+void Game::popAllStates() {
+	while (!states.empty()) popState();
 }
 
 void Game::run()
-{
-	// Switch to Level state
-	changeState(Level::instance());
-
-	while (running())
+{	
+	// Switch to base menu
+	pushState(new Menu(this, window));
+	
+	/* What Game really wants to do is run a sequence of initial states:
+	   these might include a splash, video, and so on. i.e. it will need to run through a list:
+	   if (something remains in the list), push it; otherwise, quit. */
+	
+	while (!states.empty() && !should_quit)
     {
-		// Events
-		handleEvents();
-		
-		// Updates
+		sendEvents();
 		update();
-
-		// Drawing
 		draw();
     }
 
-	// We left the game loop
-	cleanStates();
+	popAllStates();
 }
 
 void Game::quit() {
-	is_running = false;
-	window->Close();
+	should_quit = true;
 }

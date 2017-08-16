@@ -16,7 +16,7 @@ View::View(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offse
 }
 
 View::~View() {
-	
+	std::cout << "view destruct" << std::endl;
 }
 
 void View::createEventResponderMap() {
@@ -95,7 +95,10 @@ void View::_acceptEvent(Event *ev) {
 	acceptEvent(ev);
 }
 void View::acceptEvent(Event *ev) {
-	
+	if (!ready_for_event_response) return;
+	std::list<EventResponder*> *resps = &responderMap[ev->y * blocks_w + ev->x];
+	for (std::list<EventResponder*>::iterator i = resps->begin(); i != resps->end(); i++)
+		(*i)->receiveEvent(ev);
 }
 
 

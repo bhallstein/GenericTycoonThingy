@@ -53,17 +53,17 @@ public:
 	
 	// Methods
 	virtual void draw();					// Your subclass should override this
-	virtual void acceptEvent(Event *);		// and this, if you want it to receive events
 
-	virtual void _acceptEvent(Event *);		// Wrapper for acceptEvent: EventHandler calls this, allowing View to do some
-											// shit before calling your acceptEvent function
+	void acceptEvent(Event *);
+	virtual void _acceptEvent(Event *);		// Wrapper for acceptEvent: EventHandler calls this, allowing View & subclasses to do some
+											// shit before calling acceptEvent function
 	
 	void createEventResponderMap(); 		// Create structures necessary for event response
 	void addResponder(EventResponder *);
 	void removeResponder(EventResponder *);
 	
 	bool requestPrivilegedEventResponderStatus(EventResponder *);		// lol
-	void relinquishPrivilegedEventResponderStatus(EventResponder *);
+	void relinquishPrivilegedEventResponderStatus(EventResponder *);	//
 	
 	// Properties
 	int l_pos, t_pos, r_pos, b_pos;
@@ -92,7 +92,7 @@ public:
 	void drawRect(sf::Color colour, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 	
 protected:
-	
+	// Properties
 	int block_size_x, block_size_y;		// Subclasses should override. Default is 20.
 	int scroll_x, scroll_y;
 	

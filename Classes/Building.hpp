@@ -18,7 +18,7 @@
 class Building : public EventResponder
 {
 public:
-	Building(NavMap *, EventHandler *, int posX, int posY);
+	Building(NavMap *, int posX, int posY);
 	~Building();
 
 	// Methods
@@ -32,7 +32,6 @@ protected:
 
 	// Properties
 	NavMap *navmap;
-	EventHandler *eventHandler;
 	bool clicked;
 	
 };

@@ -16,7 +16,7 @@ Unit::~Unit() {
 	std::cout << "unit destruct" << std::endl;
 }
 
-void Unit::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {
+void Unit::receiveEvent(Event *ev) {
 	// Event handling shizzle
 }
 
