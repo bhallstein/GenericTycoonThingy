@@ -1,18 +1,19 @@
+
 #include "Unit.hpp"
 
 Unit::Unit(NavMap *_navmap, int _x, int _y) : navmap(_navmap), destroyed(false) {
-	x = _x, y = _y;
+	dest_x = x = _x, dest_y = y = _y;
 	w = h = 1;
 	a = b = 0;
 	
 	state = S_IDLE;
 	
 	// Generate random destination
-	goSomewhere(rand()%navmap->w, rand()%navmap->h);
+	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;
 }
 
 Unit::~Unit() {
-
+	std::cout << "unit destruct" << std::endl;
 }
 
 void Unit::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {
@@ -25,54 +26,81 @@ char Unit::col() {
 	else return 'w';
 }
 
-void Unit::goSomewhere(int _destX, int _destY) {
-	std::cout << "(dest: " << _destX << "," << _destY << ") ";
-	destX = _destX, destY = _destY;
+void Unit::update() {
+	bool at_dest = (x == dest_x && y == dest_y);
 	
-	std::cout << "getting route..." << std::endl;
-	bool success = navmap->getRoute(x, y, destX, destY, &route);
-	if (success) {
-		state = S_TRAVELING;
-		std::cout << "traveling to destination" << std::endl;
+	if (state == S_IDLE) {
+		if (!at_dest)
+			setToTraveling();
 	}
+	else if (state == S_WAITING) {
+		frames_waited++;
+		if (frames_waited == 60)
+			frames_waited = 0, setToTraveling();
+	}
+	else if (at_dest)
+		setToIdle();
+	else if (state == S_TRAVELING) {
+		if (route.empty())
+			setToTraveling();
+	}
+
+	if (state != S_TRAVELING) return;	
+
+	incrementLocation();
 }
 
 void Unit::nextInRoute() {
 	route.erase(route.begin());
 }
-
-void Unit::update() {
-	if (state == S_IDLE) return;
-	if (x == route[0]->x && y == route[0]->y) {
-		a = b = 0;
-		nextInRoute();
-		if (!route.size()) {
-			state = S_IDLE;
-			return;
-		}
-	}
-	
-	int next_x = route[0]->x, next_y = route[0]->y;
-	float diff = 0.05;
-	
+void Unit::setToIdle() {
+	route.clear();
+	state = S_IDLE;
+}
+void Unit::setToTraveling() {
+	if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+		route.erase(route.begin()), state = S_TRAVELING;
+	else
+		setToWaiting();
+}
+void Unit::setToWaiting() {
+	frames_waited = 0;
+	state = S_WAITING;
+}
+void Unit::incrementLocation() {
+	// Increment a & b toward next in route
+	float step = 0.05;
 	float a_diff = 0, b_diff = 0;
-	if (x < next_x) a_diff = diff;
-	else if (x > next_x) a_diff = -diff;
-	if (y < next_y) b_diff = diff;
-	else if (y < next_y) b_diff = -diff;
 
-	if (a_diff != 0 && b_diff != 0)
-		a_diff *= 0.71, b_diff *= 0.71;
+	int next_x = route[0]->x, next_y = route[0]->y;
+	bool diagonal = (x != next_x && y != next_y);
+	
+	if (x < next_x) 		a_diff = step;
+	else if (x > next_x) 	a_diff = -step;
+	if (y < next_y) 		b_diff = step;
+	else if (y > next_y) 	b_diff = -step;
+
+	if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
 
 	a += a_diff, b += b_diff;
 	
-	if (next_x - x != 0 && next_y - y != 0) {
-		if (a*a + b*b >= 2)
-			x = next_x, y = next_y, a = b = 0;
+	// Check if we’ve reached the next loc. This happens:
+	//   - for diagonals, when a^2 + b^2 = 2
+	//   - for linears, when |a| = 1 or |b| = 1
+	bool reached_next = ((diagonal && a*a + b*b >= 2) || (!diagonal && (a*a >= 1 || b*b >= 1)));
+	if (reached_next) {
+		// If on point of entering next loc, check is passable
+		if (route[0]->passable) {
+			x = next_x, y = next_y;
+			a = b = 0;
+			nextInRoute();
+		}
+		// If access denied, go back to the previous square. Waiting & recalculation will ensue upon arrival.
+		else {
+			route.clear();
+			route.push_back( navmap->nodeAt(x, y) );
+			x = next_x, y = next_y;
+			a = b = 0;
+		}
 	}
-	else if (a*a > 1 || b*b > 1)
-		x = next_x, y = next_y, a = b = 0;
 }
-
-
-

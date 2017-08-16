@@ -65,12 +65,14 @@ public:
 	void addImpassableObject(EventResponder *resp);
 	void removeImpassableObject(EventResponder *resp);
 	bool isPassableAt(int atX, int atY);
+	NavNode* nodeAt(int atX, int atY);
 	
 	bool getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route);
 
 protected:
 	// Properties
 	std::vector<NavNode> maplocs;		// A w*h-sized array of NavNodes
+	MisterHeapy<NavNode*, float> open_nodes;
 	
 	// Methods
 	void makeImpassable(int atX, int atY);

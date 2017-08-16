@@ -26,7 +26,7 @@ void NavNode::setComparator(float new_min_dist) {
 
 /****   NavMap implementation   ****/
 
-NavMap::NavMap(int _w, int _h) {
+NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h) {
 	w = _w, h = _h;
 	int n = w * h;
 	maplocs.resize(n);
@@ -75,6 +75,9 @@ void NavMap::makeImpassable(int atX, int atY) {
 			else if (i < 0 || i >= w || j < 0 || j >= h) ;
 			else maplocs[j*w + i].removeNeighbour(maploc);
 }
+NavNode* NavMap::nodeAt(int atX, int atY) {
+	return &maplocs[atY * w + atX];
+}
 void NavMap::addImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
 	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
@@ -105,13 +108,13 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNod
 	// This is so we don’t have to reverse the route after extracting it, since it arrives in reverse order.
 	NavNode *A = &maplocs[w*toY + toX], *B = &maplocs[w*fromY + fromX];
 	if (!A->passable || !B->passable) {
-		cout << (A->passable ? "B" : "A") << " impassable!" << endl;
+		//cout << (!A->passable ? "A" : "B") << " impassable!" << endl;
 		return false;
 	}
 	
 	/* Initialisation */
 	int n = w * h, _i = 0;
-	MisterHeapy<NavNode*, float> open_nodes(n);
+	open_nodes.reset();
 	for (int i=0; i < n; i++) {
 		NavNode *maploc = &maplocs[i];
 		maploc->min_dist = (maploc == A ? 0 : INFINITAH);	// Set nodes’ min_dist to inifinity
@@ -121,8 +124,6 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNod
 	A->min_dist = 0;					// Set start node’s min_dist to 0
 	open_nodes.reheapify();				// Re-sort heap
 	
-	cout << "Initialised: " << _i << " open nodes" << endl;
-	
 	/* Run */
 	NavNode *X, *neighbour;
 	float dist_via_X;
@@ -130,14 +131,12 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNod
 	while (open_nodes.size()) {
 		X = open_nodes.pop();		// Pop node with lowest dist off heap
 		
-		//cout << "got lowest dist node:" << X->x << "," << X->y << " d: " << X->min_dist << endl;
-		
 		if (X->min_dist == INFINITAH) {
-			cout << "lowest dist node unreachable!" << endl;
+			// cout << "lowest dist node unreachable!" << endl;
 			return false;		// No route is possible.
 		}
 		if (X == B) {
-			cout << "route found!" << endl;
+			// cout << "route found!" << endl;
 			route_found = true;
 			break;
 		}

@@ -49,23 +49,21 @@ public:
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
-	//Update Methods
+	// Top-level-object methods
 	void updateObjects();
 	void destroyThings();
 	void destroyAllThings();
 
-	//GameState Methods
-	void Init(sf::RenderWindow *_window, EventHandler *);
-	void Cleanup();
+	// GameState methods
+	void init(sf::RenderWindow *_window, EventHandler *);
+	void reset();
+	void pause();
+	void resume();
+	void handleEvents(Game* g,Event* event);
+	void update(Game* g);
+	void draw(Game* g);
 
-	void Pause();
-	void Resume();
-
-	void HandleEvents(Game* g,Event* event);
-	void Update(Game* g);
-	void Draw(Game* g);
-
-	static Level* Instance() {
+	static Level* instance() {
 		return &level_instance;
 	}
 	
@@ -76,7 +74,7 @@ public:
 	std::vector<Unit*> units;
 
 protected:
-	Level() { } //Singleton Constructor
+	Level() { } // Singleton Constructor
 
 	// Methods
 	ptree readLevel(std::string fileName);
@@ -89,7 +87,7 @@ protected:
 	
 	NavMap *navmap;
 	LevelView *levelview;
-	//View uiview;
+	View *uiview;
 	
 	int framecount;
 

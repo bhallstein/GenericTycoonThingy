@@ -27,22 +27,21 @@ public:
 	~Game();
 
 	// Methods
-	void Cleanup();
+	void run();
 
-	void Run();
+	void cleanStates();
+	void changeState(GameState *);
+	void pushState(GameState *);
+	void popState();
 
-	//State Methods
-	void ChangeState(GameState *);
-	void PushState(GameState *);
-	void PopState();
+         
+	// Events/Update/Drawing - passed to active State
+	void handleEvents(Event,sf::Event); 
+	void update();
+	void draw();
 
-	//Events/Update/Draw - usually passed to active State
-	void HandleEvents(Event,sf::Event); 
-	void Update();
-	void Draw();
-
-	bool Running() { return is_running; }
-	void Quit() { is_running = false; }
+	bool running() { return is_running; }
+	void quit();
 
 	SettingsManager* settings;
 

@@ -2,46 +2,41 @@
 
 Level Level::level_instance;
 
-void Level::Init(sf::RenderWindow *_window, EventHandler *_eventHandler) //:
-	//window(_window), eventHandler(_eventHandler), uiview(_window, 16, 3, 0, -80, 0, 0)
+void Level::init(sf::RenderWindow *_window, EventHandler *_eventHandler)
 {	
-	//initialise properties - initialisation list fails as no longer constructor?
 	window = _window;
 	eventHandler = _eventHandler;
-	//uiview = View(_window,16,3,0,80,0,0);
+	uiview = new View(_window, 16, 3, 0, -80, 0, 0);
 
-	// Build level
-	std::cout << "calling buildLevel" << std::endl;
 	buildLevel(readLevel("Data/level1.xml"));
 	
 	framecount = 0;
 }
 
-void Level::Cleanup()
+void Level::reset()
 {
-	std::cout << "level destruct" << std::endl;
+	std::cout << "level reset" << std::endl;
 	destroyAllThings();
 	delete navmap;
 	delete levelview;
+	delete uiview;
 }
 
 //To be done later ;)
-void Level::Pause() { }
-void Level::Resume() { }
+void Level::pause() { }
+void Level::resume() { }
 
-void Level::Update(Game* g)
+void Level::update(Game* g)
 {
 	updateObjects();
 	destroyThings();	// Removed destroyed objects.
 }
 
-void Level::HandleEvents(Game* g,Event* event)
+void Level::handleEvents(Game* g,Event* event)
 {			
 	// Keys
 	if (event->type == KEYPRESS) { 
-		if (event->key == K_ESC || event->key == K_Q) //This won't stay - ESC in Level will bring up a menu when we're ready ;)
-			g->Quit();
-		else if (event->key == K_P)
+		if (event->key == K_P)
 			createPlaceable();
 	}
 			
@@ -112,10 +107,10 @@ void Level::updateObjects() {
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();
 }
-void Level::Draw(Game* g)
+void Level::draw(Game* g)
 {
 	levelview->draw(&buildings, &placeables, &units);
-	//uiview.draw();
+	uiview->draw();
 }
 
 ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later

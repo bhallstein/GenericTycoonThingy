@@ -33,17 +33,17 @@ Game::~Game()
 	
 }
 
-void Game::Cleanup()
+void Game::cleanStates()
 {
-	// cleanup all the states
+	// Clean up all the states
 	while ( !states.empty() ) {
-		states.back()->Cleanup();
+		states.back()->reset();
 		states.pop_back();
 	}
 }
 
 //Events/Update/Draw - usually passed to active State
-void Game::HandleEvents(Event event,sf::Event sf_event)
+void Game::handleEvents(Event event,sf::Event sf_event)
 {
 	event.loadFromMousePos(sf::Mouse::GetPosition(*window));					
 	if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
@@ -53,94 +53,95 @@ void Game::HandleEvents(Event event,sf::Event sf_event)
 		event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
 			
 		// Close window : exit
-		if (event.type == CLOSED)
-		{
-			window->Close();
-			Quit();
-		}
-
-		//Let the active GameState handle anything else :)
-		states.back()->HandleEvents(this,&event);
+		if (event.type == CLOSED || event.key == K_Q)
+			quit();
+		
+		else
+			states.back()->handleEvents(this, &event);	// Pass to active state
 	}
 }
 
-void Game::Update()
+void Game::update()
 {
 	//let the current active state perform updates
-	states.back()->Update(this);
+	states.back()->update(this);
 }
-void Game::Draw()
+void Game::draw()
 {
 	//Clear screen
 	window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
 
 	//let the current active state draw
-	states.back()->Draw(this);
+	states.back()->draw(this);
 
 	//Display shizzle
 	window->Display();	// Refresh the window
 }
 
-void Game::ChangeState(GameState* state) 
+void Game::changeState(GameState *state)
 {
-	// cleanup the current state
+	// Destroy the current state
 	if ( !states.empty() ) {
-		states.back()->Cleanup();
+		states.back()->reset();
 		states.pop_back();
 	}
 
-	// store and init the new state
+	// Add the new state
 	states.push_back(state);
-	states.back()->Init(window, &eventHandler);
+	states.back()->init(window, &eventHandler);
 }
 
-void Game::PushState(GameState* state)
+void Game::pushState(GameState* state)
 {
-	// pause current state
+	// Pause current state
 	if ( !states.empty() ) {
-		states.back()->Pause();
+		states.back()->pause();
 	}
 
-	// store and init the new state
+	// Add the new state
 	states.push_back(state);
-	states.back()->Init(window, &eventHandler);
+	states.back()->init(window, &eventHandler);
 }
 
-void Game::PopState()
+void Game::popState()
 {
-	// cleanup the current state
+	// Clean up the current state
 	if ( !states.empty() ) {
-		states.back()->Cleanup();
+		states.back()->reset();
 		states.pop_back();
 	}
 
-	// resume previous state
+	// Resume previous state
 	if ( !states.empty() ) {
-		states.back()->Resume();
+		states.back()->resume();
 	}
 }
 
-void Game::Run()
+void Game::run()
 {
-	//Switch to Level State
-	ChangeState(Level::Instance());
+	// Switch to Level state
+	changeState(Level::instance());
 
 	sf::Event sf_event;
 	Event event;
 
-	while (Running())
+	while (running())
     {
 		// Events
-		HandleEvents(event,sf_event);
+		handleEvents(event,sf_event);
 		
-		//Updates
-		Update();
+		// Updates
+		update();
 
 		// Drawing
-		Draw();
+		draw();
     }
 
-	//We left the game loop
-	Cleanup();
+	// We left the game loop
+	cleanStates();
+}
 
+void Game::quit() {
+	is_running = false;
+	window->Close();
 }

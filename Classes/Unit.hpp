@@ -15,8 +15,9 @@
 #include "EventResponder.hpp"
 #include "NavMap.hpp"
 
-#define S_IDLE 1
-#define S_TRAVELING 2
+#define S_IDLE      1		// Doing nothing
+#define S_TRAVELING 2		// Traveling along a route
+#define S_WAITING   3		// Periodically retrying finding a path to destination
 
 class Unit : public EventResponder
 {
@@ -27,12 +28,11 @@ public:
 	// Methods
 	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);	// Override to handle events
 	char col();
-	void goSomewhere(int x, int y);
 	void update();
 
 	// Properties
 	float a, b;		// Floating point offset from block
-	int destX, destY;
+	int dest_x, dest_y;
 	
 	bool destroyed;
 	
@@ -42,11 +42,15 @@ public:
 protected:
 	// Methods
 	void nextInRoute();
+	void setToIdle();
+	void setToTraveling();
+	void setToWaiting();
+	void incrementLocation();
 
 	// Properties
 	NavMap *navmap;
 	std::vector<NavNode*> route;
-	
+	int frames_waited;
 };
 
 #endif

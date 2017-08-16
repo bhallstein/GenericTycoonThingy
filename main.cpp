@@ -13,7 +13,7 @@ int main(int argc, char *argv[], char *envp[])
 {
 	srand(time(0));
 	
-	//create SettingsManager
+	// Create SettingsManager
 	SettingsManager dbt_settings(argv);
 
 	// Create game window
@@ -21,5 +21,5 @@ int main(int argc, char *argv[], char *envp[])
 
 	// Start game
 	Game g(&dbt_window,&dbt_settings);
-	g.Run();
+	g.run();
 }
