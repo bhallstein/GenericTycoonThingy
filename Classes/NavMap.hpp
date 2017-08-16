@@ -14,9 +14,7 @@
 #define NavMap_H
 
 #include <iostream>
-#include <list>
 #include <vector>
-#include <set>
 
 #include "types.h"
 #include "MappedObj.hpp"

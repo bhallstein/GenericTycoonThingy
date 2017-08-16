@@ -189,18 +189,21 @@ void ScrollingView::convertEventToBlockCoordinates(Event *ev) {
 	if (x < 0 || y < 0 || x >= r_pos - l_pos || y >= b_pos - t_pos)
 		return;
 
-	int scrollMargin = 30;
-	if (x <= scrollMargin)					scroll_x -= scrollMargin - x;
-	else if (x >= r_pos - scrollMargin)		scroll_x += x - r_pos + scrollMargin;
-	if (y <= scrollMargin)					scroll_y -= scrollMargin - y;
-	else if (y >= b_pos - scrollMargin)		scroll_y += y - b_pos + scrollMargin;
-    
-	int max_scroll_x = block_pixel_width  * grid_w - (r_pos - l_pos);
-	int max_scroll_y = block_pixel_height * grid_h - (b_pos - t_pos);
-	if (scroll_x < 0) scroll_x = 0;
-	else if (scroll_x >= max_scroll_x) scroll_x = max_scroll_x;
-	if (scroll_y < 0) scroll_y = 0;
-	else if (scroll_y >= max_scroll_y) scroll_y = max_scroll_y;
+	if (window->GetWidth() < block_pixel_width * grid_w) {
+		if (x <= SCROLL_MARGIN)					scroll_x -= SCROLL_MARGIN - x;
+		else if (x >= r_pos - SCROLL_MARGIN)	scroll_x += x - r_pos + SCROLL_MARGIN;
+		int max_scroll_x = block_pixel_width * grid_w - (r_pos - l_pos);
+		if (scroll_x < 0) scroll_x = 0;
+		else if (scroll_x >= max_scroll_x) scroll_x = max_scroll_x;
+	}
+
+	if (window->GetHeight() < block_pixel_height * grid_h) {	
+		if (y <= SCROLL_MARGIN)					scroll_y -= SCROLL_MARGIN - y;
+		else if (y >= b_pos - SCROLL_MARGIN)	scroll_y += y - b_pos + SCROLL_MARGIN;
+		int max_scroll_y = block_pixel_height * grid_h - (b_pos - t_pos);
+		if (scroll_y < 0) scroll_y = 0;
+		else if (scroll_y >= max_scroll_y) scroll_y = max_scroll_y;
+	}
 }
 void ScrollingView::drawRect(sf::Color colour, int _x, int _y, int _w, int _h, float a_offset, float b_offset) {
 	// Calculate position & dimensions of rect

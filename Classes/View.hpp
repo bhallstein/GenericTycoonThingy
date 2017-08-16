@@ -53,6 +53,7 @@
 #include "EventResponder.hpp"
 #include "MappedObj.hpp"
 
+#define SCROLL_MARGIN 30
 
 class View {
 public:

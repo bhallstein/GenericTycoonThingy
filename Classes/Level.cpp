@@ -80,7 +80,6 @@ Building* Level::createBuilding(int atX, int atY) {
 	buildings.push_back(b);
 	levelview->addResponder(b);
 	navmap->addBuilding(b);
-	//navmap->addImpassableObject(b);
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
@@ -128,7 +127,7 @@ void Level::destroyAllThings() {
 
 void Level::updateObjects() {
 	if (framecount == 180) framecount = 0;
-	if (10 == framecount++) createUnit(0, 0);	// Create a new unit every so often
+	if (10 == framecount++) createUnit(rand()%w, rand()%h);	// Create a new unit every so often
 	
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();
