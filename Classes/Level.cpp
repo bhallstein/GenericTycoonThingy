@@ -42,25 +42,28 @@ void Level::createPlaceable() {
 	return;
 }
 void Level::destroyThings() {
-	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); i++)
+	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); )
 		if ((*i)->destroyed) {
 			levelview->removeResponder(*i);
 			navmap->removeImpassableObject(*i);
 			delete *i;
-			i = placeables.erase(i) - 1;
+			i = placeables.erase(i);
 		}
-	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
+		else i++;
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end();)
 		if ((*i)->destroyed) {
 			levelview->removeResponder(*i);
 			navmap->removeImpassableObject(*i);
 			delete *i;
-			i = buildings.erase(i) - 1;
+			i = buildings.erase(i);
 		}
-	for (std::vector<Unit*>::iterator i = units.begin(); i < units.end(); i++)
+		else i++;
+	for (std::vector<Unit*>::iterator i = units.begin(); i < units.end(); )
 		if ((*i)->destroyed) {
 			delete *i;
-			i = units.erase(i) - 1;
+			i = units.erase(i);
 		}
+		else i++;
 }
 void Level::destroyAllThings() {
 	for (int i=0; i < placeables.size(); i++)   placeables[i]->destroyed = true;
