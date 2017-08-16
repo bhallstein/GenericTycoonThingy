@@ -49,7 +49,6 @@ public:
 	// GameState function implementations
 	void resume(W::Returny *);
 	void update();
-	void setResolution();
 	
 	void pause();
 	void unpause();
@@ -65,15 +64,15 @@ public:
 	Unit*       createUnit(int atX, int atY, const char *type);
 	Building*   createBuilding(W::position &, const char *type, std::vector<W::rect> *plan);
 	Furnishing* createFurnishing(const char *type, bool placeableMode = true, int atX = 0, int atY = 0);
-	Behaviour*  createBehaviour(const char *type);
+	void  addBehaviour(Behaviour *);
 	void purchaseFurnishing(const char *type);
 	void hireStaff(const char *type);
 	
 	void destroyThings();
 	void destroyAllThings();
 	
-	Building* randomBuildingWithType(const char *);
-	Building* buildingAtLocation(int x, int y);
+	Building* randomBuildingWithType(const char *);	// Returns NULL if none of the given type exists
+	Building* buildingAtPosition(const W::position &);
 	
 	// View stuff
 	void openFurnishingPurchasingView(Building *);

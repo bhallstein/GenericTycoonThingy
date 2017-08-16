@@ -3,6 +3,7 @@
 #include "Level.hpp"
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"
+#include "Behaviour.hpp"
 #include "W.h"
 
 // Initialize static members
@@ -14,21 +15,18 @@ bool Building::initialized = false;
 std::vector<std::map<Furnishing*, Unit*>::iterator> Building::_ind_array;
 
 Building::Building(W::EventHandler *_eh, W::NavMap *_nm, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *_level) :
-	TLO(_eh), navmap(_nm), type(_type), level(_level), clicked(false), time_hovered(0), hover(false)
+	TLO(_eh),
+	navmap(_nm), type(_type), level(_level),
+	clicked(false), time_hovered(0), hover(false), customerCount(0)
 {
-	pos   = _pos;
-	plan  = *_plan;
+	pos  = _pos;
+	plan = *_plan;
+	bInfo = &Building::buildingTypes[type];	// Save ptr to properties for this building type
 	
 	eh->subscribeToEventType(W::EventType::LEVEL_LEFTMOUSEDOWN, W::Callback(&Building::receiveEvent, this));
 	
-	// Get properties for this building type
-	b_colour             = Building::buildingTypes[type].col;
-	b_hoverColour        = Building::buildingTypes[type].hoverCol;
-	b_allowedFurnishings = &Building::buildingTypes[type].allowedFurnishings;
-	
 	if (!navmap->isPassableUnder(this))
 		throw W::Exception("Navmap was not passable under Building plan.");
-	
 	navmap->isolate(this);
 }
 Building::~Building()
@@ -44,40 +42,45 @@ void Building::receiveEvent(W::Event *ev) {
 }
 
 void Building::update() {
+	if (!buildingIsAtCapacity()) dequeueCustomer();
+	
 	// Queue dispatch
-	for (std::vector<Unit*>::iterator itQ = Q.begin(); itQ < Q.end(); ) {
-		Unit *u = *itQ;
-		Building::_ind_array.clear();
-		if (u->nextBehaviour.empty()) {
-			level->createBehaviour("despawn")->init(u);
-			itQ = Q.erase(itQ);
-			continue;
-		}
-		const char *beh = u->nextBehaviour.c_str();
-		// Get random Furnishing f ready for behaviour
-		std::map<Furnishing*, Unit*>::iterator itB;
-		for (itB = staffBindings.begin(); itB != staffBindings.end(); itB++)
-			if (itB->first->readyForBehaviour(beh) && itB->second->readyForBehaviour(beh))
-				Building::_ind_array.push_back(itB);
-		int nFound = (int) Building::_ind_array.size();
-		if (nFound == 0)
-			itQ++;
-		else {
-			itB = Building::_ind_array[W::randUpTo(nFound)];
-			Furnishing *f = itB->first;
-			Unit *s = itB->second;
-			level->createBehaviour(beh)->init(level, u, s, f);
-			u->nextBehaviour.clear();
-			itQ = Q.erase(itQ);
-		}
-	}
+//	for (std::vector<Unit*>::iterator itQ = Q.begin(); itQ < Q.end(); ) {
+//		Unit *u = *itQ;
+//		Building::_ind_array.clear();
+//		if (u->nextBehaviour.empty()) {
+//			level->createBehaviour("despawn")->init(u);
+//			itQ = Q.erase(itQ);
+//			continue;
+//		}
+//		const char *beh = u->nextBehaviour.c_str();
+//		// Get random Furnishing f ready for behaviour
+//		std::map<Furnishing*, Unit*>::iterator itB;
+//		for (itB = staffBindings.begin(); itB != staffBindings.end(); itB++)
+//			if (itB->first->readyForBehaviour(beh) && itB->second->readyForBehaviour(beh))
+//				Building::_ind_array.push_back(itB);
+//		int nFound = (int) Building::_ind_array.size();
+//		if (nFound == 0)
+//			itQ++;
+//		else {
+//			itB = Building::_ind_array[W::randUpTo(nFound)];
+//			Furnishing *f = itB->first;
+//			Unit *s = itB->second;
+//			level->createBehaviour(beh)->init(level, u, s, f);
+//			u->nextBehaviour.clear();
+//			itQ = Q.erase(itQ);
+//		}
+//	}
 }
 
 W::Colour& Building::col() {
-	if (hover) { hover = false; return b_hoverColour; }
-	return b_colour;
+	if (hover) { hover = false; return bInfo->hoverCol; }
+	return bInfo->col;
 }
 
+void Building::getQueuePoint(W::position &p) {
+	p = pos;
+}
 //void Building::getEntryPoint(int *_x, int *_y) {
 //	// TODO: handle case where there are no doors
 //	std::cout << "doors: " << doors.size() << std::endl;
@@ -89,54 +92,56 @@ W::Colour& Building::col() {
 //	else if (d.orientation == Direction::RIGHTWARD) *_x += 1;
 //	else if (d.orientation == Direction::LEFTWARD)  *_x -= 1;
 //}
-void Building::getQueuePoint(int *_x, int *_y) {
-	*_x = pos.x;
-	*_y = pos.y;
+bool Building::buildingIsAtCapacity() {
+	return customerCount <= furnishings.size();
 }
-void Building::addToQueue(Unit *u) {
-	Q.push_back(u);
+void Building::queueCustomer(CustomerBehaviour *_cb) {
+	Q.push(_cb);
 }
+void Building::dequeueCustomer() {
+	if (Q.size() == 0) return;
+	CustomerBehaviour *cb = Q.front();
+	Q.pop();
+	cb->buildingAccessGranted();
+}
+void Building::customerEntering() { customerCount++; }
+void Building::customerLeaving() { customerCount--; }
+
 void Building::addFurnishing(Furnishing *f) {
 	furnishings.push_back(f);
-	// If there is a free staff, bind it to the furnishing
-	for (std::vector<Unit*>::iterator itS = staff.begin(); itS < staff.end(); itS++) {
-		Unit *staffUnit = *itS;
-		bool isBound = false;
-		for (std::map<Furnishing*, Unit*>::iterator itB = staffBindings.begin(); itB != staffBindings.end(); itB++)
-			if (itB->second == staffUnit) {
-				isBound = true;
-				break;
-			}
-		if (!isBound) {
-			staffBindings[f] = staffUnit;
-			break;
-		}
-	}
 }
 void Building::removeFurnishing(Furnishing *f) {
-	staffBindings.erase(f);
 	for (std::vector<Furnishing *>::iterator it = furnishings.begin(); it != furnishings.end(); )
 		if (*it == f) it = furnishings.erase(it);
 		else ++it;
 }
-void Building::addStaff(Unit *s) {
-	staff.push_back(s);
-	// Add to unstaffed furnishing, if any
-	for (int i=0; i < furnishings.size(); i++) {
-		Furnishing *f = furnishings[i];
-		if (f->requiresStaff(s->type.c_str()) && staffBindings.count(f) == 0) {
-			staffBindings[f] = s;
-			break;
-		}
-	}
+Furnishing* Building::getRandomAvailableFurnishing() {
+	std::vector<Furnishing *> availables;
+	int n = 0;
+	for (std::vector<Furnishing*>::iterator it = furnishings.begin(); it < furnishings.end(); it++)
+		if ((*it)->isAvailable())
+			availables.push_back(*it), n++;
+	if (n) return availables[W::randUpTo(n)];
+	return NULL;
 }
-void Building::removeStaff(Unit *s) {
-	for (std::vector<Unit*>::iterator it = staff.begin(); it < staff.end(); )
-		if (*it == s) it = staff.erase(it);
+
+void Building::addShopKeeper(ShopKeeperBehaviour *_skb) {
+	removeShopKeeper(_skb);
+	shopKeeperBehaviours.push_back(_skb);
+}
+void Building::removeShopKeeper(ShopKeeperBehaviour *_skb) {
+	for (std::vector<ShopKeeperBehaviour*>::iterator it = shopKeeperBehaviours.begin(); it < shopKeeperBehaviours.end(); )
+		if (*it == _skb) it = shopKeeperBehaviours.erase(it);
 		else it++;
-	for (std::map<Furnishing*, Unit*>::iterator it = staffBindings.begin(); it != staffBindings.end(); )
-		if (it->second == s) staffBindings.erase(it++);
-		else ++it;
+}
+ShopKeeperBehaviour* Building::getRandomAvailableShopKeeperBehaviour() {
+	std::vector<ShopKeeperBehaviour*> availables;
+	int n = 0;
+	for (std::vector<ShopKeeperBehaviour*>::iterator it = shopKeeperBehaviours.begin(); it < shopKeeperBehaviours.end(); it++)
+		if ((*it)->isAvailable())
+			availables.push_back(*it), n++;
+	if (n) return availables[W::randUpTo(n)];
+	return NULL;
 }
 
 bool Building::objIsEntirelyInsideBuilding(W::MappedObj *obj) {
@@ -195,8 +200,7 @@ bool Building::initialize() {
 		Building::defaultColour      = strToColour(mrLua.getvalue<const char *>("defaultColour"));
 		Building::defaultHoverColour = strToColour(mrLua.getvalue<const char *>("defaultHoverColour"));
 	} catch (W::Exception &exc) {
-		std::string s = "In buildings.lua, could not get defaults. Error: "; s.append(exc.msg);
-		W::log << s << std::endl;
+		W::log << "In buildings.lua, could not get defaults. Error: " << exc.what() << std::endl;
 	}
 	
 	// Construct Building::buildingTypes map

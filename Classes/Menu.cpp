@@ -56,10 +56,8 @@ void Menu::startLevel(std::string path) {
 		level = new Level(win, path);
 		W::pushState(level);
 		W::log << "Level started" << std::endl;
-	} catch (W::Exception &ex) {
-		std::string msg = "Oh noes! ";
-		msg.append(ex.msg);
-		std::cout << msg << std::endl;
+	} catch (W::Exception &exc) {
+		std::cout << "Oh noes! " << exc.what() << std::endl;
 //		theW->warning(msg.c_str());
 	}
 }

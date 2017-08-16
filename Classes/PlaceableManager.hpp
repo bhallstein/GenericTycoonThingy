@@ -1,5 +1,5 @@
 /*
- * MappedObj.hpp - abstract base class for objects to be drawn on the map
+ * PlaceableManager.hpp - 
  *
  */
 

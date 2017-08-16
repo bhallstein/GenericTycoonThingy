@@ -9,6 +9,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <queue>
 
 #include "types.hpp"
 #include "TLO.hpp"
@@ -17,6 +18,10 @@ class Level;
 class LuaHelper;
 class Unit;
 class Furnishing;
+class Behaviour;
+class CustomerBehaviour;
+class DispatchingBehaviour;
+class ShopKeeperBehaviour;
 
 struct buildingInfo {
 	W::Colour col, hoverCol;
@@ -30,22 +35,26 @@ public:
 	
 	// Properties
 	std::string type;
-	W::Colour b_colour;
-	W::Colour b_hoverColour;
-	std::vector<std::string> *b_allowedFurnishings;
+	struct buildingInfo *bInfo;
 	
 	// Methods
 	void receiveEvent(W::Event *);		// Handle mouse events
 	void update();
 	W::Colour& col();
 	
+	void getQueuePoint(W::position &);
+	void queueCustomer(CustomerBehaviour *);
+	void customerEntering();	// Behaviours must call these so building can track how
+	void customerLeaving();		// many customers are inside it
 //	void getEntryPoint(int *_x, int *_y);
-	void getQueuePoint(int *_x, int *_y);
-	void addToQueue(Unit *);
+
 	void addFurnishing(Furnishing *);
 	void removeFurnishing(Furnishing *);
-	void addStaff(Unit *);
-	void removeStaff(Unit *);
+	Furnishing* getRandomAvailableFurnishing();
+
+	void addShopKeeper(ShopKeeperBehaviour *);
+	void removeShopKeeper(ShopKeeperBehaviour *);
+	ShopKeeperBehaviour* getRandomAvailableShopKeeperBehaviour();
 	
 	bool objIsEntirelyInsideBuilding(W::MappedObj *);
 	
@@ -59,11 +68,18 @@ protected:
 	int time_hovered;
 	W::NavMap *navmap;
 	Level *level;
-	// Dispatchery
-	std::vector<Unit*> Q;
-	std::vector<Unit*> staff;
+
+	// Customers waiting to enter the shop
+	std::queue<CustomerBehaviour*> Q;
+	void dequeueCustomer();
+	bool buildingIsAtCapacity();
+	int customerCount;
+	
 	std::vector<Furnishing*> furnishings;
-	std::map<Furnishing*, Unit*> staffBindings;
+	std::vector<DispatchingBehaviour*> tryoutBehaviours;
+	std::vector<ShopKeeperBehaviour*> shopKeeperBehaviours;
+	
+//	std::map<Furnishing*, Unit*> staffBindings;
 	
 	// Info on building types, saved as static members for private use by Building & its instances.
 	static std::map<std::string, struct buildingInfo> buildingTypes;	// e.g. "pieshop" => struct buildingInfo { }

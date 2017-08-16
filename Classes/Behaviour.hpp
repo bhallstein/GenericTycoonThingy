@@ -8,6 +8,7 @@
 
 #include <string>
 #include <map>
+#include <queue>
 
 #include "types.hpp"
 #include "TLO.hpp"
@@ -21,52 +22,29 @@ class Furnishing;
 class Level;
 class LuaHelper;
 
-class BehaviourBase;
-
-class Behaviour {
+class Behaviour : public TLO {
 public:
-	Behaviour(const char *_type, W::EventHandler *);
-	~Behaviour();
-	static bool initialize();
-	void update();
-	bool destroyed();
-	void destroy();
-	const char * getType();
-	void init(Unit *u);
-	void init(Level *, Unit *);
-	void init(Unit *, Unit *, Furnishing *);
-	void init(Level *l, Unit *, Unit *, Furnishing *);
-protected:
-	BehaviourBase *b;
-	std::string type;
-	W::EventHandler *eh;
-};
-
-class BehaviourBase : public TLO {
-public:
-	BehaviourBase(W::EventHandler *_eh) : TLO(_eh), stage(0), waiting(false), initialized(false) { };
-	virtual ~BehaviourBase() { }
+	Behaviour(W::EventHandler *);
+	virtual ~Behaviour();
 	void update() {
-		if (!initialized) throw W::Exception("update called on uninitialized Behaviour object");
-		if (waiting && ++frames_waited >= WAIT_PERIOD)
-			waiting = false;
+		// This waiting routine is provided so that subclasses can simply
+		// call wait() to wait a fixed amount of time
+		if (waiting) {
+			if (++frames_waited >= WAIT_PERIOD)
+				waiting = false;
+		}
 		else
 			_update();
 	}
 	virtual void _update() = 0;
-	virtual void init(Unit *) { }
-	virtual void init(Level *, Unit *) { }
-	virtual void init(Unit *, Unit *, Furnishing *) { }
-	virtual void init(Level *, Unit *, Unit *, Furnishing *) { }
-	
 	static bool initialize();
+	void destroy() { destroyed = true; }
 	
 protected:
-	int stage;
+	int stage;				// Stages always start at zero
 	int frames_waited;
 	bool waiting;
-	bool initialized;		// The init override should set this to true when done
-	virtual void wait() {
+	void wait() {
 		frames_waited = 0;
 		waiting = true;
 	}
@@ -75,66 +53,164 @@ protected:
 	static bool lua_initialized;
 };
 
-class DespawnBehaviour : public BehaviourBase {
+
+/*
+	SuperBehaviours implement broader tasks such as "being a customer",
+	work by chaining behaviours together.
+*/
+
+class SuperBehaviour /* to the rescue */ : public Behaviour {
 public:
-	DespawnBehaviour(W::EventHandler *_eh) : BehaviourBase(_eh) { }
-	void init(Unit *);
+	SuperBehaviour(W::EventHandler *);
+	virtual ~SuperBehaviour();
 	void _update();
+	virtual void _superupdate() = 0;	// Implementation for SBs goes in this override
+	void unsuspend();
 protected:
-	Unit *unit;
+	Behaviour *yield_behaviour;		// A yield behaviour is one created by the SB itself
+	void yield(Behaviour *);
+	void unyield();				// Deletes yield_behaviour & resumes updating the SB
+	bool suspended;			// When a SB instead dispatches a unit U to an externally owned
+	void suspend();			// dispatching behaviour E, it should then call suspend. E is responsible
+							// for calling unsuspend when it has finished with U.
 };
 
+/*
+	Yielding
+	- When a SB creates another behaviour, it yields to it.
+	- After yield is called, the SB will call the yield behaviour’s update method indstead of its own.
+	- When the yield behaviour sets itself to destroyed with destroy(), the SB will call unyield.
+	  This deletes yield_behaviour and resumes updating the SB.
+ 
+	Suspending
+	- When a SB dispatches a unit U to an externally owned dispatching behaviour B, it should then call suspend.
+	- E is responsible for calling unsuspend when it has finished with U.
+ 
+	NOTE
+	- If the SB has captured participants, they should be creating a new behaviour or dispatching a unit to a dispatching behaviour.
+*/
 
-/* SeekBehaviour: navigating a unit to a building of the required type */
 
-struct seekBehaviourInfo {
-	std::string requisiteBuildingType;
-	std::string followingBehaviour;
-};
-
-class SeekBehaviour : public BehaviourBase {
+class CustomerBehaviour : public SuperBehaviour {
 public:
-	SeekBehaviour(const char *_type, W::EventHandler *_eh);
-	static bool initialize();
-	void init(Level *, Unit *);
-	void _update();
-protected:
-	Level *level;
-	Unit *unit;
-	Building *building;
+	CustomerBehaviour(W::EventHandler *, Unit *, Level *);
+	~CustomerBehaviour();
+	void _superupdate();
 	
-	static bool lua_initialized;
-	static std::map<std::string, struct seekBehaviourInfo> types;
-	std::string type;
-	struct seekBehaviourInfo *bType;
+	void buildingAccessGranted();	// Called by Building when dequeueing a unit from its queue
+protected:
+	Unit *customer;
+	Level *level;
+	Building *destination_building;
+	Furnishing *itemForPurchase;
 };
+
+
+/*
+	"Normal" behaviours
+*/
+
+class RouteBehaviour : public Behaviour {
+public:
+	RouteBehaviour(W::EventHandler *, Unit *, W::position &_dest);
+	~RouteBehaviour();
+	void _update();
+private:
+	Unit *unit;
+	W::position dest;
+};
+
+
+/*
+	Dispatching Behaviours
+*/
+
+class DispatchingBehaviour : public SuperBehaviour {
+public:
+	DispatchingBehaviour(W::EventHandler *);
+	virtual bool dispatchUnit(Unit *, SuperBehaviour *) { return false; }
+	virtual bool dispatchUnit(Unit *, Furnishing *, SuperBehaviour *) { return false; }
+	virtual void finishedDispatch() = 0;	// When DB has finished performing task, should unsuspend its calling SB
+	bool isAvailable();
+protected:
+	bool available;
+	// Relating to particular dispatch instance
+	SuperBehaviour *sb;
+};
+
+class ShopKeeperBehaviour : public DispatchingBehaviour {
+public:
+	ShopKeeperBehaviour(W::EventHandler *, Unit *, Level *);
+	void _superupdate();
+	bool dispatchUnit(Unit *, Furnishing *, SuperBehaviour *);
+	void finishedDispatch();
+	
+	void unitWasPickedUp();
+	void unitWasPutDown();
+	
+protected:
+	Unit *sk;
+	Building *contextBuilding;
+	Level *level;
+
+	// Relating to particular dispatch instance
+	Unit *customer;
+	Furnishing *furnishing;
+};
+
+class PurchaseBehaviour : public Behaviour {
+public:
+	PurchaseBehaviour(W::EventHandler *, Unit *_customer, Unit *_staff, Furnishing *, Level *);
+	void _update();
+private:
+	Unit *customer;
+	Unit *staff;
+	Furnishing *furnishing;
+	Level *level;
+};
+
+//class QueueBehaviour : public DispatchingBehaviour {
+//public:
+//	QueueBehaviour(W::EventHandler *, Building *, int _qsize);
+//	~QueueBehaviour();
+//	void _update();
+//	bool dispatchUnit(Unit *, SuperBehaviour *);	// NB: dispatch *to* the queue, not from it!
+//private:
+//	std::queue<Unit*> Q;
+//	bool queue(Unit *, SuperBehaviour *);
+//	void dequeue();
+//	std::map<Unit*, SuperBehaviour*> sbs;
+//	
+//	Building *shop;
+//	int qsize;
+//};
 
 
 /* ServiceBehaviour: a unit interacts with a placeable & a staff unit */
 
-struct serviceBehaviourInfo {
-	int charge;
-};
-
-class ServiceBehaviour : public BehaviourBase {
-public:
-	ServiceBehaviour(const char *_type, W::EventHandler *_eh);
-	~ServiceBehaviour();
-	static bool initialize();
-	void init(Level *, Unit *u, Unit *s, Furnishing *f);
-	void _update();
-	void receiveEvent(W::Event *);
-protected:
-	Level *level;
-	Unit *unit, *staff;
-	Furnishing *furnishing;
-	
-	Building *contextBuilding;	// Used in interruption
-	
-	static bool lua_initialized;
-	static std::map<std::string, struct serviceBehaviourInfo> types;
-	std::string type;
-	struct serviceBehaviourInfo *bType;
-};
+//struct serviceBehaviourInfo {
+//	int charge;
+//};
+//
+//class ServiceBehaviour : public Behaviour {
+//public:
+//	ServiceBehaviour(W::EventHandler *_eh);
+//	~ServiceBehaviour();
+//	static bool initialize();
+//	void init(Level *, Unit *u, Unit *s, Furnishing *f);
+//	void _update();
+//	void receiveEvent(W::Event *);
+//protected:
+//	Level *level;
+//	Unit *unit, *staff;
+//	Furnishing *furnishing;
+//	
+//	Building *contextBuilding;	// Used in interruption
+//	
+//	static bool lua_initialized;
+//	static std::map<std::string, struct serviceBehaviourInfo> types;
+//	std::string type;
+//	struct serviceBehaviourInfo *bType;
+//};
 
 #endif

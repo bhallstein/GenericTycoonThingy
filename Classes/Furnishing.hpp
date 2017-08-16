@@ -39,7 +39,8 @@ public:
 	virtual void finalizePlacement();
 	W::Colour& col();
 	
-	void getInteractionPoint(const char *_unitType, int *_x, int *_y);
+	void getInteractionPoint(const char *_unitType, W::position &);
+		// Throws exception if no IP exists for the given unit type
 	bool requiresStaff(const char *uType);
 	void runAnimation(int duration);
 	bool animationFinished;
@@ -49,10 +50,7 @@ public:
 
 	static int costForType(const char *);
 protected:
-	W::Colour f_colour;
-	W::Colour f_hoverColour;
-	std::vector<std::string> *f_compatibleBehaviours;
-	std::map<std::string, W::position> *f_interactionPoints;
+	struct furnishingInfo *fInfo;
 	std::vector<std::string>* getCompatibleBehaviours();
 	
 	W::NavMap *navmap;

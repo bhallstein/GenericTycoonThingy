@@ -20,7 +20,7 @@ furnishingTypes = {
 		},
 		compatibleBehaviours = { "service:haircut" },
 		interactionPoints = {
-			civilian = {-1,0},
+			customer = {-1,0},
 			staff = {0,-1}
 		},
 		cost = 20
@@ -32,7 +32,7 @@ furnishingTypes = {
 		compatibleBehaviours = { "service:piesale" },
 		interactionPoints = {
 			staff = {1,-1},
-			civilian = {1,1}
+			customer = {1,1}
 		},
 		colour = "red",
 		hoverColour = "white",

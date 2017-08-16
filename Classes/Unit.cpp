@@ -16,19 +16,20 @@ bool Unit::initialized = false;
 
 Unit::Unit(W::EventHandler *_eh, W::NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
 	PlaceableManager(_eh, _placeableMode), navmap(_navmap), type(_type), level(_level),
-	contextBuilding(NULL), mode(IDLE), hired(false)
+	mode(IDLE), hired(false), skBehaviour(NULL)
 {
 	plan.resize(1);
 	W::rect *r = &plan[0];
 	r->sz.width = r->sz.height = 1;
 	
-	// Get properties for this unit type
-	unitInfo *t = &unitTypes[type];
-	u_colour               = t->col;
-	u_hoverColour          = t->hoverCol;
-	u_compatibleBehaviours = &t->compatibleBehaviours;
-	u_isStaff              = t->isStaff;
-	u_hireCost             = t->hireCost;
+	// Save ptr to properties for this unit type
+	std::map<std::string, unitInfo>::iterator it = unitTypes.find(type);
+	if (it == unitTypes.end()) {
+		char s[200];
+		sprintf(s, "Unit created of unknown type \"%s\"\n", _type);
+		throw W::Exception(s);
+	}
+	uInfo = &it->second;
 }
 Unit::~Unit()
 {
@@ -45,14 +46,12 @@ bool Unit::canPlace(int _x, int _y) {
 	return navmap->isPassableAt(_x, _y);
 }
 void Unit::finalizePlacement() {
-	if (placeableMode && u_isStaff) {
-		if (Building *b = level->buildingAtLocation(pos.x, pos.y))
-			b->addStaff(this), contextBuilding = b;
-		if (!hired) {
-			level->chargePlayer(Unit::hireCostForType(type.c_str()));
-			hired = true;
-		}
+	if (skBehaviour) skBehaviour->unitWasPutDown();
+	if (uInfo->isStaff && placeableMode) {
+		level->chargePlayer(uInfo->hireCost);
+		hired = true;
 	}
+	
 	using namespace W::EventType;
 	eh->subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Unit::receiveEvent, this));
 	eh->subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Unit::receiveEvent, this));
@@ -60,7 +59,7 @@ void Unit::finalizePlacement() {
 	eh->subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Unit::receiveEvent, this));
 	eh->subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Unit::receiveEvent, this));
 
-	prev_x = pos.x, prev_y = pos.y;
+	prev_pos = pos;
 }
 
 void Unit::receiveEvent(W::Event *ev) {
@@ -74,37 +73,38 @@ void Unit::receiveEvent(W::Event *ev) {
 	else if (ev->type == LEVEL_LEFTMOUSEDOWN)
 		printDebugInfo();
 	else if (ev->type == LEVEL_RIGHTMOUSEDOWN)
-		if (u_isStaff) pickUp();
+		if (uInfo->isStaff) pickUp();
 }
 
 W::Colour& Unit::col() {
-	if (hover) { hover = false; return u_hoverColour; }
-	return u_colour;
+	if (hover) { hover = false; return uInfo->hoverCol; }
+	return uInfo->col;
 }
 
 void Unit::update() {
 	if (hover) return;
 	else if (mode == IDLE) { }
-	else if (mode == WAITING && ++frames_waited >= 60) voyage(dest_x, dest_y);
+	else if (mode == WAITING && ++frames_waited >= 60) voyage(dest);
 	else if (mode == VOYAGING) { if (!incrementLocation()) wait(); }
 	else if (mode == ANIMATING) incrementAnimation();
 }
 
 /*** Utility methods ***/
 
-void Unit::getDespawnPoint(int *x, int *y) {
+void Unit::getDespawnPoint(W::position &p) {
 	int w = navmap->w, h = navmap->h, n = W::randUpTo(2*w + 2*h - 4);
-	if (n < w)            *x = n,     *y = 0;
-	else if (n < 2*w)     *x = n - w, *y = h - 1;
-	else if (n < 2*w + h) *x = 0,     *y = n - 2*w;
-	else                  *x = w - 1, *y = n - (2*w + h);
+	if (n < w)            p.x = n,     p.y = 0;
+	else if (n < 2*w)     p.x = n - w, p.y = h - 1;
+	else if (n < 2*w + h) p.x = 0,     p.y = n - 2*w;
+	else                  p.x = w - 1, p.y = n - (2*w + h);
 }
 void Unit::destroy() {
 	destroyed = true;
 }
-bool Unit::voyage(int _x, int _y) {
+bool Unit::voyage(const W::position &_dest) {
   	arrived = false;
-	bool success = navmap->getRoute(pos.x, pos.y, dest_x = _x, dest_y = _y, &route);
+	dest = _dest;
+	bool success = navmap->getRoute(pos.x, pos.y, dest.x, dest.y, &route);
 	if (success) mode = VOYAGING;
 	return success;
 }
@@ -124,13 +124,12 @@ void Unit::incrementAnimation() {
 }
 
 void Unit::pickUp() {
-	W::Event ev;
-	ev.setType(W::EventType::INTERRUPT_UNITPICKUP);
-	ev._payload = this;
-	eh->dispatchEvent(&ev);
+//	W::Event ev;
+//	ev.setType(W::EventType::INTERRUPT_UNITPICKUP);
+//	ev._payload = this;
+//	eh->dispatchEvent(&ev);
 	
-	if (contextBuilding) contextBuilding->removeStaff(this);
-	contextBuilding = NULL;
+	if (skBehaviour) skBehaviour->unitWasPickedUp();
 	
 	using namespace W::EventType;
 	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
@@ -156,7 +155,7 @@ bool Unit::incrementLocation() {
 	
 	float step = 0.10;
 	float a_diff = 0, b_diff = 0;
-	bool diagonal = pos.x != prev_x && pos.y != prev_y;
+	bool diagonal = pos.x != prev_pos.x && pos.y != prev_pos.y;
 	
 	// Check if we've reached the next loc. This happens
 	//  - for linears, when |a| < step or |b| < step
@@ -170,29 +169,29 @@ bool Unit::incrementLocation() {
 			// Get next in route
 			int c = route[0].x, d = route[0].y;
 			if (navmap->isPassableAt(c, d)) {
-				prev_x = pos.x, prev_y = pos.y;
+				prev_pos = pos;
 				pos.x = c, pos.y = d;
-				pos.a = prev_x == pos.x ? 0 : prev_x < pos.x ? -1 : 1;
-				pos.b = prev_y == pos.y ? 0 : prev_y < pos.y ? -1 : 1;
+				pos.a = prev_pos.x == pos.x ? 0 : prev_pos.x < pos.x ? -1 : 1;
+				pos.b = prev_pos.y == pos.y ? 0 : prev_pos.y < pos.y ? -1 : 1;
 				route.erase(route.begin());
 			}
 			else
-				return navmap->getRoute(pos.x, pos.y, dest_x, dest_y, &route);
+				return navmap->getRoute(pos.x, pos.y, dest.x, dest.y, &route);
 		}
 	}
 	else {
 		// Decrement a & b toward current loc
-		if (pos.x > prev_x)      a_diff = step;
-		else if (pos.x < prev_x) a_diff = -step;
-		if (pos.y > prev_y)      b_diff = step;
-		else if (pos.y < prev_y) b_diff = -step;
+		if (pos.x > prev_pos.x)      a_diff = step;
+		else if (pos.x < prev_pos.x) a_diff = -step;
+		if (pos.y > prev_pos.y)      b_diff = step;
+		else if (pos.y < prev_pos.y) b_diff = -step;
 		if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
 		pos.a += a_diff, pos.b += b_diff;
 	}
 	return true;
 }
 inline bool Unit::atDest() {
-	return dest_x == pos.x && dest_y == pos.y && pos.a == 0 && pos.b == 0;
+	return dest.x == pos.x && dest.y == pos.y && pos.a == 0 && pos.b == 0;
 }
 inline bool Unit::inHinterland() {
 	return (
@@ -202,7 +201,7 @@ inline bool Unit::inHinterland() {
 }
 
 std::vector<std::string>* Unit::getCompatibleBehaviours() {
-	return u_compatibleBehaviours;
+	return &uInfo->compatibleBehaviours;
 }
 
 bool Unit::initialize() {
@@ -224,8 +223,7 @@ bool Unit::initialize() {
 		Unit::defaultColour      = strToColour(mrLua.getvalue<const char *>("defaultColour"));
 		Unit::defaultHoverColour = strToColour(mrLua.getvalue<const char *>("defaultHoverColour"));
 	} catch (W::Exception &exc) {
-		std::string s = "In units.lua, could not get defaults. Error: "; s.append(exc.msg);
-		W::log << s << std::endl;
+		W::log << "In units.lua, could not get defaults. Error: " << exc.what() << std::endl;
 	}
 	
 	// Construct Unit::unitTypes map
@@ -294,13 +292,19 @@ bool Unit::initialize() {
 	Unit::initialized = true;
 	return true;
 }
-int Unit::hireCostForType(const char *_type) {
-	return unitTypes[_type].hireCost;
+unitInfo * Unit::infoForType(const char *_type) {
+	std::map<std::string, unitInfo>::iterator it = unitTypes.find(_type);
+	if (it == unitTypes.end()) {
+		char s[200];
+		sprintf(s, "hireCostForType called with nonexistent type \"%s\"\n", _type);
+		throw W::Exception(s);
+	}
+	return &it->second;
 }
 
 void Unit::printDebugInfo() {
 	printf("\nUnit %p - x,y:%d,%d a,b:%.1f,%.1f dest:%d,%d mode:%s\n\n",
-		this, pos.x, pos.y, pos.a, pos.b, dest_x, dest_y,
+		this, pos.x, pos.y, pos.a, pos.b, dest.x, dest.y,
 		mode == WAITING ? "WAITING" :
 		mode == VOYAGING ? "VOYAGING" :
 		mode == ANIMATING ? "ANIMATING" :

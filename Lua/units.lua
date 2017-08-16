@@ -4,13 +4,13 @@ defaultColour = "transparent black"
 defaultHoverColour = "blue"
 
 unitTypes = {
-	civilian = {
+	customer = {
 		compatibleBehaviours = {
 			"seek:haircut", "service:haircut",
 			"seek:pie", "service:piesale"
 		}
 	},
-	staff = {
+	shopkeeper = {
 		colour = "green",
 		hoverColour = "white",
 		isStaff = true,
