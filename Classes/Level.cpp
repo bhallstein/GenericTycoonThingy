@@ -586,7 +586,7 @@ UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, int
 	buttons.push_back(new Button(10, 10, 20, 20, "open hiring ui view"));
 }
 void UIBarView::draw() {
-	theW->drawRect(0, 0, width, height, "black");
+	theW->drawRect(0, 0, width, height, "black", 0, 0.3);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
@@ -611,10 +611,16 @@ FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston
 	}
 }
 void FurnishingPurchasingUIView::draw() {
-	theW->drawRect(0, 0, width, height, "black");
+	theW->drawRect(0, 0, width, height, "black", 0, 0.3);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
-		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+		if (i == 0) {
+			theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+			theW->drawRect(b->x+2, b->y+5, 8, 2, "white", 45);
+			theW->drawRect(b->x+2, b->y+5, 8, 2, "white", -45);
+		}
+		else
+			theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 }
 
@@ -624,10 +630,16 @@ HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_r
 	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));
 }
 void HiringUIView::draw() {
-	theW->drawRect(0, 0, width, height, "black");
+	theW->drawRect(0, 0, width, height, "black", 0, 0.3);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
-		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+		if (i==0) {
+			theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+			theW->drawRect(b->x+2, b->y+5, 8, 2, "white", 45);
+			theW->drawRect(b->x+2, b->y+5, 8, 2, "white", -45);
+		}
+		else
+			theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 }
 
@@ -638,10 +650,17 @@ GTTHelpView::GTTHelpView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm,
 }
 void GTTHelpView::draw() {
 	theW->drawRect(0, 0, width, height, "black", 0, 0.7);
-	for (int i=0, n = buttons.size(); i < n; i++) {
-		Button *b = buttons[i];
-		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
-	}
+
+	// Draw close button
+	Button *b = buttons[0];
+	theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	theW->drawRect(b->x+2, b->y+5, 8, 2, "white", 45);
+	theW->drawRect(b->x+2, b->y+5, 8, 2, "white", -45);
+//	for (int i=0, n = buttons.size(); i < n; i++) {
+//		Button *b = buttons[i];
+//		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+//	}
+	
 	theW->drawText(220, 10, "white", (char*)"Help");
 	theW->drawText(14, 54, "white", (char*)"place furniture and staff in your");
 	theW->drawText(14, 74, "white", (char*)"buildings. customers will come and");
