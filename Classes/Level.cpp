@@ -76,8 +76,7 @@ void Level::buildLevel(std::string levelname)
 		ab->defaultCol.alpha = mrLua.getSubfield<int>("colour","a");
 
 		//add other template properties here
-		mrLua.stackdump(mrLua.LuaInstance);
-		
+
 		//add this template
 		availableBuildings[ab->type] = ab;
 		
@@ -87,7 +86,6 @@ void Level::buildLevel(std::string levelname)
 	
 	//empty the stack for safety?
 	lua_settop(mrLua.LuaInstance,0);
-	mrLua.stackdump(mrLua.LuaInstance);
 	
 	//buildings
 	mrLua.pushtable("buildings");
