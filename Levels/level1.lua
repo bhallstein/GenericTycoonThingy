@@ -21,5 +21,11 @@ mapData = {
 	},
 	spawnPoints = {
 		
-	}
+	},
+	controllers = {
+		
+	},
+	inactiveControllers = {
+		
+	},
 }

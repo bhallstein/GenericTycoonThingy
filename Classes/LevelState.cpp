@@ -8,7 +8,7 @@
 #include "Building.hpp"
 #include "Furnishing.hpp"
 #include "Unit.hpp"
-#include "Behaviour.hpp"
+#include "Controller.hpp"
 
 LevelState::LevelState() :
 	levelView(NULL),
@@ -95,8 +95,8 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	if (!Building::initialize())   { W::log << "Couldn't initialize Building class"   << std::endl; return false; }
 	if (!Unit::initialize())       { W::log << "Couldn't initialize Unit class"       << std::endl; return false; }
 	if (!Furnishing::initialize()) { W::log << "Couldn't initialize Furnishing class" << std::endl; return false; }
-	if (!Behaviour::initialize())  { W::log << "Couldn't initialize Behaviour class"  << std::endl; return false; }
-	if (!CustomerBehaviour::initialize()) { W::log << "Couldn't initialize CustomerBehaviour class"  << std::endl; return false; }
+	Controller::initialize();
+	CustomerController::initialize();
 	
 	// Load level lua file
 	string path = MrPaths::resourcesPath + string("Levels/") + levelName + ".lua";

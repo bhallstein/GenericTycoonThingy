@@ -8,7 +8,6 @@
 #include "LevelState.hpp"
 #include "LevelView.hpp"
 #include "Placeable.hpp"
-#include "Behaviour.hpp"
 
 W::EventType::T W::EventType::INTERRUPT_UNITPICKUP = W::Event::registerType();
 
@@ -40,8 +39,7 @@ bool Unit::initialized = false;
 Unit::Unit(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode),
 	mode(UnitMode::IDLE),
-	hired(false),
-	behaviour(NULL)
+	hired(false)
 {
 	rct.setSz(W::size(1, 1));
 	
@@ -58,7 +56,7 @@ Unit::~Unit()
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
 	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
-	if (behaviour) delete behaviour;
+	UIDManager::unregisterTLO(this);
 	delete drawnUnit;
 }
 void Unit::setUp() {
@@ -76,8 +74,10 @@ void Unit::setUp() {
 	
 	// Perform set-up for units constructed programmatically
 	if (!deserialized) {
-		createBehaviour();
+		uid = UIDManager::getNewUID();
 	}
+	
+	UIDManager::registerTLO(this);
 	
 	// Set up state of DrawnUnit
 	// e.g. du.setSpriteSet()...
@@ -104,8 +104,6 @@ void Unit::update() {
 	if (mode == UnitMode::IDLE) { }
 	else if (mode == UnitMode::VOYAGING) { incrementLocation(); }
 	//	else if (mode == ANIMATING) { incrementAnimation(); }
-	
-	behaviour->update();
 }
 
 
@@ -183,7 +181,7 @@ bool Unit::canPlace(const W::position &_pos) {
 bool Unit::incrementLocation() {
 	if (rct.pos == dest) {
 		mode = UnitMode::IDLE;
-		behaviour->success();
+		controllerPtr()->success(this);
 		return true;
 	}
 	
@@ -271,38 +269,14 @@ bool Unit::initialize() {
 	sd["route"] = makeSerializer(&Unit::route);
 	sd["hired"] = makeSerializer(&Unit::hired);
 	sd["mode"]  = makeSerializer(&Unit::mode);
+	sd["controller"] = makeSerializer(&Unit::controller);
 	
 	return Unit::initialized = true;
 }
 
 
-/* Unit: Serialization-related */
-
-TLO::sdvec Unit::_getSDs() {
-	sdvec vec;
-	vec.push_back(&Unit::sd);
-	return vec;
-}
-void Unit::deserializeAdditionalProperties(LuaObj &o) {
-	createBehaviour();
-	behaviour->deserialize(o["behaviour"]);
-}
-void Unit::getAdditionalSerializedProperties(std::map<std::string, std::string> &m) {
-	m["behaviour"] = behaviour->serialize();
-}
-
 /* Unit: Other */
 
-void Unit::createBehaviour() {
-	using std::string;
-	if (type == "customer")
-		behaviour = new CustomerBehaviour(this);
-	else
-		throw W::Exception(
-			string("Error: couldn't create unit behaviour - unrecognised type '") +
-			type + string("'")
-		);
-}
 void Unit::printDebugInfo() {
 	printf("\nUnit %p - x,y:%d,%d a,b:%.1f,%.1f dest:%d,%d mode:%s\n\n",
 		this, rct.pos.x, rct.pos.y, rct.pos.a, rct.pos.b, dest.x, dest.y,

@@ -24,13 +24,14 @@ struct unitInfo {
 
 class LevelState;
 class LevelView;
-class Behaviour;
 class Furnishing;
+class Controller;
 
 class Unit : public PlaceableManager {
 public:
 	Unit(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Unit();
+	void setUp();
 		// When a unit is constructed, we may not yet know its type, which is therefore
 		// initially set to NO_TYPE.
 		// The unit must then be "set up".
@@ -39,7 +40,6 @@ public:
 		//   setUp() - perform setup (after type has been set)
 		
 		// Note: then also need to init() the Unit, since it is a PlaceableManager.
-	void setUp();
 	
 	// Event callbacks
 	W::EventPropagation::T mouseEvent(W::Event *);
@@ -54,11 +54,14 @@ public:
 	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
 	
-	class DrawnUnit;
+	// Unit state properties: regrettably, a big-ass list for now
+	// ...
+	
+	UID controller;
 	
 protected:
 	UnitMode::T mode;
-	Behaviour *behaviour;
+	Controller* controllerPtr() { return (Controller*) controller.get(); }
 	bool hired;
 	
 	// PlaceableManager overrides
@@ -76,21 +79,22 @@ protected:
 	
 	// Serialization
 	static serialization_descriptor sd;
-	sdvec _getSDs();
-	void deserializeAdditionalProperties(LuaObj &o);
-	void getAdditionalSerializedProperties(std::map<std::string, std::string> &m);
+	virtual void getSDs(sdvec &vec) {
+		PlaceableManager::getSDs(vec);
+		vec.push_back(&Unit::sd);
+	}
+	void deserializeAdditionalProperties(LuaObj &o) { }
+	void getAdditionalSerializedProperties(std::map<std::string, std::string> &m) { }
 	
 	// Type info
 	struct unitInfo *typeInfo;
 	static std::map<std::string, unitInfo*> unitTypeInfo;
 	
 	// Drawing
+	class DrawnUnit;
 	DrawnUnit *drawnUnit;
 	
 	// Other
-	void createBehaviour();
-		// Creates the appropriate Behaviour subclass
-
 	void printDebugInfo();
 };
 

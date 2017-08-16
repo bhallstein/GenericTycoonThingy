@@ -1,6 +1,11 @@
 #include "UIDManager.hpp"
 #include "TLO.hpp"
 
+TLO* UID::get() {
+	return UIDManager::getTLO(*this);
+}
+
+
 unsigned int UIDManager::currentID = 1;
 std::map<UID,UID> UIDManager::translationMap;
 std::map<UID,TLO*> UIDManager::lookupMap;

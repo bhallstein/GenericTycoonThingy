@@ -50,10 +50,9 @@ protected:
 	bool canPlace(const W::position &);
 	
 	// Serialization
-	sdvec _getSDs() {
-		sdvec vec;
+	virtual void getSDs(sdvec &vec) {
+		PlaceableManager::getSDs(vec);
 		vec.push_back(&Furnishing::sd);
-		return vec;
 	}
 	static serialization_descriptor sd;
 	

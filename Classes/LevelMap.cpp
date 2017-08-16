@@ -20,6 +20,7 @@ LevelMap::~LevelMap()
 void LevelMap::update() {
 	updateTLOVec(units);
 	updateTLOVec(furnishings);
+	updateTLOVec(controllers);
 }
 
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
@@ -86,6 +87,18 @@ bool LevelMap::load(LuaObj &mapData) {
 	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
 		createSpawnPoint(it->second);
 	
+	// Get controllers
+	LuaObj &controllersObj = mapData["controllers"];
+	d = &controllersObj.descendants;
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+		createController(it->second, true);
+	
+	// Get inactive controllers
+	LuaObj &inactiveControllersObj = mapData["inactiveControllers"];
+	d = &inactiveControllersObj.descendants;
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+		createController(it->second, false);
+	
 	return loaded = true;
 }
 
@@ -99,23 +112,37 @@ std::string LevelMap::save() {
 	// Units
 	ss << "units = {\n";
 	if (units.size() == 0) ss << "\n";
-	for (tloVec::iterator it = units.begin(), itend = units.end(); it < units.end(); ++it)
+	for (tloVec::iterator it = units.begin(), itend = units.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
 	ss << "},\n";
 	
 	// Furnishings
 	ss << "furnishings = {\n";
 	if (furnishings.size() == 0) ss << "\n";
-	for (tloVec::iterator it = furnishings.begin(), itend = furnishings.end(); it < furnishings.end(); ++it)
+	for (tloVec::iterator it = furnishings.begin(), itend = furnishings.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
 	ss << "},\n";
 	
 	// SPs
 	ss << "spawnPoints = {\n";
 	if (spawnPoints.size() == 0) ss << "\n";
-	for (tloVec::iterator it = spawnPoints.begin(), itend = spawnPoints.end(); it < spawnPoints.end(); ++it)
+	for (tloVec::iterator it = spawnPoints.begin(), itend = spawnPoints.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
-	ss << "}\n";
+	ss << "},\n";
+	
+	// Controllers
+	ss << "controllers = {\n";
+	if (controllers.size() == 0) ss << "\n";
+	for (tloVec::iterator it = controllers.begin(), itend = controllers.end(); it < itend; ++it)
+		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
+	ss << "},\n";
+	
+	// Inactive Controllers
+	ss << "inactiveControllers = {\n";
+	if (inactiveControllers.size() == 0) ss << "\n";
+	for (tloVec::iterator it = inactiveControllers.begin(), itend = inactiveControllers.end(); it < itend; ++it)
+		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
+	ss << "},\n";
 	
 	return ss.str();
 }
@@ -126,8 +153,6 @@ Furnishing* LevelMap::createFurnishing(bool placeableMode, const std::string &ty
 	f->setUp();
 	bool initsuccess = f->init(placeableMode ? W::position(-100,-100) : pos);
 	if (initsuccess) {
-		f->uid = UIDManager::getNewUID();
-		UIDManager::registerTLO(f);
 		furnishings.push_back(f);
 		W::log << "Furnishing " << f->uid.id << " created and initialized "
 			<< (placeableMode ? " in placeable mode" : std::string("at ") + f->rct.pos.xyStr()) << std::endl;
@@ -143,7 +168,6 @@ Furnishing* LevelMap::createFurnishing(LuaObj &o) {
 	f->deserialize(o);
 	f->setUp();
 	if (f->init()) {
-		UIDManager::registerTLO(f);
 		furnishings.push_back(f);
 		W::log << "Furnishing " << f->uid.id << " deserialized and initialized at " << f->rct.pos.xyStr() << std::endl;
 	}
@@ -160,14 +184,14 @@ Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W:
 	u->setUp();
 	bool initsuccess = u->init(placeableMode ? W::position(-100,-100) : pos);
 	if (initsuccess) {
-		u->uid = UIDManager::getNewUID();
-		UIDManager::registerTLO(u);
 		units.push_back(u);
-		W::log << "Unit " << u->uid.id << " created and initialized "
+		W::log << "Unit (" << u->type << ") " << u->uid.id << " created and initialized "
 			<< (placeableMode ? "in placeable mode" : std::string("at ") + u->rct.pos.xyStr()) << std::endl;
+		Controller *c = createControllerForUnit(u);
+		c->dispatchUnit(u);
 	}
 	else {
-		W::log << "Unit " << u->uid.id << " created then failed to initialize" << std::endl;
+		W::log << "Unit (" << u->type << ") " << u->uid.id << " created then failed to initialize" << std::endl;
 		delete u;
 		u = NULL;
 	}
@@ -178,12 +202,11 @@ Unit* LevelMap::createUnit(LuaObj &o) {
 	u->deserialize(o);
 	u->setUp();
 	if (u->init()) {
-		UIDManager::registerTLO(u);
 		units.push_back(u);
-		W::log << "Unit " << u->uid.id << " deserialized and initialized at " << u->rct.pos.xyStr() << std::endl;
+		W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized and initialized at " << u->rct.pos.xyStr() << std::endl;
 	}
 	else {
-		W::log << "Unit " << u->uid.id << " deserialized then failed to initialize at " << u->rct.pos.xyStr() << std::endl;
+		W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized then failed to initialize at " << u->rct.pos.xyStr() << std::endl;
 		delete u;
 		u = NULL;
 	}
@@ -191,10 +214,9 @@ Unit* LevelMap::createUnit(LuaObj &o) {
 }
 SpawnPoint* LevelMap::createSpawnPoint(bool placeableMode, const W::position &pos) {
 	SpawnPoint *sp = new SpawnPoint(levelState, this, levelView, navmap, placeableMode);
+	sp->setUp();
 	bool initsuccess = sp->init(placeableMode ? W::position(-100,-100) : pos);
 	if (initsuccess) {
-		sp->uid = UIDManager::getNewUID();
-		UIDManager::registerTLO(sp);
 		spawnPoints.push_back(sp);
 		W::log << "SpawnPoint " << sp->uid.id << " created and initialized "
 			<< (placeableMode ? "in placeable mode" : std::string("at ") + sp->rct.pos.xyStr()) << std::endl;
@@ -208,8 +230,8 @@ SpawnPoint* LevelMap::createSpawnPoint(bool placeableMode, const W::position &po
 SpawnPoint* LevelMap::createSpawnPoint(LuaObj &o) {
 	SpawnPoint *sp = new SpawnPoint(levelState, this, levelView, navmap, false);
 	sp->deserialize(o);
+	sp->setUp();
 	if (sp->init()) {
-		UIDManager::registerTLO(sp);
 		spawnPoints.push_back(sp);
 		W::log << "SpawnPoint " << sp->uid.id << "deserialized and initialized at " << sp->rct.pos.xyStr() << std::endl;
 	}
@@ -220,10 +242,63 @@ SpawnPoint* LevelMap::createSpawnPoint(LuaObj &o) {
 	}
 	return sp;
 }
+Controller* LevelMap::createController(const std::string &type, bool active) {
+	Controller *c = NULL;
+	if (type == "CustomerController") {
+		c = new CustomerController(levelState, this, levelView, navmap);
+	}
+	if (c != NULL) {
+		c->setUp();
+		(active ? controllers : inactiveControllers).push_back(c);
+		W::log << "Controller (" << type << ") " << c->uid.id << " created" << std::endl;
+	}
+	return c;
+}
+Controller* LevelMap::createController(LuaObj &o, bool active) {
+	Controller *c = NULL;
+	std::string &type = o["type"].str_value;
+	if (type == "CustomerController") {
+		c = new CustomerController(levelState, this, levelView, navmap);
+		c->deserialize(o);
+	}
+	if (c != NULL) {
+		c->setUp();
+		(active ? controllers : inactiveControllers).push_back(c);
+		W::log << "Controller (" << type << ") " << c->uid.id << " deserialized" << std::endl;
+	}
+	return c;
+}
+Controller* LevelMap::createControllerForUnit(Unit *u) {
+	using std::string;
+	
+	string &type = u->type;
+	Controller *c = NULL;
+	if (type == "customer") {
+		c = createController("CustomerController");
+	}
+	else if (type == "blah") {
+		// ...
+	}
+	
+	if (c == NULL) throw W::Exception(
+		string("Error: couldn't create unit behaviour - unrecognised type ") +
+		string("'") + type + string("'")
+	);
+	
+	return c;
+}
 
-void LevelMap::destroyTLO(TLO *tlo) {
-	UIDManager::unregisterTLO(tlo);
-	delete tlo;
+void LevelMap::deactivateController(Controller *c) {
+	inactiveControllers.push_back(c);
+	for (tloVec::iterator it = controllers.begin(); it < controllers.end(); )
+		if (*it == c) it = controllers.erase(it);
+		else ++it;
+}
+void LevelMap::reactivateController(Controller *c) {
+	controllers.push_back(c);
+	for (tloVec::iterator it = inactiveControllers.begin(); it < inactiveControllers.end(); )
+		if (*it == c) it = inactiveControllers.erase(it);
+		else ++it;
 }
 
 void LevelMap::updateTLOVec(std::vector<TLO *> &v) {
@@ -231,7 +306,7 @@ void LevelMap::updateTLOVec(std::vector<TLO *> &v) {
 		TLO *tlo = *it;
 		tlo->update();
 		if (tlo->destroyed) {
-			destroyTLO(tlo);
+			delete tlo;
 			it = v.erase(it);
 		}
 		else ++it;

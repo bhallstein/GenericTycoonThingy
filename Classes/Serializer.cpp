@@ -25,7 +25,7 @@ std::string _serialize(W::position &p) {
 }
 std::string _serialize(W::size &s) {
 	std::stringstream ss;
-	ss << "{ width=" << s.width << ", height=" << s.height << " }";
+	ss << "{ width=" << s.width << ",height=" << s.height << " }";
 	return ss.str();
 }
 std::string _serialize(W::rect &r) {
@@ -47,6 +47,15 @@ std::string _serialize(const UnitMode::T &m) {
 	else if (m == VOYAGING) return "\"VOYAGING\"";
 	else if (m == ANIMATING) return "\"ANIMATING\"";
 	return "\"UNKNOWN\"";
+}
+std::string _serialize(const std::map<UID,UID> &m) {
+	std::stringstream ss;
+	ss << "{ ";
+	int i=0, n = m.size();
+	for (std::map<UID,UID>::const_iterator it = m.begin(); it != m.end(); ++it)
+		ss << it->first.id << " = " << it->second.id << (++i == n ? "" : ", ");
+	ss << " }";
+	return ss.str();
 }
 
 
@@ -120,6 +129,16 @@ void _deserialize(LuaObj &o, UnitMode::T &m) {
 	if (s == "VOYAGING") m = VOYAGING;
 	else if (s == "ANIMATING") m = ANIMATING;
 	else m = IDLE;
+}
+void _deserialize(LuaObj &o, std::map<UID,UID> &m) {
+	m.clear();
+	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
+		UID u1, u2;
+		unsigned int x;
+		std::stringstream(it->first) >> x;
+		_deserialize(it->second, u2);
+		m[UID(u1)] = UID(u2);
+	}
 }
 
 

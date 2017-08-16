@@ -62,6 +62,7 @@ Furnishing::~Furnishing()
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
 	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
 	navmap->makePassable(rct);
+	UIDManager::unregisterTLO(this);
 	delete drawnFurnishing;
 }
 
@@ -78,6 +79,12 @@ void Furnishing::setUp() {
 		throw W::Exception(msg);
 	}
 	typeInfo = Furnishing::furnishingTypeInfo[type];
+	
+	// Perform set-up for furnishings constructed programmatically
+	if (!deserialized) {
+		uid = UIDManager::getNewUID();
+	}
+	UIDManager::registerTLO(this);
 	
 	// Set up state of DrawnFurnishing
 	// ...

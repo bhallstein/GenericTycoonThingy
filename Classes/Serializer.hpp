@@ -42,15 +42,16 @@ std::string _serialize(W::rect &r);
 std::string _serialize(const UID &uid);
 std::string _serialize(const UnitMode::T &);
 template <typename T>
-std::string _serialize(std::vector<T> &x) {
+std::string _serialize(const std::vector<T> &x) {
 	std::string s = "{ ";
-	for (typename std::vector<T>::iterator it = x.begin(); it < x.end(); ++it) {
+	for (typename std::vector<T>::const_iterator it = x.begin(); it < x.end(); ++it) {
 		T v = *it;
 		s += _serialize(v) + (it == x.end() - 1 ? "" : ", ");
 	}
 	s += " }";
 	return s;
 }
+std::string _serialize(const std::map<UID,UID> &);
 
 /*
  * Deserializer functions
@@ -72,6 +73,7 @@ void _deserialize(LuaObj &, std::vector<std::string> &);
 void _deserialize(LuaObj &, std::vector<W::position> &);
 void _deserialize(LuaObj &, UID &);
 void _deserialize(LuaObj &, UnitMode::T &);
+void _deserialize(LuaObj &, std::map<UID,UID> &);
 
 
 /* SerializerBase class */

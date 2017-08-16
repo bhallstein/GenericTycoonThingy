@@ -17,7 +17,7 @@ protected:
 	typedef std::map<std::string, SerializerBase*> serialization_descriptor;
 	typedef std::vector<serialization_descriptor*> sdvec;
 	typedef serialization_descriptor::iterator sdit;
-	virtual sdvec getSDs() = 0;
+	virtual void getSDs(sdvec &) = 0;
 		// Subclasses should override to return their SDs.
 		// Note: it is up to the subclass chain to construct a vector
 		// of all the serialization descriptors in said chain.

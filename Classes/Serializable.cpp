@@ -6,7 +6,8 @@ std::string Serializable::serialize() {
 	using std::vector;
 	using std::map;
 	
-	sdvec sds = getSDs();
+	sdvec sds;
+	getSDs(sds);
 	
 	string s;
 	vector<string> v;
@@ -32,7 +33,8 @@ std::string Serializable::serialize() {
 }
 
 void Serializable::deserialize(LuaObj &luaObj) {
-	sdvec sds = getSDs();
+	sdvec sds;
+	getSDs(sds);
 	
 	for (sdvec::iterator it = sds.begin(); it < sds.end(); ++it) {
 		serialization_descriptor &sd = **it;

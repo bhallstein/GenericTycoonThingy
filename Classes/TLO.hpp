@@ -59,21 +59,17 @@ public:
 	UID uid;
 	W::rect rct;
 	
+	std::string type;
+	
 protected:
-	sdvec getSDs() {
-		sdvec vec, vec2 = _getSDs();
+	virtual void getSDs(sdvec &vec) {
 		vec.push_back(&TLO::sd);
-		vec.insert(vec.end(), vec2.begin(), vec2.end());
-		return vec;
 	}
-	virtual sdvec _getSDs() { return sdvec(); }
 	
 	LevelState *levelState;
 	LevelMap   *levelMap;
 	LevelView  *levelView;
 	W::NavMap *navmap;
-	
-	std::string type;
 	
 private:
 	static serialization_descriptor sd;

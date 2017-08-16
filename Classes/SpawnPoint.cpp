@@ -5,7 +5,15 @@ SpawnPoint::SpawnPoint(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap
 {
 	// hai spawny
 }
-
+SpawnPoint::~SpawnPoint()
+{
+	UIDManager::unregisterTLO(this);
+}
+void SpawnPoint::setUp() {
+	if (!deserialized)
+		uid = UIDManager::getNewUID();
+	UIDManager::registerTLO(this);
+}
 void SpawnPoint::placementLoopStarted() {
 	// Update drawn representation properties
 }

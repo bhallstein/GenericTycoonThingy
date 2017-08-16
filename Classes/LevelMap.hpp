@@ -11,6 +11,7 @@
 
 #include "W.h"
 #include "LuaObj.h"
+#include "Controller.hpp"
 
 class LevelState;
 class LevelView;
@@ -33,25 +34,31 @@ public:
 	int width() { return mapSize.width; }
 	int height() { return mapSize.height; }
 	
-private:
-	LevelState *levelState;
-	LevelView *levelView;
-	
-	W::NavMap *navmap;
-	
-//	std::vector<Unit*> customers;
-	typedef std::vector<TLO*> tloVec;
-	tloVec units;
-	tloVec furnishings;
-	tloVec spawnPoints;
-	
 	Furnishing* createFurnishing(bool placeableMode, const std::string &type, const W::position &pos = W::position());
 	Furnishing* createFurnishing(LuaObj &);
 	Unit* createUnit(bool placeableMode, const std::string &type, const W::position &pos = W::position());
 	Unit* createUnit(LuaObj &);
 	SpawnPoint* createSpawnPoint(bool placeableMode, const W::position &pos = W::position());
 	SpawnPoint* createSpawnPoint(LuaObj &);
-	void destroyTLO(TLO *);
+	Controller* createController(const std::string &type, bool active = true);
+	Controller* createController(LuaObj &, bool active = true);
+	Controller* createControllerForUnit(Unit *);
+	
+	void deactivateController(Controller *);
+	void reactivateController(Controller *);
+	
+private:
+	LevelState *levelState;
+	LevelView *levelView;
+	
+	W::NavMap *navmap;
+	
+	typedef std::vector<TLO*> tloVec;
+	tloVec units;
+	tloVec furnishings;
+	tloVec spawnPoints;
+	tloVec controllers;
+	tloVec inactiveControllers;
 	
 	void updateTLOVec(tloVec &);
 		// Calls update() on each TLO.

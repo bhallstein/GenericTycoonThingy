@@ -28,10 +28,6 @@
 class LevelState;
 class Unit;
 class Furnishing;
-class Behaviour;
-class CustomerBehaviour;
-class DispatchingBehaviour;
-class ShopKeeperBehaviour;
 
 struct buildingInfo {
 	buildingInfo(LuaObj &);

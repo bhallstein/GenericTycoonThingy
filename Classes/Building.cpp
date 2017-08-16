@@ -3,7 +3,6 @@
 #include "LevelView.hpp"
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"
-#include "Behaviour.hpp"
 #include "W.h"
 
 /* buildingInfo constructor impl */
