@@ -74,11 +74,12 @@ void View::drawRect(sf::Color colour, int _x, int _y, int _w, int _h, float x_of
 }
 
 void View::drawMappedObj(MappedObj *obj) {		// Temporary but useful function to draw a top level object
-	char c = obj->col();											// in a very generic way
+	char c = obj->col();						// in a very generic way
 	sf::Color col;
 	if (c == 'l') col = sf::Color::Blue;
 	else if (c == 'r') col = sf::Color::Red;
 	else if (c == 'w') col = sf::Color::White;
+	else if (c == 'y') col = sf::Color::Yellow;
 	else col = sf::Color(0, 0, 0, 128);
 
 	int x = obj->x, y = obj->y;
