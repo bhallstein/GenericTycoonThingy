@@ -45,6 +45,10 @@ void Game::Run()
 	while (window->IsOpened() && !should_quit)
     {
 		// Events
+		event.loadFromMousePos(sf::Mouse::GetPosition(*window));					
+		if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
+			eventHandler.dispatchEvent(&event);										
+		
 		while (window->PollEvent(sf_event)) {
 			event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
 			
@@ -61,6 +65,7 @@ void Game::Run()
 			}
 			
 			// Mouse events sent via eventhandler
+			if (event.type == MOUSEMOVE) ;				// Ignore actual mouse moves
 			eventHandler.dispatchEvent(&event);
 		}
 		

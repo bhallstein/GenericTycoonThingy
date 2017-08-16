@@ -15,11 +15,11 @@ void Event::loadFromSFEvent(sf::Event *sf_event) {
 		type = KEYPRESS;
 		key  = keyFromSFKeyCode(sf_event->Key.Code);
 	}
-	else if (sf_event->Type == sf::Event::MouseMoved) {
-		type = MOUSEMOVE;
-		x = sf_event->MouseMove.X;
-		y = sf_event->MouseMove.Y;
-	}
+	//else if (sf_event->Type == sf::Event::MouseMoved) {
+	//	type = MOUSEMOVE;
+	//	x = sf_event->MouseMove.X;
+	//	y = sf_event->MouseMove.Y;
+	//}
 	else if (sf_event->Type == sf::Event::MouseButtonPressed) {
 		type = sf_event->MouseButton.Button == sf::Mouse::Left ? LEFTCLICK : RIGHTCLICK;
 		x = sf_event->MouseButton.X;
@@ -29,8 +29,13 @@ void Event::loadFromSFEvent(sf::Event *sf_event) {
 		type = UNKNOWNEVENT;
 	}
 }
+void Event::loadFromMousePos(sf::Vector2i p) {
+	type = MOUSEMOVE;
+	x = p.x, y = p.y;
+}
 
-void Event::convertCoords(int block_width, int block_height) {
+void Event::convertCoords(int block_width, int block_height, int offset_x, int offset_y) {
+	x += offset_x, y += offset_y;
 	a = (float) (x%block_width) / (float) block_width;
 	b = (float) (y%block_height) / (float) block_height;
 	x = x/block_width;

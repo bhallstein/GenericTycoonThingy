@@ -1,7 +1,7 @@
 #include "Level.hpp"
 
 Level::Level(std::string fileName, sf::RenderWindow *_window, EventHandler *_eventHandler) :
-	window(_window), eventHandler(_eventHandler), uiview(_window, 10, 10, 0, -80, 0, 0)
+	window(_window), eventHandler(_eventHandler), uiview(_window, 16, 3, 0, -80, 0, 0)
 {	
 	// Build level
 	std::cout << "calling buildLevel" << std::endl;
@@ -31,7 +31,7 @@ Building* Level::createBuilding(int atX, int atY) {
 	buildings.push_back(b);
 	levelview->addResponder(b);
 	eventHandler->subscribe(b, K_L);
-	std::cout << "added building " << b << "(now " << buildings.size() << ")" << std::endl;
+	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
 void Level::createPlaceable() {
@@ -82,7 +82,7 @@ void Level::buildLevel(ptree levelFile)
 
 
 LevelView::LevelView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
-	View(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
+	ScrollingView(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
 {
 	
 }
@@ -97,9 +97,9 @@ void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> p
 
 	// This is obviously a horrendous way to get info into the view, but the separation of View is nonetheless a structural
 	// improvement. The sane way to do it might be to pass the game map.
-
-	float block_width  = (r_pos - l_pos) / blocks_w;
-	float block_height = (b_pos - t_pos) / blocks_h;
+	
+	// Draw background
+	drawRect(sf::Color(0, 0, 0, 50), 0, 0, blocks_w, blocks_h);
 
 	// Draw buildings
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++) {
@@ -110,7 +110,7 @@ void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> p
 		else
 			drawRect(
 				(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'l' ? sf::Color::Blue : sf::Color::Black,
-				(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height
+				(*i)->x, (*i)->y, (*i)->w, (*i)->h
 			);
 	}
 	// Draw placeables
@@ -122,14 +122,14 @@ void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> p
 		else
 			drawRect(
 				(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'r' ? sf::Color::Red : sf::Color::Yellow,
-				(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height
+				(*i)->x, (*i)->y, (*i)->w, (*i)->h
 			);
 	}
 	//Draw units
 	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++) {
 		drawRect(
 			(*i)->col() == 'r' ? sf::Color::Red : (*i)->col() == 'b' ? sf::Color::Black : sf::Color::White,
-			(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height
+			(*i)->x, (*i)->y, (*i)->w, (*i)->h
 		);
 	}
 }

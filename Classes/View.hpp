@@ -48,14 +48,15 @@
 
 class View {
 public:
-	View(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
+	View(sf::RenderWindow *, int _blocks_w = 10, int _blocks_h = 10, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0);
 	~View();
 	
 	// Methods
 	virtual void draw();					// Your subclass should override this
 	virtual void acceptEvent(Event *);		// and this, if you want it to receive events
-	
-	virtual void _acceptEvent(Event *);		// Wrapper for acceptEvent: EventHandler calls it, allowing View to do some shit first.
+
+	virtual void _acceptEvent(Event *);		// Wrapper for acceptEvent: EventHandler calls this, allowing View to do some
+											// shit before calling your acceptEvent function
 	
 	void createEventResponderMap(); 		// Create structures necessary for event response
 	void addResponder(EventResponder *);
@@ -69,7 +70,7 @@ public:
 	int l_offset, t_offset, r_offset, b_offset;
 
 protected:
-	
+	// Properties
 	sf::RenderWindow *window;
 	void drawRect(sf::Color color, int atX, int atY, int width, int height);
 
@@ -77,6 +78,23 @@ protected:
 	int blocks_w, blocks_h;
 	std::vector<std::list<EventResponder*> > responderMap;
 	EventResponder *privileged_event_responder;
+	
+};
+
+
+class ScrollingView : public View {
+public:
+	ScrollingView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
+	~ScrollingView();
+	
+	// Methods
+	void _acceptEvent(Event *);
+	void drawRect(sf::Color colour, int atX, int atY, int width, int height);
+	
+protected:
+	
+	int block_size_x, block_size_y;		// Subclasses should override. Default is 16.
+	int scroll_x, scroll_y;
 	
 };
 

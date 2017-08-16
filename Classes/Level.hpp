@@ -29,7 +29,7 @@
 
 using boost::property_tree::ptree;
 
-class LevelView : public View {
+class LevelView : public ScrollingView {
 public:
 	
 	// Methods

@@ -1,6 +1,6 @@
 #include "View.hpp"
 
-View::View(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
+View::View(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :
 	window(_window),
 	l_offset(_l_offset), t_offset(_t_offset), r_offset(_r_offset), b_offset(_b_offset),
 	blocks_w(_blocks_w), blocks_h(_blocks_h)
@@ -53,7 +53,13 @@ void View::relinquishPrivilegedEventResponderStatus(EventResponder *resp) {
 	privileged_event_responder = NULL;
 }
 
-void View::drawRect(sf::Color colour, int atX, int atY, int width, int height) {
+void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall) {
+	float block_width  = (r_pos - l_pos) / blocks_w;
+	float block_height = (b_pos - t_pos) / blocks_h;
+	int atX = l_pos + block_x * block_width;
+	int atY = t_pos + block_y * block_height;
+	int width = blocks_wide * block_width;
+	int height = blocks_tall * block_height;
 	if (atX + width >= r_pos)  width = r_pos - atX;
 	if (atY + height >= b_pos) height = b_pos - atY;
 	window->Draw(
@@ -63,14 +69,13 @@ void View::drawRect(sf::Color colour, int atX, int atY, int width, int height) {
 
 void View::draw() {
 	// Everybody loves a checkerboard pattern
-	int checkerboard_size = 20, i, j;
-	for (i = l_pos; i < r_pos; i += checkerboard_size)
-		for (j = t_pos; j < b_pos; j += checkerboard_size)
+	for (int i = 0; i < blocks_w; i++)
+		for (int j = 0; j < blocks_h; j++)
 			drawRect(
-				i%(2*checkerboard_size)
-					? (j%(2*checkerboard_size) ? sf::Color::Black : sf::Color::White)
-					: (j%(2*checkerboard_size) ? sf::Color::White : sf::Color::Black),
-				i, j, r_pos - i, b_pos - j
+				i%(2)
+					? (j%(2) ? sf::Color::Black : sf::Color::White)
+					: (j%(2) ? sf::Color::White : sf::Color::Black),
+				i, j, 1, 1
 			);
 }
 
@@ -81,12 +86,62 @@ void View::_acceptEvent(Event *ev) {
 	if (ev->x < 0 || ev->x >= blocks_w || ev->y < 0 || ev->y >= blocks_h)
 		return;
 
-	if (privileged_event_responder != NULL) {
-		privileged_event_responder->receiveEvent(ev);
-		return;
-	}
 	acceptEvent(ev);
 }
 void View::acceptEvent(Event *ev) {
 	
+}
+
+
+
+ScrollingView::ScrollingView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :
+	View(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
+{
+	scroll_x = scroll_y = 0;
+	block_size_x = block_size_y = 20;
+}
+ScrollingView::~ScrollingView() {
+	
+}
+
+void ScrollingView::_acceptEvent(Event *ev) {
+	if (!ready_for_event_response) return;
+	
+	if (ev->x < 0 || ev->y < 0 || ev->x >= r_pos - l_pos || ev->y >= b_pos - t_pos)
+		return;
+	
+	bool moved = false;
+	int scrollMargin = 30;
+	if (ev->x <= scrollMargin)					scroll_x -= scrollMargin - ev->x, moved = true;
+	else if (ev->x >= r_pos - scrollMargin)		scroll_x += ev->x - r_pos + scrollMargin, moved = true;
+	if (ev->y <= scrollMargin)					scroll_y -= scrollMargin - ev->y, moved = true;
+	else if (ev->y >= b_pos - scrollMargin)		scroll_y += ev->y - b_pos + scrollMargin, moved = true;
+
+	int max_scroll_x = block_size_x * blocks_w - (r_pos - l_pos);
+	int max_scroll_y = block_size_y * blocks_h - (b_pos - t_pos);
+	if (scroll_x < 0) scroll_x = 0;
+	else if (scroll_x >= max_scroll_x) scroll_x = max_scroll_x;
+	if (scroll_y < 0) scroll_y = 0;
+	else if (scroll_y >= max_scroll_y) scroll_y = max_scroll_y;
+	
+	ev->convertCoords(block_size_x, block_size_y, scroll_x, scroll_y);
+	
+	if (privileged_event_responder != NULL) {
+		privileged_event_responder->receiveEvent(ev);
+		return;
+	}
+	
+	if (!moved) acceptEvent(ev);
+}
+void ScrollingView::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall) {
+	int atX = block_x * block_size_x - scroll_x;
+	int atY = block_y * block_size_y - scroll_y;
+	int width = blocks_wide * block_size_x;
+	int height = blocks_tall * block_size_y;
+	if (atX >= r_pos || atY >= b_pos) return;
+	if (atX + width >= r_pos)  width = r_pos - atX;
+	if (atY + height >= b_pos) height = b_pos - atY;
+	window->Draw(
+		sf::Shape::Rectangle(atX, atY, width, height, colour)
+	);
 }
