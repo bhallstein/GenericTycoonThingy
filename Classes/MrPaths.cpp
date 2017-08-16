@@ -8,19 +8,18 @@
 
 #include "W.h"
 
-std::string MrPaths::logfilePath;
+std::string MrPaths::desktopPath;
 std::string MrPaths::settingsPath;
-std::string MrPaths::luaPath;
-std::string MrPaths::dataPath;
+std::string MrPaths::resourcesPath;
 
 struct MrPaths::init {
 	init() {
+		using std::string;
 #ifdef __APPLE__
 		// Log path
 		char path[MRPATHS_MAX_PATH] = "";
 		[NSHomeDirectory() getCString:path maxLength:MRPATHS_MAX_PATH encoding:NSUTF8StringEncoding];
-		logfilePath = path;
-		logfilePath.append("/Desktop/DBTlog.txt");
+		desktopPath = string(path) + "/Desktop/";
 		
 		// Settings path
 		settingsPath = path;
@@ -28,19 +27,15 @@ struct MrPaths::init {
 		settingsPath.append(TYCOON_NAME);
 		settingsPath.append("/");
 		
-		// Lua path
+		// Top level resources path
 		[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MRPATHS_MAX_PATH encoding:NSUTF8StringEncoding];
-		std::string resourcesPath = path;
-		luaPath = resourcesPath + "/Lua/";
+		resourcesPath = string(path) + "/";
 		
-		// Data path
-		dataPath = resourcesPath + "/Data/";
 #elif defined _WIN32 || _WIN64
 		// Log path
 		char path[MRPATHS_MAX_PATH] = "";
 		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, path);
-		logfilePath = path;
-		logfilePath.append("/DBTlog.txt");
+		desktopPath = string(path) + "/";
 		
 		// Settings path
 		SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
@@ -51,15 +46,11 @@ struct MrPaths::init {
 		
 		/* The following are debug-only: need specifying for debug/release using ifdefs */
 		
-		// Lua path
+		// Resources path
 		GetModuleFileName(0, path, sizeof(path) - 1);
-		std::string resourcesPath = path;
+		resourcesPath = path;
 		resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
 		resourcesPath.append("/../Demon Barber Tycoon/");
-		luaPath = resourcesPath + "Lua/";
-		
-		// Data path
-		dataPath = resourcesPath + "Data/";
 #endif
 	}
 };

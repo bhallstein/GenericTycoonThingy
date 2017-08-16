@@ -1,11 +1,10 @@
 #include "PlaceableManager.hpp"
 #include "Placeable.hpp"
 
-PlaceableManager::PlaceableManager(bool _placeableMode) :
+PlaceableManager::PlaceableManager(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+	TLO(_ls, _lm, _lv, _nm),
 	placeableMode(_placeableMode), placeable(NULL)
 {
-	pos.x = pos.y = 0;
-	rotation = 0;
 	placeable = new Placeable(this);
 }
 PlaceableManager::~PlaceableManager()
@@ -13,30 +12,33 @@ PlaceableManager::~PlaceableManager()
 	if (placeable) delete placeable;
 }
 
-bool PlaceableManager::init(int _x, int _y) {
-	if (placeableMode) {
-		if (!placeable->activate()) {
-			W::log << "Couldn't initialize PlaceableManager: placeable would not activate" << std::endl;
-			return false;
-		}
-		return true;
-	}
+bool PlaceableManager::init(const W::position &_pos) {
+	if (placeableMode)
+		return pickUp();
 	else
-		return attemptToPlace(_x, _y);
+		return attemptToPlace(_pos);
+}
+bool PlaceableManager::init() {
+	return init(rct.pos);
 }
 
 bool PlaceableManager::pickUp() {
-	placeable->pos = pos;
-	return placeableMode = placeable->activate();
+	if ((placeableMode = placeable->activate())) {
+		placeable->pos = rct.pos;
+		placementLoopStarted();
+	}
+	else W::log << "Couldn't initialize PlaceableManager: placeable would not activate" << std::endl;
+	return placeableMode;
 }
-bool PlaceableManager::attemptToPlace(int _x, int _y) {
-	if (!canPlace(_x, _y)) return false;
-	pos.x = _x, pos.y = _y;
-	finalizePlacement();
+bool PlaceableManager::attemptToPlace(const W::position &_pos) {
+	if (!canPlace(_pos))
+		return false;
+	rct.setPos(_pos);
 	placeableMode = false;
+	placementLoopSucceeded();
 	return true;
 }
-
-//void PlaceableManager::setGroundPlan(std::vector<intcoord> *_p) {
-//	groundplan = *_p;
-//}
+void PlaceableManager::cancel() {
+	placeableMode = false;
+	placementLoopCancelled();
+}

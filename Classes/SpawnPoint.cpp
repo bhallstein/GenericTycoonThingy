@@ -1,19 +1,23 @@
 #include "SpawnPoint.hpp"
 
-SpawnPoint::SpawnPoint(int _x, int _y/*, std::string _name, int _rate*/) :
-	x(_x), y(_y), /*name(_name), rate(_rate),*/ rateCounter(0)
+SpawnPoint::SpawnPoint(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode)
 {
 	// hai spawny
 }
 
-bool SpawnPoint::spawn(W::position *c)
-{
-	bool spawn_ahoy = rate == ++rateCounter;
-	if (spawn_ahoy)
-		rateCounter = 0, c->x = x, c->y = y;
-	return spawn_ahoy;
+void SpawnPoint::placementLoopStarted() {
+	// Update drawn representation properties
 }
-
-void SpawnPoint::getCoords(W::position *c) {
-	c->x = x, c->y = y;
+void SpawnPoint::placementLoopUpdate() {
+	// Update drawn repr position
+}
+void SpawnPoint::placementLoopCancelled() {
+	// Reset drawn representation properties
+}
+void SpawnPoint::placementLoopSucceeded() {
+	// Reset drawn repr properties
+}
+bool SpawnPoint::canPlace(const W::position &pos) {
+	return true;
 }

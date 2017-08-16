@@ -1,16 +1,7 @@
 -- Building definitions
 
-defaultColour = "transparent black"
-defaultHoverColour = "transparent black"
-
-universalFurnishings = {
-	"door"
-}
-
 buildingTypes = {
 	shop = {
-		colour = "yellow",
-		hoverColour = "black",
 		allowedFurnishings = { "barberschair" }
 	},
 	-- pieshop = {

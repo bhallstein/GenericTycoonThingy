@@ -10,8 +10,8 @@
 
 class MrKlangy {
 public:
-	static void playSound(const char *);
-	static void playBGM(const char *, bool loop = true);
+	static void playSound(const char *filename);
+	static void playBGM(const char *filename, bool loop = true);
 	static void stopBGM();
 	
 	struct init;

@@ -11,95 +11,117 @@
 
 #include "types.hpp"
 #include "PlaceableManager.hpp"
-#include "BehaviourParticipant.hpp"
-
-class NavNode;
-class Building;
-class Level;
-class Furnishing;
-
-struct unitInfo {
-	W::Colour col, hoverCol;
-	std::vector<std::string> compatibleBehaviours;
-	bool isStaff;
-	int hireCost;
-};
+#include "Behaviour.hpp"
 
 namespace W { namespace EventType {
 	extern T INTERRUPT_UNITPICKUP;
 } }
 
-class Unit : public PlaceableManager, public BehaviourParticipant {
+
+struct unitInfo {
+	unitInfo(LuaObj &);
+	bool isStaff;
+	int hireCost;
+};
+
+
+class Building;
+class LevelState;
+class LevelView;
+class Furnishing;
+
+class Unit : public PlaceableManager {
 public:
-	Unit(W::NavMap *, const char *_type, Level *, bool _placeableMode);
+	Unit(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Unit();
+		// When a unit is constructed, we may not yet know its type, which is therefore
+		// initially set to NO_TYPE.
+		// The unit must then be "set up".
+		//   setType(t)	- set the type manually
+		//				- (not req’d if being deserialized)
+		//   setUp() - perform setup (after type has been set)
+		
+		// Note: then need to init() the Unit, since it is a PlaceableManager.
 	
-	// Properties
-	std::string type;
-	W::position prev_pos;
-	W::position dest;
-	Building *dest_building;
+	void setUp();
 	
-	ShopKeeperBehaviour *skBehaviour;	// Only used by shopkeepers
-	
-	// Methods
-	void receiveEvent(W::Event *);
+	void mouseEvent(W::Event *);
 	void update();
-	bool canPlace(int _x, int _y);
-	void finalizePlacement();
-	W::Colour& col();
 	
 	// Utility methods
+	void wanderToRandomMapDestination();
 	void getDespawnPoint(W::position &);
-	void destroy();
 	bool voyage(const W::position &_dest);
-	bool arrived;
-	void runAnimation(/* Animation...? */);
-	bool animation_finished;
-	
-//	Building* getContextBuilding() { return contextBuilding; }
 	
 	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
-
-	static unitInfo * infoForType(const char *);
-
+	
+	class DrawnUnit;
+	
 protected:
-	enum Mode {
-		WAITING,	// Waiting always precedes voyaging?
-		VOYAGING,
-		ANIMATING,
-		IDLE
-	} mode;
-
-	void wait();
-	int frames_waited;
-	int frames_animated;
-	void incrementAnimation();
+	UnitMode::T mode;
+	Behaviour *behaviour;
 	
-	void pickUp();
+	// PlaceableManager overrides
+	void placementLoopStarted();
+	void placementLoopUpdate();
+	void placementLoopCancelled();
+	void placementLoopSucceeded();
+	bool canPlace(const W::position &);
 	
-	bool incrementLocation();		// Move along route. Returns false if an obstacle is encountered.
-	inline bool atDest();
+	W::position dest;
+	bool incrementLocation();	// Move along route. Returns false if obstacle encountered.
 	inline bool inHinterland();
 	
-	// Properties
-	struct unitInfo *uInfo;
-	std::vector<std::string>* getCompatibleBehaviours();
+	DrawnUnit *drawnUnit;
+	struct unitInfo *typeInfo;
 	
 	bool hired;
 	
-	W::NavMap *navmap;
 	std::vector<W::position> route;
-	Level *level;
-//	Building *contextBuilding;
 	
-	// Static members
-	static std::map<std::string, unitInfo> unitTypes;
-	static W::Colour defaultColour;
-	static W::Colour defaultHoverColour;
+	// Serialization
+	static serialization_descriptor sd;
+	sdvec _getSDs() {
+		sdvec vec;
+		vec.push_back(&Unit::sd);
+		return vec;
+	}
+	void deserializeAdditionalProperties(LuaObj &o) {
+		createBehaviour();
+		behaviour->deserialize(o["behaviour"]);
+	}
+	void getAdditionalSerializedProperties(std::map<std::string, std::string> &m) {
+		m["behaviour"] = behaviour->serialize();
+	}
 	
+	static std::map<std::string, unitInfo*> unitTypeInfo;
+	
+	void createBehaviour() {
+		using std::string;
+		if (type == "customer")
+			behaviour = new CustomerBehaviour(this);
+		else
+			throw W::Exception(
+				string("Error: couldn't create unit behaviour - unrecognised type '") +
+				type + string("'")
+			);
+	}
 	void printDebugInfo();
+};
+
+
+class Unit::DrawnUnit {
+public:
+	DrawnUnit(LevelView *);
+	~DrawnUnit();
+	void setPosn(const W::position &);
+	void setOpac(float x);
+	void incRot();
+	
+private:
+	LevelView *lv;
+	W::DrawnRect *r;
 };
 
 #endif

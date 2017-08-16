@@ -5,6 +5,8 @@ irrklang::ISoundEngine *MrKlangy::sound_engine;
 irrklang::ISound *MrKlangy::bgm;
 bool MrKlangy::device_available;
 
+bool disableSounds = true;
+
 struct MrKlangy::init {
 	init() {
 		bgm = NULL;
@@ -18,14 +20,16 @@ struct MrKlangy::init {
 	}
 };
 
-void MrKlangy::playSound(const char *soundfile) {
-	if (!device_available) return;
-	sound_engine->play2D((MrPaths::dataPath + soundfile).c_str(), false);
+void MrKlangy::playSound(const char *filename) {
+	if (!device_available || disableSounds) return;
+	std::string path = MrPaths::resourcesPath + std::string("Data/") + filename;
+	sound_engine->play2D(path.c_str(), false);
 }
-void MrKlangy::playBGM(const char *soundfile, bool loop) {
-	if (!device_available) return;
+void MrKlangy::playBGM(const char *filename, bool loop) {
+	if (!device_available || disableSounds) return;
 	stopBGM();
-	bgm = sound_engine->play2D((MrPaths::dataPath + soundfile).c_str(), loop, false, true);
+	std::string path = MrPaths::resourcesPath + std::string("Data/") + filename;
+	bgm = sound_engine->play2D(path.c_str(), loop, false, true);
 }
 void MrKlangy::stopBGM() {
 	if (bgm) {

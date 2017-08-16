@@ -11,30 +11,25 @@
 #include <vector>
 #include <iostream>
 
-#include "Unit.hpp"
+#include "PlaceableManager.hpp"
+#include "Serializable.hpp"
 
-class SpawnPoint
-{
+class W::NavMap;
+
+class SpawnPoint : public PlaceableManager {
 public:
-	SpawnPoint(int _x, int _y/*, std::string _name, int rate*/);
-	~SpawnPoint();
-
-	bool spawn(W::position *);
-//	void updateRate(int newRate);
-//	void addCustomer(std::string customer, int rate);
-//	void removeCustomer(std::string customer);
-	void getCoords(W::position *);
-
-	std::map<std::string, int[2]> customers;//to store both the types and the rate at which they will spawn. 2nd element in array is the counter.
+	SpawnPoint(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	
-	//properties
-	bool isSpawning;
-	int x, y;
-	std::string name;
-	int rate; //global rate right now; no unit typing
-	int rateCounter; //temp!
+	void update() { }
+	void setUp() { }
 	
 protected:
+	// Placeable overrides
+	void placementLoopStarted();
+	void placementLoopUpdate();
+	void placementLoopCancelled();
+	void placementLoopSucceeded();
+	bool canPlace(const W::position &);
 	
 };
 

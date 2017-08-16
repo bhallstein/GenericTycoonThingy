@@ -21,3 +21,25 @@ W::Colour strToColour(const char *s) {
 	else if (streq(s, "transparent black")) return W::Colour::TransparentBlack;
 	else return W::Colour::Black;
 }
+
+bool luaLoad(const std::string &filename, lua_State **L) {
+	// Load file
+	*L = luaL_newstate();
+	bool loadError = luaL_loadfile(*L, filename.c_str());
+	if (loadError) {
+		W::log
+			<< "couldn't open lua file '" << filename << "' - error was: "
+			<< lua_tostring(*L, -1) << std::endl;
+		lua_close(*L);
+		return false;
+	}
+	bool runError = lua_pcall(*L, 0, 0, 0);
+	if (runError) {
+		W::log
+			<< "couldn't execute file '" << filename << "' - error was: "
+			<< lua_tostring(*L, -1) << std::endl;
+		lua_close(*L);
+		return false;
+	}
+	return true;
+}

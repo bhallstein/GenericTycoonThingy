@@ -13,14 +13,15 @@
 
 class PlaceableManager;
 
-class Placeable : public W::MappedObj {
+class Placeable {
 public:
 	Placeable(PlaceableManager *);
 	~Placeable();
 	bool activate();
 	void deactivate();
-	void receiveEvent(W::Event *ev);
+	W::EventPropagation::T mouseEvent(W::Event *);
 	PlaceableManager *mngr;
+	W::position pos;
 };
 
 #endif

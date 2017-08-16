@@ -1,7 +1,4 @@
--- Unit definitions
-
-defaultColour = "transparent black"
-defaultHoverColour = "blue"
+-- Unit type definitions
 
 unitTypes = {
 	customer = {
@@ -11,8 +8,6 @@ unitTypes = {
 		}
 	},
 	shopkeeper = {
-		colour = "green",
-		hoverColour = "white",
 		isStaff = true,
 		hireCost = 10,
 		compatibleBehaviours = {
