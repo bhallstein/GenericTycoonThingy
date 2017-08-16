@@ -1,7 +1,9 @@
 #include "MrPaths.hpp"
 
 #ifdef __APPLE__
-#include <Cocoa/Cocoa.h>
+	#include <Cocoa/Cocoa.h>
+#elif defined WIN32 || WIN64
+	#include "shlobj.h"
 #endif
 
 #include "W.h"
