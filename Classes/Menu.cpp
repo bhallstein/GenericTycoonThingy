@@ -68,7 +68,7 @@ void Button::receiveEvent(Event *ev) {
 	if (ev->type == MOUSEMOVE)
 		hover = true;
 	else if (ev->type == LEFTCLICK)
-		menu->startLevel("Data/level1.xml");
+		menu->startLevel("Data/level1.lua");
 }
 char Button::col() {
 	if (hover) { hover = false; return 'r'; }

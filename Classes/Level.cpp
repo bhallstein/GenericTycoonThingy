@@ -6,7 +6,7 @@ Level::Level(Game *_game, sf::RenderWindow *_window, std::string levelpath) :
 	uiview = new View(_window, 16, 3, 0, -80, 0, 0);
 	eventHandler.subscribe(uiview);
 	
-	buildLevel(readLevel(levelpath));
+	buildLevel(levelpath);
 }
 Level::~Level() {
 	std::cout << "level reset" << std::endl;
@@ -16,47 +16,80 @@ Level::~Level() {
 	delete uiview;
 }
 
-ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
+void Level::buildLevel(std::string levelFile)
 {
-	ptree pt;
-	read_xml(fileName, pt);
-	return pt;
-}
-void Level::buildLevel(ptree levelFile)
-{
-	w = levelFile.get<int>("level.<xmlattr>.width");
-	h = levelFile.get<int>("level.<xmlattr>.height");
-	std::cout << "level dimensions: " << w << " x " << h << std::endl;
-	
-	// Create map
-	navmap = new NavMap(w, h);
-	
-	// Create levelview
-	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
-	eventHandler.subscribe(levelview);
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
 
-	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
+	if (luaL_loadfile(L, levelFile.c_str()) || lua_pcall(L, 0, 0, 0))
 	{
-		
-		if(obj.first == "building")
-		{
-			Building* b = createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
+		std::cout << lua_tostring(L,-1);
+		std::cin.get();
+		//some kind of error!
+		//throw 1;
+	}
+	else
+	{
+		//level width and height
+		lua_getglobal(L,"width");
+		w = lua_tonumber(L,-1);
+		lua_pop(L,1);
+		lua_getglobal(L,"height");
+		h = lua_tonumber(L,-1);
+		lua_pop(L,1);
 
-			switch(obj.second.get<int>("type",0))
+		std::cout << "level dimensions: " << w << " x " << h << std::endl;
+
+		// Create map
+		navmap = new NavMap(w, h);
+	
+		// Create levelview
+		levelview = new LevelView(window, w, h, 0, 0, 0, 80);
+		eventHandler.subscribe(levelview);
+
+		//buildings
+		lua_getglobal(L,"buildings");
+
+		lua_pushnil(L); //start at the start
+		while (lua_next(L,1) != 0) //"buildings" table is at index 1 in the stack
+		{
+			int x,y; //temp. since we need these to even construct building!
+
+			//x and y
+			lua_pushstring(L,"x"); //push the property we want
+			lua_gettable(L,-2); //get the key we pushed from the table at -2
+			x = (int)lua_tonumber(L,-1);
+			lua_pop(L,1);
+
+			lua_pushstring(L,"y"); //push the property we want
+			lua_gettable(L,-2); //get the key we pushed from the table at -2
+			y = (int)lua_tonumber(L,-1);
+			lua_pop(L,1);
+
+			Building* b = createBuilding(x, y);
+
+			//type
+			lua_pushstring(L,"type"); //push the property we want
+			lua_gettable(L,-2); //get the key we pushed from the table at -2
+			switch((int)lua_tonumber(L,-1)) //get the value returned from the top
 			{
-			case 1:
-				b->type = HOME;
-				break;
-			case 2:
-				b->type = BARBER;
-				break;
-			case 3:
-				b->type = PIESHOP;
-				break;
-			default:
-				b->type = DERELICT;
-				break;
+				case 1:
+					b->type = HOME;
+					break;
+				case 2:
+					b->type = BARBER;
+					break;
+				case 3:
+					b->type = PIESHOP;
+					break;
+				default:
+					b->type = DERELICT;
+					break;
 			}
+			lua_pop(L,1); //pop the top
+
+			//pop the table, leaving the key ready for next iteration
+			lua_pop(L, 1);
 		}
 	}
 }

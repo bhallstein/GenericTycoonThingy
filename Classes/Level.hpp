@@ -13,10 +13,9 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
+
+#include <lua.hpp>
 
 #include "types.h"
 #include "NavMap.hpp"
@@ -28,9 +27,6 @@
 #include "EventHandler.hpp"
 #include "GameState.hpp"
 #include "Game.hpp"
-
-
-using boost::property_tree::ptree;
 
 class LevelView;
 
@@ -67,8 +63,7 @@ public:
 	
 protected:
 	// Methods
-	ptree readLevel(std::string fileName);
-	void buildLevel(ptree level_tree);
+	void buildLevel(std::string filename);
 	
 	// Properties
 	int w, h; 					// Blocks wide/tall.
