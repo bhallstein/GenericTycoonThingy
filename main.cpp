@@ -8,28 +8,18 @@
 #endif
 
 #include "W.h"
-#include "Classes/Menu.hpp"
+#include "Classes/MenuState.hpp"
+#include "Classes/MrPaths.hpp"
 
 int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, int nCmdShow) {
-	W::Window *window = new W::Window();
-	Menu *menu = new Menu(window);
-
-	W::pushState(menu);
-	W::startGameLoop();
-
-	MSG msg;
-	while (!W::_quit) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT)
-				W::_quit = true;
-			else {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-	}
+	W::setLogFile(MrPaths::desktopPath + "DBTlog.txt");
+	W::log << "settings file path: " << MrPaths::settingsPath  << std::endl;
+	W::log << "resources path: "     << MrPaths::resourcesPath << std::endl;
+	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;
 	
-	delete window;
+	W::createWindow(W::size(800,600), "Generic Tycoon Thingy");
+	W::pushState(new MenuState());
+	W::start();
 
 	return 1;
 }
