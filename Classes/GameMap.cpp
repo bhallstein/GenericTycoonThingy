@@ -11,15 +11,15 @@ MapLoc::~MapLoc() {
 
 void MapLoc::addResponder(EventResponder *resp) {
 	// Add an eventresponder to the list thereof
-	// std::cout << responderList.size() << " -> ";
+	// cout << responderList.size() << " -> ";
 	responderList.push_back(resp);
-	// std::cout << responderList.size() << std::endl;
+	// cout << responderList.size() << endl;
 }
 void MapLoc::removeResponder(EventResponder *resp) {
 	// Remove an eventresponder from the list thereof
-	// std::cout << responderList.size() << " -> ";
+	// cout << responderList.size() << " -> ";
 	responderList.remove(resp);
-	// std::cout << responderList.size() << std::endl;
+	// cout << responderList.size() << endl;
 }
 void MapLoc::dispatchEvent(Event *ev, EventResponder **p_e_r) {
 	for (std::list<EventResponder*>::iterator i = responderList.begin(); i != responderList.end(); i++)
@@ -33,7 +33,7 @@ void MapLoc::removeNeighbour(MapLoc *neighbour) {
 	neighbours.remove(neighbour);
 }
 bool MapLoc::operator< (MapLoc *m) {
-	return min_dist < m->min_dist;
+	return min_dist > m->min_dist;		// Heap orders larger items first by def. We want the opposite.
 }
 void MapLoc::setComparator(float new_min_dist) {
 	min_dist = new_min_dist;
@@ -53,6 +53,15 @@ void GameMap::setDimensions(int _w, int _h) {
 	w = _w, h = _h;
 	int n = w * h;
 	maplocs.resize(n);
+
+	// Test binary heap ordering
+	//BinaryHeap<MapLoc*, float> heap;
+	//srand(time(0));
+	//for (int a = 0; a < 15; a++) {
+	//	maplocs[a].min_dist = rand()%10;
+	//	heap.push(&maplocs[a]);
+	//}
+	//heap.print(); heap.pop(); heap.print();
 
 	int i, j, x, y;
 	MapLoc *maploc;
@@ -77,21 +86,21 @@ void GameMap::addResponder(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
 	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
 		return;
-	// std::cout << "Adding object to responders at " << atX << "," << atY << "... " << std::endl;
+	// cout << "Adding object to responders at " << atX << "," << atY << "... " << endl;
 	for (int j = y; j < y + resp->h; j++)
 		for (int i = x; i < x + resp->w; i++)
 			maplocs[j*w + i].addResponder(resp);
-	// std::cout << std::endl << std::endl;
+	// cout << endl << endl;
 }
 void GameMap::removeResponder(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
 	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
 		return;
-	// std::cout << "Removing object from responders at " << atX << "," << atY << "... " << std::endl;
+	// cout << "Removing object from responders at " << atX << "," << atY << "... " << endl;
 	for (int j = y; j < y + resp->h; j++)
 		for (int i = x; i < x + resp->w; i++)
 			maplocs[j*w + i].removeResponder(resp);
-	// std::cout << std::endl;
+	// cout << endl;
 }
 void GameMap::dispatchEvent(Event *ev, EventResponder **p_e_r) {
 	maplocs[w*ev->y + ev->x].dispatchEvent(ev, p_e_r);
@@ -133,51 +142,65 @@ bool GameMap::isPassableAt(int atX, int atY) {
 	return maplocs[atY*w + atX].passable;
 }
 bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route) {
-	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h)
+	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
+		cout << "out of bounds" << endl;
 		return false;
+	}
     
 	// Navigate from A to B
 	// Note: pathfinding is actually done backwards: from the destination to the start.
 	// This is so we don’t have to reverse the route after extracting it, since it arrives in reverse order.
 	MapLoc *A = &maplocs[w*toY + toX], *B = &maplocs[w*fromY + fromX];
-	if (!A->passable || !B->passable) return false;
-
+	if (!A->passable || !B->passable) {
+		cout << (A->passable ? "B" : "A") << " impassable!" << endl;
+		return false;
+	}
+	
 	/* Initialisation */
-	int n = w * h;
-	BinaryHeap<MapLoc*, float> open_nodes;
-	std::vector<MapLoc*> *vec = open_nodes.vec;
-	vec->reserve(n);				// Reserve mem in advance (faster than expanding dynamically)
+	int n = w * h, _i = 0;
+	BinaryHeap<MapLoc*, float> open_nodes(n);
 	for (int i=0; i < n; i++) {
 		MapLoc *maploc = &maplocs[i];
 		maploc->min_dist = (maploc == A ? 0 : INFINITAH);	// Set nodes’ min_dist to inifinity
 		if (maploc->passable)
-			vec->push_back(maploc);		// Populate heap vector with passable nodes
+			open_nodes.fast_push(maploc), _i++;		// Populate heap vector with passable nodes
 	}
 	A->min_dist = 0;					// Set start node’s min_dist to 0
 	open_nodes.reheapify();				// Re-sort heap
+	
+	cout << "Initialised: " << _i << " open nodes" << endl;
 	
 	/* Run */
 	MapLoc *X, *neighbour;
 	float dist_via_X;
 	bool route_found = false;
 	while (open_nodes.size()) {
-		X = open_nodes.top();			// Pop node with lowest min_dist off
-		open_nodes.pop();				// the open node list
+		X = open_nodes.pop();		// Pop node with lowest dist off heap
 		
-		if (X->min_dist == INFINITAH) return false;		// No route is possible.
+		//cout << "got lowest dist node:" << X->x << "," << X->y << " d: " << X->min_dist << endl;
+		
+		if (X->min_dist == INFINITAH) {
+			cout << "lowest dist node unreachable!" << endl;
+			return false;		// No route is possible.
+		}
 		if (X == B) {
+			cout << "route found!" << endl;
 			route_found = true;
 			break;
 		}
 		
 		// Recalc neighbours’ min_dists
+		//cout << "recalculate neighbours’ min_dists:" << endl;
 		for (std::list<MapLoc*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
 			neighbour = (*i);
 			dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
+			//cout << " " << neighbour->x << "," << neighbour->y << ": " << dist_via_X << " vs " << neighbour->min_dist;
 			if (dist_via_X < neighbour->min_dist) {
 				neighbour->min_dist = dist_via_X;
 				neighbour->route_prev = X;
+				open_nodes.reheapify();
 			}
+			//cout << " (" << neighbour->min_dist << ")" << endl;
 		}
 	}
 	if (!route_found) return false;
@@ -185,5 +208,7 @@ bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLo
 	/* Get route */
 	for (X = B; X != A; X = X->route_prev)
 		route->push_back(X);
+	route->push_back(A);
+	
 	return true;
 }

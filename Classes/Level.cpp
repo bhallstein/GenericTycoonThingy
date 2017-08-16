@@ -24,9 +24,8 @@ Building* Level::createBuilding()
 }
 
 Unit* Level::createUnit() {
-	std::cout << "adding new unit (currently " << units.size() << ")... ";
+	std::cout << "adding new unit (currently " << units.size() << ")" << std::endl;
 	units.push_back( new Unit(gamemap) );
-	std::cout << "now: " << units.size() << std::endl;
 	return units.back();
 }
 
@@ -55,8 +54,8 @@ void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 			)
 		);
 	}
-	if (framecount == 1800) framecount = 0;
-	if (300 == framecount++) this->createUnit();	// Create a new unit every 30 seconds
+	if (framecount == 1200) framecount = 0;
+	if (50 == framecount++) this->createUnit();	// Create a new unit every 20 seconds
 }
 
 

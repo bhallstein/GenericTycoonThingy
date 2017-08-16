@@ -25,11 +25,15 @@ public:
 	// Methods
 	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);	// Override to handle events
 	char col();
+	void goSomewhere(int x, int y);
 
 	// Properties
 	int a, b;		// Floating point offset from block
 	
+	int destX, destY;
+	
 	std::string state;
+
 
 protected:
 

@@ -23,6 +23,9 @@
 #include "EventResponder.hpp"
 #include "BinaryHeap.hpp"
 
+using std::cout;
+using std::endl;
+
 
 class MapLoc
 {
@@ -48,6 +51,7 @@ public:
 	MapLoc *route_prev;
 	
 protected:
+	
 	std::list<EventResponder*> responderList;
 	
 };

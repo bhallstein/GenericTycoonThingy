@@ -13,8 +13,7 @@
 
 int main(int argc, char *argv[], char *envp[])
 {
-	// Configuration: paths
-	std::string path_settings = "Data/Settings.xml";
+	srand(time(0));
 
 	// Start game
 	Game g;
