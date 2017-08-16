@@ -46,6 +46,8 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	realtimetimer = new Ogre::Timer();
 	
 	openHelpView();
+
+	theW->playBGM("level.mod");
 }
 Level::~Level()
 {

@@ -48,7 +48,8 @@ public:
 	
 	// Sound shizzle
 	void playSound(const char *);
-	
+	void playBGM(const char *);
+
 	// Event shizzle
 	void addEvent(Event &);
 	std::vector<Event>* getEvents();
@@ -91,6 +92,7 @@ protected:
 	
 	static MTRand_int32 twister;
 	irrklang::ISoundEngine* sound_engine;
+	irrklang::ISound* bgm; //the background music sound instance
 };
 
 #endif

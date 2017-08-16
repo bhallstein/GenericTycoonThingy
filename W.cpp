@@ -24,6 +24,7 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	time_t timey;
 	time(&timey);
 	twister.seed(timey);
+	bgm = 0;
 	
 	this->initializePaths();
 	W::logfile.open(logfilePath.c_str());
@@ -37,6 +38,8 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 W::~W() {
 	log("W destruct");
 	logfile.close();
+	bgm->drop();
+	bgm = 0;
 	sound_engine->drop();
 }
 
@@ -409,6 +412,16 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 
 void W::playSound(const char *soundfile) {
 	sound_engine->play2D((dataPath + soundfile).c_str(), false);
+}
+void W::playBGM(const char *soundfile) {
+	//stop current background music
+	if(bgm) {
+		bgm->stop();
+		bgm->drop(); //drop tracking to be safe?
+	}
+
+	//play specified file as tracked bgm instance
+	bgm = sound_engine->play2D((dataPath + soundfile).c_str(), true, false, true);
 }
 
 void W::addEvent(Event &ev) {

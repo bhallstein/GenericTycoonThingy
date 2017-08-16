@@ -15,6 +15,8 @@ Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
 	responderMap.subscribeToKey(this, Event::K_ESC);
+
+	theW->playBGM("menu.xm");
 }
 Menu::~Menu()
 {	
@@ -25,6 +27,7 @@ void Menu::pause() {
 	
 }
 void Menu::resume(Returny *returny) {
+	theW->playBGM("menu.xm");
 	delete level;
 	if (returny->type == Returny::killer_returny)
 		game->stateFinished(this, Returny(Returny::killer_returny));
