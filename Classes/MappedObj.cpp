@@ -28,6 +28,7 @@ bool MappedObj::init(int _x, int _y) {
 
 bool MappedObj::pickUp() {
 	placeable->x = x, placeable->y = y;
+	a = b = 0;
 	return placeableMode = placeable->activate();
 }
 bool MappedObj::attemptToPlace(int _x, int _y) {

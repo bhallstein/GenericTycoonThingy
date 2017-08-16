@@ -8,6 +8,8 @@
 
 #include <string>
 
+class Unit;
+
 class Event {
 public:
 	Event() { }
@@ -20,6 +22,7 @@ public:
 		SCREENEDGE_TOP, SCREENEDGE_BOTTOM, SCREENEDGE_LEFT, SCREENEDGE_RIGHT,
 		CLOSED,
 		BUTTONCLICK,
+		INTERRUPT_UNITPICKUP,
 		UNKNOWN_EVENT
 	};
 	enum key_code {
@@ -57,6 +60,7 @@ public:
 	event_type type;
 	key_code key;
 	std::string payload;
+	Unit *unit;
 };
 
 #endif

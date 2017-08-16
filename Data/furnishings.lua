@@ -9,7 +9,7 @@ furnishingTypes = {
 			{0,0}, {1,0},
 			{0,1}, {1,1}
 		},
-		compatibleBehaviours = { "shave", "havehaircut" },
+		compatibleBehaviours = { "service:haircut" },
 		interactionPoints = {
 			civilian = {-1,0},
 			staff = {0,-1}
@@ -32,7 +32,7 @@ furnishingTypes = {
 		groundplan = {
 			{0,0}, {1,0}, {2,0}
 		},
-		compatibleBehaviours = { "piesale" },
+		compatibleBehaviours = { "service:piesale" },
 		interactionPoints = {
 			staff = {1,-1},
 			civilian = {1,1}

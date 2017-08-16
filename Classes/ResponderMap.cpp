@@ -59,6 +59,8 @@ void ResponderMap::subscribeToEventType(EventResponder *resp, event_type type) {
 void ResponderMap::unsubscribeFromEventType(EventResponder *resp, event_type type) {
 	if (!type_subscriptions.count(type)) return;
 	type_subscriptions[type].remove(resp);
+	if (type_subscriptions[type].size() == 0)
+		type_subscriptions.erase(type);
 }
 
 void ResponderMap::dispatchEvent(Event *ev) {

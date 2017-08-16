@@ -6,8 +6,8 @@ defaultHoverColour = "blue"
 unitTypes = {
 	civilian = {
 		compatibleBehaviours = {
-			"seekhaircut", "havehaircut",
-			"seekpie", "piesale"
+			"seek:haircut", "service:haircut",
+			"seek:pie", "service:piesale"
 		}
 	},
 	staff = {
@@ -16,8 +16,7 @@ unitTypes = {
 		isStaff = true,
 		hireCost = 10,
 		compatibleBehaviours = {
-			"havehaircut",
-			"piesale"
+			"service:haircut", "service:piesale"
 		}
 	}
 }

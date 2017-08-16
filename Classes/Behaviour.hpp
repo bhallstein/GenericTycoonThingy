@@ -7,8 +7,10 @@
 #define BEHAVIOUR_H
 
 #include <string>
+#include <map>
 
 #include "types.hpp"
+#include "EventResponder.hpp"
 
 #define WAIT_PERIOD 60
 
@@ -16,13 +18,17 @@ class Unit;
 class Building;
 class Furnishing;
 class Level;
+class ResponderMap;
+class W;
+class LuaHelper;
 
 class BehaviourBase;
 
 class Behaviour {
 public:
-	Behaviour(const char *_type);
+	Behaviour(const char *_type, ResponderMap *_levelRM);
 	~Behaviour();
+	static bool initialize(W *);
 	void update();
 	bool destroyed();
 	void destroy();
@@ -35,9 +41,9 @@ protected:
 	std::string type;
 };
 
-class BehaviourBase {
+class BehaviourBase : public EventResponder {
 public:
-	BehaviourBase() : stage(0), destroyed(false), waiting(false), initialized(false) { };
+	BehaviourBase(ResponderMap *_levelRM) : levelRM(_levelRM), stage(0), destroyed(false), waiting(false), initialized(false) { };
 	virtual ~BehaviourBase() { }
 	void update() {
 		if (!initialized) throw MsgException("update called on uninitialized Behaviour object");
@@ -52,6 +58,9 @@ public:
 	virtual void init(Unit *, Unit *, Furnishing *) { }
 	virtual void init(Level *, Unit *, Unit *, Furnishing *) { }
 	bool destroyed;
+	virtual void receiveEvent(Event *) { }
+
+	static bool initialize(W *);
 	
 protected:
 	int stage;
@@ -62,10 +71,15 @@ protected:
 		frames_waited = 0;
 		waiting = true;
 	}
+	ResponderMap *levelRM;
+	
+	static LuaHelper *mrLua;
+	static bool lua_initialized;
 };
 
 class DespawnBehaviour : public BehaviourBase {
 public:
+	DespawnBehaviour(ResponderMap *rm) : BehaviourBase(rm) { }
 	void init(Unit *);
 	void _update();
 protected:
@@ -73,55 +87,56 @@ protected:
 };
 
 
-/* Seek behaviours: navigating a unit to a building of the required type */
+/* SeekBehaviour: navigating a unit to a building of the required type */
+
+struct seekBehaviourInfo {
+	std::string requisiteBuildingType;
+	std::string followingBehaviour;
+};
 
 class SeekBehaviour : public BehaviourBase {
 public:
+	SeekBehaviour(const char *_type, ResponderMap *rm);
+	static bool initialize(W *);
 	void init(Level *, Unit *);
 	void _update();
 protected:
 	Level *level;
 	Unit *unit;
 	Building *building;
-	virtual const char * requisiteBuildingType() = 0;
-	virtual const char * followingBehaviour() = 0;
-};
-
-class SeekHaircutBehaviour : public SeekBehaviour {
-protected:
-	const char * requisiteBuildingType() { return "barber"; }
-	const char * followingBehaviour() { return "havehaircut"; }
-};
-class SeekPieBehevaiour : public SeekBehaviour {
-protected:
-	const char * requisiteBuildingType() { return "pieshop"; }
-	const char * followingBehaviour() { return "piesale"; }
+	
+	static bool lua_initialized;
+	static std::map<std::string, struct seekBehaviourInfo> types;
+	std::string type;
+	struct seekBehaviourInfo *bType;
 };
 
 
-/* Service behaviours: a unit interacts with a placeable & a staff unit */
+/* ServiceBehaviour: a unit interacts with a placeable & a staff unit */
+
+struct serviceBehaviourInfo {
+	int charge;
+};
 
 class ServiceBehaviour : public BehaviourBase {
 public:
+	ServiceBehaviour(const char *_type, ResponderMap *rm);
+	~ServiceBehaviour();
+	static bool initialize(W *);
 	void init(Level *, Unit *u, Unit *s, Furnishing *f);
 	void _update();
+	void receiveEvent(Event *);
 protected:
-	virtual int serviceCharge() = 0; //the charge for this "service"
 	Level *level;
 	Unit *unit, *staff;
 	Furnishing *furnishing;
-	virtual const char * typestring() = 0;
-};
-
-class HaveHaircutBehaviour : public ServiceBehaviour {
-protected:
-	const char * typestring() { return "havehaircut"; }
-	int serviceCharge() { return 1; }
-};
-class PieSaleBehaviour : public ServiceBehaviour {
-protected:
-	const char * typestring() { return "piesale"; }
-	int serviceCharge() { return 3; }
+	
+	Building *contextBuilding;	// Used in interruption
+	
+	static bool lua_initialized;
+	static std::map<std::string, struct serviceBehaviourInfo> types;
+	std::string type;
+	struct serviceBehaviourInfo *bType;
 };
 
 #endif

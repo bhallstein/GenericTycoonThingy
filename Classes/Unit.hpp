@@ -37,7 +37,6 @@ public:
 	int prev_x, prev_y;
 	int dest_x, dest_y;
 	Building *dest_building;
-	Level *level;
 	
 	// Methods
 	void receiveEvent(Event *);
@@ -53,6 +52,8 @@ public:
 	bool arrived;
 	void runAnimation(/* Animation...? */);
 	bool animation_finished;
+	
+	Building* getContextBuilding() { return contextBuilding; }
 	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
 	static bool initialized;
@@ -90,6 +91,7 @@ protected:
 	
 	NavMap *navmap;
 	std::vector<NavNode *> route;
+	Level *level;
 	Building *contextBuilding;
 	bool hover;
 	

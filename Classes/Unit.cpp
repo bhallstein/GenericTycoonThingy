@@ -100,6 +100,10 @@ void Unit::incrementAnimation() {
 }
 
 void Unit::pickUp() {
+	Event ev;
+	ev.setType(Event::INTERRUPT_UNITPICKUP);
+	ev.unit = this;
+	rm->dispatchEvent(&ev);
 	if (contextBuilding) contextBuilding->removeStaff(this);
 	contextBuilding = NULL;
 	MappedObj::pickUp();

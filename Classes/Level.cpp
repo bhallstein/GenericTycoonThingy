@@ -63,6 +63,7 @@ void Level::buildLevel(std::string levelname) {
 	if (!Building::initialize(theW))   throw MsgException("Couldn't read building info.");
 	if (!Unit::initialize(theW))       throw MsgException("Couldn't read unit info.");
 	if (!Furnishing::initialize(theW)) throw MsgException("Couldn't read furnishing info.");
+	if (!Behaviour::initialize(theW))  throw MsgException("Couldn't read behaviour info.");
 	
 	// Set level width and height
 	try {
@@ -215,9 +216,9 @@ void Level::update() {
 			if (q == 0)
 				createBehaviour("despawn")->init(u);
 			else if (q == 1)
-				createBehaviour("seekhaircut")->init(this, u);
+				createBehaviour("seek:haircut")->init(this, u);
 			else
-				createBehaviour("seekpie")->init(this, u);
+				createBehaviour("seek:pie")->init(this, u);
 		}
 	
 	// Update TLOs
@@ -308,7 +309,7 @@ Furnishing* Level::createFurnishing(const char *type) {
 	return NULL;
 }
 Behaviour* Level::createBehaviour(const char *_type) {
-	Behaviour *bhvr = new Behaviour(_type);
+	Behaviour *bhvr = new Behaviour(_type, levelResponderMap);
 	behaviours.push_back(bhvr);
 	return bhvr;
 }

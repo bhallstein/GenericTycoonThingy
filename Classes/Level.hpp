@@ -15,7 +15,6 @@
 #include "GameState.hpp"
 #include "EventResponder.hpp"
 #include "SpawnPoint.hpp"
-#include "Behaviour.hpp"
 
 class Game;
 class W;
@@ -25,6 +24,7 @@ class NavMap;
 class Building;
 class Furnishing;
 class Unit;
+class Behaviour;
 
 class LevelView;
 class UIBarView;
@@ -35,8 +35,6 @@ class Level : public GameState, public EventResponder {
 public:
 	Level(Game *, W *, std::string path);
 	~Level();
-	
-	// Methods
 	
 	// GameState function implementations
 	void reset();

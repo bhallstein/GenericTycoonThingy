@@ -7,6 +7,7 @@
 #define BEHAVIOURPARTICIPANT_H
 
 #include "types.hpp"
+#include "Behaviour.hpp"
 
 class BehaviourParticipant {
 public:
@@ -22,7 +23,10 @@ public:
 		if (!available) return false;
 		return capableOfBehaviour(bTypestring);
 	}
-	void capture() { if (!available) throw MsgException("Attempt to capture unavailable BehaviourParticipant"); available = false; }
+	void capture() {
+		if (!available) throw MsgException("Attempt to capture unavailable BehaviourParticipant");
+		available = false;
+	}
 	void release() { available = true; }
 	bool isAvailable() { return available; }
 	
