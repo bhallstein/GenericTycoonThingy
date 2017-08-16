@@ -7,7 +7,7 @@ Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 {
 	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file)
 	
-	settings = new SettingsManager();
+	settings = new SettingsManager(theW);
 	
 	if (settings->fullscreen.value)
 		theW->goFullscreen();
@@ -27,9 +27,9 @@ Game::~Game()
 	
 }
 
-void Game::sendEvents(std::vector<Event*> *events) {
-	for (std::vector<Event*>::iterator it = events->begin(); it != events->end(); it++)
-		states.back()->handleEvent(*it);
+void Game::sendEvents(std::vector<Event> *events) {
+	for (std::vector<Event>::iterator it = events->begin(); it != events->end(); it++)
+		states.back()->handleEvent(&(*it));
 }
 
 void Game::pushState(GameState *st)
@@ -60,7 +60,7 @@ bool Game::update()	{		// Return false to quit
 	if (states.empty()) {
 		if (finishedIntro)
 			return false;
-		else 
+		else
 			finishedIntro = true, pushState(new Menu(this, theW));
 	}
 	

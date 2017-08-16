@@ -1,37 +1,177 @@
-#import "MyView.h"
+#include "W.hpp"
+
+#ifdef TARGET_OS_MAC
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
+#import "MyView.h"
+#elif defined _WIN32 || _WIN64
+#include <gl\gl.h>
+#include <gl\glu.h>
+#endif
 
-#include "Event.hpp"
+#include "Classes/Event.hpp"
+#include "Classes/View.hpp"
 
+W::W(WindowManager *_winManager) : 
+	winManager(_winManager), opengl_needs_setting_up(true)
+{
+
+}
+
+W::~W() {
+	std::cout << "w destroy" << std::endl;
+}
+
+bool W::goWindowed() {
+	return winManager->goWindowed();
+}
+bool W::goFullscreen() {
+	return winManager->goFullscreen();
+}
+bool W::setResolution(int _x, int _y) {
+	// ...
+	return true;
+}
+void W::setWindowTitle(const char *t) {
+	winManager->setTitle(t);
+}
+
+void W::setUpOpenGL() {
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_SCISSOR_TEST);
+	opengl_needs_setting_up = false;
+}
+void W::frameChanged() {
+	// ...
+}
+void W::startDrawing() {
+	winManager->enableDrawing();
+
+	if (opengl_needs_setting_up)
+		setUpOpenGL();
+	
+	int w = width(), h = height();
+
+	current_drawn_view = NULL;
+	glScissor(0, 0, w, h);
+	
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	
+	glClearColor(0.525, 0.187, 0.886, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+void W::finishDrawing() {
+	winManager->endDrawing();
+}
+void W::setUpDrawingForView(View *v) {
+	current_drawn_view = v;
+	glScissor(v->x, height() - v->y - v->height, v->width, v->height);
+}
+void W::drawRect(float _x, float _y, float _width, float _height, colour_name col) {
+	if (col == RED)			glColor3f(1, 0, 0);
+	else if (col == GREEN)	glColor3f(0, 1, 0);
+	else if (col == BLUE)	glColor3f(0, 0, 1);
+	else if (col == YELLOW)	glColor3f(1, 1, 0);
+	else if (col == WHITE)	glColor3f(1, 1, 1);
+	else if (col == BLACK)	glColor4f(0, 0, 0, 0.5);
+
+	float x = _x, y = _y;
+	if (current_drawn_view != NULL)
+		x += current_drawn_view->x, y += current_drawn_view->y;
+	
+	glBegin(GL_QUADS);
+		glVertex2f(x, y);
+		glVertex2f(x + _width, y);
+		glVertex2f(x + _width, y + _height);
+		glVertex2f(x, y + _height);
+	glEnd();
+}
+
+void W::addEvent(Event &ev) {
+	events.push_back(ev);
+}
+std::vector<Event>* W::getEvents() {
+	return &events;
+}
+void W::clearEvents() {
+	events.clear();
+}
+
+//FILE* W::filePointerToResource(std::string s) {
+//	int len = 180; char path[len];
+//	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
+//	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
+//	return fopen(path, "r");
+//}
+std::string W::pathForResource(std::string s) {
+#ifdef TARGET_OS_MAC
+	int len = 200; char path[len];
+	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
+	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
+	return path;
+#elif defined _WIN32 || _WIN64
+	char appPath[MAX_PATH] = "";
+	std::string appDir;
+	GetModuleFileName(0, appPath, sizeof(appPath) - 1);
+	appDir = appPath;
+	appDir = appDir.substr(0, appDir.rfind("\\"));
+	appDir.append("Data/");
+	appDir.append(s);
+	return appDir;
+#endif
+}
+std::string W::pathToSettingsDir() {
+#ifdef TARGET_OS_MAC
+	// ...
+#elif defined _WIN32 || _WIN64
+	char dir[] = "%APPDATA%/Demon Barber Tycoon/";
+	DWORD dw = GetFileAttributes(dir);
+	if (dw != INVALID_FILE_ATTRIBUTES && (dw & FILE_ATTRIBUTE_DIRECTORY)) {
+		std::string s = dir;
+		return s;
+	}
+	if (!CreateDirectory(dir, NULL))
+		; // throw
+	return dir;
+#endif
+}
+
+int W::width() {
+	return winManager->width();
+}
+int W::height() {
+	return winManager->height();
+}
+
+/*#ifdef TARGET_OS_MAC
+	return [objs->view bounds].size.width;
+	return [objs->view bounds].size.height;
+#endif*/
+
+/*
 struct NativeObjs {
+#ifdef TARGET_OS_MAC
 	NSWindow *window;
 	MyWindowDelegate *windowDelegate;
 	MyView *view;
 	NSOpenGLContext *context;
+#elif defined _WIN32 || _WIN64
+	HINSTANCE appInstance;
+	HWND windowHandle;
+	HGLRC context;
+	HDC deviceContext;
+#endif
 };
+*/
 
-Event::key_code convertNativeStringToKeycode(NSString *str) {
-	unichar c = [str characterAtIndex:0];
-	if (c >= 'a' && c <= 'z') return (Event::key_code) ((int)Event::K_A + c - 'a');
-	if (c >= 'A' && c <= 'Z') return (Event::key_code) ((int)Event::K_A + c - 'A');
-	if (c >= '0' && c <= '9') return (Event::key_code) ((int)Event::K_0 + c - '0');
-	if (c == NSLeftArrowFunctionKey)	return Event::K_LEFT_ARROW;
-	if (c == NSRightArrowFunctionKey)	return Event::K_RIGHT_ARROW;
-	if (c == NSUpArrowFunctionKey)		return Event::K_UP_ARROW;
-	if (c == NSDownArrowFunctionKey)	return Event::K_DOWN_ARROW;
-	if (c == 27) return Event::K_ESC;		// Apparently these are rather universal
-	if (c == 13) return Event::K_RETURN;	// 
-	return Event::K_OTHER;
-}
-
-#include "W.hpp"
-#include "Classes/View.hpp"
-
-W::W() : mode(NONE), quit_event(false), opengl_needs_setting_up(true) {
+/*
 	a_lion_is_here = false;
-	
-	objs = new NativeObjs;
 	
 	// Create OpenGL context
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
@@ -45,17 +185,16 @@ W::W() : mode(NONE), quit_event(false), opengl_needs_setting_up(true) {
 		std::cout << "couldn't create opengl context" << std::endl;
 		// throw exception
 	}
-}
+#elif defined _WIN32 || _WIN64
+	objs = new NativeObjs;
+	objs->appInstance = GetModuleHandle(NULL);
 
-W::~W() {
-	closeWindow();
-	delete objs;
-	std::cout << "w destroy" << std::endl;
-}
+	createWindow();		// May throw an exception, which should be handled in main.cpp
+#endif
+*/
 
-bool W::goWindowed() {
-	if (mode == WINDOWED) return true;
-	
+/*
+#ifdef TARGET_OS_MAC
 	if (a_lion_is_here) {
 		
 	}
@@ -80,13 +219,11 @@ bool W::goWindowed() {
 		[objs->window makeKeyAndOrderFront:NSApp];
 		[objs->window makeFirstResponder:objs->view];
 	}
-	
-	mode = WINDOWED;
-	return true;
+#endif
 }
 bool W::goFullscreen() {
 	if (mode == FULLSCREEN) return true;
-	
+#ifdef TARGET_OS_MAC
 	if (a_lion_is_here) {
 		// Lion fullscreen shizzle
 	}
@@ -115,47 +252,69 @@ bool W::goFullscreen() {
 		[objs->window makeKeyAndOrderFront:NSApp];
 		[objs->window makeFirstResponder:objs->view];
 	}
-	
-	mode = FULLSCREEN;
-	return true;
+#endif
 }
+*/
+/*
 void W::closeWindow() {
 	if (mode == NONE) return;
+#ifdef TARGET_OS_MAC
 	[objs->context clearDrawable];
 	[objs->window release];
 	[objs->windowDelegate release];
+#elif defined _WIN32 || _WIN64
+	// ...
+#endif
 	mode = NONE;
 }
+*/
+/*
 void W::setBackBufferSize(int _x, int _y) {
+#ifdef TARGET_OS_MAC
 	GLint size[] = { _x, _y };
 	CGLContextObj ctx = (CGLContextObj) [objs->context CGLContextObj];
 	CGLSetParameter(ctx, kCGLCPSurfaceBackingSize, size);
 	CGLEnable(ctx, kCGLCESurfaceBackingSize);
+#elif defined _WIN32 || _WIN64
+	// May not need doing on windows, or something else may need doing... display mode perhaps
+#endif
 }
-void W::setUpOpenGL() {
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_SCISSOR_TEST);
-	opengl_needs_setting_up = false;
-}
+*/
+
+/*
 void W::frameChanged() {
+#ifdef TARGET_OS_MAC
 	[objs->context update];
 	// Update the backing buffer if in windowed mode
 	if (mode == WINDOWED)
 		setBackBufferSize(width(), height());
+#elif defined _WIN32 || _WIN64
+	// ...
+#endif
 }
+*/
+
+/*
+#ifdef TARGET_OS_MAC
 void* W::getView() {
 	return objs->view;
 }
+#endif
+*/
 
-void W::setWindowTitle(std::string s) {
+/*void W::setWindowTitle(std::string s) {
+#ifdef TARGET_OS_MAC
 	[objs->window setTitle:[NSString stringWithUTF8String:s.c_str()]];
-}
+#elif defined _WIN32 || _WIN64
 
+#endif
+}*/
+
+/*
 std::vector<Event*>* W::getEvents() {
-	// Convert to DBTEvents
+#ifdef TARGET_OS_MAC
 	events.clear();
+	// Convert to DBTEvents
 	NSDictionary *ext_events = [objs->view getEvents];
 	NSEnumerator *enumerator = [ext_events keyEnumerator];
 	while (NSString *event_type = [enumerator nextObject]) {
@@ -172,21 +331,28 @@ std::vector<Event*>* W::getEvents() {
 		}
 		else if (event_type == @"keydown") {
 			ev->setType(Event::KEYPRESS);
-			ev->key = convertNativeStringToKeycode([ext_events objectForKey:event_type]);
+			ev->key = convertNativeStringToKeycode([[ext_events objectForKey:event_type] characterAtIndex:0]);
 		}
 		else
 			ev->setType(Event::UNKNOWN_EVENT);
 		events.push_back(ev);
 	}
+	[objs->view clearEvents];
+#endif
 	// Synthesize a mousemove event from the current mouse position
+#ifdef TARGET_OS_MAC
 	NSPoint mouseloc = [objs->view convertMouseCoords:[[objs->view window] mouseLocationOutsideOfEventStream]];
-	Event *ev = new Event;
-	if (mouseloc.x >= 0 && mouseloc.y >= 0 && mouseloc.x < width() && mouseloc.y < height()) {		
+#elif defined _WIN32 || _WIN64
+	POINT mouseloc;
+	GetCursorPos(&mouseloc);
+	ScreenToClient(objs->windowHandle, &mouseloc);
+#endif
+	if (mouseloc.x >= 0 && mouseloc.y >= 0 && mouseloc.x < width() && mouseloc.y < height()) {
+		Event *ev = new Event;
 		ev->setType(Event::MOUSEMOVE);
 		ev->x = (int) mouseloc.x;
 		ev->y = (int) mouseloc.y;
 		events.push_back(ev);
-		
 		// Generate screenedge events, used for scrolling the map
 		int scrollmargin = 20;
 		if (ev->x < scrollmargin) {
@@ -210,85 +376,38 @@ std::vector<Event*>* W::getEvents() {
 			events.push_back(ev);
 		}
 	}
+	
+	// Send close event if have been asked to
 	if (quit_event) {
 		Event *ev = new Event;
 		ev->type = Event::CLOSED;
 		events.push_back(ev);
 		quit_event = false;
 	}
-	
-	[objs->view clearEvents];
+
 	return &events;
 }
+*/
+/*
 void W::sendQuitEvent() {
 	quit_event = true;
 }
+*/
 
-int W::width() {
-	return [objs->view bounds].size.width;
-}
-int W::height() {
-	return [objs->view bounds].size.height;
-}
-
+/*
 void W::startDrawing() {
+#ifdef TARGET_OS_MAC
 	[objs->context makeCurrentContext];
-
-	if (opengl_needs_setting_up)
-		setUpOpenGL();
-	
-	int w = width(), h = height();
-
-	current_drawn_view = NULL;
-	glScissor(0, 0, w, h);
-	
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	
-	glClearColor(0.525, 0.187, 0.886, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+#elif defined _WIN32 || _WIN64
+	events.clear();
+#endif
 }
 void W::finishDrawing() {
+#ifdef TARGET_OS_MAC
 	[NSOpenGLContext clearCurrentContext];
 	[objs->context flushBuffer];
+#elif defined _WIN32 || _WIN64
+	// Don't think anything needs doing here
+#endif
 }
-void W::setUpDrawingForView(View *v) {
-	current_drawn_view = v;
-	glScissor(v->x, height() - v->y - v->height, v->width, v->height);
-}
-
-void W::drawRect(float _x, float _y, float _width, float _height, colour_name col) {
-	if (col == RED)			glColor3f(1, 0, 0);
-	else if (col == GREEN)	glColor3f(0, 1, 0);
-	else if (col == BLUE)	glColor3f(0, 0, 1);
-	else if (col == YELLOW)	glColor3f(1, 1, 0);
-	else if (col == WHITE)	glColor3f(1, 1, 1);
-	else if (col == BLACK)	glColor4f(0, 0, 0, 0.5);
-
-	float x = _x, y = _y;
-	if (current_drawn_view != NULL)
-		x += current_drawn_view->x, y += current_drawn_view->y;
-	
-	glBegin(GL_QUADS);
-		glVertex2f(x, y);
-		glVertex2f(x + _width, y);
-		glVertex2f(x + _width, y + _height);
-		glVertex2f(x, y + _height);
-	glEnd();
-}
-
-//FILE* W::filePointerToResource(std::string s) {
-//	int len = 180; char path[len];
-//	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
-//	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
-//	return fopen(path, "r");
-//}
-std::string W::pathForResource(std::string s) {
-	int len = 180; char path[len];
-	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
-	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
-	return path;
-}
+*/

@@ -15,15 +15,18 @@
 #include <string>
 #include <iostream>
 
+#include "../W.hpp"
 #include "Setting.hpp"
 #include "LuaHelper.hpp"
 
 class SettingsManager
 {
 public:
-	SettingsManager(/*char* argv[]*/);
+	SettingsManager(W *_theW /*char* argv[]*/);
 
 	// Properties
+	W *theW;
+
 	Setting<int> screenWidth;
 	Setting<int> screenHeight;
 	Setting<bool> fullscreen;

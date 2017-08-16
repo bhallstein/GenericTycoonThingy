@@ -1,5 +1,5 @@
 /*
- * W.hpp - a cross-platform OpenGL combobulator
+ * W.hpp - Cross-platform OpenGL Bobulator
  *
  */
 
@@ -10,62 +10,58 @@
 #include <vector>
 
 #include "Classes/types.h"
+#include "WindowManager.hpp"
 
 class View;
 class Event;
 
-struct NativeObjs;
-
 class W {
 public:
-	W();
+	W(WindowManager *);
 	~W();
 	
 	// Methods
 	
-	// Window setup
+	// Window shizzle
 	bool goWindowed();
 	bool goFullscreen();
+	bool setResolution(int _x, int _y);
+	void setWindowTitle(const char *);
 	
-	void setWindowTitle(std::string);
+	// Drawing shizzle
 	void setUpOpenGL();
 	void frameChanged();
-	void* getView();
+	void startDrawing();
+	void finishDrawing();
+	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
+	void drawRect(float _x, float _y, float _width, float _height, colour_name);
+
+	// Event shizzle
+	void addEvent(Event &);
+	std::vector<Event>* getEvents();
+	void clearEvents();
 	
+	// File shizzle
+	//FILE* filePointerToResource(std::string);	// Be sure to call fclose() when you're done
+	std::string pathForResource(std::string);
+	std::string pathToSettingsDir();
+
+	//void* getView();
 	int width();
 	int height();
 	
-	// Events
-	std::vector<Event *>* getEvents();
-	void sendQuitEvent();
-	
-	// Drawing
-	void startDrawing();		// Called by the app delegate
-	void finishDrawing();		// 
-	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
-	void drawRect(float _x, float _y, float _width, float _height, colour_name);
-	
-	// File access
-	//FILE* filePointerToResource(std::string);	// Be sure to call fclose() when you're done
-	std::string pathForResource(std::string);
-	
 protected:
 	// Methods
-	void setBackBufferSize(int _x, int _y);
-	void closeWindow();
+	//void setBackBufferSize(int _x, int _y);
 	
 	// Properties
-	struct NativeObjs *objs;
-	enum mode_type { WINDOWED, FULLSCREEN, NONE } mode;
+	//enum mode_type { WINDOWED, FULLSCREEN, NONE } mode;
+	WindowManager *winManager;
 	bool opengl_needs_setting_up;
 	View *current_drawn_view;
 
-	std::vector<Event *> events;
+	std::vector<Event> events;
 
-	bool quit_event;
-	int prev_width, prev_height;
-	
-	bool a_lion_is_here;
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW), buttonMap(_theW->width(), _theW->height())
 {
-	JenniferAniston aniston(theW, TOP_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 1);
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
 	menuview = new MenuView(_theW, aniston, &buttonMap, &buttons);
 	responderMap.addResponder(menuview);
 	

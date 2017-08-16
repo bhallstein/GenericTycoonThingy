@@ -13,7 +13,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) :
 
 	buildLevel(levelpath);
 	
-	JenniferAniston aniston(theW, BOTTOM_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 0.1);
+	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
 	uibarview = new UIBarView(theW, aniston, this);
 	responderMap.addResponder(uibarview);
 	
@@ -61,7 +61,7 @@ void Level::buildLevel(std::string fileName)
 	levelResponderMap = new ResponderMap(w, h);
 	
 	// Create levelview
-	JenniferAniston aniston(theW, TOP_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 1);
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
 	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &placeables, &units, w, h);
 	responderMap.addResponder(levelview);
 	

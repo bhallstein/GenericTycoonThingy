@@ -25,7 +25,7 @@ public:
 	// Methods
 	
 	// Events/Update/Drawing
-	void sendEvents(std::vector<Event*> *);
+	void sendEvents(std::vector<Event> *);
 	bool update();
 	void draw();
 	

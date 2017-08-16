@@ -20,7 +20,7 @@
 #include "../W.hpp"
 
 enum corner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT };
-enum pos_type { FIXED, PROPORTIONAL };
+enum pos_type { PFIXED, PPROPORTIONAL };
 
 class JenniferAniston {
 public:
@@ -37,23 +37,23 @@ public:
 		int Ww = theW->width();
 		int Wh = theW->height();
 		
-		if (size_method == FIXED)
+		if (size_method == PFIXED)
 			width = w, height = h;
 		else
 			width = w * Ww, height = h * Wh;
 		
 		// Set x
 		if (fixed_corner == TOP_LEFT || fixed_corner == BOTTOM_LEFT)
-			x = (pos_method == FIXED ? corner_x : corner_x * Ww);
+			x = (pos_method == PFIXED ? corner_x : corner_x * Ww);
 		else {
-			int rval = Ww - (pos_method == FIXED ? corner_x : corner_x * Ww);
+			int rval = Ww - (pos_method == PFIXED ? corner_x : corner_x * Ww);
 			x = rval - width;
 		}
 		// Set y
 		if (fixed_corner == TOP_LEFT || fixed_corner == TOP_RIGHT)
-			y = (pos_method == FIXED ? corner_y : corner_y * Wh);
+			y = (pos_method == PFIXED ? corner_y : corner_y * Wh);
 		else {
-			int bval = Wh - (pos_method == FIXED ? corner_y : corner_y * Wh);
+			int bval = Wh - (pos_method == PFIXED ? corner_y : corner_y * Wh);
 			y = bval - height;
 		}
 	}
