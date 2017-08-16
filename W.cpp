@@ -428,7 +428,7 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 void W::playSound(const char *soundfile) {
 	sound_engine->play2D((dataPath + soundfile).c_str(), false);
 }
-void W::playBGM(const char *soundfile) {
+void W::playBGM(const char *soundfile, bool loop) {
 	//stop current background music
 	if(bgm) {
 		bgm->stop();
@@ -436,7 +436,7 @@ void W::playBGM(const char *soundfile) {
 	}
 
 	//play specified file as tracked bgm instance
-	bgm = sound_engine->play2D((dataPath + soundfile).c_str(), true, false, true);
+	bgm = sound_engine->play2D((dataPath + soundfile).c_str(), loop, false, true);
 }
 
 void W::addEvent(Event &ev) {

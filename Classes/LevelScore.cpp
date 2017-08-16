@@ -15,7 +15,7 @@ LevelScore::LevelScore(Game *_game, W *_theW, bool _victory) : GameState(_game, 
 	victory = _victory;
 	
 	if (!victory) theW->playSound("pacman-death.wav");
-	theW->playBGM(victory ? "win.ogg" : "lose-b.ogg");
+	theW->playBGM(victory ? "win.ogg" : "lose-b.ogg", false);
 
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
