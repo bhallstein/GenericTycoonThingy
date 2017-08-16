@@ -7,6 +7,7 @@
 #define GAME_H
 
 #include "Level.h"
+#include "SettingsManager.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -21,6 +22,9 @@ public:
 
 	// Instance methods
 	void Run();
+
+	// Instance Properties
+	SettingsManager Settings;
 
 protected:
 	sf::RenderWindow DBTWindow;

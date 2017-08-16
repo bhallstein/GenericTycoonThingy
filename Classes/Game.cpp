@@ -1,9 +1,5 @@
 #include "Game.h"
 
-//#include "Level.h"
-#include "Building.h"
-
-
 Game::Game()
 {
 	/* Window setup */
@@ -13,7 +9,7 @@ Game::Game()
 	std::string w_name = "Demon Barber Tycoon";
 	
 	// Get settings from file and if success & values valid, replace defaults.
-	// ...
+	Settings.Load(false); //false = don't load defaults
 	
  	DBTWindow.Create(sf::VideoMode(pixel_width, pixel_height), w_name, sf::Style::Close);
 	DBTWindow.SetFramerateLimit(60);
