@@ -42,6 +42,9 @@ public:
 	void finalizePlacement();
 	const char * col();
 	
+	void getEntryPoint(int *_x, int *_y);
+	void getQueuePoint(int *_x, int *_y);
+	
 	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
 	
 protected:

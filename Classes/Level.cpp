@@ -244,6 +244,7 @@ void Level::handleCloseEvent() {
 
 Unit* Level::createUnit(int atX, int atY, const char *type) {
 	std::vector<Unit*> *vctr = &units;
+	Unit *u = new Unit(levelResponderMap, navmap, type, this);
 	if (strcmp(type, "staff") == 0) {
 		// Find the asylum (spawn building) amongst our buildings
 		// Note: this method will use the first asylum it finds
@@ -255,7 +256,10 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 			}
 		vctr = &staff;
 	}
-	Unit *u = new Unit(levelResponderMap, navmap, type);
+	else {
+		u->addIntention(W::randUpTo(2) == 0 ? Intention::HAIRCUT : Intention::PIE);
+		u->addIntention(Intention::DESTRUCT);
+	}
 	if (u->init(atX, atY)) {
 		vctr->push_back(u);
 		std::cout << "added unit " << u << " of type '" << type << "' (now " << vctr->size() << ")" << std::endl;
@@ -315,8 +319,16 @@ void Level::destroyAllThings() {
 	destroyThings();
 }
 
+Building* Level::randomBuildingWithType(const char *_type) {
+	int nOfType = 0, indices[50];
+	for (int i=0, n = buildings.size(); i < n; i++)
+		if (buildings[i]->type.compare(_type) == 0)
+			indices[nOfType++] = i;
+	return nOfType == 0 ? NULL : buildings[indices[W::randUpTo(nOfType)]];
+}
+
 void Level::openFurniturePurchasingView(Building *b) {
-	if (furniturePurchasingView != NULL) closeFurniturePurchasingView();
+	if (furniturePurchasingView != NULL) return;
 	currentlyEditedBuilding = b;
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
 	furniturePurchasingView = new FurniturePurchasingUIView(theW, aniston, b->b_allowedFurniture);
@@ -327,12 +339,13 @@ void Level::openFurniturePurchasingView(Building *b) {
 	furniturePurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
 }
 void Level::closeFurniturePurchasingView() {
+	responderMap.removeResponder(furniturePurchasingView);
 	delete furniturePurchasingView;
 	furniturePurchasingView = NULL;
 	currentlyEditedBuilding = NULL;
 }
 void Level::openHiringView() {
-	if (hiringUIView != NULL) closeHiringView();
+	if (hiringUIView != NULL) return;
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PFIXED, 10, 90, 140, 200);
 	hiringUIView = new HiringUIView(theW, aniston);
 	responderMap.addResponder(hiringUIView);
@@ -342,6 +355,7 @@ void Level::openHiringView() {
 	hiringUIView->subscribe("hire staff", new Callback(&Level::createStaffUnit, this));
 }
 void Level::closeHiringView() {
+	responderMap.removeResponder(hiringUIView);
 	delete hiringUIView;
 	hiringUIView = NULL;
 }

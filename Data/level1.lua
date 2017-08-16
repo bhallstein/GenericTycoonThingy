@@ -24,7 +24,7 @@ buildings = {
 		doors = {
 			{ 2,4, "downward" },
 			{ 3,4, "downward" },
-			{ 5,2, "rightward" }
+			{ 6,1, "rightward" }
 		}
 	},
 	{

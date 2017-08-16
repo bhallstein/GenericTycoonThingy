@@ -42,6 +42,16 @@ const char * Building::col() {
 	return b_colour->c_str();
 }
 
+void Building::getEntryPoint(int *_x, int *_y) {
+	door d = doors[W::randUpTo(doors.size())];
+	*_x = x + d.coord.x;
+	*_y = y + d.coord.y;
+}
+void Building::getQueuePoint(int *_x, int *_y) {
+	*_x = x;
+	*_y = y;
+}
+
 bool Building::initialize(W *_W) {
 	W::log("Building::initialize() called...");
 	
