@@ -1,7 +1,11 @@
 -- Building definitions
 
-defaultColour = "black"
-defaultHoverColour = "black"
+defaultColour = "transparent black"
+defaultHoverColour = "transparent black"
+
+universalFurnishings = {
+	"door"
+}
 
 buildingTypes = {
 	barber = {

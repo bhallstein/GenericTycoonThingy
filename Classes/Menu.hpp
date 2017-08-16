@@ -10,53 +10,40 @@
 #define MENU_H
 
 #include <vector>
-
-#include "GameState.hpp"
-#include "EventResponder.hpp"
-
-class Game;
-class W;
-class Level;
-class Button;
+#include "W.h"
 
 class MenuBackgroundView;
 class ClickToBeginView;
 
-class Menu : public GameState, public EventResponder {
+class Level;
+
+class Menu : public W::GameState, public W::EventResponder {
 public:
-	Menu(Game *, W *);
+	Menu(W::Window *);
 	~Menu();
 	
 	// Methods
-	void reset();
-	void pause();
-	void resume(Returny *);
+	void resume(W::Returny *);
 	void update();
-	void draw();
-	void setResolution(int _w, int _h);
 	
-	void receiveEvent(Event *);
+	void receiveEvent(W::Event *);
 	
 	void startLevel(std::string path);
 	void startLevelOne();
 	
 protected:
-	// Properties
 	MenuBackgroundView *menubackgroundview;
 	ClickToBeginView *clicktobeginview;
+
 	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
-	
+	W::Window *win;
 };
 
-
-#include "View.hpp"
-
-class ClickToBeginView : public View {
+class ClickToBeginView : public W::UIView {
 public:
-	ClickToBeginView(W *, JenniferAniston &, Menu *);
-	~ClickToBeginView();
+	ClickToBeginView(W::Window *, W::EventHandler *, Menu *);
 	void draw();
-	void processMouseEvent(Event *);
+	void processMouseEvent(W::Event *);
 private:
 	bool mr_hov;
 	Menu *menu;
@@ -65,15 +52,15 @@ private:
 
 struct colour_square;
 
-class MenuBackgroundView : public View {
+class MenuBackgroundView : public W::View {
 public:
-	MenuBackgroundView(W *, JenniferAniston &);
+	MenuBackgroundView(W::Window *);
 	~MenuBackgroundView();
 	void draw();
 private:
 	int *colour_squares;
-	__colour *colour_cycle_array;
-	int      colour_cycle_length;
+	W::Colour *colour_cycle_array;
+	int colour_cycle_length;
 	
 	int framecount;
 	

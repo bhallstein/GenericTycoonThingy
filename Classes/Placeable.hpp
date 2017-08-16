@@ -9,21 +9,19 @@
 #include <iostream>
 #include <map>
 
-#include "types.hpp"
-#include "EventResponder.hpp"
-#include "ResponderMap.hpp"
+#include "W.h"
 
-class MappedObj;
+class PlaceableManager;
 
-class Placeable : public EventResponder {
+class Placeable : public W::MappedObj {
 public:
-	Placeable(MappedObj *, ResponderMap *);
+	Placeable(PlaceableManager *, W::EventHandler *);
 	~Placeable();
 	bool activate();
 	void deactivate();
-	void receiveEvent(Event *ev);
-	MappedObj *mo;
-	ResponderMap *rm;
+	void receiveEvent(W::Event *ev);
+	PlaceableManager *mngr;
+	W::EventHandler *eh;
 };
 
 #endif

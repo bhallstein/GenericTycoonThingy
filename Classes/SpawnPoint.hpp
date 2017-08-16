@@ -19,11 +19,11 @@ public:
 	SpawnPoint(int _x, int _y/*, std::string _name, int rate*/);
 	~SpawnPoint();
 
-	bool spawn(intcoord *);
+	bool spawn(W::position *);
 //	void updateRate(int newRate);
 //	void addCustomer(std::string customer, int rate);
 //	void removeCustomer(std::string customer);
-	void getCoords(intcoord *);
+	void getCoords(W::position *);
 
 	std::map<std::string, int[2]> customers;//to store both the types and the rate at which they will spawn. 2nd element in array is the counter.
 	

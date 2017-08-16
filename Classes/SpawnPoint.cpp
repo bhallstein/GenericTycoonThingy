@@ -6,7 +6,7 @@ SpawnPoint::SpawnPoint(int _x, int _y/*, std::string _name, int _rate*/) :
 	// hai spawny
 }
 
-bool SpawnPoint::spawn(intcoord *c)
+bool SpawnPoint::spawn(W::position *c)
 {
 	bool spawn_ahoy = rate == ++rateCounter;
 	if (spawn_ahoy)
@@ -14,6 +14,6 @@ bool SpawnPoint::spawn(intcoord *c)
 	return spawn_ahoy;
 }
 
-void SpawnPoint::getCoords(intcoord *c) {
+void SpawnPoint::getCoords(W::position *c) {
 	c->x = x, c->y = y;
 }

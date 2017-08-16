@@ -9,34 +9,21 @@
 #define LEVELSCORE_H
 
 #include <vector>
+#include "W.h"
 
-#include "GameState.hpp"
-#include "EventResponder.hpp"
-
-class Game;
-class W;
 class Level;
-class Button;
-
 class ScoreView;
 
-class LevelScore : public GameState, public EventResponder {
+class LevelScore : public W::GameState, public W::EventResponder {
 public:
-	LevelScore(Game *, W *, bool);
+	LevelScore(W::Window *, bool _victory);
 	~LevelScore();
 	
 	// Methods
-	void reset();
-	void pause();
-	void resume(Returny *);
+	void resume(W::Returny *);
 	void update();
-	void draw();
-	void setResolution(int _w, int _h);
 	
-	void receiveEvent(Event *);
-	
-	void startLevel(std::string path);
-	void startLevelOne();
+	void recEv(W::Event *);
 	
 	void exitToMenu();
 	void replayLevel();
@@ -44,17 +31,14 @@ public:
 protected:
 	// Properties
 	ScoreView *scoreview;
-	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
 	bool victory;
+	W::Window *win;
 	
 };
 
-
-#include "UIView.hpp"
-
-class ScoreView : public UIView {
+class ScoreView : public W::UIView {
 public:
-	ScoreView(W *, JenniferAniston &, ResponderMap *, bool _victory);
+	ScoreView(W::Window *_win, W::EventHandler *_eh, bool _victory);
 	void draw();
 	bool victory;
 };

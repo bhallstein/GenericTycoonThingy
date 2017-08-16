@@ -13,16 +13,9 @@
 #include <ctime>
 
 #include "types.hpp"
-#include "GameState.hpp"
-#include "EventResponder.hpp"
 #include "SpawnPoint.hpp"
-#include "LevelScore.hpp"
+//#include "LevelScore.hpp" // TODO: re-add levelscore
 
-class Game;
-class W;
-class ResponderMap;
-class Button;
-class NavMap;
 class Building;
 class Furnishing;
 class Unit;
@@ -33,31 +26,45 @@ class UIBarView;
 class FurnishingPurchasingUIView;
 class HiringUIView;
 class GTTHelpView;
+
+class LevelScore;
+
 namespace Ogre { class Timer; }
 
-class Level : public GameState, public EventResponder {
+// Register level event types
+namespace W { namespace EventType {
+	extern T
+	LEVEL_LEFTMOUSEDOWN,
+	LEVEL_LEFTMOUSEUP,
+	LEVEL_RIGHTMOUSEDOWN,
+	LEVEL_RIGHTMOUSEUP,
+	LEVEL_MOUSEMOVE;
+} }
+
+class Level : public W::GameState, public W::EventResponder {
 public:
-	Level(Game *, W *, std::string path);
+	Level(W::Window *, std::string path);
 	~Level();
 	
 	// GameState function implementations
-	void reset();
+	void resume(W::Returny *);
+	void update();
+	void setResolution();
+	
 	void pause();
 	void unpause();
-	void resume(Returny *);
-	void update();
-	void draw();
-	void setResolution();
 
 	void handleCloseEvent();		// Will need to prompt for save, probably
-	void receiveEvent(Event *);		// Level is also an eventresponder, so can itself subscribe directly to events
+	void scrollEvent(W::Event *);
+	void keyEvent(W::Event *);
+	void buttonEvent(W::Event *);
 	
 	void setResolution(int _w, int _h);
 	
 	// TLO stuff
 	Unit*       createUnit(int atX, int atY, const char *type);
-	Building*   createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
-	Furnishing* createFurnishing(const char *type);
+	Building*   createBuilding(W::position &, const char *type, std::vector<W::rect> *plan);
+	Furnishing* createFurnishing(const char *type, bool placeableMode = true, int atX = 0, int atY = 0);
 	Behaviour*  createBehaviour(const char *type);
 	void purchaseFurnishing(const char *type);
 	void hireStaff(const char *type);
@@ -86,20 +93,20 @@ public:
 	int columns, rows;
 	std::vector<Building*>   buildings;
 	std::vector<Furnishing*> furnishings;
+	std::vector<Furnishing*> doors;
 	std::vector<Unit*>       units;
 	std::vector<Unit*>       staff;
 	std::vector<Behaviour*>  behaviours;
 	std::vector<SpawnPoint*> spawnPoints;
 	
 protected:
-	// Methods
 	void buildLevel(std::string filename);
 	
-	// Properties
+	W::Window *win;
+	
 	int w, h; 					// Blocks wide/tall.
 	
-	NavMap *navmap;
-	ResponderMap *levelResponderMap;
+	W::NavMap *navmap;
 	LevelView *levelview;
 	UIBarView *uibarview;
 	FurnishingPurchasingUIView *furnishingPurchasingView;
@@ -123,65 +130,70 @@ protected:
 };
 
 
-#include "View.hpp"
-#include "JenniferAniston.hpp"
-
-class LevelView : public View {
+class LevelView : public W::View {
 public:
 	// Methods
 	LevelView(
-		W *, JenniferAniston &,
-		ResponderMap *_levelRM,
+		W::Window *, W::EventHandler *,
 		std::vector<Building*> *, std::vector<Furnishing*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 		int _level_width, int _level_height,
-		int *_time_remaining
+		int *_time_remaining,
+		W::NavMap *
 	);
+	
+//	void setMousePos(W::position p) {
+//		mousepos = p;
+//	}
+//	W::position mousepos;
+	
 	void draw();
-	void drawMappedObj(MappedObj *obj);	// Utility fn for drawing objects
-	void processMouseEvent(Event *);
-	void scroll(Direction::Enum);
+	inline void drawTLOAt(TLO *, W::position &);
+	void drawTLO(TLO *);				// Utility fn for drawing our top-level objects
+	void drawPM(PlaceableManager *);	// ...& for drawing those that may manage a placeable
+	void processMouseEvent(W::Event *);
+	void scroll(Direction::T);
 	
 	// Properties
 	int gridsize;
 	int level_width, level_height;		// how many blocks wide/tall the level is
 	int scroll_x, scroll_y;
-	ResponderMap *levelResponderMap;
 	int *time_remaining;
 
 	std::vector<Building*>   *buildings;
 	std::vector<Furnishing*> *furnishings;
 	std::vector<Unit*>       *units;
 	std::vector<Unit*>       *staff;
+	
+	W::EventHandler *eh;
+	W::NavMap *nm;
 };
 
 
-#include "UIView.hpp"
-
-class UIBarView : public UIView {
+class UIBarView : public W::UIView {
 public:
-	UIBarView(W *, JenniferAniston &, ResponderMap *, int *_econ);
+	UIBarView(W::Window *, W::EventHandler *, int *_econ);
 	void draw();
 private:
 	int *economy;
 };
 
-class FurnishingPurchasingUIView : public UIView {
+class FurnishingPurchasingUIView : public W::UIView {
 public:
-	FurnishingPurchasingUIView(W *, JenniferAniston &, ResponderMap *, std::vector<std::string> *_furnishingTypes);
+	FurnishingPurchasingUIView(W::Window *, W::EventHandler *, std::vector<std::string> *_furnishingTypes);
 	void draw();
 protected:
 	std::vector<std::string> *furnishingTypes;
 };
 
-class HiringUIView : public UIView {
+class HiringUIView : public W::UIView {
 public:
-	HiringUIView(W *, JenniferAniston &, ResponderMap *);
+	HiringUIView(W::Window *, W::EventHandler *);
 	void draw();
 };
 
-class GTTHelpView : public UIView {
+class GTTHelpView : public W::UIView {
 public:
-	GTTHelpView(W *, JenniferAniston &, ResponderMap *, int *_time_remaining, int *_monetary_target);
+	GTTHelpView(W::Window *, W::EventHandler *, int *_time_remaining, int *_monetary_target);
 	void draw();
 private:
 	int *time_remaining;

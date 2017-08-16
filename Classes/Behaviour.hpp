@@ -10,7 +10,8 @@
 #include <map>
 
 #include "types.hpp"
-#include "EventResponder.hpp"
+#include "TLO.hpp"
+#include "W.h"
 
 #define WAIT_PERIOD 60
 
@@ -18,20 +19,19 @@ class Unit;
 class Building;
 class Furnishing;
 class Level;
-class ResponderMap;
-class W;
 class LuaHelper;
 
 class BehaviourBase;
 
 class Behaviour {
 public:
-	Behaviour(const char *_type, ResponderMap *_levelRM);
+	Behaviour(const char *_type, W::EventHandler *);
 	~Behaviour();
-	static bool initialize(W *);
+	static bool initialize();
 	void update();
 	bool destroyed();
 	void destroy();
+	const char * getType();
 	void init(Unit *u);
 	void init(Level *, Unit *);
 	void init(Unit *, Unit *, Furnishing *);
@@ -39,14 +39,15 @@ public:
 protected:
 	BehaviourBase *b;
 	std::string type;
+	W::EventHandler *eh;
 };
 
-class BehaviourBase : public EventResponder {
+class BehaviourBase : public TLO {
 public:
-	BehaviourBase(ResponderMap *_levelRM) : levelRM(_levelRM), stage(0), destroyed(false), waiting(false), initialized(false) { };
+	BehaviourBase(W::EventHandler *_eh) : TLO(_eh), stage(0), waiting(false), initialized(false) { };
 	virtual ~BehaviourBase() { }
 	void update() {
-		if (!initialized) throw MsgException("update called on uninitialized Behaviour object");
+		if (!initialized) throw W::Exception("update called on uninitialized Behaviour object");
 		if (waiting && ++frames_waited >= WAIT_PERIOD)
 			waiting = false;
 		else
@@ -57,10 +58,8 @@ public:
 	virtual void init(Level *, Unit *) { }
 	virtual void init(Unit *, Unit *, Furnishing *) { }
 	virtual void init(Level *, Unit *, Unit *, Furnishing *) { }
-	bool destroyed;
-	virtual void receiveEvent(Event *) { }
-
-	static bool initialize(W *);
+	
+	static bool initialize();
 	
 protected:
 	int stage;
@@ -71,8 +70,6 @@ protected:
 		frames_waited = 0;
 		waiting = true;
 	}
-	ResponderMap *levelRM;
-	static W *theW;
 	
 	static LuaHelper *mrLua;
 	static bool lua_initialized;
@@ -80,7 +77,7 @@ protected:
 
 class DespawnBehaviour : public BehaviourBase {
 public:
-	DespawnBehaviour(ResponderMap *rm) : BehaviourBase(rm) { }
+	DespawnBehaviour(W::EventHandler *_eh) : BehaviourBase(_eh) { }
 	void init(Unit *);
 	void _update();
 protected:
@@ -97,8 +94,8 @@ struct seekBehaviourInfo {
 
 class SeekBehaviour : public BehaviourBase {
 public:
-	SeekBehaviour(const char *_type, ResponderMap *rm);
-	static bool initialize(W *);
+	SeekBehaviour(const char *_type, W::EventHandler *_eh);
+	static bool initialize();
 	void init(Level *, Unit *);
 	void _update();
 protected:
@@ -121,12 +118,12 @@ struct serviceBehaviourInfo {
 
 class ServiceBehaviour : public BehaviourBase {
 public:
-	ServiceBehaviour(const char *_type, ResponderMap *rm);
+	ServiceBehaviour(const char *_type, W::EventHandler *_eh);
 	~ServiceBehaviour();
-	static bool initialize(W *);
+	static bool initialize();
 	void init(Level *, Unit *u, Unit *s, Furnishing *f);
 	void _update();
-	void receiveEvent(Event *);
+	void receiveEvent(W::Event *);
 protected:
 	Level *level;
 	Unit *unit, *staff;

@@ -10,26 +10,28 @@
 #include <map>
 
 #include "types.hpp"
-#include "MappedObj.hpp"
+#include "PlaceableManager.hpp"
 #include "BehaviourParticipant.hpp"
-#include "../W.hpp"
 
-class NavMap;
 class NavNode;
 class Building;
 class Level;
 class Furnishing;
 
 struct unitInfo {
-	std::string col, hoverCol;
+	W::Colour col, hoverCol;
 	std::vector<std::string> compatibleBehaviours;
 	bool isStaff;
 	int hireCost;
 };
 
-class Unit : public MappedObj, public BehaviourParticipant {
+namespace W { namespace EventType {
+	extern T INTERRUPT_UNITPICKUP;
+} }
+
+class Unit : public PlaceableManager, public BehaviourParticipant {
 public:
-	Unit(ResponderMap *, NavMap *, const char *_type, Level *, bool _placeableMode);
+	Unit(W::EventHandler *, W::NavMap *, const char *_type, Level *, bool _placeableMode);
 	~Unit();
 	
 	// Properties
@@ -39,11 +41,11 @@ public:
 	Building *dest_building;
 	
 	// Methods
-	void receiveEvent(Event *);
+	void receiveEvent(W::Event *);
 	void update();
 	bool canPlace(int _x, int _y);
 	void finalizePlacement();
-	const char * col();
+	W::Colour& col();
 	
 	// Utility methods
 	void getDespawnPoint(int *x, int *y);
@@ -55,7 +57,7 @@ public:
 	
 	Building* getContextBuilding() { return contextBuilding; }
 	
-	static bool initialize(W *); 	// Populate static unitTypes from units.lua
+	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
 	
 	std::string nextBehaviour;
@@ -82,8 +84,8 @@ protected:
 	inline bool inHinterland();
 	
 	// Properties
-	std::string *u_colour;
-	std::string *u_hoverColour;
+	W::Colour u_colour;
+	W::Colour u_hoverColour;
 	std::vector<std::string> *u_compatibleBehaviours;
 	std::vector<std::string>* getCompatibleBehaviours();
 	bool u_isStaff;
@@ -91,16 +93,15 @@ protected:
 	
 	bool hired;
 	
-	NavMap *navmap;
-	std::vector<NavNode *> route;
+	W::NavMap *navmap;
+	std::vector<W::position> route;
 	Level *level;
 	Building *contextBuilding;
-	bool hover;
 	
 	// Static members
 	static std::map<std::string, unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }
-	static std::string defaultColour;
-	static std::string defaultHoverColour;
+	static W::Colour defaultColour;
+	static W::Colour defaultHoverColour;
 	
 	void printDebugInfo();
 };

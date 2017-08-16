@@ -1,33 +1,44 @@
 #include "Unit.hpp"
-#include "NavMap.hpp"
+
 #include "LuaHelper.hpp"
 #include "Building.hpp"
 #include "Level.hpp"
 #include "Furnishing.hpp"
+#include "MrPaths.hpp"
+#include "W.h"
+
+W::EventType::T W::EventType::INTERRUPT_UNITPICKUP = W::Event::registerType();
 
 std::map<std::string, struct unitInfo> Unit::unitTypes;
-std::string Unit::defaultColour;
-std::string Unit::defaultHoverColour;
+W::Colour Unit::defaultColour;
+W::Colour Unit::defaultHoverColour;
 bool Unit::initialized = false;
 
-Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
-	MappedObj(_rm, _placeableMode), navmap(_navmap), type(_type), level(_level),
-	contextBuilding(NULL), hover(false), mode(IDLE), hired(false)
+Unit::Unit(W::EventHandler *_eh, W::NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
+	PlaceableManager(_eh, _placeableMode), navmap(_navmap), type(_type), level(_level),
+	contextBuilding(NULL), mode(IDLE), hired(false)
 {
-	intcoord c = {0,0};
-	groundplan.push_back(c);
+	plan.resize(1);
+	W::rect *r = &plan[0];
+	r->sz.width = r->sz.height = 1;
 	
 	// Get properties for this unit type
 	unitInfo *t = &unitTypes[type];
-	u_colour               = &t->col;
-	u_hoverColour          = &t->hoverCol;
+	u_colour               = t->col;
+	u_hoverColour          = t->hoverCol;
 	u_compatibleBehaviours = &t->compatibleBehaviours;
 	u_isStaff              = t->isStaff;
 	u_hireCost             = t->hireCost;
 }
 Unit::~Unit()
 {
-	std::cout << "Unit destruct" << std::endl;
+	std::cout << "unit destruct" << std::endl;
+	using namespace W::EventType;
+	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
+	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
+	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
+	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
+	eh->unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
 }
 
 bool Unit::canPlace(int _x, int _y) {
@@ -35,31 +46,40 @@ bool Unit::canPlace(int _x, int _y) {
 }
 void Unit::finalizePlacement() {
 	if (placeableMode && u_isStaff) {
-		if (Building *b = level->buildingAtLocation(x, y))
+		if (Building *b = level->buildingAtLocation(pos.x, pos.y))
 			b->addStaff(this), contextBuilding = b;
 		if (!hired) {
 			level->chargePlayer(Unit::hireCostForType(type.c_str()));
 			hired = true;
 		}
 	}
-	prev_x = x, prev_y = y;
+	using namespace W::EventType;
+	eh->subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Unit::receiveEvent, this));
+	eh->subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Unit::receiveEvent, this));
+	eh->subscribeToEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Unit::receiveEvent, this));
+	eh->subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Unit::receiveEvent, this));
+	eh->subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Unit::receiveEvent, this));
+
+	prev_x = pos.x, prev_y = pos.y;
 }
 
-void Unit::receiveEvent(Event *ev) {
-	if (mode == ANIMATING) return;
-	if (ev->type == Event::MOUSEMOVE)
+void Unit::receiveEvent(W::Event *ev) {
+	using namespace W::EventType;
+
+	if (mode == ANIMATING)
+		return;
+
+	if (ev->type == LEVEL_MOUSEMOVE)
 		hover = true;
-	else if (ev->type == Event::LEFTCLICK) {
+	else if (ev->type == LEVEL_LEFTMOUSEDOWN)
 		printDebugInfo();
-	}
-	else if (ev->type == Event::RIGHTCLICK) {
+	else if (ev->type == LEVEL_RIGHTMOUSEDOWN)
 		if (u_isStaff) pickUp();
-	}
 }
 
-const char * Unit::col() {
-	if (hover) { hover = false; return u_hoverColour->c_str(); }
-	return u_colour->c_str();
+W::Colour& Unit::col() {
+	if (hover) { hover = false; return u_hoverColour; }
+	return u_colour;
 }
 
 void Unit::update() {
@@ -84,7 +104,7 @@ void Unit::destroy() {
 }
 bool Unit::voyage(int _x, int _y) {
   	arrived = false;
-	bool success = navmap->getRoute(x, y, dest_x = _x, dest_y = _y, &route);
+	bool success = navmap->getRoute(pos.x, pos.y, dest_x = _x, dest_y = _y, &route);
 	if (success) mode = VOYAGING;
 	return success;
 }
@@ -104,13 +124,22 @@ void Unit::incrementAnimation() {
 }
 
 void Unit::pickUp() {
-	Event ev;
-	ev.setType(Event::INTERRUPT_UNITPICKUP);
-	ev.unit = this;
-	rm->dispatchEvent(&ev);
+	W::Event ev;
+	ev.setType(W::EventType::INTERRUPT_UNITPICKUP);
+	ev._payload = this;
+	eh->dispatchEvent(&ev);
+	
 	if (contextBuilding) contextBuilding->removeStaff(this);
 	contextBuilding = NULL;
-	MappedObj::pickUp();
+	
+	using namespace W::EventType;
+	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
+	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
+	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
+	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
+	eh->unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
+	
+	PlaceableManager::pickUp();
 }
 
 void Unit::wait() {
@@ -127,48 +156,48 @@ bool Unit::incrementLocation() {
 	
 	float step = 0.10;
 	float a_diff = 0, b_diff = 0;
-	bool diagonal = x != prev_x && y != prev_y;
+	bool diagonal = pos.x != prev_x && pos.y != prev_y;
 	
 	// Check if we've reached the next loc. This happens
 	//  - for linears, when |a| < step or |b| < step
 	//  - for diagonals, when a^2 + b^2 < 2 * step^2
-	float t = a != 0 ? a : b;
-	bool reached_next = (diagonal && a*a + b*b < 2*step*step) || (!diagonal && t*t < step*step);
+	float t = pos.a != 0 ? pos.a : pos.b;
+	bool reached_next = (diagonal && pos.a*pos.a + pos.b*pos.b < 2*step*step) || (!diagonal && t*t < step*step);
 	if (reached_next) {
 		if (route.empty())
-			a = b = 0;		// Arrived!
+			pos.a = pos.b = 0;		// Arrived!
 		else {
 			// Get next in route
-			int c = route[0]->x, d = route[0]->y;
+			int c = route[0].x, d = route[0].y;
 			if (navmap->isPassableAt(c, d)) {
-				prev_x = x, prev_y = y;
-				x = c, y = d;
-				a = prev_x == x ? 0 : prev_x < x ? -1 : 1;
-				b = prev_y == y ? 0 : prev_y < y ? -1 : 1;
+				prev_x = pos.x, prev_y = pos.y;
+				pos.x = c, pos.y = d;
+				pos.a = prev_x == pos.x ? 0 : prev_x < pos.x ? -1 : 1;
+				pos.b = prev_y == pos.y ? 0 : prev_y < pos.y ? -1 : 1;
 				route.erase(route.begin());
 			}
 			else
-				return navmap->getRoute(x, y, dest_x, dest_y, &route);
+				return navmap->getRoute(pos.x, pos.y, dest_x, dest_y, &route);
 		}
 	}
 	else {
 		// Decrement a & b toward current loc
-		if (x > prev_x)      a_diff = step;
-		else if (x < prev_x) a_diff = -step;
-		if (y > prev_y)      b_diff = step;
-		else if (y < prev_y) b_diff = -step;
+		if (pos.x > prev_x)      a_diff = step;
+		else if (pos.x < prev_x) a_diff = -step;
+		if (pos.y > prev_y)      b_diff = step;
+		else if (pos.y < prev_y) b_diff = -step;
 		if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
-		a += a_diff, b += b_diff;
+		pos.a += a_diff, pos.b += b_diff;
 	}
 	return true;
 }
 inline bool Unit::atDest() {
-	return dest_x == x && dest_y == y && a == 0 && b == 0;
+	return dest_x == pos.x && dest_y == pos.y && pos.a == 0 && pos.b == 0;
 }
 inline bool Unit::inHinterland() {
 	return (
-		x < HINTERLAND_WIDTH || x >= navmap->w-HINTERLAND_WIDTH || 
-		y < HINTERLAND_WIDTH || y >= navmap->h-HINTERLAND_WIDTH
+		pos.x < HINTERLAND_WIDTH || pos.x >= navmap->w-HINTERLAND_WIDTH ||
+		pos.y < HINTERLAND_WIDTH || pos.y >= navmap->h-HINTERLAND_WIDTH
 	);
 }
 
@@ -176,32 +205,32 @@ std::vector<std::string>* Unit::getCompatibleBehaviours() {
 	return u_compatibleBehaviours;
 }
 
-bool Unit::initialize(W *_W) {
+bool Unit::initialize() {
 	if (Unit::initialized) return true;
 	
-	W::log("  Unit::initialize() called...");
-	LuaHelper mrLua(_W);
+	W::log << "  Unit::initialize() called..." << std::endl;
+	LuaHelper mrLua;
 	
-	std::string path = _W->luaPath;
+	std::string path = MrPaths::luaPath;
 	path.append("units.lua");
 	if (!mrLua.loadFile(path.c_str())) {
-		W::log("Could not read units.lua");
+		W::log << "Could not read units.lua" << std::endl;
 		return false;
 	}
 	lua_State *L = mrLua.LuaInstance;
 	
 	try {
 		// Set Unit defaults
-		Unit::defaultColour      = mrLua.getvalue<const char *>("defaultColour");
-		Unit::defaultHoverColour = mrLua.getvalue<const char *>("defaultHoverColour");
-	} catch (MsgException &exc) {
+		Unit::defaultColour      = strToColour(mrLua.getvalue<const char *>("defaultColour"));
+		Unit::defaultHoverColour = strToColour(mrLua.getvalue<const char *>("defaultHoverColour"));
+	} catch (W::Exception &exc) {
 		std::string s = "In units.lua, could not get defaults. Error: "; s.append(exc.msg);
-		W::log(s.c_str());
+		W::log << s << std::endl;
 	}
 	
 	// Construct Unit::unitTypes map
 	if (!mrLua.pushtable("unitTypes")) {
-		W::log("In units.lua, could not get the unitTypes table.");
+		W::log << "In units.lua, could not get the unitTypes table." << std::endl;
 		return false;
 	}
 	lua_pushnil(L);									// S: -1 nil; -2 table
@@ -214,11 +243,17 @@ bool Unit::initialize(W *_W) {
 		struct unitInfo *uInfo = &Unit::unitTypes[uType];
 		
 		lua_getfield(L, -1, "colour");				// S: -1 colour; -2 subtable; -3 key; -4 table
-		uInfo->col = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColour;
+		if (lua_isstring(L, -1))
+			uInfo->col = strToColour(lua_tostring(L, -1));
+		else
+			uInfo->col = Unit::defaultColour;
 		lua_pop(L, 1);
 		
 		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
-		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
+		if (lua_isstring(L, -1))
+			uInfo->hoverCol = strToColour(lua_tostring(L, -1));
+		else
+			uInfo->hoverCol = Unit::defaultHoverColour;
 		lua_pop(L, 1);
 		
 		lua_getfield(L, -1, "isStaff");				// S: -1 isStaff; -2 subtable; -3 key; -4 table
@@ -232,7 +267,7 @@ bool Unit::initialize(W *_W) {
 		// Compatible Behaviours
 		if (!mrLua.pushSubtable("compatibleBehaviours")) {
 			char s[100]; sprintf(s, "In units.lua, could not find compatibleBehaviours for '%s' type", uType);
-			W::log(s);
+			W::log << s << std::endl;
 			return false;
 		}
 		std::string s = "    "; s += uType; s += "\n      compatibleBehaviours: ";
@@ -252,8 +287,7 @@ bool Unit::initialize(W *_W) {
 		lua_pop(L, 1);								// S: -1 subtable; -2 key; -3 table
 		if (n > 0) s.erase(s.size() - 2);
 		else s += "none";
-		W::log(s.c_str());
-		
+		W::log << s << std::endl;
 		lua_pop(L, 1);								// S: -1 key; -2 table
 	}
 	
@@ -265,13 +299,11 @@ int Unit::hireCostForType(const char *_type) {
 }
 
 void Unit::printDebugInfo() {
-	char s[100];
-	sprintf(s, "\nUnit %p - x,y:%d,%d a,b:%.2f,%.2f dest:%d,%d mode:%s\n",
-			this, x, y, a, b, dest_x, dest_y,
-			mode == WAITING ? "WAITING" :
-			mode == VOYAGING ? "VOYAGING" :
-			mode == ANIMATING ? "ANIMATING" :
-			mode == IDLE ? "IDLE" : "UNKNOWN"
-			);
-	std::cout << s << std::endl;
+	printf("\nUnit %p - x,y:%d,%d a,b:%.1f,%.1f dest:%d,%d mode:%s\n\n",
+		this, pos.x, pos.y, pos.a, pos.b, dest_x, dest_y,
+		mode == WAITING ? "WAITING" :
+		mode == VOYAGING ? "VOYAGING" :
+		mode == ANIMATING ? "ANIMATING" :
+		mode == IDLE ? "IDLE" : "UNKNOWN"
+	);
 }

@@ -1,6 +1,6 @@
 -- Unit definitions
 
-defaultColour = "black"
+defaultColour = "transparent black"
 defaultHoverColour = "blue"
 
 unitTypes = {

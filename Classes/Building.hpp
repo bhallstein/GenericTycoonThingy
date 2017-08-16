@@ -11,40 +11,35 @@
 #include <string>
 
 #include "types.hpp"
-#include "MappedObj.hpp"
+#include "TLO.hpp"
 
-class W;
 class Level;
 class LuaHelper;
-class NavMap;
 class Unit;
 class Furnishing;
 
 struct buildingInfo {
-	std::string col, hoverCol;
+	W::Colour col, hoverCol;
 	std::vector<std::string> allowedFurnishings;
 };
 
-class Building : public MappedObj {
+class Building : public TLO {
 public:
-	Building(ResponderMap *, NavMap *, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *);
+	Building(W::EventHandler *, W::NavMap *, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *);
 	~Building();
 	
 	// Properties
 	std::string type;
-	std::vector<door> doors;		// Doors. These should probably be on the edge of the building. lol.
-	std::string *b_colour;
-	std::string *b_hoverColour;
+	W::Colour b_colour;
+	W::Colour b_hoverColour;
 	std::vector<std::string> *b_allowedFurnishings;
-									// See types.hpp for what a door looks like
-	// Methods
-	void receiveEvent(Event *);		// Handle mouse events
-	void update();
-	bool canPlace(int _x, int _y);
-	void finalizePlacement();
-	const char * col();
 	
-	void getEntryPoint(int *_x, int *_y);
+	// Methods
+	void receiveEvent(W::Event *);		// Handle mouse events
+	void update();
+	W::Colour& col();
+	
+//	void getEntryPoint(int *_x, int *_y);
 	void getQueuePoint(int *_x, int *_y);
 	void addToQueue(Unit *);
 	void addFurnishing(Furnishing *);
@@ -52,14 +47,17 @@ public:
 	void addStaff(Unit *);
 	void removeStaff(Unit *);
 	
-	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
+	bool objIsEntirelyInsideBuilding(W::MappedObj *);
+	
+	static bool initialize();	// Populate our static buildingTypes map from buildings.lua
 	static bool initialized;
 	
 protected:
 	// Properties
 	bool clicked;
+	bool hover;
 	int time_hovered;
-	NavMap *navmap;
+	W::NavMap *navmap;
 	Level *level;
 	// Dispatchery
 	std::vector<Unit*> Q;
@@ -69,8 +67,8 @@ protected:
 	
 	// Info on building types, saved as static members for private use by Building & its instances.
 	static std::map<std::string, struct buildingInfo> buildingTypes;	// e.g. "pieshop" => struct buildingInfo { }
-	static std::string defaultColour;
-	static std::string defaultHoverColour;
+	static W::Colour defaultColour;
+	static W::Colour defaultHoverColour;
 	
 	static std::vector<std::map<Furnishing*, Unit*>::iterator> _ind_array;
 };
