@@ -2,14 +2,38 @@
 
 Building::Building() {
 	// initialize building
-	// see LevelMap.cpp for part of this process
+	mode = PLACEMENT;
+	std::cout << "created building";
+	width = 100, height = 80;
 }
 Building::~Building()
 {
-	//deconstructor
+	// Destroy things
 }
 
+void Building::handleMouseMove(int x, int y)
+{
+	posX = x, posY = y;
+}
 
+bool Building::placeAt(int x, int y)
+{
+	mode = PLACED;
+	posX = x, posY = y;
+	std::cout << "placed building at " << x << ","  << y << std::endl;
+	return true;
+}
+
+void Building::draw(sf::RenderWindow &wind)
+{
+	if (mode == PLACEMENT)
+		posX = sf::Mouse::GetPosition(wind).x, posY = sf::Mouse::GetPosition(wind).y;
+	sf::Shape s = sf::Shape::Rectangle(
+		posX - width/2, posY - height/2, width, height,
+		(mode == PLACEMENT) ? sf::Color::White : sf::Color::Black
+	);
+	wind.Draw(s);
+}
 
 #ifdef yeah_this_doesnt_need_compiling_either_sorry
 

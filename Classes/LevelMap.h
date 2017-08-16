@@ -5,6 +5,7 @@
 #ifndef LEVELMAP_H
 #define LEVELMAP_H
 
+#include <iostream>
 #include <vector>
 #include "Building.h"
 
@@ -20,14 +21,16 @@ public:
 	~LevelMap();
 
 	// Properties
-	int Columns, Rows;
-	vector<Building> Buildings;	// Can this be replaced with an array of pointers?
+	int columns, rows;
+	vector<Building> buildings;
 
 	// Getters
 	int numberOfBuildings();
 
 	// Functions
-	void Draw(sf::RenderWindow& window);
+	void draw(sf::RenderWindow& window);
+	Building *createBuilding();
+	void destroyBuilding(); //currently does last one in the vector; later should take a building reference
 
 private:
 

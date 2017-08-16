@@ -2,8 +2,8 @@
 
 LevelMap::LevelMap(int w, int h)
 {
-	Rows = h;
-	Columns = w;
+	rows = h;
+	columns = w;
 }
 LevelMap::~LevelMap()
 {
@@ -12,17 +12,28 @@ LevelMap::~LevelMap()
 
 int LevelMap::numberOfBuildings()
 {
-	return Buildings.size();
+	return buildings.size();
 }
 
-void LevelMap::Draw(sf::RenderWindow &window)
+Building *LevelMap::createBuilding()
 {
-	// Draw background
-	window.Clear(sf::Color::White);
-	
+	Building b;
+	buildings.push_back(b);
+	std::cout << "created building: " << buildings.size() << std::endl;
+	return &buildings.back();
+}
+
+void LevelMap::destroyBuilding()
+{
+	buildings.pop_back();
+	std::cout << "cancelled building creation. " << std::endl;
+}
+
+void LevelMap::draw(sf::RenderWindow &window)
+{
 	// Draw buildings
-	for (vector<Building>::iterator i = Buildings.begin(); i < Buildings.end(); i++)
-		; // draw building
+	for (vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++)
+		(*i).draw(window);
 }
 
 

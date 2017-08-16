@@ -1,6 +1,8 @@
 #include "Game.h"
 
 //#include "LevelMap.h"
+#include "Building.h"
+
 
 Game::Game()
 {
@@ -28,11 +30,14 @@ void Game::Run()
 	LevelMap levelmap(default_map_width, default_map_height);
 	
 	bool should_quit = false;
-	// privileged_event_responder = NULL;
+	void *privileged_event_responder = NULL;
+	enum perTypes { BUILDING } privileged_event_responder_type;
+	sf::Event ev;
     
 	while (DBTWindow.IsOpened() && !should_quit)
     {
-        sf::Event ev;
+		/* Events */
+
         while (DBTWindow.PollEvent(ev)) 
 		{
             // Close window : exit
@@ -40,21 +45,62 @@ void Game::Run()
 	   		DBTWindow.Close();
 	
 			// If there is privileged event responder: send events to it
-			
-			if (ev.Type == sf::Event::KeyPressed) {
-				sf::Keyboard::Key keycode = ev.Key.Code;
+			if (privileged_event_responder == NULL) 
+			{
+				// Keys
+				if (ev.Type == sf::Event::KeyPressed)
+				{
+					sf::Keyboard::Key keycode = ev.Key.Code;
 				
-				if (keycode == sf::Keyboard::Escape)
-					should_quit = true;
-				
-				if (keycode == 'b')
-					; // Add building to building array thing
-
+					if (keycode == sf::Keyboard::Escape)
+					{
+						should_quit = true;
+					}
+					else if (keycode == sf::Keyboard::B)
+					{
+						std::cout << "creating new building... ";
+						Building *pb = levelmap.createBuilding();
+						privileged_event_responder = (Building*) pb;
+						privileged_event_responder_type = BUILDING;
+					}
+				}
+				// Mouse
+				else if (ev.Type == sf::Event::MouseMoved) 
+				{
+					
+				}
+			}
+			else 
+			{
+				// Send to PER
+				Building *pb = (Building*) privileged_event_responder;
+				if (ev.Type == sf::Event::MouseMoved) 
+				{
+					pb->handleMouseMove(ev.MouseMove.X, ev.MouseMove.Y);
+				}
+				if (ev.Type == sf::Event::MouseButtonPressed)
+				{
+					if(ev.MouseButton.Button == sf::Mouse::Right)
+					{
+						privileged_event_responder = NULL;
+						levelmap.destroyBuilding();
+					}
+					else if (ev.MouseButton.Button == sf::Mouse::Left)
+					{
+						if (pb->placeAt(ev.MouseButton.X,ev.MouseButton.Y))
+							privileged_event_responder = NULL;
+					}
+				}
 			}
         }
     
+
+		/* Drawing */
+		
 		DBTWindow.Clear(sf::Color(138,43,226));		// Electric Indigo
-    
+
+		levelmap.draw(DBTWindow);
+
         // Update the window
         DBTWindow.Display();
     }
