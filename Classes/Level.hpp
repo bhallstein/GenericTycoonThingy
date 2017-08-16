@@ -69,6 +69,11 @@ public:
 	Building *currentlyEditedBuilding;
 	void openHiringView();
 	void closeHiringView();
+
+	//Money
+	void payPlayer(int);
+	bool chargePlayer(int);		//returns false if player can't be charged (i.e. not enough positive balance to complete transaction)
+	void decreaseMoney(int);	//as chargePlayer() but without the checks, since some actions may decrease even if Player has negative balance (e.g. monthly expenditure)
 	
 	// Properties
 	int columns, rows;
@@ -92,6 +97,8 @@ protected:
 	FurniturePurchasingUIView *furniturePurchasingView;
 	HiringUIView *hiringUIView;
 	
+	int money;
+
 	int framecount;
 	
 	std::list<std::string> allowedBuildings;

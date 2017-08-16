@@ -3,6 +3,7 @@ require("buildings")
 --level properties
 width  = 50
 height = 40
+startingBalance = 50
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"

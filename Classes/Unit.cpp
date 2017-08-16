@@ -204,10 +204,17 @@ bool Unit::initialize(W *_W) {
 		
 		lua_getfield(L, -1, "colourWhenMoving");	// S: -1 colour; 2 subtable; -3 key; -4 table
 		uInfo->colWhenMoving = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColourWhenMoving;
-		
+		lua_pop(L, 1);
+
+		lua_getfield(L, -1, "hireCost");	// S: -1 colour; 2 subtable; -3 key; -4 table
+		uInfo->hireCost = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
+
 		lua_pop(L, 2);								// S: -1 key; -2 table
 	}
 	
 	W::log("...initialization succeeded.");
 	return true;
+}
+int Unit::getUnitHireCost(std::string _unitKey) {
+	return unitTypes[_unitKey].hireCost;
 }

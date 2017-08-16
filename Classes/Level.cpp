@@ -74,6 +74,15 @@ void Level::buildLevel(std::string levelname) {
 		s.append(exc.msg);
 		throw MsgException(s.c_str());
 	}
+
+	//set level (player's) money to the starting balance
+	try {
+		money = mrLua.getvalue<int>("startingBalance");
+	} catch (MsgException &exc) {
+		std::string s = "Couldn't get level's starting balance: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
+	}
 	
 	// Create map
 	navmap = new NavMap(w, h);
@@ -281,7 +290,13 @@ void Level::createFurniture(const char *type) {
 }
 void Level::createBarbersChair() { createFurniture("barberschair"); }
 void Level::createSofa() { createFurniture("sofa"); }
-void Level::createStaffUnit() { createUnit(0, 0, "staff"); }
+void Level::createStaffUnit() { 
+	if(chargePlayer(Unit::getUnitHireCost("staff")))
+		createUnit(0, 0, "staff");
+	else
+		W::log("Not enough money to hire a Staff!");
+}
+
 void Level::destroyThings() {
 	for (std::vector<Furniture*>::iterator i = furniture.begin(); i < furniture.end(); )
 		if ((*i)->destroyed) {
@@ -346,6 +361,19 @@ void Level::closeHiringView() {
 	hiringUIView = NULL;
 }
 
+//Money stuff
+void Level::payPlayer(int _amount) {
+	money += _amount;
+}
+bool Level::chargePlayer(int _amount) {
+	if(money < _amount) return false; //not enough balance to pay
+
+	decreaseMoney(_amount);
+	return true;
+}
+void Level::decreaseMoney(int _amount) {
+	money -= _amount;
+}
 
 #include "Button.hpp"
 

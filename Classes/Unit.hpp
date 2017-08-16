@@ -18,6 +18,7 @@ class NavNode;
 
 struct unitInfo {
 	std::string col, hoverCol, colWhenMoving;
+	int hireCost;
 };
 
 class Unit : public MappedObj {
@@ -36,7 +37,9 @@ public:
 	const char * col();
 	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
-	
+
+	//UnitInfo gets
+	static int getUnitHireCost(std::string); //lookup a unitInfo hireCost from unitTypes
 protected:
 	// Methods
 	void nextInRoute();
