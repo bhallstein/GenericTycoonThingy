@@ -16,7 +16,6 @@
 #include <iostream>
 #include <list>
 #include <vector>
-#include <queue>
 
 #include "types.h"
 #include "Event.hpp"
@@ -27,25 +26,26 @@ using std::cout;
 using std::endl;
 
 
-class MapLoc
+class NavNode
 {
 public:
-	MapLoc();
-	~MapLoc();
+	NavNode();
+	~NavNode();
 	
 	// Methods
-	void addNeighbour(MapLoc *neighbour);
-	void removeNeighbour(MapLoc *neighbour);
+	void addNeighbour(NavNode *neighbour);
+	void removeNeighbour(NavNode *neighbour);
 	
-	bool operator< (MapLoc*);		// For ordering in BinaryHeap
-	void setComparator(float);      // For updating by BinaryHeap
+	bool operator< (NavNode*);		// For ordering in MisterHeapy
+	void setComparator(float);      // For updating by MisterHeapy
 	
 	// Properties
 	int x, y;
 	bool passable;
-	std::list<MapLoc*> neighbours;		// Pointers to passable neighbour nodes. For pathfinding.
+	std::list<NavNode*> neighbours;		// Pointers to passable neighbour nodes. For pathfinding.
 	float min_dist;
-	MapLoc *route_prev;
+
+	NavNode *route_prev;
 	
 protected:
 	
@@ -62,17 +62,19 @@ public:
 	int w, h;
 	
 	// Methods
-	void makeImpassable(int atX, int atY);
-	void makePassable(int atX, int atY);
 	void addImpassableObject(EventResponder *resp);
 	void removeImpassableObject(EventResponder *resp);
 	bool isPassableAt(int atX, int atY);
-	bool getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route);
+	
+	bool getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route);
 
 protected:
 	// Properties
-	std::vector<MapLoc> maplocs;		// A w*h-sized array of MapLocs
+	std::vector<NavNode> maplocs;		// A w*h-sized array of NavNodes
 	
+	// Methods
+	void makeImpassable(int atX, int atY);
+	void makePassable(int atX, int atY);
 };
 
 #endif

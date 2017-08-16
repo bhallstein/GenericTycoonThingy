@@ -1,25 +1,25 @@
 #include "NavMap.hpp"
 
-/****   MapLoc implementation   ****/
+/****   NavNode implementation   ****/
 
-MapLoc::MapLoc() {
+NavNode::NavNode() {
 	passable = false;
 }
-MapLoc::~MapLoc() {
+NavNode::~NavNode() {
 	// Destructor
 }
 
-void MapLoc::addNeighbour(MapLoc *neighbour) {
+void NavNode::addNeighbour(NavNode *neighbour) {
 	neighbours.remove(neighbour);	 // This may perhaps not be necessary.
 	neighbours.push_back(neighbour);
 }
-void MapLoc::removeNeighbour(MapLoc *neighbour) {
+void NavNode::removeNeighbour(NavNode *neighbour) {
 	neighbours.remove(neighbour);
 }
-bool MapLoc::operator< (MapLoc *m) {
-	return min_dist > m->min_dist;		// Heap orders larger items first by def. We want the opposite.
+bool NavNode::operator< (NavNode *m) {
+	return min_dist > m->min_dist;		// Heap orders larger items first by default. We want the opposite.
 }
-void MapLoc::setComparator(float new_min_dist) {
+void NavNode::setComparator(float new_min_dist) {
 	min_dist = new_min_dist;
 }
 
@@ -32,14 +32,14 @@ NavMap::NavMap(int _w, int _h) {
 	maplocs.resize(n);
 
 	int i, j, x, y;
-	MapLoc *maploc;
+	NavNode *maploc;
 	for (int j=0; j < h; j++) {
 		for (int i=0; i < w; i++) {
 			maploc = &maplocs[j*w + i];
-			maploc->x = i;						// MapLocs should know their coordinates
+			maploc->x = i;						// NavNodes should know their coordinates
 			maploc->y = j;						//
 			
-			maploc->passable = true;			// Set MapLocs’ passability (all passable for now)
+			maploc->passable = true;			// Set NavNodes’ passability (all passable for now)
 			for (y = j-1; y <= j+1; y++)		// Setup refs to neighbouring maplocs
 				for (x = i-1; x <= i+1; x++)
 					if (x == i && y == j) ;							// self is not a neighbour
@@ -55,7 +55,7 @@ NavMap::~NavMap() {
 
 void NavMap::makePassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
-	MapLoc *maploc = &maplocs[n];
+	NavNode *maploc = &maplocs[n];
 	maploc->passable = true;
 	// Add maploc back to network
 	for (j = atY-1; j <= atY+1; j++)
@@ -66,7 +66,7 @@ void NavMap::makePassable(int atX, int atY) {
 }
 void NavMap::makeImpassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
-	MapLoc *maploc = &maplocs[n];
+	NavNode *maploc = &maplocs[n];
 	maploc->passable = false;
 	// Remove maploc from network
 	for (j = atY-1; j <= atY+1; j++)
@@ -81,7 +81,7 @@ void NavMap::addImpassableObject(EventResponder *resp) {
 		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)
-			this->makeImpassable(i, j);
+			makeImpassable(i, j);
 }
 void NavMap::removeImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
@@ -89,12 +89,12 @@ void NavMap::removeImpassableObject(EventResponder *resp) {
 		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)
-			this->makePassable(i, j);
+			makePassable(i, j);
 }
 bool NavMap::isPassableAt(int atX, int atY) {
 	return maplocs[atY*w + atX].passable;
 }
-bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route) {
+bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route) {
 	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
 		cout << "out of bounds" << endl;
 		return false;
@@ -103,7 +103,7 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc
 	// Navigate from A to B
 	// Note: pathfinding is actually done backwards: from the destination to the start.
 	// This is so we don’t have to reverse the route after extracting it, since it arrives in reverse order.
-	MapLoc *A = &maplocs[w*toY + toX], *B = &maplocs[w*fromY + fromX];
+	NavNode *A = &maplocs[w*toY + toX], *B = &maplocs[w*fromY + fromX];
 	if (!A->passable || !B->passable) {
 		cout << (A->passable ? "B" : "A") << " impassable!" << endl;
 		return false;
@@ -111,9 +111,9 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc
 	
 	/* Initialisation */
 	int n = w * h, _i = 0;
-	MisterHeapy<MapLoc*, float> open_nodes(n);
+	MisterHeapy<NavNode*, float> open_nodes(n);
 	for (int i=0; i < n; i++) {
-		MapLoc *maploc = &maplocs[i];
+		NavNode *maploc = &maplocs[i];
 		maploc->min_dist = (maploc == A ? 0 : INFINITAH);	// Set nodes’ min_dist to inifinity
 		if (maploc->passable)
 			open_nodes.fast_push(maploc), _i++;		// Populate heap vector with passable nodes
@@ -124,7 +124,7 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc
 	cout << "Initialised: " << _i << " open nodes" << endl;
 	
 	/* Run */
-	MapLoc *X, *neighbour;
+	NavNode *X, *neighbour;
 	float dist_via_X;
 	bool route_found = false;
 	while (open_nodes.size()) {
@@ -144,7 +144,7 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc
 		
 		// Recalc neighbours’ min_dists
 		//cout << "recalculate neighbours’ min_dists:" << endl;
-		for (std::list<MapLoc*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
+		for (std::list<NavNode*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
 			neighbour = (*i);
 			dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
 			//cout << " " << neighbour->x << "," << neighbour->y << ": " << dist_via_X << " vs " << neighbour->min_dist;

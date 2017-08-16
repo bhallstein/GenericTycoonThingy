@@ -48,14 +48,13 @@ public:
 	// Methods
 	void draw();
 
-	Unit* createUnit();
+	Unit* createUnit(int atX, int atY);
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
 	void destroyThings();
 	void destroyAllThings();
 	
-
 	// Properties
 	int columns, rows;
 	std::vector<Building*> buildings;

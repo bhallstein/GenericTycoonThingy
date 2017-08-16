@@ -17,8 +17,8 @@ Level::~Level()
 	delete levelview;
 }
 
-Unit* Level::createUnit() {
-	Unit *u = new Unit(navmap);
+Unit* Level::createUnit(int atX, int atY) {
+	Unit *u = new Unit(navmap, atX, atY);
 	units.push_back(u);
 	std::cout << "added new unit (now " << units.size() << ")" << std::endl;
 	return u;
@@ -73,12 +73,12 @@ void Level::destroyAllThings() {
 }
 
 void Level::draw()
-{	
+{
 	levelview->draw(&buildings, &placeables, &units);
 	uiview.draw();
 
 	if (framecount == 1200) framecount = 0;
-	if (50 == framecount++) createUnit();	// Create a new unit every 20 seconds
+	if (50 == framecount++) createUnit(0, 0);	// Create a new unit every 20 seconds
 }
 
 ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
@@ -95,7 +95,7 @@ void Level::buildLevel(ptree levelFile)
 	
 	// Create map
 	navmap = new NavMap(w, h);
-
+	
 	// Create levelview
 	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
 	levelview->createEventResponderMap();					// Make levelview respond to mouse events
@@ -112,7 +112,7 @@ void Level::buildLevel(ptree levelFile)
 LevelView::LevelView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
 	ScrollingView(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
 {
-	
+	// oh hai
 }
 
 void LevelView::acceptEvent(Event *ev) {

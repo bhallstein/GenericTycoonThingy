@@ -19,7 +19,7 @@
 class Unit : public EventResponder
 {
 public:
-	Unit(NavMap *);
+	Unit(NavMap *, int _x, int _y);
 	~Unit();
 
 	// Methods
