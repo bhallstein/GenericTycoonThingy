@@ -9,13 +9,13 @@ Game::Game()
 	/* Window setup */
 
 	// Set defaults (manually for now)
-	int w_width = 800, w_height = 600;
+	pixel_width = 800, pixel_height = 600;
 	std::string w_name = "Demon Barber Tycoon";
 	
 	// Get settings from file and if success & values valid, replace defaults.
 	// ...
 	
- 	DBTWindow.Create(sf::VideoMode(w_width, w_height), w_name, sf::Style::Close);
+ 	DBTWindow.Create(sf::VideoMode(pixel_width, pixel_height), w_name, sf::Style::Close);
 }
 
 Game::~Game()
@@ -26,12 +26,12 @@ Game::~Game()
 void Game::Run()
 {
 	// Create LevelMap
-	int default_map_width = 100, default_map_height = 60;
-	LevelMap levelmap(default_map_width, default_map_height);
+	int default_map_columns = 100, default_map_rows = 60;
+	LevelMap levelmap(default_map_columns, default_map_rows, pixel_width, pixel_height);
 	
 	bool should_quit = false;
-	void *privileged_event_responder = NULL;
-	enum perTypes { BUILDING } privileged_event_responder_type;
+	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, and imlement the 
+															// receiveEvent(sf::Event *ev) method
 	sf::Event ev;
     
 	while (DBTWindow.IsOpened() && !should_quit)
@@ -42,54 +42,38 @@ void Game::Run()
 		{
             // Close window : exit
             if (ev.Type == sf::Event::Closed)
-	   		DBTWindow.Close();
+	   			DBTWindow.Close();
 	
 			// If there is privileged event responder: send events to it
-			if (privileged_event_responder == NULL) 
-			{
+			if (privileged_event_responder != NULL) {
+				// Send to P.E.R.
+				// The game loop can't always know what the P.E.R. should do with the event
+				// 	– it depends on what the P.E.R. is up to. We merely send the event on.
+				EventResponder *resp = (EventResponder*) privileged_event_responder;
+				cout << "sending event to Privileged Responder... ";
+				resp->receiveEvent(&ev, &privileged_event_responder);
+			}
+			else {
 				// Keys
-				if (ev.Type == sf::Event::KeyPressed)
-				{
+				if (ev.Type == sf::Event::KeyPressed) {
 					sf::Keyboard::Key keycode = ev.Key.Code;
 				
-					if (keycode == sf::Keyboard::Escape)
-					{
+					if (keycode == sf::Keyboard::Escape || keycode == sf::Keyboard::Q) {
 						should_quit = true;
 					}
-					else if (keycode == sf::Keyboard::B)
-					{
+					else if (keycode == sf::Keyboard::B) {
 						std::cout << "creating new building... ";
-						Building *pb = levelmap.createBuilding();
-						privileged_event_responder = (Building*) pb;
-						privileged_event_responder_type = BUILDING;
+						Building *b = levelmap.createBuilding();
+						privileged_event_responder = (EventResponder*) b;	// not sure if cast to EvResp needed here
+
+						std::cout << "adding building to memory map... ";
+						// add to memory map
 					}
 				}
 				// Mouse
 				else if (ev.Type == sf::Event::MouseMoved) 
 				{
-					
-				}
-			}
-			else 
-			{
-				// Send to PER
-				Building *pb = (Building*) privileged_event_responder;
-				if (ev.Type == sf::Event::MouseMoved) 
-				{
-					pb->handleMouseMove(ev.MouseMove.X, ev.MouseMove.Y);
-				}
-				if (ev.Type == sf::Event::MouseButtonPressed)
-				{
-					if(ev.MouseButton.Button == sf::Mouse::Right)
-					{
-						privileged_event_responder = NULL;
-						levelmap.destroyBuilding();
-					}
-					else if (ev.MouseButton.Button == sf::Mouse::Left)
-					{
-						if (pb->placeAt(ev.MouseButton.X,ev.MouseButton.Y))
-							privileged_event_responder = NULL;
-					}
+					// Send to relevant things, use memory mapping
 				}
 			}
         }

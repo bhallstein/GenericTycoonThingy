@@ -23,8 +23,9 @@ public:
 	void Run();
 
 private:
-	// Instance Variables
 	sf::RenderWindow DBTWindow;
+	int pixel_width, pixel_height;
+	
 };
 
 #endif

@@ -1,39 +1,87 @@
 #include "Building.h"
 
-Building::Building() {
-	// initialize building
+/*********************************
+ * EventResponder implementation *
+ *********************************/
+
+EventResponder::EventResponder() { }
+EventResponder::~EventResponder() { }
+
+void EventResponder::receiveEvent(sf::Event *ev, EventResponder **p_e_r) { }
+
+
+
+/*********************************
+ *    Building implementation    *
+ *********************************/
+
+Building::Building(sf::Vector2i _block_size) {
 	mode = PLACEMENT;
-	std::cout << "created building";
-	width = 100, height = 80;
+	size_in_blocks.x = 6;
+	size_in_blocks.y = 4;
+	block_size = _block_size;
 }
 Building::~Building()
 {
 	// Destroy things
 }
 
-void Building::handleMouseMove(int x, int y)
+void Building::setPositionFromMouse(int x, int y)		// convert a pixel coordinate to a 'block' coordinate
 {
-	posX = x, posY = y;
+	int remainder_x = x % block_size.x;
+	int remainder_y = y % block_size.y;
+
+	int topleftcorner_x = x - (size_in_blocks.x * block_size.x)/2;
+	int topleftcorner_y = y - (size_in_blocks.y * block_size.y)/2;
+	
+	pos.x = topleftcorner_x - remainder_x;
+	pos.y = topleftcorner_y - remainder_y;
 }
 
-bool Building::placeAt(int x, int y)
-{
-	mode = PLACED;
-	posX = x, posY = y;
-	std::cout << "placed building at " << x << ","  << y << std::endl;
-	return true;
+void Building::setPos(sf::Vector2i _pos) {
+	pos = _pos;
 }
 
-void Building::draw(sf::RenderWindow &wind)
+void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {		// how to unhook from PER status? pass pointer to it?
+	if (mode == PLACEMENT) {
+		if (ev->Type == sf::Event::MouseMoved) {
+			this->setPositionFromMouse(ev->MouseMove.X, ev->MouseMove.Y);
+		}
+		else if (ev->Type == sf::Event::MouseButtonPressed) {
+			if (ev->MouseButton.Button == sf::Mouse::Left) {
+				mode = PLACED;
+				*p_e_r = NULL;
+					
+			}
+			else if (ev->MouseButton.Button == sf::Mouse::Right) {
+				//levelmap.destroyBuilding();
+				*p_e_r = NULL;
+			}
+		}
+	}
+	else if (mode == PLACED) {
+		
+	}
+	std::cout << "Building pos: " << pos.x << "," << pos.y << std::endl;
+}
+
+void Building::draw(sf::RenderWindow &w)
 {
-	if (mode == PLACEMENT)
-		posX = sf::Mouse::GetPosition(wind).x, posY = sf::Mouse::GetPosition(wind).y;
-	sf::Shape s = sf::Shape::Rectangle(
-		posX - width/2, posY - height/2, width, height,
-		(mode == PLACEMENT) ? sf::Color::White : sf::Color::Black
+	//if (mode == PLACEMENT) {
+	//	sf::Vector2i m_pos = sf::Mouse::GetPosition(w);
+	//	pos = nearestBlock(m_pos.x, m_pos.y);
+	//}
+	
+	std::cout << "Draw - building pos: " << pos.x << "," << pos.y << std::endl;
+	
+	w.Draw(
+		sf::Shape::Rectangle(
+			pos.x, pos.y, size_in_blocks.x * block_size.x, size_in_blocks.y * block_size.y,
+			(mode == PLACEMENT) ? sf::Color::White : sf::Color::Black
+		)
 	);
-	wind.Draw(s);
 }
+
 
 #ifdef yeah_this_doesnt_need_compiling_either_sorry
 

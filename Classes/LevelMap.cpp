@@ -1,23 +1,51 @@
 #include "LevelMap.h"
 
-LevelMap::LevelMap(int w, int h)
+/*********************************
+ *   MapLocation implementation  *
+ *********************************/
+
+MapLocation::MapLocation() {
+	// Constructor
+}
+MapLocation::~MapLocation() {
+	// Destructor
+}
+
+void MapLocation::addBuilding(Building *b) {
+	// Add a building to the list thereof
+	buildings.push_back(b);
+}
+void MapLocation::removeBuilding(Building *b) {
+	// Remove a bulding from the list thereof
+	buildings.remove(b);
+}
+
+
+
+/*********************************
+ *    LevelMap implementation    *
+ *********************************/
+
+LevelMap::LevelMap(int _rows, int _columns, int _width, int _height)
 {
-	rows = h;
-	columns = w;
+	rows = rows, columns = _columns;
+	block_size.x = _width/_columns;
+	block_size.y = _height/_rows;
+	
+	maplocs.resize(block_size.x * block_size.y);
 }
 LevelMap::~LevelMap()
 {
-	//deconstructor
+	// Destructor
 }
 
-int LevelMap::numberOfBuildings()
-{
+int LevelMap::numberOfBuildings() {
 	return buildings.size();
 }
 
-Building *LevelMap::createBuilding()
+Building* LevelMap::createBuilding()
 {
-	Building b;
+	Building b(block_size);
 	buildings.push_back(b);
 	std::cout << "created building: " << buildings.size() << std::endl;
 	return &buildings.back();
@@ -28,6 +56,17 @@ void LevelMap::destroyBuilding()
 	buildings.pop_back();
 	std::cout << "cancelled building creation. " << std::endl;
 }
+
+void LevelMap::moveBuilding(Building *b, int x1, int y1, int x2, int y2)
+{
+	//// Remove from current maploc
+	//if (x1 >= 0 and y1 >= 0)
+	//	(*maplocs[y1 * rows + x1]).removeBuilding(b);
+	//	
+	//// Add to new maploc
+	//(*maplocs[y2 * rows + x2]).addBuilding(b);
+}
+
 
 void LevelMap::draw(sf::RenderWindow &window)
 {
