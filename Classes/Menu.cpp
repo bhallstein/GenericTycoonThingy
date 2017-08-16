@@ -1,86 +1,72 @@
 #include "Menu.hpp"
-#include "Game.hpp"
 #include "Level.hpp"
-#include "Button.hpp"
-#include "Callback.hpp"
 
-Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
+Menu::Menu(W::Window *_win) : W::GameState(W::GS_OPAQUE), win(_win)
 {
-	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	menuview = new MenuView(_theW, aniston, &responderMap);
-	responderMap.addResponder(menuview);
-	
-	menuview->subscribeToButtons(new Callback(&Menu::receiveEvent, this));
+	menuview = new MenuView(
+		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 1),
+		win,
+		&eh
+	);
+	addView(menuview);
+	menuview->subscribeToButtons(new W::Callback(&Menu::receiveEvent, this));
 	
 	// Key subscriptions
-	responderMap.subscribeToKey(this, Event::K_Q);
-	responderMap.subscribeToKey(this, Event::K_ESC);
+	eh.subscribeToKey(W::KeyCode::K_Q, new W::Callback(&Menu::receiveEvent, this));
+	eh.subscribeToKey(W::KeyCode::K_ESC, new W::Callback(&Menu::receiveEvent, this));
 }
 Menu::~Menu()
-{	
+{
+	removeView(menuview);
 	delete menuview;
 }
 
-void Menu::pause() {
-	
-}
-void Menu::resume(Returny *returny) {
-	delete level;
-	if (returny->type == Returny::killer_returny)
-		game->stateFinished(this, Returny(Returny::killer_returny));
+void Menu::resume(W::Returny *ret) {
+//	delete level;
+	if (ret->type == W::ReturnyType::KILLER_RETURNY)
+		W::popState(W::KillerReturny);
+	else if (ret->type == W::ReturnyType::PAYLOAD_RETURNY) {
+		if (ret->payload == "replay") startLevel("level1.lua");
+	}
 }
 void Menu::update() {
-
-}
-void Menu::draw() {
-	menuview->_draw();
+	
 }
 
-void Menu::setResolution(int _w, int _h) {
-	GameState::setResolution(_w, _h);
-	menuview->updatePosition();
-}
-
-void Menu::receiveEvent(Event *ev) {
-	if (ev->type == Event::KEYPRESS) {
-		if (ev->key == Event::K_Q)
-			game->stateFinished(this, Returny(Returny::killer_returny));
-		if (ev->key == Event::K_ESC)
-			game->stateFinished(this, Returny(Returny::empty_returny));
+void Menu::receiveEvent(W::Event *ev) {
+	if (ev->type == W::EventType::KEYPRESS) {
+		if (ev->key == W::KeyCode::K_Q || ev->key == W::KeyCode::K_ESC)
+			W::popState(W::EmptyReturny);
 	}
-	else if (ev->type == Event::BUTTONCLICK) {
-		if (ev->payload == "start level 1")
+	else if (ev->type == W::EventType::BUTTONCLICK) {
+		if (*((std::string*) ev->_payload) == "start level 1")
 			startLevel("level1.lua");
 	}
 }
 
 void Menu::startLevel(std::string path) {
-	std::string s = "Starting level: "; s += path; s += "\n";
-	theW->log(s.c_str());
+	W::log << "Starting level: " << path << std::endl;
 	try {
-		level = new Level(game, theW, path);
-		game->pushState(level);
-		W::log("Level started.\n");
-		theW->playSound("Scream.wav");
-	} catch (MsgException &ex) {
+		level = new Level(win, path);
+		W::pushState(level);
+		W::log << "Level started" << std::endl;
+	} catch (W::Exception &ex) {
 		std::string msg = "Oh noes! ";
 		msg.append(ex.msg);
-		theW->warning(msg.c_str());
+		std::cout << msg << std::endl;
+//		theW->warning(msg.c_str());
 	}
 }
 
-
-#include "../W.hpp"
-
-MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
+MenuView::MenuView(W::Positioner *_pos, W::Window *_win, W::EventHandler *_eh) : W::UIView(_pos, _win, _eh)
 {
-	buttons.push_back(new Button(280, 160, 240, 110, "start level 1"));
+	buttons.push_back(new W::Button(280, 160, 240, 110, "start level 1"));
 }
 void MenuView::draw() {
-	for (int i=0, n = buttons.size(); i < n; i++) {
-		Button *b = buttons[i];
-		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	for (std::vector<W::Button*>::iterator it = buttons.begin(); it < buttons.end(); it++) {
+		W::Button *b = *it;
+		drawRect(b->pos.x, b->pos.y, b->plan[0].sz.width, b->plan[0].sz.height, b->col());
 	}
-	theW->drawText(186, 340, "black", (char *) "Welcome to Generic Tycoon Thingy");
-	theW->drawText(308, 380, "white", (char *) "Click to begin");
+	drawText(186, 340, W::Colour::BLACK, (char *) "Welcome to Generic Tycoon Thingy");
+	drawText(308, 380, W::Colour::WHITE, (char *) "Click to begin");
 }

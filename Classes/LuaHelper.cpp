@@ -1,7 +1,8 @@
 #include "LuaHelper.hpp"
-#include "../W.hpp"
+#include "MrPaths.hpp"
+#include "W.h"
 
-LuaHelper::LuaHelper(W *_theW) : theW(_theW) {
+LuaHelper::LuaHelper() {
 	LuaInstance = luaL_newstate();
 	luaL_openlibs(LuaInstance);
 }
@@ -15,14 +16,14 @@ bool LuaHelper::loadFile(const char *filename)
 	if (!loadingSuccess) {
 		std::string s = "LuaHelper: could not load file '", t; s.append(filename); s.append("'; error was: ");
 		to<std::string>(-1, t); s.append(t);
-		W::log(s.c_str());
+		W::log << s << std::endl;
 		return false;
 	}
 	// Add our Resources folder to the Lua path
 	lua_getglobal(LuaInstance, "package");
 	lua_getfield(LuaInstance, -1, "path");
 	std::string path = lua_tostring(LuaInstance, -1);	// Grab path string from top of stack
-	path.append(";"); path.append(theW->luaPath); path.append("?.lua");
+	path.append(";"); path.append(MrPaths::luaPath); path.append("?.lua");
 	lua_pop(LuaInstance, 1);					// Pop previous path from stack
 	lua_pushstring(LuaInstance, path.c_str());	// Push new path onto stack
 	lua_setfield(LuaInstance, -2, "path");		// Set the "path" of table at -2 to value at top of stack (value is then popped)
@@ -32,7 +33,7 @@ bool LuaHelper::loadFile(const char *filename)
 	if (!callingSuccess) {
 		std::string s = "LuaHelper: could not execute file '", t; s.append(filename); s.append("'; error was: ");
 		to<std::string>(-1, t); s.append(t);
-		W::log(s.c_str());
+		W::log << s << std::endl;
 		return false;
 	}
 	return true;

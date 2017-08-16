@@ -1,92 +1,64 @@
 #include "LevelScore.hpp"
-#include "Game.hpp"
 #include "Level.hpp"
-#include "Button.hpp"
-#include "Callback.hpp"
 
-LevelScore::LevelScore(Game *_game, W *_theW, bool _victory) : GameState(_game, _theW)
+LevelScore::LevelScore(W::Window *_win, bool _victory) : win(_win), victory(_victory)
 {
-	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	scoreview = new ScoreView(_theW, aniston, &responderMap, _victory);
-	responderMap.addResponder(scoreview);
+	scoreview = new ScoreView(win, &eh, victory);
+	addView(scoreview);
+	scoreview->subscribeToButtons(new W::Callback(&LevelScore::recEv, this));
 	
-	scoreview->subscribeToButtons(new Callback(&LevelScore::receiveEvent, this));
-	
-	victory = _victory;
-	
-	theW->playSound(victory ? "Mission accomplished.wav" : "Scream.wav");
+//	theW->playSound(victory ? "Mission accomplished.wav" : "Mission failed.wav");
 
 	// Key subscriptions
-	responderMap.subscribeToKey(this, Event::K_Q);
-	responderMap.subscribeToKey(this, Event::K_ESC);
+	eh.subscribeToKey(W::KeyCode::K_Q, new W::Callback(&LevelScore::recEv, this));
+	eh.subscribeToKey(W::KeyCode::K_ESC, new W::Callback(&LevelScore::recEv, this));
 }
 LevelScore::~LevelScore()
 {	
 	delete scoreview;
 }
 
-void LevelScore::pause() {
-	
-}
-void LevelScore::resume(Returny *returny) {
-	delete level;
-	if (returny->type == Returny::killer_returny)
-		game->stateFinished(this, Returny(Returny::killer_returny));
-}
-void LevelScore::update() {
+void LevelScore::resume(W::Returny *returny) { }
+void LevelScore::update() { }
 
-}
-void LevelScore::draw() {
-	scoreview->_draw();
-}
-
-void LevelScore::setResolution(int _w, int _h) {
-	GameState::setResolution(_w, _h);
-	scoreview->updatePosition();
-}
-
-void LevelScore::receiveEvent(Event *ev) {
-	if (ev->type == Event::KEYPRESS) {
-		if (ev->key == Event::K_Q)
-			game->stateFinished(this, Returny(Returny::killer_returny));
-		if (ev->key == Event::K_ESC)
-			game->stateFinished(this, Returny(Returny::empty_returny));
+void LevelScore::recEv(W::Event *ev) {
+	if (ev->type == W::EventType::KEYPRESS) {
+		if (ev->key == W::KeyCode::K_ESC) exitToMenu();
 	}
-	else if (ev->type == Event::BUTTONCLICK) {
-		if (ev->payload == "start level 1")
-			startLevel("level1.lua");
+	else if (ev->type == W::EventType::BUTTONCLICK) {
+		if (*((std::string*)ev->_payload) == "exit to menu") exitToMenu();
+		else if (*((std::string*)ev->_payload) == "replay") replayLevel();
 	}
 }
 
-void LevelScore::startLevel(std::string path) {
-	std::string s = "Starting level: "; s += path; s += "\n";
-	theW->log(s.c_str());
-	try {
-		level = new Level(game, theW, path);
-		game->pushState(level);
-		W::log("Level started.\n");
-	} catch (MsgException &ex) {
-		std::string msg = "Oh noes! ";
-		msg.append(ex.msg);
-		theW->warning(msg.c_str());
-	}
+void LevelScore::exitToMenu() {
+	W::Returny ret(W::ReturnyType::PAYLOAD_RETURNY);
+	ret.payload = "exit to menu";
+	W::popState(ret);
+}
+void LevelScore::replayLevel() {
+	W::Returny ret(W::ReturnyType::PAYLOAD_RETURNY);
+	ret.payload = "replay";
+	W::popState(ret);
 }
 
 
-#include "../W.hpp"
-
-ScoreView::ScoreView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, bool _victory) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
+ScoreView::ScoreView(W::Window *_win, W::EventHandler *_eh, bool _victory) :
+	UIView(
+		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 1),
+		_win,
+		_eh
+	),
+	victory(_victory)
 {
-	//buttons.push_back(new Button(280, 160, 240, 110, "start level 1"));
-	victory = _victory;
+	buttons.push_back(new W::Button(240, 155, 120, 80, "replay"));
+	buttons.push_back(new W::Button(440, 155, 120, 80, "exit to menu"));
 }
 void ScoreView::draw() {
-	/*for (int i=0, n = buttons.size(); i < n; i++) {
-		Button *b = buttons[i];
-		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
-	}*/
-	if(victory)
-		theW->drawText(180, 180, "green", (char*)"YOU WIN!");
-	else
-		theW->drawText(180, 180, "red", (char*)"YOU LOSE!");
+	for (std::vector<W::Button*>::iterator it = buttons.begin(); it < buttons.end(); it++) {
+		W::Button *b = *it;
+		drawRect(b->pos.x, b->pos.y, b->plan[0].sz.width, b->plan[0].sz.height, b->col());
+	}
+	if (victory) drawText(180, 180, W::Colour::GREEN, (char*)"YOU WIN!");
+	else drawText(180, 180, W::Colour::RED, (char*)"YOU LOSE!");
 }

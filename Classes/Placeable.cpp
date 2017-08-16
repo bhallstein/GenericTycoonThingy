@@ -1,32 +1,44 @@
 #include "Placeable.hpp"
-#include "MappedObj.hpp"
-#include "../W.hpp"
+#include "PlaceableManager.hpp"
+#include "Level.hpp"
 
-Placeable::Placeable(MappedObj *_mo, ResponderMap *_rm) : mo(_mo), rm(_rm)
+Placeable::Placeable(PlaceableManager *_mngr, W::EventHandler *_eh) :
+	mngr(_mngr), eh(_eh)
 {
-	
+	plan.resize(1);
+	W::rect *r = &plan[0];
+	r->pos.x = r->pos.y = 0;
+	r->sz.width = r->sz.height = 1;
 }
 Placeable::~Placeable()
 {
-	rm->relinquishPrivilegedEventResponderStatus(this);
+	deactivate();
 }
 
-void Placeable::receiveEvent(Event *ev) {
-	if (ev->type == Event::MOUSEMOVE)
-		x = ev->x, y = ev->y;
-	else if (ev->type == Event::LEFTCLICK) {
-		if (!mo->attemptToPlace(ev->x, ev->y))
+void Placeable::receiveEvent(W::Event *ev) {
+	using namespace W::EventType;
+	if (ev->type == LEVEL_MOUSEMOVE)
+		pos.x = ev->pos.x, pos.y = ev->pos.y;
+	else if (ev->type == LEVEL_LEFTMOUSEDOWN) {
+		if (!mngr->attemptToPlace(ev->pos.x, ev->pos.y))
 			return;
 		else
 			deactivate();
 	}
-	else if (ev->type == Event::RIGHTCLICK)
-		mo->destroyed = true;
+	else if (ev->type == LEVEL_RIGHTMOUSEDOWN)
+		mngr->destroyed = true;
 }
 
 bool Placeable::activate() {
-	return rm->requestPrivilegedEventResponderStatus(this);
+	using namespace W::EventType;
+	eh->requestPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE,      new W::Callback(&Placeable::receiveEvent, this));
+	eh->requestPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN,  new W::Callback(&Placeable::receiveEvent, this));
+	eh->requestPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, new W::Callback(&Placeable::receiveEvent, this));
+	return true;
 }
 void Placeable::deactivate() {
-	rm->relinquishPrivilegedEventResponderStatus(this);
+	using namespace W::EventType;
+	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE, this);
+	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN, this);
+	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, this);
 }

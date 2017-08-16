@@ -14,8 +14,8 @@ public:
 	BehaviourParticipant() : available(true) { }
 	bool capableOfBehaviour(const char *bTypestring) {
 		std::vector<std::string> *compBehs = getCompatibleBehaviours();
-		for (int i=0, n = compBehs->size(); i < n; i++)
-			if (compBehs->at(i) == bTypestring)
+		for (std::vector<std::string>::iterator it = compBehs->begin(); it < compBehs->end(); it++)
+			if (*it == bTypestring)
 				return true;
 		return false;
 	}
@@ -24,7 +24,7 @@ public:
 		return capableOfBehaviour(bTypestring);
 	}
 	void capture() {
-		if (!available) throw MsgException("Attempt to capture unavailable BehaviourParticipant");
+		if (!available) throw W::Exception("Attempt to capture unavailable BehaviourParticipant");
 		available = false;
 	}
 	void release() { available = true; }

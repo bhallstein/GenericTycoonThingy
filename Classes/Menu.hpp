@@ -10,31 +10,21 @@
 #define MENU_H
 
 #include <vector>
-
-#include "GameState.hpp"
-#include "EventResponder.hpp"
-
-class Game;
-class W;
-class Level;
-class Button;
+#include "W.h"
 
 class MenuView;
+class Level;
 
-class Menu : public GameState, public EventResponder {
+class Menu : public W::GameState, public W::EventResponder {
 public:
-	Menu(Game *, W *);
+	Menu(W::Window *);
 	~Menu();
 	
 	// Methods
-	void reset();
-	void pause();
-	void resume(Returny *);
+	void resume(W::Returny *);
 	void update();
-	void draw();
-	void setResolution(int _w, int _h);
 	
-	void receiveEvent(Event *);
+	void receiveEvent(W::Event *);
 	
 	void startLevel(std::string path);
 	void startLevelOne();
@@ -42,16 +32,14 @@ public:
 protected:
 	// Properties
 	MenuView *menuview;
-	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
 	
+	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
+	W::Window *win;
 };
 
-
-#include "UIView.hpp"
-
-class MenuView : public UIView {
+class MenuView : public W::UIView {
 public:
-	MenuView(W *, JenniferAniston &, ResponderMap *);
+	MenuView(W::Positioner *, W::Window *, W::EventHandler *);
 	void draw();
 };
 

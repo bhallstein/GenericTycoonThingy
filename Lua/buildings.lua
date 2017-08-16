@@ -3,11 +3,15 @@
 defaultColour = "black"
 defaultHoverColour = "black"
 
+universalFurnishings = {
+	"door"
+}
+
 buildingTypes = {
 	barber = {
 		colour = "red",
 		hoverColour = "black",
-		allowedFurnishings = { "barberschair", "sofa" }
+		allowedFurnishings = { "barberschair" }
 	},
 	pieshop = {
 		colour = "yellow",

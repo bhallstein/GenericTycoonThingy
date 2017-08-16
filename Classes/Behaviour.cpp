@@ -4,31 +4,26 @@
 #include "Furnishing.hpp"
 #include "Level.hpp"
 #include "LuaHelper.hpp"
+#include "MrPaths.hpp"
 
-bool strstarts(const char *str, const char *search) {
-	for (int i=0; str[i] != '\0' && search[i] != '\0'; i++)
-		if (str[i] != search[i]) return false;
-	return true;
-}
-
-Behaviour::Behaviour(const char *_type, ResponderMap *levelRM) : type(_type)
+Behaviour::Behaviour(const char *_type, W::EventHandler *_eh) : type(_type), eh(_eh)
 {
-	if (strcmp(_type, "despawn") == 0)     b = new DespawnBehaviour(levelRM);
-	else if (strstarts(_type, "seek:"))    b = new SeekBehaviour(_type, levelRM);
-	else if (strstarts(_type, "service:")) b = new ServiceBehaviour(_type, levelRM);
-	else throw MsgException("Behaviour with invalid type created");
+	if (strcmp(_type, "despawn") == 0)     b = new DespawnBehaviour(eh);
+	else if (strstarts(_type, "seek:"))    b = new SeekBehaviour(_type, eh);
+	else if (strstarts(_type, "service:")) b = new ServiceBehaviour(_type, eh);
+	else throw W::Exception("Behaviour with invalid type created");
 }
 Behaviour::~Behaviour()
 {
 	std::cout << "Behaviour \"" << type << "\" destruct" << std::endl;
 	delete b;
 }
-bool Behaviour::initialize(W *_W) {
-	return BehaviourBase::initialize(_W);
+bool Behaviour::initialize() {
+	return BehaviourBase::initialize();
 }
-void Behaviour::update() { b->update(); }
+void Behaviour::update()    { b->update(); }
 bool Behaviour::destroyed() { return b->destroyed; }
-void Behaviour::destroy() { b->destroyed = true; }
+void Behaviour::destroy()   { b->destroyed = true; }
 /* Initialiser passthroughs */
 void Behaviour::init(Unit *u) { b->init(u); }
 void Behaviour::init(Level *l, Unit *u) { b->init(l, u); } 
@@ -40,22 +35,22 @@ void Behaviour::init(Level *l, Unit *u1, Unit *u2, Furnishing *f) { b->init(l, u
 
 bool BehaviourBase::lua_initialized = false;
 LuaHelper *BehaviourBase::mrLua;
-bool BehaviourBase::initialize(W *_W) {
+bool BehaviourBase::initialize() {
 	if (BehaviourBase::lua_initialized) return true;
 	
-	W::log("  BehaviourBase::initialize() called...");
-	mrLua = new LuaHelper(_W);
+	W::log << "  BehaviourBase::initialize() called..." << std::endl;
+	mrLua = new LuaHelper();
 	
-	std::string path = _W->luaPath;
+	std::string path = MrPaths::luaPath;
 	path.append("behaviours.lua");
 	if (!mrLua->loadFile(path.c_str())) {
-		W::log("Could not read behaviours.lua");
+		W::log << "Could not read behaviours.lua" << std::endl;
 		return false;
 	}
 	
 	BehaviourBase::lua_initialized = true;
 	
-	return SeekBehaviour::initialize(_W) && ServiceBehaviour::initialize(_W);
+	return SeekBehaviour::initialize() && ServiceBehaviour::initialize();
 }
 
 /* DespawnBehaviour */
@@ -64,7 +59,7 @@ void DespawnBehaviour::init(Unit *_u) {
 	unit = _u;
 	initialized = true;
 }
-void DespawnBehaviour::_update() {
+void DespawnBehaviour::update() {
 	if (stage == -1) {		// Waiting
 		if (++frames_waited >= WAIT_PERIOD) stage++;
 	}
@@ -86,8 +81,8 @@ void DespawnBehaviour::_update() {
 bool SeekBehaviour::lua_initialized = false;
 std::map<std::string, struct seekBehaviourInfo> SeekBehaviour::types;
 
-SeekBehaviour::SeekBehaviour(const char *_type, ResponderMap *_levelRM) :
-	BehaviourBase(_levelRM), type(_type)
+SeekBehaviour::SeekBehaviour(const char *_type, W::EventHandler *_eh) :
+	BehaviourBase(_eh), type(_type)
 {
 	bType = &types[type];
 }
@@ -97,20 +92,19 @@ void SeekBehaviour::init(Level *_l, Unit *_u) {
 	building = level->randomBuildingWithType(bType->requisiteBuildingType.c_str());
 	initialized = true;
 }
-void SeekBehaviour::_update() {
-	if (stage == 0) {		// Send unit to requisite establishment
+void SeekBehaviour::update() {
+//	if (stage == 0) {		// Send unit to requisite establishment
+//		int x, y;
+//		building->getEntryPoint(&x, &y);
+//		if (unit->voyage(x, y)) stage++;
+//		else wait();
+//	}
+//	else if (stage == 1) {	// Send unit to queue point
+	if (stage == 0) {
 		int x, y;
-		building->getEntryPoint(&x, &y);
+		building->getQueuePoint(&x, &y);
 		if (unit->voyage(x, y)) stage++;
 		else wait();
-	}
-	else if (stage == 1) {	// Send unit to queue point
-		if (unit->arrived) {
-			int x, y;
-			building->getQueuePoint(&x, &y);
-			if (unit->voyage(x, y)) stage++;
-			else wait();
-		}
 	}
 	else if (stage == 2) {	// Done!
 		if (unit->arrived) {
@@ -121,12 +115,12 @@ void SeekBehaviour::_update() {
 		}
 	}
 }
-bool SeekBehaviour::initialize(W *_W) {
+bool SeekBehaviour::initialize() {
 	lua_State *L = mrLua->LuaInstance;
 	
 	// Construct types map
 	if (!mrLua->pushtable("seekBehaviours")) {
-		W::log("In behaviours.lua, could not push the seekBehaviours table onto the stack");
+		W::log << "In behaviours.lua, could not push the seekBehaviours table onto the stack" << std::endl;
 		return false;
 	}
 	lua_pushnil(L);							// S: -1 nil; -2 seekBehaviours
@@ -142,9 +136,8 @@ bool SeekBehaviour::initialize(W *_W) {
 			bInfo->requisiteBuildingType = mrLua->getfield<const char *>("requisiteBuildingType");
 			bInfo->followingBehaviour = mrLua->getfield<const char *>("followingBehaviour");
 		}
-		catch (MsgException &exc) {
-			char s[100]; sprintf(s, "Invalid SeekBehaviour definition in behaviours.lua for '%s' type", bType);
-			W::log(s);
+		catch (W::Exception &exc) {
+			W::log << "Invalid SeekBehaviour definition in behaviours.lua for '" << bType << "' type" << std::endl;
 			return false;
 		}
 		
@@ -162,31 +155,34 @@ bool SeekBehaviour::initialize(W *_W) {
 bool ServiceBehaviour::lua_initialized = false;
 std::map<std::string, serviceBehaviourInfo> ServiceBehaviour::types;
 
-ServiceBehaviour::ServiceBehaviour(const char *_type, ResponderMap *_levelRM) :
-	BehaviourBase(_levelRM), type(_type)
+ServiceBehaviour::ServiceBehaviour(const char *_type, W::EventHandler *_eh) :
+	BehaviourBase(_eh), type(_type)
 {
 	bType = &types[type];
 }
 ServiceBehaviour::~ServiceBehaviour()
 {
-	levelRM->unsubscribeFromEventType(this, Event::INTERRUPT_UNITPICKUP);
+	eh->unsubscribeFromEventType(W::EventType::INTERRUPT_UNITPICKUP, this);
 }
 void ServiceBehaviour::init(Level *_l, Unit *_u, Unit *_s, Furnishing *_f) {
 	level = _l, unit = _u, staff = _s, furnishing = _f;
 	// Check furnishing is capable of this interaction
 	if (!furnishing->capableOfBehaviour(type.c_str())) {
-		char s[100]; sprintf(s, "'%s' behaviour initialized with incompatible '%s' furnishing", type.c_str(), furnishing->type.c_str());
-		throw MsgException(s);
+		char s[150]; sprintf(s, "'%s' behaviour initialized with incompatible '%s' furnishing", type.c_str(), furnishing->type.c_str());
+		throw W::Exception(s);
 	}
 	unit->capture(), staff->capture(), furnishing->capture();
 	initialized = true;
 	
-	levelRM->subscribeToEventType(this, Event::INTERRUPT_UNITPICKUP);
+	eh->subscribeToEventType(
+		W::EventType::INTERRUPT_UNITPICKUP,
+		new W::Callback(&ServiceBehaviour::receiveEvent, this)
+	);
 	
 	//take the nice patron's money
 	level->payPlayer(bType->charge);
 }
-void ServiceBehaviour::_update() {
+void ServiceBehaviour::update() {
 	if (stage == 0) {		// Send units to interaction points
 		int uDestX, uDestY, sDestX, sDestY;
 		furnishing->getInteractionPoint("civilian", &uDestX, &uDestY);
@@ -210,7 +206,7 @@ void ServiceBehaviour::_update() {
 	// Interrupt handling
 	else if (stage == 10) {	// Send unit to queue point
 		int x, y;
-		char s[100]; sprintf(s, "interrupt: getting queue point from building %p", contextBuilding);
+		char s[120]; sprintf(s, "interrupt: getting queue point from building %p", contextBuilding);
 		std::cout << s << std::endl;
 		contextBuilding->getQueuePoint(&x, &y);
 		if (unit->voyage(x, y)) stage++;
@@ -225,9 +221,9 @@ void ServiceBehaviour::_update() {
 		}
 	}
 }
-void ServiceBehaviour::receiveEvent(Event *ev) {
-	if (ev->type == Event::INTERRUPT_UNITPICKUP) {
-		if (ev->unit != staff)
+void ServiceBehaviour::receiveEvent(W::Event *ev) {
+	if (ev->type == W::EventType::INTERRUPT_UNITPICKUP) {
+		if (ev->_payload != staff)
 			return;
 		// Interrupt the behaviour
 		contextBuilding = staff->getContextBuilding();
@@ -235,12 +231,12 @@ void ServiceBehaviour::receiveEvent(Event *ev) {
 		stage = 10;
 	}
 }
-bool ServiceBehaviour::initialize(W *_W) {
+bool ServiceBehaviour::initialize() {
 	lua_State *L = mrLua->LuaInstance;
 	
 	// Construct types map
 	if (!mrLua->pushtable("serviceBehaviours")) {
-		W::log("In behaviours.lua, could not push the serviceBehaviours table onto the stack");
+		W::log << "In behaviours.lua, could not push the serviceBehaviours table onto the stack" << std::endl;
 		return false;
 	}
 	lua_pushnil(L);							// S: -1 nil; -2 serviceBehaviours
@@ -255,9 +251,8 @@ bool ServiceBehaviour::initialize(W *_W) {
 		try {
 			bInfo->charge = mrLua->getfield<int>("charge");
 		}
-		catch (MsgException &exc) {
-			char s[100]; sprintf(s, "Invalid ServiceBehaviour definition in behaviours.lua for '%s' type", bType);
-			W::log(s);
+		catch (W::Exception &exc) {
+			W::log << "Invalid ServiceBehaviour definition in behaviours.lua for '" << bType << "' type" << std::endl;
 			return false;
 		}
 		
