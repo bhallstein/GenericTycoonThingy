@@ -18,6 +18,7 @@
 #include "GameState.hpp"
 #include "View.hpp"
 #include "MappedObj.hpp"
+#include "Level.hpp"
 
 
 

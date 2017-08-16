@@ -13,11 +13,10 @@
 #define SETTINGSMANAGER_H
 
 #include <string>
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/xml_parser.hpp>
-//#include <boost/foreach.hpp>
+#include <iostream>
 
 #include "Setting.hpp"
+#include "LuaHelper.hpp"
 
 class SettingsManager
 {
@@ -25,13 +24,13 @@ public:
 	SettingsManager(char* argv[]);
 	// Methods
 	void init(char* argv[]); //initialise SM - this includes loading settings or defaults as appropriate
-	void save(std::string fileName); // Save external files (XML and Binary)
+	void save(std::string fileName); // Save external files (Lua)
 	//void detect(); 					// Run detection routines for flagged settings
 
 	//The Settings
-	Setting<int> Screen_Width;
-	Setting<int> Screen_Height;
-	Setting<bool> Windowed;
+	Setting<int> ScreenWidth;
+	Setting<int> ScreenHeight;
+	Setting<bool> FullScreen;
 	Setting<int> FramerateLimit;
 
 	//loadDefaults is implemented in the header because it's important
@@ -40,19 +39,29 @@ public:
 	{
 		//Ultimately we will set more than just values! ;)
 
-		//Screen_Width
-		Screen_Width.value = 1680;
+		//ScreenWidth
+		ScreenWidth.value = 800;
 
-		//Screen_Height
-		Screen_Height.value = 1050;
+		//ScreenHeight
+		ScreenHeight.value = 600;
 
-		//Windowed
-		Windowed.value = false;
+		//FullScreen
+		FullScreen.value = false;
 
 		//FramerateLimit
 		FramerateLimit.value = 60;
 	}
 
+	//loadSettings is implemented in the header because it's important
+	//This way if we add a setting we only have to come to the header to add both it AND its defaults AND it's luaRead
+	void loadSettings(LuaHelper* mrLua)
+	{		
+		mrLua->pushtable("settings");
+		ScreenWidth.value = mrLua->getSubfield<int>("ScreenWidth","value");
+		ScreenHeight.value = mrLua->getSubfield<int>("ScreenHeight","value");
+		FullScreen.value = mrLua->getSubfield<bool>("FullScreen","value");
+		FramerateLimit.value = mrLua->getSubfield<int>("FramerateLimit","value");
+	}
 };
 
 

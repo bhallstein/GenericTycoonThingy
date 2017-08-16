@@ -13,10 +13,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-//#include <boost/lexical_cast.hpp>
-
-#include <lua.hpp>
-
+#include "LuaHelper.hpp"
 #include "types.h"
 #include "NavMap.hpp"
 #include "EventResponder.hpp"

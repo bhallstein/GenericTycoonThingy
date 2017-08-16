@@ -21,9 +21,9 @@ Game::Game(sf::RenderWindow *_window, SettingsManager* _settings) : resume(false
 	 * 2. is probably better – it enables us to consolidate settings into the game code. And it is 
 	 * more flexible: the game should be able most excellent-like to switch graphics modes on the fly.
 	 */
-	int windowStyle = (settings->Windowed.value ? sf::Style::Close : sf::Style::Fullscreen);
+	int windowStyle = (settings->FullScreen.value ? sf::Style::Fullscreen : sf::Style::Close);
 	std::string window_name = (game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
- 	window->Create(sf::VideoMode(settings->Screen_Width.value, settings->Screen_Height.value), window_name, windowStyle);
+ 	window->Create(sf::VideoMode(settings->ScreenWidth.value, settings->ScreenHeight.value), window_name, windowStyle);
 	window->SetFramerateLimit(settings->FramerateLimit.value);
 }
 

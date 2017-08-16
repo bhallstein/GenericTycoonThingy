@@ -18,12 +18,11 @@ Level::~Level() {
 
 void Level::buildLevel(std::string levelFile)
 {
-	lua_State *L = luaL_newstate();
-	luaL_openlibs(L);
+	LuaHelper mrLua;
 
-	if (luaL_loadfile(L, levelFile.c_str()) || lua_pcall(L, 0, 0, 0))
+	if (mrLua.loadFile(levelFile))
 	{
-		std::cout << lua_tostring(L,-1);
+		std::cout << mrLua.to<std::string>(-1);
 		std::cin.get();
 		//some kind of error!
 		//throw 1;
@@ -31,12 +30,8 @@ void Level::buildLevel(std::string levelFile)
 	else
 	{
 		//level width and height
-		lua_getglobal(L,"width");
-		w = lua_tonumber(L,-1);
-		lua_pop(L,1);
-		lua_getglobal(L,"height");
-		h = lua_tonumber(L,-1);
-		lua_pop(L,1);
+		w = mrLua.getvalue<int>("width");
+		h = mrLua.getvalue<int>("height");
 
 		std::cout << "level dimensions: " << w << " x " << h << std::endl;
 
@@ -48,30 +43,21 @@ void Level::buildLevel(std::string levelFile)
 		eventHandler.subscribe(levelview);
 
 		//buildings
-		lua_getglobal(L,"buildings");
+		mrLua.pushtable("buildings");
 
-		lua_pushnil(L); //start at the start
-		while (lua_next(L,1) != 0) //"buildings" table is at index 1 in the stack
+		lua_pushnil(mrLua.LuaInstance); //start at the start
+		while (lua_next(mrLua.LuaInstance,1) != 0) //"buildings" table is at index 1 in the stack
 		{
 			int x,y; //temp. since we need these to even construct building!
 
 			//x and y
-			lua_pushstring(L,"x"); //push the property we want
-			lua_gettable(L,-2); //get the key we pushed from the table at -2
-			x = (int)lua_tonumber(L,-1);
-			lua_pop(L,1);
-
-			lua_pushstring(L,"y"); //push the property we want
-			lua_gettable(L,-2); //get the key we pushed from the table at -2
-			y = (int)lua_tonumber(L,-1);
-			lua_pop(L,1);
+			x = mrLua.getfield<int>("x");
+			y = mrLua.getfield<int>("y");
 
 			Building* b = createBuilding(x, y);
 
 			//type
-			lua_pushstring(L,"type"); //push the property we want
-			lua_gettable(L,-2); //get the key we pushed from the table at -2
-			switch((int)lua_tonumber(L,-1)) //get the value returned from the top
+			switch(mrLua.getfield<int>("type")) //get the value returned from the top
 			{
 				case 1:
 					b->type = HOME;
@@ -86,10 +72,9 @@ void Level::buildLevel(std::string levelFile)
 					b->type = DERELICT;
 					break;
 			}
-			lua_pop(L,1); //pop the top
 
 			//pop the table, leaving the key ready for next iteration
-			lua_pop(L, 1);
+			lua_pop(mrLua.LuaInstance, 1);
 		}
 	}
 }
