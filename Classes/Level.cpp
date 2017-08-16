@@ -39,6 +39,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	
 	// Time
 	framecount = 0;
+	timeRemaining = 0;
 	realtimetime = 0.0;
 	realtimetimer = new Ogre::Timer();
 }
@@ -87,6 +88,22 @@ void Level::buildLevel(std::string levelname) {
 		s.append(exc.msg);
 		throw MsgException(s.c_str());
 	}
+
+	//set victory conditions and other level stuff (e.g. time limit)
+	try {
+		moneyLimit = mrLua.getvalue<int>("moneyLimit");
+	} catch (MsgException &exc) {
+		std::string s = "Couldn't get level's money target: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
+	}
+	try {
+		timeLimit = mrLua.getvalue<int>("timeLimit");
+	} catch (MsgException &exc) {
+		std::string s = "Couldn't get level's time limit: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
+	}
 	
 	// Create map
 	navmap = new NavMap(w, h);
@@ -94,7 +111,7 @@ void Level::buildLevel(std::string levelname) {
 	
 	// Create levelview
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furnishings, &units, &staff, w, h, &realtimetime);
+	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furnishings, &units, &staff, w, h, &timeRemaining);
 	responderMap.addResponder(levelview);
 	
 	// Get allowed buildings
@@ -214,6 +231,7 @@ void Level::resume(Returny *returny) {
 void Level::update() {
 	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
 	realtimetimer->reset();
+	timeRemaining = timeLimit - (int) realtimetime;
 
 	intcoord c;
 	for (int i=0, n = spawnPoints.size(); i < n; i++)
@@ -235,6 +253,19 @@ void Level::update() {
 	for (int i=0, n = behaviours.size(); i < n; i++) behaviours[i]->update();
 	
 	destroyThings();	// Removed destroyed objects.
+
+	//check for level end
+	if((int) realtimetime >= timeLimit || money >= moneyLimit)
+	{
+		if((int) realtimetime >= timeLimit)
+			levelScore = new LevelScore(game, theW, false);
+		
+		if(money >= moneyLimit)
+			levelScore = new LevelScore(game, theW, true);
+
+		game->pushState(levelScore);
+	}
+	
 }
 void Level::draw() {
 	levelview->_draw();
@@ -438,12 +469,12 @@ LevelView::LevelView(
 	ResponderMap *_levelRM,
 	std::vector<Building*> *_buildings, std::vector<Furnishing*> *_furnishings, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 	int _level_width, int _level_height,
-	float *_time_elapsed
+	int *_time_remaining
 ) :
 	View(_theW, _aniston),
 	levelResponderMap(_levelRM), buildings(_buildings), furnishings(_furnishings), units(_units), staff(_staff), 
 	level_width(_level_width), level_height(_level_height),
-	scroll_x(0), scroll_y(0), time_elapsed(_time_elapsed)
+	scroll_x(0), scroll_y(0), time_remaining(_time_remaining)
 {
 	gridsize = 20;		// Pixel size of a level block
 }
@@ -477,11 +508,12 @@ void LevelView::draw() {
 	for (int i=0, n = units->size(); i < n; i++)       drawMappedObj((*units)[i]);
 	for (int i=0, n = staff->size(); i < n; i++)       drawMappedObj((*staff)[i]);
 	char s[100];
-	int time_seconds = (int) *time_elapsed;
-	int time_minutes = time_seconds / 60;
-	time_seconds = time_seconds%60;
+	int time_minutes = *time_remaining / 60;
+	int time_seconds = *time_remaining%60;
+
+	char * timerColour = (*time_remaining <= 20) ? "red" : "white"; //change the timer colour as it gets low
 	sprintf(s, "%02d:%02d", time_minutes, time_seconds);
-	theW->drawText(10, 10, "white", s);
+	theW->drawText(10, 10, timerColour, s);
 }
 
 void LevelView::processMouseEvent(Event *ev) {
@@ -526,7 +558,7 @@ void UIBarView::draw() {
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 	char econ[10];
-	sprintf(econ, "$%d", *economy);
+	sprintf(econ, "£%d", *economy);
 	theW->drawText(743, 10, "white", econ);
 }
 

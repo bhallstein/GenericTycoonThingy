@@ -383,6 +383,14 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 				drawRect(x+4, y-1, 2, 12, colname);
 				break;
 			}
+			case '£' : {
+				drawRect(x+3, y-1, 6, 2, colname);
+				drawRect(x, y+9, 10, 2, colname);
+				drawRect(x, y+4, 8, 2, colname);
+				drawRect(x+9, y, 2, 2, colname);
+				drawRect(x+2, y, 2, 10, colname);
+				break;
+			}
 			case ':' : {
 				drawRect(x+6, y+4, 2, 2, colname);
 				drawRect(x+6, y+8, 2, 2, colname);
