@@ -1,6 +1,6 @@
 #pragma once
-#include "builder.h"
-#include "tutorial.h"
+#include "Builder.h"
+#include "Tutorial.h"
 #include "Level.h"
 #include <string.h>
 
