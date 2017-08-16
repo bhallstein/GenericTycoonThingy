@@ -44,6 +44,8 @@ protected:
 	void setToTraveling();
 	void setToWaiting();
 	void incrementLocation();
+	void seekHinterland();
+	bool inHinterland();
 	
 	// Properties
 	enum state_types { S_IDLE, S_TRAVELING, S_WAITING } state;

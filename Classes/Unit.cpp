@@ -49,15 +49,30 @@ void Unit::update() {
 	
 	if (state == S_IDLE) {
 		if (!at_dest)
+		{
 			setToTraveling();
+		}
+		else
+		{
+			frames_waited++;
+			if(frames_waited == 120)
+			{
+				frames_waited = 0;
+				seekHinterland();
+			}
+		}
 	}
 	else if (state == S_WAITING) {
 		frames_waited++;
 		if (frames_waited == 60)
 			frames_waited = 0, setToTraveling();
 	}
-	else if (at_dest)
+	else if (at_dest) {
+		if(inHinterland())
+			destroyed = true;
+
 		setToIdle();
+	}
 	else if (state == S_TRAVELING) {
 		if (route.empty())
 			setToTraveling();
@@ -68,10 +83,42 @@ void Unit::update() {
 	incrementLocation();
 }
 
+void Unit::seekHinterland()
+{
+	//randomise whether we head to the sides or top/bottom
+	switch(rand()%4 + 1)
+	{
+	case 1: //head left
+		dest_x = 0, dest_y = rand()%navmap->h;
+		break;
+	case 2: //head right
+		dest_x = navmap->w-1, dest_y = rand()%navmap->h;
+		break;
+	case 3: //head up
+		dest_y = 0, dest_x = rand()%navmap->w;
+		break;
+	case 4: //head down
+		dest_y = navmap->h-1, dest_x = rand()%navmap->w;
+		break;
+	}
+
+	//now we've set our new Hinterlandsy destination - go there!
+	setToTraveling();
+}
+
+bool Unit::inHinterland()
+{
+	return (x <= HINTERLAND_WIDTH ||
+			x >= navmap->w-HINTERLAND_WIDTH || 
+			y <= HINTERLAND_WIDTH || 
+			y > navmap->h-HINTERLAND_WIDTH );
+}
+
 void Unit::nextInRoute() {
 	route.erase(route.begin());
 }
 void Unit::setToIdle() {
+	frames_waited = 0; //bodged in here because a) current Hinterlands implementation and b) why not? it doesn't need retaining cross-state
 	route.clear();
 	state = S_IDLE;
 }
