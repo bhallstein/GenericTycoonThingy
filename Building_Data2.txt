@@ -1,0 +1,18 @@
+barber
+50
+10
+kill
+barber set to kill.
+shave
+barber set to shave.
+shaving
+killing
+pieshop
+150
+10
+fleshpies
+pieshop set to serve flesh pies.
+plainpies
+pie shop set to serve plain pies.
+serving plain pies
+serving flesh pies

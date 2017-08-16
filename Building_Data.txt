@@ -1,0 +1,2 @@
+Barber 50
+Pieshop 150
