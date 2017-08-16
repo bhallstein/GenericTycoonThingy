@@ -5,7 +5,7 @@
 	  <arg>w</arg>
 	  <arg>windowed</arg>
       <key>Windowed</key>
-      <value>0</value>
+      <value>1</value>
       <displaytext>Windowed mode</displaytext>
     </bool>
     <combo code="2" detect="true">

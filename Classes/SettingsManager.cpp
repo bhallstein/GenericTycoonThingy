@@ -32,7 +32,7 @@ int SettingsManager::Load(bool defaults)
 		BOOST_FOREACH(ptree::value_type &set,pt.get_child("settings").get_child(cat.first))
 		{
 			//Create a setting
-			Setting* x = new Setting();
+			Setting *x = new Setting();
 
 			//Populate it with properties from the XML
 			x->Type = set.first;
@@ -47,25 +47,20 @@ int SettingsManager::Load(bool defaults)
 			x->Range[1] = set.second.get<int>("max",0);
 			x->Tooltip = set.second.get<std::string>("tooltip","");
 			x->Value = set.second.get<std::string>("value","");
-			//loop through 'arg' keys
-			if(set.second.count("arg") > 0) //if there are any
+
+			//loop through all children of this setting, looking for 'arg' and 'option' keys
+			BOOST_FOREACH(ptree::value_type &key,cat.second.get_child(set.first))
 			{
-				BOOST_FOREACH(ptree::value_type &arg,set.second.get_child("arg"))
-				{
-					x->Args.push_back(arg.second.data());
-				}
-			}
-			//loop through 'option' keys
-			if(set.second.count("option") > 0) //if there are any
-			{
-				BOOST_FOREACH(ptree::value_type &opt,set.second.get_child("option"))
-				{
-					x->Options.push_back(opt.second.data());
-				}
+				if(key.first == "arg")
+					x->Args.push_back(key.second.get_value(""));
+				if(key.first == "option")
+					x->Options.push_back(key.second.get_value(""));
 			}
 
 			//add to the Settings Map, with a Key for lookups
-			SetMap["key"] = *x;
+			SetMap[x->Key] = *x;
+
+			x->~Setting(); //destroy the setting?
 		}
 	}
 

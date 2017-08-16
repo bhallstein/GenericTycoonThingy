@@ -11,8 +11,13 @@ Game::Game()
 	
 	// Get settings from file and if success & values valid, replace defaults.
 	Settings.Load(false); //false = don't load defaults
+
+	int windowStyle;
+	if(Settings.SetMap["Windowed"].Value == "1")
+		windowStyle = sf::Style::Close;
+	else windowStyle = sf::Style::Fullscreen;
 	
- 	DBTWindow.Create(sf::VideoMode(w * block_w, h * block_h), window_name, sf::Style::Close);
+ 	DBTWindow.Create(sf::VideoMode(w * block_w, h * block_h), window_name, windowStyle);
 	DBTWindow.SetFramerateLimit(60);
 }
 
