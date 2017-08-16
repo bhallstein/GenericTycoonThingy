@@ -94,17 +94,17 @@ void Building::addToQueue(Unit *u) {
 }
 void Building::addFurnishing(Furnishing *f) {
 	furnishings.push_back(f);
-	// If there is a free staff, bind it
-	for (int i=0, n = staff.size(); i < n; i++) {
-		Unit *u = staff[i];
+	// If there is a free staff, bind it to the furnishing
+	for (std::vector<Unit*>::iterator itS = staff.begin(); itS < staff.end(); itS++) {
+		Unit *staffUnit = *itS;
 		bool isBound = false;
-		for (std::map<Furnishing*, Unit*>::iterator it = staffBindings.begin(); it != staffBindings.end(); it++)
-			if (it->second == u) {
+		for (std::map<Furnishing*, Unit*>::iterator itB = staffBindings.begin(); itB != staffBindings.end(); itB++)
+			if (itB->second == staffUnit) {
 				isBound = true;
 				break;
 			}
 		if (!isBound) {
-			staffBindings[f] = u;
+			staffBindings[f] = staffUnit;
 			break;
 		}
 	}
