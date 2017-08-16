@@ -18,6 +18,8 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	furnishingPurchasingView = NULL;
 	hiringUIView = NULL;
 	helpView = NULL;
+	
+	paused = false;
 
 	buildLevel(levelpath);
 	
@@ -41,7 +43,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	
 	// Time
 	framecount = 0;
-	timeRemaining = 0;
+	timeRemaining = timeLimit;
 	realtimetime = 0.0;
 	realtimetimer = new Ogre::Timer();
 	
@@ -228,7 +230,11 @@ void Level::buildLevel(std::string levelname) {
 }
 
 void Level::pause() {
-	// pausery
+	paused = true;
+}
+void Level::unpause() {
+	realtimetimer->reset();
+	paused = false;
 }
 void Level::resume(Returny *returny) {
 	if (returny->type == Returny::killer_returny)
@@ -241,6 +247,8 @@ void Level::resume(Returny *returny) {
 	}
 }
 void Level::update() {
+	if (paused) return;
+	
 	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
 	realtimetimer->reset();
 	timeRemaining = timeLimit - (int) realtimetime;
@@ -462,12 +470,14 @@ void Level::closeHiringView() {
 }
 void Level::openHelpView() {
 	if (helpView != NULL) return;
+	pause();
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 140, 77, 520, 400);
-	helpView = new GTTHelpView(theW, aniston, &responderMap);
+	helpView = new GTTHelpView(theW, aniston, &responderMap, &timeRemaining, &moneyLimit);
 	responderMap.addResponder(helpView);
 	helpView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
 }
 void Level::closeHelpView() {
+	unpause();
 	responderMap.removeResponder(helpView);
 	delete helpView;
 	helpView = NULL;
@@ -536,7 +546,6 @@ void LevelView::draw() {
 	char s[100];
 	int time_minutes = *time_remaining / 60;
 	int time_seconds = *time_remaining%60;
-
 	sprintf(s, "%02d:%02d", time_minutes, time_seconds);
 	theW->drawText(10, 10, *time_remaining <= 20 ? "red" : "white", s);
 }
@@ -622,16 +631,32 @@ void HiringUIView::draw() {
 	}
 }
 
-GTTHelpView::GTTHelpView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, ALLOW_DRAG)
+GTTHelpView::GTTHelpView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, int *_time_remaining, int *_monetary_target) :
+	UIView(_theW, _aniston, _rm, ALLOW_DRAG), time_remaining(_time_remaining), monetary_target(_monetary_target)
 {
 	buttons.push_back(new Button(7, 7, 12, 12, "close help view"));
 }
 void GTTHelpView::draw() {
-	theW->drawRect(0, 0, width, height, "black");
+	theW->drawRect(0, 0, width, height, "black", 0, 0.7);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
-//	theW->drawText(<#float x#>, <#float y#>, <#const char *col#>, <#char *text#>)
+	theW->drawText(220, 10, "white", (char*)"Help");
+	theW->drawText(14, 54, "white", (char*)"place furniture and staff in your");
+	theW->drawText(14, 74, "white", (char*)"buildings. customers will come and");
+	theW->drawText(14, 94, "white", (char*)"give you money.");
+	int time_minutes = *time_remaining / 60;
+	int time_seconds = *time_remaining%60;
+	char s[60];
+	sprintf(s, "you've got %02d:%02d left to earn %c%d", time_minutes, time_seconds, MR_CURRENCY, *monetary_target);
+	theW->drawText(14, 144, "white", s);
+	theW->drawText(14, 184, "white", (char*)"Get cracking! GO!");
+	
+	theW->drawRect(10, 234, 500, 1, "white", 0, 0.3);
+
+	theW->drawText(10, 274, "white", (char*)"Esc: quit to main menu");
+	theW->drawText(10, 294, "white", (char*)"Q: quit completely");
+	theW->drawText(10, 314, "white", (char*)"H: help");
 }
 

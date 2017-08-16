@@ -43,6 +43,7 @@ public:
 	// GameState function implementations
 	void reset();
 	void pause();
+	void unpause();
 	void resume(Returny *);
 	void update();
 	void draw();
@@ -111,6 +112,7 @@ protected:
 	int timeLimit;	//potential time limit
 
 	int framecount;
+	bool paused;
 	Ogre::Timer *realtimetimer;
 	float realtimetime;	// Number of real-time seconds elapsed while level running
 	int timeRemaining;	// integer time remaining calculated from realtimetime and the level's time limit - passed to levelview for display, don't use for calculations
@@ -177,8 +179,11 @@ public:
 
 class GTTHelpView : public UIView {
 public:
-	GTTHelpView(W *, JenniferAniston &, ResponderMap *);
+	GTTHelpView(W *, JenniferAniston &, ResponderMap *, int *_time_remaining, int *_monetary_target);
 	void draw();
+private:
+	int *time_remaining;
+	int *monetary_target;
 };
 
 #endif
