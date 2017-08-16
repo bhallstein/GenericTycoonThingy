@@ -49,18 +49,10 @@ void Unit::update() {
 	
 	if (state == S_IDLE) {
 		if (!at_dest)
-		{
 			setToTraveling();
-		}
 		else
-		{
-			frames_waited++;
-			if(frames_waited == 120)
-			{
-				frames_waited = 0;
-				seekHinterland();
-			}
-		}
+			if(++frames_waited == 120)
+				frames_waited = 0, seekHinterland();
 	}
 	else if (state == S_WAITING) {
 		frames_waited++;
@@ -111,7 +103,7 @@ bool Unit::inHinterland()
 	return (x <= HINTERLAND_WIDTH ||
 			x >= navmap->w-HINTERLAND_WIDTH || 
 			y <= HINTERLAND_WIDTH || 
-			y > navmap->h-HINTERLAND_WIDTH );
+			y >= navmap->h-HINTERLAND_WIDTH);
 }
 
 void Unit::nextInRoute() {
@@ -140,10 +132,10 @@ void Unit::incrementLocation() {
 	int next_x = route[0]->x, next_y = route[0]->y;
 	bool diagonal = (x != next_x && y != next_y);
 	
-	if (x < next_x) 		a_diff = step;
-	else if (x > next_x) 	a_diff = -step;
-	if (y < next_y) 		b_diff = step;
-	else if (y > next_y) 	b_diff = -step;
+	if (x < next_x)      a_diff = step;
+	else if (x > next_x) a_diff = -step;
+	if (y < next_y)      b_diff = step;
+	else if (y > next_y) b_diff = -step;
 
 	if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
 

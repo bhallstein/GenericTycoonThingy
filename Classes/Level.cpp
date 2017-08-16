@@ -288,6 +288,13 @@ void Level::destroyThings() {
 			i = units.erase(i);
 		}
 		else i++;
+	for (std::vector<Unit*>::iterator i = staff.begin(); i < staff.end(); )
+		if ((*i)->destroyed) {
+			levelResponderMap->removeMappedObj(*i);
+			delete *i;
+			i = staff.erase(i);
+		}
+		else i++;
 }
 void Level::destroyAllThings() {
 	for (int i=0; i < placeables.size(); i++)   placeables[i]->destroyed = true;
