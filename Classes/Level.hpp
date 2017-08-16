@@ -11,7 +11,7 @@
 #include <list>
 #include <string>
 
-#include "LuaHelper.hpp"
+
 #include "types.hpp"
 #include "GameState.hpp"
 #include "EventResponder.hpp"
@@ -52,7 +52,7 @@ public:
 	
 	// Top-level-object stuff
 	Unit* createUnit(int atX, int atY);
-	Building* createBuilding(int atX, int atY);
+	Building* createBuilding(int atX, int atY, const char *type);
 	void createPlaceable();
 	
 	void destroyThings();
@@ -68,7 +68,6 @@ public:
 protected:
 	// Methods
 	void buildLevel(std::string filename);
-	std::map<std::string, Building*> availableBuildings;
 	
 	// Properties
 	int w, h; 					// Blocks wide/tall.
@@ -79,6 +78,8 @@ protected:
 	UIBarView *uibarview;
 	
 	int framecount;
+	
+	std::list<std::string> allowedBuildings;
 	
 };
 

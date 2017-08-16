@@ -9,52 +9,58 @@ LuaHelper::~LuaHelper() {
 	lua_close(LuaInstance);
 }
 
-bool LuaHelper::loadFile(std::string &filename)
+bool LuaHelper::loadFile(const char *filename)
 {
-	int loadingSuccess = !luaL_loadfile(LuaInstance, filename.c_str());
+	bool loadingSuccess = !luaL_loadfile(LuaInstance, filename);
+	if (!loadingSuccess) {
+		std::string s = "LuaHelper: could not load file '"; s.append(filename); s.append("'");
+		theW->log(s.c_str());
+		s = "error was: '"; s.append(to<const char *>(-1)); s.append("'");
+		theW->log(s.c_str());
+		return false;
+	}
 	// Set the Lua path to our Resources folder
 	lua_getglobal(LuaInstance, "package");
 	lua_getfield(LuaInstance, -1, "path");
-	std::string path = lua_tostring(LuaInstance, -1);	// grab path string from top of stack
-	path.append(";");
-	path.append(theW->resourcesPath);
-	path.append("?.lua");
-	theW->log(path.c_str());
-	lua_pop(LuaInstance, 1);					// get rid of the string on the stack we just pushed on line 5
-	lua_pushstring(LuaInstance, path.c_str());	// push the new one
-	lua_setfield(LuaInstance, -2, "path");		// set the field "path" in table at -2 with value at top of stack
-	lua_pop(LuaInstance, 1);					// get rid of package table from top of stack
-	int callingSuccess = !lua_pcall(LuaInstance, 0, 0, 0);
-	return (loadingSuccess && callingSuccess);
+	std::string path = lua_tostring(LuaInstance, -1);	// Grab path string from top of stack
+	path.append(";"); path.append(theW->resourcesPath); path.append("?.lua");
+	lua_pop(LuaInstance, 1);					// Pop previous path from stack
+	lua_pushstring(LuaInstance, path.c_str());	// Push new path onto stack
+	lua_setfield(LuaInstance, -2, "path");		// Set the "path" of table at -2 to value at top of stack (value is then popped)
+	lua_pop(LuaInstance, 1);					// Pop "package" table from top of stack
+	
+	bool callingSuccess = !lua_pcall(LuaInstance, 0, 0, 0);
+	if (!callingSuccess) {
+		std::string s = "LuaHelper: could not execute file '"; s.append(filename); s.append("'");
+		theW->log(s.c_str());
+		s = "error was: '"; s.append(to<const char *>(-1)); s.append("'");
+		theW->log(s.c_str());
+		return false;
+	}
+	return true;
 }
 //push a table onto the stack, or error if nil;
-int LuaHelper::pushtable(const char *key)
+bool LuaHelper::pushtable(const char *key)
 {
 	lua_getglobal(LuaInstance, key); //push the table to the stack
-	int success = lua_isnil(LuaInstance,-1);
-	if (success)
-		lua_pop(LuaInstance,1);
-	return success;
+	bool error = lua_isnil(LuaInstance, -1);
+	if (error)
+		lua_pop(LuaInstance, 1);
+	return !error;
 }
-int LuaHelper::pushSubtable(const char *key)
+bool LuaHelper::pushSubtable(const char *key)
 {
 	lua_pushstring(LuaInstance, key); //push the key to the stack
 	lua_gettable(LuaInstance, -2);  //get table[key] - pop the key and push the value to the stack
-	if(lua_isnil(LuaInstance,-1))
-	{
-		lua_pop(LuaInstance,1);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+	bool error = lua_isnil(LuaInstance, -1);
+	if (error)
+		lua_pop(LuaInstance, 1);
+	return !error;
 }
 std::string LuaHelper::stackdump(lua_State* l)
 {
 	std::string strRet;
-    int i;
-    int top = lua_gettop(l);
+    int i, top = lua_gettop(l);
  
     /*strRet.append("total in stack: ");
 	strRet.append*/ //fix this for string later
@@ -67,22 +73,19 @@ std::string LuaHelper::stackdump(lua_State* l)
             case LUA_TSTRING:  /* strings and numbers */
                 strRet.append("string: ");
 				strRet.append(lua_tostring(l, i));
-				strRet.append("\n");
                 break;
             case LUA_TBOOLEAN:  /* booleans */
 				strRet.append("boolean: ");
 				strRet.append(lua_toboolean(l, i) ? "true" : "false");
-				strRet.append("\n");
                 break;
             /*case LUA_TNUMBER:  /* numbers 
                 printf("number: %g\n", lua_tonumber(l, i));
                 break;*/
             default:  /* other values */
 				strRet.append(lua_typename(l, t));
-				strRet.append("\n");
                 break;
         }
-        //printf("  ");  /* put a separator */
+		strRet.append("\n");
     }
     //printf("\n");  /* end the listing */
 	return strRet;

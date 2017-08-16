@@ -16,11 +16,13 @@
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
 	this->initializePaths();
 	logfile.open(logfilePath.c_str());
-	log(settingsPath.c_str());
-	log(resourcesPath.c_str());
+	std::string s = "W: settingsPath: "; s.append(settingsPath);
+	std::string t = "W: resourcesPath: "; t.append(resourcesPath);
+	log(s.c_str()); log(t.c_str());
+	log("");
 }
 W::~W() {
-	std::cout << "w destroy" << std::endl;
+	log("W destruct");
 	logfile.close();
 }
 

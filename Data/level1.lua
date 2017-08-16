@@ -3,32 +3,33 @@ require("buildings")
 --level properties
 width=100
 height=80
-availableBuildings = {
-	barber(),
-	pieshop(),
+allowedBuildings = {	-- buildings which are allowed to appear in the level
+	"barber",
+	"pieshop"
 }
+
 --level contents
-buildings = { 
+buildings = {
 	{
-		["type"] = "Barber",
+		["type"] = "barber",
 		x = 1,
 		y = 2,
 	},
 	{
-		["type"] = "Pie Shop",
+		["type"] = "pieshop",
 		x = 12,
 		y = 15,
 	},
 	{
-		["type"] = home(),
+		["type"] = "home",
 		x = 28,
 		y = 31,
 	},
 	{
-		["type"] = home(),
+		["type"] = "home",
 		x = 37,
 		y = 18,
-	},
+	}
 }
 spawnPoints = {
 	{

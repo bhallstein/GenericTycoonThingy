@@ -1,5 +1,27 @@
-require([[buildingactions]])
 
+defaultColour = "black"
+defaultHoverColour = "black"
+
+buildingTypes = {
+	barber = {
+		colour = "red",
+		hoverColour = "black",
+		-- allowedPlaceables = { }		-- list of placeables permitted in the building
+	},
+	pieshop = {
+		colour = "yellow"
+	},
+	home = {
+		colour = "black"
+	}
+}
+
+numberOfAubergines = 4
+
+
+--require([[buildingactions]])
+
+--[[
 function barber()
 	building = {}
 	
@@ -76,3 +98,4 @@ function derelict()
 	return building
 
 end
+--]]

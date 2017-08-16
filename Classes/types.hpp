@@ -49,7 +49,17 @@ typedef struct colour {
 		else if (c == _BLUE_)   red = green = 0, blue = 1, alpha = 1;
 		else if (c == _YELLOW_) red = green = 1, blue = 0, alpha = 1;
 	}
+	colour(std::string s) {
+		if (s == "black") red = green = blue = 0, alpha = 0.5;
+		else if (s == "white")  red = green = blue = alpha = 1;
+		else if (s == "red")    red = 1, green = blue = 0, alpha = 1;
+		else if (s == "green")  red = 0, green = 1, blue = 0, alpha = 1;
+		else if (s == "blue")   red = green = 0, blue = 1, alpha = 1;
+		else if (s == "yellow") red = green = 1, blue = 0, alpha = 1;
+		colname = s;
+	}
 	float red, green, blue, alpha;
+	std::string colname;
 } colour;
 
 class MsgException : public std::exception {

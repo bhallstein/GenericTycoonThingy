@@ -68,11 +68,12 @@ void Menu::buttonClick(Button *btn) {
 }
 
 void Menu::startLevel(std::string path) {
-	theW->log("starting level:");
-	theW->log(path.c_str());
+	std::string s = "Starting level: "; s.append(path);
+	theW->log(s.c_str());
 	try {
 		level = new Level(game, theW, path);
 		game->pushState(level);
+		theW->log("...level started OK.");
 	} catch (MsgException &ex) {
 		std::string msg = "Oh noes! ";
 		msg.append(ex.msg);
