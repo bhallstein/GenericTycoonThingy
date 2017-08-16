@@ -50,7 +50,7 @@ public:
 	
 	// Sound shizzle
 	void playSound(const char *);
-	void playBGM(const char *);
+	void playBGM(const char *, bool loop = true);
 
 	// Event shizzle
 	void addEvent(Event &);

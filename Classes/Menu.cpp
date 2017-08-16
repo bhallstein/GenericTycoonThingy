@@ -100,8 +100,7 @@ void ClickToBeginView::processMouseEvent(Event *ev) {
 			mr_hov = true;
 	}
 	else if (ev->type == Event::LEFTCLICK)
-		if (mr_hov)
-			menu->startLevel("level1.lua");
+		menu->startLevel("level1.lua");
 }
 
 
