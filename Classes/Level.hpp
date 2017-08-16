@@ -49,11 +49,10 @@ public:
 	
 	void setResolution(int _w, int _h);
 	
-	// Top-level-object stuff
-	Unit* createUnit(int atX, int atY);
-	Unit* createStaff();
+	// TLO stuff
+	Unit* createUnit(int atX, int atY, const char *type);
 	Building* createBuilding(int atX, int atY, const char *type);
-	void createPlaceable();
+	void createPlaceable(const char *type);
 	
 	void destroyThings();
 	void destroyAllThings();

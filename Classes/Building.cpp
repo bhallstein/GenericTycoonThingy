@@ -33,9 +33,19 @@ Building::~Building()
 	std::cout << "building destruct" << std::endl;
 }
 
+void Building::receiveEvent(Event *ev) {
+	if (ev->type == Event::LEFTCLICK) clicked = !clicked;
+	else if (ev->key == Event::K_L)	  std::cout << "Building " << this << " detected the L key!" << std::endl;
+}
+
+const char * Building::col() {
+	if (hover) { hover = false; return b_hoverColour.c_str(); }
+	return b_colour.c_str();
+}
+
 bool Building::initialize(W *_W) {
 	W::log("Building::initialize() called...");
-
+	
 	LuaHelper mrLua(_W);
 	
 	std::string path = _W->resourcesPath;
@@ -90,20 +100,4 @@ bool Building::initialize(W *_W) {
 	
 	_W->log("...initialization succeeded.");
 	return true;
-}
-
-void Building::receiveEvent(Event *ev) {
-	if (ev->type == Event::LEFTCLICK)
-		clicked = !clicked;
-	else if (ev->key == Event::K_L)
-		std::cout << "Building " << this << " detected the L key!" << std::endl;
-	else if (ev->type == Event::MOUSEMOVE)
-		if (++time_hovered == 60) {			// Eventually want an actual time, not a frame count
-			
-		}
-}
-
-const char * Building::col() {
-	if (hover) { hover = false; return b_hoverColour.c_str(); }
-	return b_colour.c_str();
 }

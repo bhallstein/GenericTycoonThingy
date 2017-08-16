@@ -24,7 +24,8 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
-	responderMap.subscribeToKey(this, Event::K_P);
+	responderMap.subscribeToKey(this, Event::K_C);
+	responderMap.subscribeToKey(this, Event::K_S);
 }
 Level::~Level() {
 	std::cout << "level destruct" << std::endl;
@@ -49,6 +50,7 @@ void Level::buildLevel(std::string levelname) {
 	// Initialize TLO classes
 	if (!Building::initialize(theW))	throw MsgException("Couldn't read building info.");
 	if (!Unit::initialize(theW))		throw MsgException("Couldn't read unit info.");
+	if (!Placeable::initialize(theW))	throw MsgException("Couldn't read placeable info.");
 	
 	// Set level width and height
 	try {
@@ -143,7 +145,7 @@ void Level::update() {
 	intcoord c;
 	for (int i=0, n = spawnPoints.size(); i < n; i++)
 		if (spawnPoints[i]->spawn(&c))
-			createUnit(c.x, c.y);
+			createUnit(c.x, c.y, "civilian");
 	
 	// Update TLOs
 	for (int i=0, n = units.size(); i < n; i++) units[i]->update();
@@ -167,12 +169,10 @@ void Level::receiveEvent(Event *ev) {
 	else if (ev->type == Event::SCREENEDGE_TOP)		levelview->scroll(UPWARD);
 	else if (ev->type == Event::SCREENEDGE_BOTTOM)	levelview->scroll(DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
-		if (ev->key == Event::K_Q)
-			game->stateFinished(this, Returny(Returny::killer_returny));
-		if (ev->key == Event::K_ESC)
-			game->stateFinished(this, Returny(Returny::empty_returny));
-		if (ev->key == Event::K_P)
-			createPlaceable();
+		if (ev->key == Event::K_Q) game->stateFinished(this, Returny(Returny::killer_returny));
+		if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
+		if (ev->key == Event::K_C) createPlaceable("barberschair");
+		if (ev->key == Event::K_S) createPlaceable("sofa");
 	}
 }
 
@@ -180,29 +180,24 @@ void Level::handleCloseEvent() {
 	GameState::handleCloseEvent();		// i.e. just quit for now
 }
 
-Unit* Level::createUnit(int atX, int atY) {
-	Unit *u = new Unit(navmap, atX, atY, "civilian");
-	units.push_back(u);
+Unit* Level::createUnit(int atX, int atY, const char *type) {
+	std::vector<Unit*> *vctr = &units;
+	if (!strcmp(type, "staff")) {
+		// Find the asylum (spawn building) amongst our buildings
+		// Note: this method will use the first asylum it finds
+		for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
+			if ((*i)->type == "asylum") {
+				atX = (*i)->x;
+				atY = (*i)->y;
+				break;
+			}
+		vctr = &staff;
+	}
+	Unit *u = new Unit(navmap, atX, atY, type);
+	vctr->push_back(u);
 	levelResponderMap->addMappedObj(u);
-	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
+	std::cout << "added unit " << u << " of type '" << type << "' (now " << vctr->size() << ")" << std::endl;
 	return u;
-}
-Unit* Level::createStaff() {
-	int atX, atY; // co-ords required by unit's ctor
-	//find the asylum (spawn building) amongst our buildings
-	//note: this method only reliably works while we only have 1 asylum per level
-	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
-		if ((*i)->type == "asylum") {
-			atX = (*i)->x;
-			atY = (*i)->y;
-			break;
-		}
-
-	Unit* s = new Unit(navmap, atX, atY, "staff"); //create the Staff with the found co-ords
-	staff.push_back(s); //add the staff to the level's unit list
-	levelResponderMap->addMappedObj(s);
-	std::cout << "added staff unit " << s << " (now " << staff.size() << ")" << std::endl;
-	return s;
 }
 Building* Level::createBuilding(int atX, int atY, const char *type) {
 	Building *b = new Building(atX, atY, type);
@@ -213,8 +208,8 @@ Building* Level::createBuilding(int atX, int atY, const char *type) {
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
-void Level::createPlaceable() {
-	Placeable *p = new Placeable(navmap, levelResponderMap);
+void Level::createPlaceable(const char *type) {
+	Placeable *p = new Placeable(navmap, levelResponderMap, type);
 	if (!levelResponderMap->requestPrivilegedEventResponderStatus(p)) {
 		delete p;
 		return;
@@ -278,9 +273,10 @@ void LevelView::drawMappedObj(MappedObj *obj) {
 	int atX = (obj->x + obj->a) * gridsize - scroll_x;
 	int atY = (obj->y + obj->b) * gridsize - scroll_y;
 	
+	const char *col = obj->col();
 	for (int i=0; i < obj->ground_plan.size(); i++) {
 		intcoord c = obj->ground_plan[i];
-		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, obj->col());
+		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, col);
 	}
 }
 
@@ -340,8 +336,8 @@ UIBarView::~UIBarView()
 }
 
 void UIBarView::buttonClick(Button *btn) {
-	if (btn == createplaceable_btn) level->createPlaceable();
-	if (btn == createstaff_btn)     level->createStaff();
+	if (btn == createplaceable_btn) level->createPlaceable("barberschair");
+	if (btn == createstaff_btn)     level->createUnit(0, 0, "staff");
 }
 
 void UIBarView::processMouseEvent(Event *ev) {

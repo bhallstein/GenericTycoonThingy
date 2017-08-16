@@ -24,7 +24,7 @@ public:
 	// Properties
 	float a, b;							// Floating pt offset from integer location (default 0)
 	std::vector<intcoord> ground_plan;	// Blocks (relative to to top left corner) taken up by the object
-
+	
 protected:
 	// Methods
 	void setGroundPlan(intcoord c[]) {						// Convenience function for setting an object’s ground plan.

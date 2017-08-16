@@ -34,78 +34,6 @@ void Unit::receiveEvent(Event *ev) {
 		hover = true;
 }
 
-bool Unit::initialize(W *_W) {
-	W::log("Unit::initialize() called...");
-	
-	LuaHelper mrLua(_W);
-	
-	std::string path = _W->resourcesPath;
-	path.append("units.lua");
-	if (!mrLua.loadFile(path.c_str())) {
-		W::log("Could not read units.lua");
-		return false;
-	}
-	lua_State *L = mrLua.LuaInstance;
-	
-	// Set Unit::defaultColour
-	lua_getglobal(L, "defaultColour");				// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultColour");
-		return false;
-	}
-	Unit::defaultColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Unit::defaultHoverColour
-	lua_getglobal(L, "defaultHoverColour");			// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultHoverColour");
-		return false;
-	}
-	Unit::defaultHoverColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Unit::defaultColourWhenMoving
-	lua_getglobal(L, "defaultColourWhenMoving");	// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultColourWhenMoving");
-		return false;
-	}
-	Unit::defaultColourWhenMoving = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~	
-	
-	// Construct Unit::unitTypes map
-	if (!mrLua.pushtable("unitTypes")) {
-		W::log("In units.lua, could not push the unitTypes table onto the stack");
-		return false;
-	}
-	lua_pushnil(L);									// S: -1 nil; -2 table
-	while (lua_next(L, -2) != 0) {					// S: -1 subtable; -2 key; -3 table
-		if (!lua_istable(L, -1)) {			// If not a subtable, skip
-			lua_pop(L, 1);
-			continue;
-		}
-		const char *u_type = lua_tostring(L, -2);
-		struct unitInfo *uInfo = &Unit::unitTypes[u_type];
-		
-		lua_getfield(L, -1, "colour");				// S: -1 colour; -2 subtable; -3 key; -4 table
-		uInfo->col = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColour;
-		lua_pop(L, 1);
-		
-		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
-		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
-		lua_pop(L, 1);
-
-		lua_getfield(L, -1, "colourWhenMoving");	// S: -1 colour; 2 subtable; -3 key; -4 table
-		uInfo->colWhenMoving = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColourWhenMoving;
-		
-		lua_pop(L, 2);								// S: -1 key; -2 table
-	}
-	
-	W::log("...initialization succeeded.");
-	return true;
-}
-
 const char * Unit::col() {
 	if (hover) { hover = false; return u_hoverColour.c_str(); }
 	else if (state == S_IDLE) return u_colour.c_str();
@@ -192,4 +120,76 @@ void Unit::incrementLocation() {
 			a = b = 0;
 		}
 	}
+}
+
+bool Unit::initialize(W *_W) {
+	W::log("Unit::initialize() called...");
+	
+	LuaHelper mrLua(_W);
+	
+	std::string path = _W->resourcesPath;
+	path.append("units.lua");
+	if (!mrLua.loadFile(path.c_str())) {
+		W::log("Could not read units.lua");
+		return false;
+	}
+	lua_State *L = mrLua.LuaInstance;
+	
+	// Set Unit::defaultColour
+	lua_getglobal(L, "defaultColour");				// S: -1 value
+	if (!lua_isstring(L, -1)) {
+		W::log("In units.lua, could not find defaultColour");
+		return false;
+	}
+	Unit::defaultColour = lua_tostring(L, -1);
+	lua_pop(L, 1);									// S: ~
+	
+	// Set Unit::defaultHoverColour
+	lua_getglobal(L, "defaultHoverColour");			// S: -1 value
+	if (!lua_isstring(L, -1)) {
+		W::log("In units.lua, could not find defaultHoverColour");
+		return false;
+	}
+	Unit::defaultHoverColour = lua_tostring(L, -1);
+	lua_pop(L, 1);									// S: ~
+	
+	// Set Unit::defaultColourWhenMoving
+	lua_getglobal(L, "defaultColourWhenMoving");	// S: -1 value
+	if (!lua_isstring(L, -1)) {
+		W::log("In units.lua, could not find defaultColourWhenMoving");
+		return false;
+	}
+	Unit::defaultColourWhenMoving = lua_tostring(L, -1);
+	lua_pop(L, 1);									// S: ~	
+	
+	// Construct Unit::unitTypes map
+	if (!mrLua.pushtable("unitTypes")) {
+		W::log("In units.lua, could not push the unitTypes table onto the stack");
+		return false;
+	}
+	lua_pushnil(L);									// S: -1 nil; -2 table
+	while (lua_next(L, -2) != 0) {					// S: -1 subtable; -2 key; -3 table
+		if (!lua_istable(L, -1)) {			// If not a subtable, skip
+			lua_pop(L, 1);
+			continue;
+		}
+		const char *u_type = lua_tostring(L, -2);
+		struct unitInfo *uInfo = &Unit::unitTypes[u_type];
+		
+		lua_getfield(L, -1, "colour");				// S: -1 colour; -2 subtable; -3 key; -4 table
+		uInfo->col = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColour;
+		lua_pop(L, 1);
+		
+		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
+		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
+		lua_pop(L, 1);
+		
+		lua_getfield(L, -1, "colourWhenMoving");	// S: -1 colour; 2 subtable; -3 key; -4 table
+		uInfo->colWhenMoving = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColourWhenMoving;
+		
+		lua_pop(L, 2);								// S: -1 key; -2 table
+	}
+	
+	W::log("...initialization succeeded.");
+	return true;
 }

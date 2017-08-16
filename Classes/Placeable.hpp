@@ -7,25 +7,33 @@
 #define PLACEABLE_H
 
 #include <iostream>
+#include <map>
 
 #include "types.hpp"
 #include "MappedObj.hpp"
 
 class NavMap;
 class ResponderMap;
+class W;
+
+struct placeableInfo {
+	std::string col, hoverCol, colWhilePlacing;
+};
 
 class Placeable : public MappedObj {
 public:
-	Placeable(NavMap *, ResponderMap *);
+	Placeable(NavMap *, ResponderMap *, const char *_type);
 	~Placeable();
-
+	
+	// Properties
+	bool destroyed;
+	
 	// Methods
 	void receiveEvent(Event *ev);
 	void update() { }
 	const char * col();
-
-	// Properties
-	bool destroyed;
+	
+	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
 
 protected:
 	// Properties
@@ -33,7 +41,16 @@ protected:
 	bool clicked;
 	NavMap *navmap;
 	ResponderMap *levelResponderMap;
+	std::string type;
+	std::string p_colour;
+	std::string p_hoverColour;
+	std::string p_colourWhilePlacing;
 	
+	// Static members
+	static std::map<std::string, struct placeableInfo> placeableTypes;	// e.g. "barber's chair" => struct unitInfo { }
+	static std::string defaultColour;
+	static std::string defaultHoverColour;
+	static std::string defaultColourWhilePlacing;
 };
 
 #endif
