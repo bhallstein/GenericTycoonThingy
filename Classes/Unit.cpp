@@ -18,8 +18,12 @@ Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level,
 	groundplan.push_back(c);
 	
 	// Get properties for this unit type
-	u_colour      = &Unit::unitTypes[type].col;
-	u_hoverColour = &Unit::unitTypes[type].hoverCol;
+	unitInfo *t = &unitTypes[type];
+	u_colour               = &t->col;
+	u_hoverColour          = &t->hoverCol;
+	u_compatibleBehaviours = &t->compatibleBehaviours;
+	u_isStaff              = t->isStaff;
+	u_hireCost             = t->hireCost;
 }
 Unit::~Unit()
 {
@@ -74,7 +78,7 @@ void Unit::getDespawnPoint(int *x, int *y) {
 	else if (n < 2*w + h) *x = 0,     *y = n - 2*w;
 	else                  *x = w - 1, *y = n - (2*w + h);
 }
-void Unit::despawn() {
+void Unit::destroy() {
 	destroyed = true;
 }
 bool Unit::voyage(int _x, int _y) {
@@ -159,6 +163,10 @@ inline bool Unit::inHinterland() {
 	);
 }
 
+std::vector<std::string>* Unit::getCompatibleBehaviours() {
+	return u_compatibleBehaviours;
+}
+
 bool Unit::initialize(W *_W) {
 	if (Unit::initialized) return true;
 	
@@ -193,8 +201,8 @@ bool Unit::initialize(W *_W) {
 			lua_pop(L, 1);
 			continue;
 		}
-		const char *u_type = lua_tostring(L, -2);
-		struct unitInfo *uInfo = &Unit::unitTypes[u_type];
+		const char *uType = lua_tostring(L, -2);
+		struct unitInfo *uInfo = &Unit::unitTypes[uType];
 		
 		lua_getfield(L, -1, "colour");				// S: -1 colour; -2 subtable; -3 key; -4 table
 		uInfo->col = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColour;
@@ -203,11 +211,41 @@ bool Unit::initialize(W *_W) {
 		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
 		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
 		lua_pop(L, 1);
-
+		
+		lua_getfield(L, -1, "isStaff");				// S: -1 isStaff; -2 subtable; -3 key; -4 table
+		uInfo->isStaff = lua_isboolean(L, -1) ? lua_toboolean(L, -1) : false;
+		lua_pop(L, 1);
+		
 		lua_getfield(L, -1, "hireCost");			// S: -1 colour; 2 subtable; -3 key; -4 table
 		uInfo->hireCost = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
+		lua_pop(L, 1);								// S: -1 subtable; -2 key; -3 table
 
-		lua_pop(L, 2);								// S: -1 key; -2 table
+		// Compatible Behaviours
+		if (!mrLua.pushSubtable("compatibleBehaviours")) {
+			char s[100]; sprintf(s, "In units.lua, could not find compatibleBehaviours for '%s' type", uType);
+			W::log(s);
+			return false;
+		}
+		std::string s = "    "; s += uType; s += "\n      compatibleBehaviours: ";
+		int n = 0;
+		lua_pushnil(L);								// S: -1 nil; -2 compatibleBehaviours; -3 subtable; ...
+		while (lua_next(L, -2)) {					// S: -1 interaction, -2 key; -3 compatibleBehaviours; ...
+			if (!lua_isstring(L, -1)) {
+				lua_pop(L, 1);
+				continue;
+			}
+			std::string iType = lua_tostring(L, -1);
+			uInfo->compatibleBehaviours.push_back(iType);
+			n++;
+			s += iType; s += ", ";
+			lua_pop(L, 1);							// S: -1 key; -2 compatibleBehaviours
+		}											// S: -1 compatibleBehaviours; -2 subtable; -3 key; -4 table
+		lua_pop(L, 1);								// S: -1 subtable; -2 key; -3 table
+		if (n > 0) s.erase(s.size() - 2);
+		else s += "none";
+		W::log(s.c_str());
+		
+		lua_pop(L, 1);								// S: -1 key; -2 table
 	}
 	
 	Unit::initialized = true;

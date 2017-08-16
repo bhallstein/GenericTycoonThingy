@@ -25,13 +25,16 @@ furnishingTypes = {
 		interactionPoints = {  }
 	},
 	piecounter = {
-		colour = "brown",
+		colour = "red",
 		hoverColour = "white",
 		groundplan = {
 			{0,0}, {1,0}, {2,0}
 		},
 		compatibleBehaviours = { "piesale" },
-		interactionPoints = {  }
+		interactionPoints = {
+			staff = {1,-1},
+			civilian = {1,1}
+		}
 	}
 }
 

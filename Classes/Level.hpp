@@ -59,6 +59,7 @@ public:
 	Behaviour*  createBehaviour(const char *type);
 	void createBarbersChair();
 	void createSofa();
+	void createPieCounter();
 	void createStaffUnit();
 	
 	void destroyThings();

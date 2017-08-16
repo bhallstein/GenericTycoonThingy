@@ -11,7 +11,7 @@ std::string Building::defaultColour;
 std::string Building::defaultHoverColour;
 bool Building::initialized = false;
 
-int *Building::ind_array = (int*) malloc(sizeof(int*) * 150);
+std::vector<std::map<Furnishing*, Unit*>::iterator> Building::_ind_array;
 
 Building::Building(ResponderMap *_rm, NavMap *_nm, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *_level) :
 	MappedObj(_rm, false), navmap(_nm), type(_type), level(_level), clicked(false), time_hovered(0)
@@ -42,24 +42,31 @@ void Building::receiveEvent(Event *ev) {
 }
 
 void Building::update() {
-	int nFound;
 	// Queue dispatch
-	for (std::vector<Unit*>::iterator it = Q.begin(); it < Q.end(); ) {
-		Unit *u = *it, *s;
-		nFound = 0;
-		// Get random Furnishing f ready for behaviour
-		for (int i=0, n = furnishings.size(); i < n; i++) {
-			Furnishing *f = furnishings[i];
-			if (f->readyForInteraction("havehaircut"))
-				if (staffBindings.find(f) != staffBindings.end())
-					s = staffBindings[f], Building::ind_array[nFound++] = i;
+	for (std::vector<Unit*>::iterator itQ = Q.begin(); itQ < Q.end(); ) {
+		Unit *u = *itQ;
+		Building::_ind_array.clear();
+		if (u->nextBehaviour.empty()) {
+			level->createBehaviour("despawn")->init(u);
+			itQ = Q.erase(itQ);
+			continue;
 		}
+		const char *beh = u->nextBehaviour.c_str();
+		// Get random Furnishing f ready for behaviour
+		std::map<Furnishing*, Unit*>::iterator itB;
+		for (itB = staffBindings.begin(); itB != staffBindings.end(); itB++)
+			if (itB->first->readyForBehaviour(beh) && itB->second->readyForBehaviour(beh))
+				Building::_ind_array.push_back(itB);
+		int nFound = Building::_ind_array.size();
 		if (nFound == 0)
-			it++;
+			itQ++;
 		else {
-			Furnishing *f = furnishings[Building::ind_array[W::randUpTo(nFound)]];
-			level->createBehaviour("havehaircut")->init(level, u, s, f);
-			it = Q.erase(it);
+			itB = Building::_ind_array[W::randUpTo(nFound)];
+			Furnishing *f = itB->first;
+			Unit *s = itB->second;
+			level->createBehaviour(beh)->init(level, u, s, f);
+			u->nextBehaviour.clear();
+			itQ = Q.erase(itQ);
 		}
 	}
 }
@@ -103,6 +110,7 @@ void Building::addFurnishing(Furnishing *f) {
 	}
 }
 void Building::removeFurnishing(Furnishing *f) {
+	staffBindings.erase(f);
 	for (std::vector<Furnishing *>::iterator it = furnishings.begin(); it != furnishings.end(); it++)
 		if (*it == f) {
 			furnishings.erase(it);
@@ -110,12 +118,11 @@ void Building::removeFurnishing(Furnishing *f) {
 		}
 }
 void Building::addStaff(Unit *s) {
-	std::cout << "adding staff to building... ";
 	staff.push_back(s);
 	// Add to unstaffed furnishing, if any
 	for (int i=0, n = furnishings.size(); i < n; i++) {
 		Furnishing *f = furnishings[i];
-		if (f->requiresStaff(s->type.c_str()) && staffBindings.find(f) == staffBindings.end()) {
+		if (f->requiresStaff(s->type.c_str()) && staffBindings.count(f) == 0) {
 			staffBindings[f] = s;
 			break;
 		}

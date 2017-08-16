@@ -212,11 +212,13 @@ void Level::update() {
 	for (int i=0, n = spawnPoints.size(); i < n; i++)
 		if (spawnPoints[i]->spawn(&c)) {
 			Unit *u = createUnit(c.x, c.y, "civilian");
-			int q = W::randUpTo(2);
+			int q = W::randUpTo(3);
 			if (q == 0)
 				createBehaviour("despawn")->init(u);
-			else
+			else if (q == 1)
 				createBehaviour("seekhaircut")->init(this, u);
+			else
+				createBehaviour("seekpie")->init(this, u);
 		}
 	
 	// Update TLOs
@@ -303,6 +305,7 @@ Behaviour* Level::createBehaviour(const char *_type) {
 }
 void Level::createBarbersChair() { createFurnishing("barberschair"); }
 void Level::createSofa() { createFurnishing("sofa"); }
+void Level::createPieCounter() { createFurnishing("piecounter"); }
 void Level::createStaffUnit() { 
 	if(chargePlayer(Unit::getUnitHireCost("staff")))
 		createUnit(0, 0, "staff");
@@ -376,6 +379,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	furnishingPurchasingView->subscribe("close", new Callback(&Level::closeFurnishingPurchasingView, this));
 	furnishingPurchasingView->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
 	furnishingPurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
+	furnishingPurchasingView->subscribe("create piecounter", new Callback(&Level::createPieCounter, this));
 }
 void Level::closeFurnishingPurchasingView() {
 	responderMap.removeResponder(furnishingPurchasingView);

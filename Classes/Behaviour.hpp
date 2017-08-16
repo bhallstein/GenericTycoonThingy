@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "types.hpp"
+
 #define WAIT_PERIOD 60
 
 class Unit;
@@ -35,8 +37,10 @@ protected:
 
 class BehaviourBase {
 public:
-	BehaviourBase() : stage(0), destroyed(false), waiting(false) { };
+	BehaviourBase() : stage(0), destroyed(false), waiting(false), initialized(false) { };
+	virtual ~BehaviourBase() { }
 	void update() {
+		if (!initialized) throw MsgException("update called on uninitialized Behaviour object");
 		if (waiting && ++frames_waited >= WAIT_PERIOD)
 			waiting = false;
 		else
@@ -48,10 +52,12 @@ public:
 	virtual void init(Unit *, Unit *, Furnishing *) { }
 	virtual void init(Level *, Unit *, Unit *, Furnishing *) { }
 	bool destroyed;
+	
 protected:
 	int stage;
 	int frames_waited;
 	bool waiting;
+	bool initialized;		// The init override should set this to true when done
 	virtual void wait() {
 		frames_waited = 0;
 		waiting = true;
@@ -66,25 +72,53 @@ protected:
 	Unit *unit;
 };
 
-class SeekHaircutBehaviour : public BehaviourBase {
+
+/* Seek behaviours: navigating a unit to a building of the required type */
+
+class SeekBehaviour : public BehaviourBase {
 public:
 	void init(Level *, Unit *);
 	void _update();
 protected:
 	Level *level;
 	Unit *unit;
-	Building *barbershop;
+	Building *building;
+	virtual const char * requisiteBuildingType() = 0;
+	virtual const char * followingBehaviour() = 0;
 };
 
-class HaveHaircutBehaviour : public BehaviourBase {
+class SeekHaircutBehaviour : public SeekBehaviour {
+protected:
+	const char * requisiteBuildingType() { return "barber"; }
+	const char * followingBehaviour() { return "havehaircut"; }
+};
+class SeekPieBehevaiour : public SeekBehaviour {
+protected:
+	const char * requisiteBuildingType() { return "pieshop"; }
+	const char * followingBehaviour() { return "piesale"; }
+};
+
+
+/* Service behaviours: a unit interacts with a placeable & a staff unit */
+
+class ServiceBehaviour : public BehaviourBase {
 public:
 	void init(Level *, Unit *u, Unit *s, Furnishing *f);
 	void _update();
 protected:
 	Level *level;
 	Unit *unit, *staff;
-	Furnishing *chair;
-	std::string typestring;
+	Furnishing *furnishing;
+	virtual const char * typestring() = 0;
+};
+
+class HaveHaircutBehaviour : public ServiceBehaviour {
+protected:
+	const char * typestring() { return "havehaircut"; }
+};
+class PieSaleBehaviour : public ServiceBehaviour {
+protected:
+	const char * typestring() { return "piesale"; }
 };
 
 #endif

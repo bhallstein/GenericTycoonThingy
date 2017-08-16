@@ -60,12 +60,12 @@ void W::setUpOpenGL() {
 }
 void W::startDrawing() {
 	winManager->enableDrawing();
-
+	
 	if (opengl_needs_setting_up)
 		setUpOpenGL();
 	
 	int w = width(), h = height();
-
+	
 	current_drawn_view = NULL;
 	glScissor(0, 0, w, h);
 	
@@ -156,7 +156,7 @@ void W::initializePaths() {
 	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
 	settingsPath = path;
 	settingsPath.append("/Demon Barber Tycoon/");
-
+	
 	// Resources path
 	GetModuleFileName(0, path, sizeof(path) - 1);
 	resourcesPath = path;

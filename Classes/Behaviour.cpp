@@ -6,14 +6,17 @@
 
 Behaviour::Behaviour(const char *_type) : type(_type) 
 {
-	if      (strcmp(_type, "seekhaircut") == 0) b = new SeekHaircutBehaviour();
+	if (strcmp(_type, "despawn") == 0)          b = new DespawnBehaviour();
+	else if (strcmp(_type, "seekhaircut") == 0) b = new SeekHaircutBehaviour();
 	else if (strcmp(_type, "havehaircut") == 0) b = new HaveHaircutBehaviour();
-	else if (strcmp(_type, "despawn") == 0)     b = new DespawnBehaviour();
+	else if (strcmp(_type, "seekpie") == 0)     b = new SeekPieBehevaiour();
+	else if (strcmp(_type, "piesale") == 0)     b = new PieSaleBehaviour();
 	else throw MsgException("Behaviour with invalid type created");
 }
 Behaviour::~Behaviour()
 {
 	std::cout << "Behaviour \"" << type << "\" destruct" << std::endl;
+	delete b;
 }
 void Behaviour::update() { b->update(); }
 bool Behaviour::destroyed() { return b->destroyed; }
@@ -27,6 +30,7 @@ void Behaviour::init(Level *l, Unit *u1, Unit *u2, Furnishing *f) { b->init(l, u
 
 void DespawnBehaviour::init(Unit *_u) {
 	unit = _u;
+	initialized = true;
 }
 void DespawnBehaviour::_update() {
 	if (stage == -1) {		// Waiting
@@ -40,53 +44,58 @@ void DespawnBehaviour::_update() {
 	}
 	else if (stage == 1) {	// Despawn on arrival
 		if (unit->arrived)
-			unit->despawn(), destroyed = true;
+			unit->destroy(), destroyed = true;
 	}
 }
 
-void SeekHaircutBehaviour::init(Level *_level, Unit *_u) {
-	unit = _u;
-	level = _level;
-	barbershop = level->randomBuildingWithType("barber");
+
+void SeekBehaviour::init(Level *_l, Unit *_u) {
+	level = _l, unit = _u;
+	unit->capture();
+	building = level->randomBuildingWithType(requisiteBuildingType());
+	initialized = true;
 }
-void SeekHaircutBehaviour::_update() {
-	if (stage == 0) {		// Send customer to barber shop
+void SeekBehaviour::_update() {
+	if (stage == 0) {		// Send unit to requisite establishment
 		int x, y;
-		barbershop->getEntryPoint(&x, &y);
+		building->getEntryPoint(&x, &y);
 		if (unit->voyage(x, y)) stage++;
 		else wait();
 	}
-	else if (stage == 1) {	// Send customer to queue point
+	else if (stage == 1) {	// Send unit to queue point
 		if (unit->arrived) {
 			int x, y;
-			barbershop->getQueuePoint(&x, &y);
+			building->getQueuePoint(&x, &y);
 			if (unit->voyage(x, y)) stage++;
 			else wait();
 		}
 	}
 	else if (stage == 2) {	// Done!
 		if (unit->arrived) {
-			barbershop->addToQueue(unit);
+			unit->nextBehaviour = followingBehaviour();
+			unit->release();
+			building->addToQueue(unit);
 			destroyed = true;
 		}
 	}
 }
 
-void HaveHaircutBehaviour::init(Level *_l, Unit *_u, Unit *_s, Furnishing *_f) {
-	level = _l, unit = _u, staff = _s, chair = _f;
-	typestring = "havehaircut";
-	// Check chair is capable of this interaction
-	if (!chair->capableOfInteraction(typestring.c_str())) {
-		char s[100]; sprintf(s, "HaveHaircutBehaviour initialized with incompatible '%s' furnishing", chair->type.c_str());
+
+void ServiceBehaviour::init(Level *_l, Unit *_u, Unit *_s, Furnishing *_f) {
+	level = _l, unit = _u, staff = _s, furnishing = _f;
+	// Check furnishing is capable of this interaction
+	if (!furnishing->capableOfBehaviour(typestring())) {
+		char s[100]; sprintf(s, "'%s' behaviour initialized with incompatible '%s' furnishing", typestring(), furnishing->type.c_str());
 		throw MsgException(s);
 	}
-	chair->capture();
+	unit->capture(), staff->capture(), furnishing->capture();
+	initialized = true;
 }
-void HaveHaircutBehaviour::_update() {
+void ServiceBehaviour::_update() {
 	if (stage == 0) {		// Send units to interaction points
 		int uDestX, uDestY, sDestX, sDestY;
-		chair->getInteractionPoint("civilian", &uDestX, &uDestY);
-		chair->getInteractionPoint("staff", &sDestX, &sDestY);
+		furnishing->getInteractionPoint("civilian", &uDestX, &uDestY);
+		furnishing->getInteractionPoint("staff", &sDestX, &sDestY);
 		if (uDestX < 0 || sDestY < 0) { }	// Incompatible unit! What to do? Hmm.
 		if (unit->voyage(uDestX, uDestY) && staff->voyage(sDestX, sDestY)) stage++;
 		else wait();
@@ -98,7 +107,7 @@ void HaveHaircutBehaviour::_update() {
 	else if (stage == 2) {	// Release things
 		if (unit->animation_finished && staff->animation_finished) {
 			level->createBehaviour("despawn")->init(unit);
-			chair->release();
+			unit->release(), staff->release(), furnishing->release();
 			destroyed = true;
 		}
 	}

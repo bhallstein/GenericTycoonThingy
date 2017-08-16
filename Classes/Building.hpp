@@ -71,7 +71,7 @@ protected:
 	static std::string defaultColour;
 	static std::string defaultHoverColour;
 	
-	static int *ind_array;
+	static std::vector<std::map<Furnishing*, Unit*>::iterator> _ind_array;
 };
 
 #endif

@@ -10,6 +10,7 @@
 
 #include "types.hpp"
 #include "MappedObj.hpp"
+#include "BehaviourParticipant.hpp"
 
 class ResponderMap;
 class NavMap;
@@ -24,7 +25,7 @@ struct furnishingInfo {
 	std::map<std::string, intcoord> interactionPoints;
 };
 
-class Furnishing : public MappedObj {
+class Furnishing : public MappedObj, public BehaviourParticipant {
 public:
 	Furnishing(ResponderMap *, NavMap *, const char *_type, Building *);
 	~Furnishing();
@@ -40,16 +41,9 @@ public:
 	const char * col();
 	
 	void getInteractionPoint(const char *_unitType, int *_x, int *_y);
-	bool capableOfInteraction(const char *iType);
-	bool readyForInteraction(const char *iType);
 	bool requiresStaff(const char *uType);
 	void runAnimation(int duration);
 	bool animationFinished;
-	
-	void setBoundUnit(Unit *);
-	void unsetBoundUnit();
-	void capture();
-	void release();
 	
 	static bool initialize(W *);	// Populate our static furnishingTypes map from furnishing.lua
 	static bool initialized;
@@ -59,11 +53,10 @@ protected:
 	std::string *f_hoverColour;
 	std::vector<std::string> *f_compatibleBehaviours;
 	std::map<std::string, intcoord> *f_interactionPoints;
+	std::vector<std::string>* getCompatibleBehaviours();
 	
 	NavMap *navmap;
 	Building *contextBuilding;
-	Unit *boundUnit;
-	bool available;
 	int animFrames, animationDuration;
 	
 	// Static members

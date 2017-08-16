@@ -12,7 +12,7 @@ bool Furnishing::initialized = false;
 
 Furnishing::Furnishing(ResponderMap *_rm, NavMap *_navmap, const char *_type, Building *_context) :
 	MappedObj(_rm, true), navmap(_navmap), type(_type), contextBuilding(_context),
-	boundUnit(NULL), available(true), animationFinished(false)
+	animationFinished(false)
 {
 	// Set properties for this Furnishing type
 	groundplan             = furnishingTypes[type].groundplan;
@@ -84,30 +84,18 @@ void Furnishing::getInteractionPoint(const char *uType, int *_x, int *_y) {
 		*_y = it->second.y + y;
 	}
 }
-bool Furnishing::capableOfInteraction(const char *behaviourType) {
-	for (std::vector<std::string>::iterator it = f_compatibleBehaviours->begin(); it < f_compatibleBehaviours->end(); it++)
-		if ((*it) == behaviourType) return true;
-	return false;
-}
-bool Furnishing::readyForInteraction(const char *behaviourType) {
-	if (!available) return false;
-	return capableOfInteraction(behaviourType);
-}
 bool Furnishing::requiresStaff(const char *uType) {
-	return f_interactionPoints->find(uType) != f_interactionPoints->end();
+	return f_interactionPoints->count(uType);
 }
 void Furnishing::runAnimation(int duration) {
 //	animationDuration = duration;
 //	animFrames = 0;
 //	animating = true;
-//	if (boundUnit) ; //boundUnit->runAnimation(duration);
 }
 
-void Furnishing::setBoundUnit(Unit *_u) { boundUnit = _u;   }
-void Furnishing::unsetBoundUnit()       { boundUnit = NULL; }
-
-void Furnishing::capture() { available = false; }
-void Furnishing::release() { available = true; }
+std::vector<std::string>* Furnishing::getCompatibleBehaviours() {
+	return f_compatibleBehaviours;
+}
 
 bool Furnishing::initialize(W *_W) {
 	if (Furnishing::initialized) return true;

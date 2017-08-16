@@ -5,12 +5,20 @@ defaultHoverColour = "blue"
 
 unitTypes = {
 	civilian = {
-		
+		compatibleBehaviours = {
+			"seekhaircut", "havehaircut",
+			"seekpie", "piesale"
+		}
 	},
 	staff = {
 		colour = "green",
-		hoverColour = "yellow",
-		hireCost = 10
+		hoverColour = "white",
+		isStaff = true,
+		hireCost = 10,
+		compatibleBehaviours = {
+			"havehaircut",
+			"piesale"
+		}
 	}
 }
 

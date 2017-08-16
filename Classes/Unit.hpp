@@ -11,6 +11,7 @@
 
 #include "types.hpp"
 #include "MappedObj.hpp"
+#include "BehaviourParticipant.hpp"
 #include "../W.hpp"
 
 class NavMap;
@@ -21,10 +22,12 @@ class Furnishing;
 
 struct unitInfo {
 	std::string col, hoverCol;
+	std::vector<std::string> compatibleBehaviours;
+	bool isStaff;
 	int hireCost;
 };
 
-class Unit : public MappedObj {
+class Unit : public MappedObj, public BehaviourParticipant {
 public:
 	Unit(ResponderMap *, NavMap *, const char *_type, Level *, bool _placeableMode);
 	~Unit();
@@ -45,7 +48,7 @@ public:
 	
 	// Utility methods
 	void getDespawnPoint(int *x, int *y);
-	void despawn();
+	void destroy();
 	bool voyage(int _x, int _y);
 	bool arrived;
 	void runAnimation(/* Animation...? */);
@@ -53,6 +56,8 @@ public:
 	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
 	static bool initialized;
+	
+	std::string nextBehaviour;
 
 	// UnitInfo gets
 	static int getUnitHireCost(std::string); //lookup a unitInfo hireCost from unitTypes
@@ -76,7 +81,11 @@ protected:
 	// Properties
 	std::string *u_colour;
 	std::string *u_hoverColour;
-	std::string *u_colourWhenMoving;
+	std::vector<std::string> *u_compatibleBehaviours;
+	std::vector<std::string>* getCompatibleBehaviours();
+	bool u_isStaff;
+	int u_hireCost;
+	
 	NavMap *navmap;
 	std::vector<NavNode *> route;
 	bool hover;
