@@ -23,12 +23,14 @@ public:
 	LevelMap(int w, int h);
 	~LevelMap();
 
-	//Properties
-	int Columns;
-	int Rows;
+	// Properties
+	int Columns, Rows;
 	vector<Building> Buildings;
 
-	//Functions
+	// Getters
+	int numberOfBuildings();
+
+	// Functions
 	void Draw(sf::RenderWindow& window);
 
 private:
