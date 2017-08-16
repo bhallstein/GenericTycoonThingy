@@ -35,31 +35,40 @@ int LuaHelper::pushSubtable(const char *key)
 		return 0;
 	}
 }
-void LuaHelper::stackdump(lua_State* l)
+std::string LuaHelper::stackdump(lua_State* l)
 {
+	std::string strRet;
     int i;
     int top = lua_gettop(l);
  
-    printf("total in stack %d\n",top);
+    /*strRet.append("total in stack: ");
+	strRet.append*/ //fix this for string later
  
     for (i = 1; i <= top; i++)
     {  /* repeat for each level */
         int t = lua_type(l, i);
         switch (t) {
-            case LUA_TSTRING:  /* strings */
-                printf("string: '%s'\n", lua_tostring(l, i));
+			case LUA_TNUMBER:
+            case LUA_TSTRING:  /* strings and numbers */
+                strRet.append("string: ");
+				strRet.append(lua_tostring(l, i));
+				strRet.append("\n");
                 break;
             case LUA_TBOOLEAN:  /* booleans */
-                printf("boolean %s\n",lua_toboolean(l, i) ? "true" : "false");
+				strRet.append("boolean: ");
+				strRet.append(lua_toboolean(l, i) ? "true" : "false");
+				strRet.append("\n");
                 break;
-            case LUA_TNUMBER:  /* numbers */
+            /*case LUA_TNUMBER:  /* numbers 
                 printf("number: %g\n", lua_tonumber(l, i));
-                break;
+                break;*/
             default:  /* other values */
-                printf("%s\n", lua_typename(l, t));
+				strRet.append(lua_typename(l, t));
+				strRet.append("\n");
                 break;
         }
-        printf("  ");  /* put a separator */
+        //printf("  ");  /* put a separator */
     }
-    printf("\n");  /* end the listing */
+    //printf("\n");  /* end the listing */
+	return strRet;
 }

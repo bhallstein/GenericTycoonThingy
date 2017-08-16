@@ -42,8 +42,7 @@ void Level::buildLevel(std::string levelname)
 
 	if (!mrLua.loadFile(path)) {
 		theW->warning("Error opening level file.");
-		//theW->warning(mrLua.to<std::string>(-1).c_str(), "Error");
-		//std::cin.get();	// ?
+		theW->log(mrLua.stackdump(mrLua.LuaInstance).c_str());
 		throw MsgException("Could not read level file");		// Might actually be neater to return a bool, & throw in the constructor.
 	}
 

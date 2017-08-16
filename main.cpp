@@ -5,8 +5,8 @@
 
 #if defined _WIN32 || _WIN64
 #include <windows.h>
-#include <gl\gl.h>
-#include <gl\glu.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
 #endif
 
 #include <vector>

@@ -10,8 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "Classes/types.hpp"
 #include "WindowManager.hpp"
-#include "types.h"
 
 class View;
 class Event;

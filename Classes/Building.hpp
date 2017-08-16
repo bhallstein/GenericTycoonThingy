@@ -8,10 +8,7 @@
 
 #include <iostream>
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
-#include "types.h"
+#include "types.hpp"
 #include "MappedObj.hpp"
 
 class Building : public MappedObj {
@@ -25,7 +22,7 @@ public:
 	std::string type;
 	bool destroyed;
 	std::vector<door> doors;		// Doors. These should probably be on the edge of the building. lol.
-									// See types.h for what a door looks like.
+									// See types.hpp for what a door looks like.
 	// Methods
 	void receiveEvent(Event *ev);	// Handle mouse events
 	void update() { }

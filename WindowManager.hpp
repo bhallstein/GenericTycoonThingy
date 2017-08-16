@@ -9,6 +9,8 @@
 #include <string>
 #include <exception>
 
+#include "Classes/types.hpp"
+
 #ifdef __APPLE__
 
 /* Mac */

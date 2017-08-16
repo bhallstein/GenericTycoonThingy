@@ -1,5 +1,5 @@
 /*
- * Types.h – useful declarations 'n junk
+ * Types.hpp – useful declarations 'n junk
  *
  */
 

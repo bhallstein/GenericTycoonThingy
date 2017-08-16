@@ -1,4 +1,4 @@
-require([[Data\buildings]])
+require([[Data/buildings]])
 
 --level properties
 width=100

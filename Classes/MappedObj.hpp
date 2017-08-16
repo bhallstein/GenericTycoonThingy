@@ -8,10 +8,7 @@
 
 #include <vector>
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
-#include "types.h"
+#include "types.hpp"
 #include "EventResponder.hpp"
 
 class MappedObj : public EventResponder

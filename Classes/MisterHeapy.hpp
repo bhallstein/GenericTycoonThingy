@@ -51,7 +51,7 @@
 
 #include <iostream>
 
-#include "types.h"
+#include "types.hpp"
 
 
 inline int log_base2(unsigned int x) {

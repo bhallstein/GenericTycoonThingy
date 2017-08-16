@@ -69,8 +69,15 @@ void Menu::buttonClick(Button *btn) {
 
 void Menu::startLevel(std::string path) {
 	std::cout << "starting level " << path << std::endl;
-	level = new Level(game, theW, path);		// Need error handling here (e.g. for exception in Level constructor?)
-	game->pushState(level);
+	try 
+	{
+		level = new Level(game, theW, path);
+		game->pushState(level);
+	} 
+	catch (MsgException &ex) 
+	{
+		theW->warning("OH NOES!");
+	}
 }
 
 

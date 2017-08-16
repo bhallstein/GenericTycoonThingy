@@ -38,7 +38,7 @@ public:
 	lua_State *LuaInstance; //instance of the Lua Interpreter
 
 	//stackdump
-	void stackdump(lua_State *l);
+	std::string stackdump(lua_State *l);
 };
 
 //template implementations
