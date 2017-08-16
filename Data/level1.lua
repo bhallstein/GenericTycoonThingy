@@ -3,7 +3,7 @@ require("buildings")
 --level properties
 width  = 50
 height = 40
-startingBalance = 50
+startingBalance = 70
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"
@@ -44,11 +44,11 @@ buildings = {
 								 {4,8}, {5,8}
 		},
 		doors = {
-			{ 3,8, "downward" },
 			{ 4,8, "downward" },
-			{ 1,3, "rightward" },
-			{ 6,4, "leftward" },
-			{ 8,3, "rightward" },
+			{ 5,8, "downward" },
+			{ 2,3, "rightward" },
+			{ 7,4, "leftward" },
+			{ 9,3, "rightward" },
 			{ 0,0, "leftward" },
 			{ 0,0, "upward" }
 		}
