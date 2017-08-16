@@ -47,6 +47,8 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	realtimetime = 0.0;
 	realtimetimer = new Ogre::Timer();
 	
+	spawnRate = 0;
+	
 	openHelpView();
 
 	theW->playBGM("level.mod");
@@ -216,9 +218,9 @@ void Level::buildLevel(std::string levelname) {
 		while (lua_next(L,1) != 0) {		// S: -1 val; -2 key; -3 table
 			spawnPoints.push_back(new SpawnPoint(
 				mrLua.getfield<int>("x"),
-				mrLua.getfield<int>("y"),
-				mrLua.getfield<std::string>("name"),
-				mrLua.getfield<int>("rate")
+				mrLua.getfield<int>("y")
+//				mrLua.getfield<std::string>("name"),
+//				mrLua.getfield<int>("rate")
 			));
 			lua_pop(L, 1);					// S: -1 key; -2 table
 		}
@@ -252,19 +254,20 @@ void Level::update() {
 	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
 	realtimetimer->reset();
 	timeRemaining = timeLimit - (int) realtimetime;
-
-	intcoord c;
-	for (int i=0, n = spawnPoints.size(); i < n; i++)
-		if (spawnPoints[i]->spawn(&c)) {
-			Unit *u = createUnit(c.x, c.y, "civilian");
-			int q = W::randUpTo(3);
-			if (q == 0)
-				createBehaviour("despawn")->init(u);
-			else if (q == 1)
-				createBehaviour("seek:haircut")->init(this, u);
-			else
-				createBehaviour("seek:pie")->init(this, u);
-		}
+	
+	float some_coefficient = 0.2;
+	float spawnRate = realtimetime / timeLimit * some_coefficient;
+	if (W::randUpTo(100) < spawnRate * 100) {
+		intcoord c;
+		SpawnPoint *sp = spawnPoints[W::randUpTo(spawnPoints.size())];
+		sp->getCoords(&c);
+		
+		Unit *u = createUnit(c.x, c.y, "civilian");
+		int q = W::randUpTo(3);
+		if (q == 0)      createBehaviour("despawn")->init(u);
+		else if (q == 1) createBehaviour("seek:haircut")->init(this, u);
+		else             createBehaviour("seek:pie")->init(this, u);
+	}
 	
 	// Update TLOs
 	for (int i=0, n = units.size(); i < n; i++)      units[i]->update();
@@ -274,7 +277,7 @@ void Level::update() {
 	
 	destroyThings();	// Removed destroyed objects.
 
-	//check for level end
+	// Check for win/lose
 	if((int) realtimetime >= timeLimit || money >= moneyLimit)
 	{
 		if((int) realtimetime >= timeLimit)

@@ -5,7 +5,7 @@ width  = 50
 height = 40
 startingBalance = 70
 moneyLimit = 300 --victory when reached
-timeLimit = 18 --in seconds for now
+timeLimit = 180 --in seconds for now
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"
@@ -109,30 +109,30 @@ spawnPoints = {
 		name = "OffTheEdgeOfTheMap1EndNameHere",
 		x = 0,
 		y = 15,
-		rate = 70,
-		types = {
-			{ Peasants, 5 },
-			{ Judges, 8 },
-		},
+		-- rate = 70,
+		-- types = {
+		-- 	{ Peasants, 5 },
+		-- 	{ Judges, 8 },
+		-- },
 	},
 	{
 		name = "InAHouse",
 		x = 33,
 		y = 11,
-		rate = 80,
-		types = {
-			{ Peasants, 5 },
-			{ Judges, 8 },
-		},
+		-- rate = 80,
+		-- types = {
+		-- 	{ Peasants, 5 },
+		-- 	{ Judges, 8 },
+		-- },
 	},
 	{
 		name = "InAHouse1",
 		x = 33,
 		y = 21,
-		rate = 90,
-		types = {
-			{ Peasants, 5 },
-			{ Judges, 8 },
-		},
+		-- rate = 90,
+		-- types = {
+		-- 	{ Peasants, 5 },
+		-- 	{ Judges, 8 },
+		-- },
 	}
 }

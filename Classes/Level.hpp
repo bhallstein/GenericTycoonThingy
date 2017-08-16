@@ -110,6 +110,8 @@ protected:
 	int money;
 	int moneyLimit; //potential victory condition
 	int timeLimit;	//potential time limit
+	
+	float spawnRate;	// i.e. number per frame (probabilistically)
 
 	int framecount;
 	bool paused;

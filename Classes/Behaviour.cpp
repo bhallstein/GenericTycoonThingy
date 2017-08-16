@@ -200,10 +200,11 @@ void ServiceBehaviour::_update() {
 	}
 	else if (stage == 1) {	// Run animations
 		if (unit->arrived && staff->arrived)
-			theW->playSound("Scream.wav"), unit->runAnimation(), staff->runAnimation(), stage++;
+			unit->runAnimation(), staff->runAnimation(), stage++;
 	}
 	else if (stage == 2) {	// Release things
 		if (unit->animation_finished && staff->animation_finished) {
+			theW->playSound("cha-ching.wav");
 			level->createBehaviour("despawn")->init(unit);
 			unit->release(), staff->release(), furnishing->release();
 			destroyed = true;

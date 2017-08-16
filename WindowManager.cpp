@@ -43,12 +43,12 @@ WindowManager::~WindowManager() {
 void WindowManager::createWindow() {
 	NSRect frame = NSMakeRect(0, 0, 800, 600);
 	objs->window = [[NSWindow alloc] initWithContentRect:frame
-											   styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
+											   styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask /*| NSResizableWindowMask*/
 												 backing:NSBackingStoreBuffered
 												   defer:NO];
-	NSWindowCollectionBehavior coll = [objs->window collectionBehavior];	// Enable lion fullscreenery
-	coll |= NSWindowCollectionBehaviorFullScreenPrimary;					// 
-	[objs->window setCollectionBehavior:coll];								//
+//	NSWindowCollectionBehavior coll = [objs->window collectionBehavior];	// Enable lion fullscreenery
+//	coll |= NSWindowCollectionBehaviorFullScreenPrimary;					// 
+//	[objs->window setCollectionBehavior:coll];								//
 	
 	[objs->window center];
 	
@@ -141,11 +141,11 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 	this->appInstance = GetModuleHandle(NULL);
 	if (this->appInstance == NULL)
 		throw MsgException("Couldn't get app instance.");
-
+	
 	// Register window class
 	int width = 800, height = 600;
 	WNDCLASSEX wc;	// Before creating a window, you have to register a class for it
-
+	
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;	// Force redraw on resize; has own device context
 	wc.lpfnWndProc = wndProc;
@@ -158,19 +158,19 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 	wc.lpszMenuName = NULL;			// Menu resource name... "MainMenu" ?
 	wc.lpszClassName = "DBTWindow";	// Window class name
 	wc.hIconSm = (HICON) LoadImage(wc.hInstance, MAKEINTRESOURCE(5), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-
+	
 	if (!RegisterClassEx(&wc))
 		throw MsgException("Failed to register window class.");
-
+	
 	// Set window style & size
 	DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	DWORD extendedWindowStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-
+	
 	RECT rect;
 	rect.left = 0, rect.right = width;
 	rect.top = 0, rect.bottom = height;
 	AdjustWindowRectEx(&rect, windowStyle, FALSE, extendedWindowStyle);
-
+	
 	// Create window
 	this->windowHandle = CreateWindowEx(
 		extendedWindowStyle,				//
@@ -235,7 +235,7 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 		closeWindow();
 		throw MsgException("Error activating the rendering context");
 	}
-
+	
 	ShowWindow(this->windowHandle, SW_SHOW);
 	SetForegroundWindow(this->windowHandle);
 	SetFocus(this->windowHandle);
@@ -271,13 +271,13 @@ bool WindowManager::goWindowed() {
 	if (mode == FULLSCREEN) {
 		if (ChangeDisplaySettings(NULL, 0) != DISP_CHANGE_SUCCESSFUL)
 			return false;
-
-		DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		
+		DWORD windowStyle = WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU; /*WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;*/
 		DWORD extendedWindowStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		
 		SetWindowLongPtr(this->windowHandle, GWL_STYLE, windowStyle);
 		SetWindowLongPtr(this->windowHandle, GWL_EXSTYLE, extendedWindowStyle);
-
+		
 		SetWindowPos(this->windowHandle, HWND_TOP, 0, 0, 800, 640, SWP_SHOWWINDOW);
 	}
 	ShowWindow(this->windowHandle, SW_SHOW);
