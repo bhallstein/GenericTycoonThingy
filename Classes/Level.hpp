@@ -142,8 +142,10 @@ public:
 
 class UIBarView : public UIView {
 public:
-	UIBarView(W *, JenniferAniston &, ResponderMap *);
+	UIBarView(W *, JenniferAniston &, ResponderMap *, int *_econ);
 	void draw();
+private:
+	int *economy;
 };
 
 class FurnishingPurchasingUIView : public UIView {

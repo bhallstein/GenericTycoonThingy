@@ -22,7 +22,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	buildLevel(levelpath);
 	
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
-	uibarview = new UIBarView(theW, aniston, &responderMap);
+	uibarview = new UIBarView(theW, aniston, &responderMap, &money);
 	responderMap.addResponder(uibarview);
 	uibarview->subscribeToButtons(new Callback(&Level::receiveEvent, this));
 	
@@ -503,17 +503,20 @@ void LevelView::scroll(Direction::Enum dir) {
 }
 
 
-UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
+UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, int *_econ) :
+	UIView(_theW, _aniston, _rm, DISALLOW_DRAG), economy(_econ)
 {
 	buttons.push_back(new Button(10, 10, 20, 20, "open hiring ui view"));
 }
-
 void UIBarView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
+	char econ[10];
+	sprintf(econ, "$%d", *economy);
+	theW->drawText(743, 10, "white", econ);
 }
 
 
@@ -530,7 +533,6 @@ FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston
 		);
 	}
 }
-
 void FurnishingPurchasingUIView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buttons.size(); i < n; i++) {
@@ -544,7 +546,6 @@ HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_r
 	buttons.push_back(new Button(7, 7, 12, 12, "close hiring ui view"));
 	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));
 }
-
 void HiringUIView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buttons.size(); i < n; i++) {

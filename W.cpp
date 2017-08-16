@@ -29,8 +29,8 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	W::logfile.open(logfilePath.c_str());
 	
 	std::string s = "W: settingsPath: "; s += settingsPath;
-	std::string t = "W: resourcesPath: "; t += resourcesPath;
-	log(s.c_str()); log(t.c_str()); log("");
+	s += "W: resourcesPath: "; s += resourcesPath; s += "\n";
+	log(s.c_str());
 }
 W::~W() {
 	log("W destruct");
@@ -373,6 +373,14 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 				drawRect(x, y+2, 2, 2, colname);
 				drawRect(x, y+8, 8, 2, colname);
 				break;
+			}
+			case '$' : {
+				drawRect(x, y, 10, 2, colname);
+				drawRect(x, y+4, 10, 2, colname);
+				drawRect(x, y+8, 10, 2, colname);
+				drawRect(x, y+2, 2, 2, colname);
+				drawRect(x+8, y+6, 2, 2, colname);
+				drawRect(x+4, y-1, 2, 12, colname);
 			}
 			default: break;
 		}
