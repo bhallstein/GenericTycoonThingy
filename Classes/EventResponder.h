@@ -1,7 +1,8 @@
 /*
  * EventResponder.h
- * - an abstract class, for subclassing, to allow various objects to handle events.
- * - implement the subclassís specific event behaviour by overriding receiveEvent().
+ *
+ * An abstract class, for subclassing, to allow objects to handle events.
+ * To define a subclass’s event behaviours, override receiveEvent().
  *
  */
 

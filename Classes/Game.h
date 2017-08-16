@@ -6,7 +6,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "LevelMap.h"
+#include "Level.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>

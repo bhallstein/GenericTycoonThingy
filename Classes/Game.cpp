@@ -1,6 +1,6 @@
 #include "Game.h"
 
-//#include "LevelMap.h"
+//#include "Level.h"
 #include "Building.h"
 
 
@@ -26,13 +26,13 @@ Game::~Game()
 
 void Game::Run()
 {
-	// Create LevelMap
+	// Create Level
 	int default_map_columns = 100, default_map_rows = 100;
-	LevelMap levelmap(default_map_columns, default_map_rows, pixel_width, pixel_height);
+	Level level(default_map_columns, default_map_rows, pixel_width, pixel_height);
 	
 	bool should_quit = false;
 	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
-															// the receiveEvent(sf::Event *ev) method
+															// the receiveEvent(sf::Event *ev, ER *p_e_r) method
 	sf::Event ev;
     
 	while (DBTWindow.IsOpened() && !should_quit)
@@ -62,7 +62,7 @@ void Game::Run()
 					}
 					else if (keycode == sf::Keyboard::B) {
 						std::cout << "creating new building... ";
-						Building *b = levelmap.createBuilding();
+						Building *b = level.createBuilding();
 						privileged_event_responder = (EventResponder*) b;	// not sure if cast to EvResp needed here
 
 						std::cout << "adding building to memory map... ";
@@ -83,7 +83,7 @@ void Game::Run()
 		
 		DBTWindow.Clear(sf::Color(138,43,226));		// Electric Indigo
 
-		levelmap.draw(DBTWindow);
+		level.draw(DBTWindow);
 
         // Update the window
         DBTWindow.Display();
