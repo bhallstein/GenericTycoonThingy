@@ -55,25 +55,45 @@ NavMap::~NavMap() {
 
 void NavMap::makePassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
-	NavNode *maploc = &maplocs[n];
+	NavNode *maploc = &maplocs[n], *m1, *m2;
+	std::vector<NavNode*> diagonalia;
 	maploc->passable = true;
 	// Add maploc back to network
 	for (j = atY-1; j <= atY+1; j++)
 		for (i = atX-1; i <= atX+1; i++)
 			if (i == atX && j == atY) ;
 			else if (i < 0 || i >= w || j < 0 || j >= h) ;
+			else if (i == atX || j == atY) diagonalia.push_back(&maplocs[j*w + i]);
 			else maplocs[j*w + i].addNeighbour(maploc);
+	// Recreate nodelinks between adjacent diagonals
+	for (int a=0; a < diagonalia.size(); a++) {
+		m1 = diagonalia[a];
+		for (int b=0; b < diagonalia.size(); b++) {
+			m2 = diagonalia[b];
+			if (m1->x != m2->x || m1->y != m2->y) m1->addNeighbour(m2);
+		}
+	}	
 }
 void NavMap::makeImpassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
-	NavNode *maploc = &maplocs[n];
+	NavNode *maploc = &maplocs[n], *m1, *m2;
+	std::vector<NavNode*> diagonalia;
 	maploc->passable = false;
 	// Remove maploc from network
 	for (j = atY-1; j <= atY+1; j++)
 		for (i = atX-1; i <= atX+1; i++)
 			if (i == atX && j == atY) ;
 			else if (i < 0 || i >= w || j < 0 || j >= h) ;
+			else if (i == atX || j == atY) diagonalia.push_back(&maplocs[j*w + i]);
 			else maplocs[j*w + i].removeNeighbour(maploc);
+	// Sever nodelinks between adjacent diagonals
+	for (int a=0; a < diagonalia.size(); a++) {
+		m1 = diagonalia[a];
+		for (int b=0; b < diagonalia.size(); b++) {
+			m2 = diagonalia[b];
+			if (m1->x != m2->x || m1->y != m2->y) m1->removeNeighbour(m2);
+		}
+	}
 }
 NavNode* NavMap::nodeAt(int atX, int atY) {
 	return &maplocs[atY * w + atX];
