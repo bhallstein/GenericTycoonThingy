@@ -11,14 +11,14 @@
 
 #include "types.h"
 #include "EventResponder.hpp"
-#include "GameMap.hpp"
+#include "NavMap.hpp"
 #include "EventHandler.hpp"
 
 
 class Building : public EventResponder
 {
 public:
-	Building(GameMap *, EventHandler *, int posX, int posY);
+	Building(NavMap *, EventHandler *, int posX, int posY);
 	~Building();
 
 	// Methods
@@ -31,7 +31,7 @@ public:
 protected:
 
 	// Properties
-	GameMap *gamemap;
+	NavMap *navmap;
 	EventHandler *eventHandler;
 	bool clicked;
 	

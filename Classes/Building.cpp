@@ -1,20 +1,21 @@
 #include "Building.hpp"
 
-Building::Building(GameMap *_gamemap, EventHandler *_eventHandler, int posX, int posY) {
+Building::Building(NavMap *_navmap, EventHandler *_eventHandler, int posX, int posY) {
 	eventHandler = _eventHandler;
 	x = posX, y = posY;
 	w = 6, h = 4;
 	clicked = false;
 	
-	gamemap = _gamemap;
+	navmap = _navmap;
+	navmap->addImpassableObject(this);
 	
 	// Builing state relevant to the LevelMap.
 	destroyed = false;
 }
 Building::~Building()
 {
-	//gamemap->removeResponder(this);
-	gamemap->removeImpassableObject(this);
+	std::cout << "building destruct" << std::endl;
+	navmap->removeImpassableObject(this);
 }
 
 void Building::receiveEvent(Event *ev) {

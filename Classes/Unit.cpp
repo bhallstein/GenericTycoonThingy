@@ -1,13 +1,11 @@
 #include "Unit.hpp"
 
-Unit::Unit(GameMap *map) {
+Unit::Unit(NavMap *_navmap) : navmap(_navmap), destroyed(false) {
 	x = y = 0;
 	w = h = 1;
 	a = b = 0;
 	
 	state = "idle";
-	
-	gamemap = map;
 	
 	// Generate random destination
 //	goSomewhere(rand()%map->w, rand()%map->h);
@@ -34,7 +32,7 @@ void Unit::goSomewhere(int _destX, int _destY) {
 	
 	std::cout << "getting route..." << std::endl;
 	std::vector<MapLoc*> route;
-	bool success = gamemap->getRoute(x, y, destX, destY, &route);
+	bool success = navmap->getRoute(x, y, destX, destY, &route);
 	std::cout << (success ? "got route:" : "no route possible :(") << std::endl;
 	
 	for (int i=0; i < route.size(); i++)

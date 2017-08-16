@@ -69,6 +69,8 @@ void Game::Run()
 			eventHandler.dispatchEvent(&event);
 		}
 		
+		level.destroyThings();	// Removed destroyed objects.
+		
 		// Drawing
 		window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
 		level.draw();

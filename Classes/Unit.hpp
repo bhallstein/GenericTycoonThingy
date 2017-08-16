@@ -13,13 +13,13 @@
 #include <SFML/Window.hpp>
 
 #include "EventResponder.hpp"
-#include "GameMap.hpp"
+#include "NavMap.hpp"
 
 
 class Unit : public EventResponder
 {
 public:
-	Unit(GameMap *map);
+	Unit(NavMap *);
 	~Unit();
 
 	// Methods
@@ -29,8 +29,9 @@ public:
 
 	// Properties
 	int a, b;		// Floating point offset from block
-	
 	int destX, destY;
+	
+	bool destroyed;
 	
 	std::string state;
 
@@ -38,7 +39,7 @@ public:
 protected:
 
 	// Properties
-	GameMap *gamemap;
+	NavMap *navmap;
 	
 };
 

@@ -13,7 +13,6 @@
 #include "types.h"
 
 #include "SettingsManager.hpp"
-#include "GameMap.hpp"
 #include "Level.hpp"
 #include "Event.hpp"
 #include "EventHandler.hpp"

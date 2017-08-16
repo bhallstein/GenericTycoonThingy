@@ -1,4 +1,4 @@
-#include "GameMap.hpp"
+#include "NavMap.hpp"
 
 /****   MapLoc implementation   ****/
 
@@ -24,9 +24,9 @@ void MapLoc::setComparator(float new_min_dist) {
 }
 
 
-/****   GameMap implementation   ****/
+/****   NavMap implementation   ****/
 
-GameMap::GameMap(int _w, int _h) {
+NavMap::NavMap(int _w, int _h) {
 	w = _w, h = _h;
 	int n = w * h;
 	maplocs.resize(n);
@@ -49,11 +49,11 @@ GameMap::GameMap(int _w, int _h) {
 		}
 	}
 }
-GameMap::~GameMap() {
+NavMap::~NavMap() {
 	maplocs.clear();
 }
 
-void GameMap::makePassable(int atX, int atY) {
+void NavMap::makePassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
 	MapLoc *maploc = &maplocs[n];
 	maploc->passable = true;
@@ -64,7 +64,7 @@ void GameMap::makePassable(int atX, int atY) {
 			else if (i < 0 || i >= w || j < 0 || j >= h) ;
 			else maplocs[j*w + i].addNeighbour(maploc);
 }
-void GameMap::makeImpassable(int atX, int atY) {
+void NavMap::makeImpassable(int atX, int atY) {
 	int i, j, n = atY * w + atX;
 	MapLoc *maploc = &maplocs[n];
 	maploc->passable = false;
@@ -75,7 +75,7 @@ void GameMap::makeImpassable(int atX, int atY) {
 			else if (i < 0 || i >= w || j < 0 || j >= h) ;
 			else maplocs[j*w + i].removeNeighbour(maploc);
 }
-void GameMap::addImpassableObject(EventResponder *resp) {
+void NavMap::addImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
 	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
@@ -83,7 +83,7 @@ void GameMap::addImpassableObject(EventResponder *resp) {
 		for (int i = resp->x; i < resp->x + resp->w; i++)
 			this->makeImpassable(i, j);
 }
-void GameMap::removeImpassableObject(EventResponder *resp) {
+void NavMap::removeImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
 	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
@@ -91,10 +91,10 @@ void GameMap::removeImpassableObject(EventResponder *resp) {
 		for (int i = resp->x; i < resp->x + resp->w; i++)
 			this->makePassable(i, j);
 }
-bool GameMap::isPassableAt(int atX, int atY) {
+bool NavMap::isPassableAt(int atX, int atY) {
 	return maplocs[atY*w + atX].passable;
 }
-bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route) {
+bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route) {
 	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
 		cout << "out of bounds" << endl;
 		return false;

@@ -6,28 +6,25 @@ Level::Level(std::string fileName, sf::RenderWindow *_window, EventHandler *_eve
 	// Build level
 	std::cout << "calling buildLevel" << std::endl;
 	buildLevel(readLevel(fileName));
+	
+	framecount = 0;
 }
 Level::~Level()
 {
-	// Buildings & units are allocated on the heap with `new` – so must be manually `delete`d.
-	for (std::vector<Building*>::iterator i = buildings.begin(); i != buildings.end(); i++)
-		delete (*i);
-	for (std::vector<Placeable*>::iterator i = placeables.begin(); i != placeables.end(); i++)
-		delete (*i);
-	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++)
-		delete (*i);
-	delete gamemap;
+	std::cout << "level destruct" << std::endl;
+	destroyAllThings();
+	delete navmap;
 	delete levelview;
 }
 
 Unit* Level::createUnit() {
-	Unit *u = new Unit(gamemap);
+	Unit *u = new Unit(navmap);
 	units.push_back(u);
 	std::cout << "added new unit (now " << units.size() << ")" << std::endl;
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
-	Building *b = new Building(gamemap, eventHandler, atX, atY);
+	Building *b = new Building(navmap, eventHandler, atX, atY);
 	buildings.push_back(b);
 	levelview->addResponder(b);
 	eventHandler->subscribe(b, K_L);
@@ -35,7 +32,7 @@ Building* Level::createBuilding(int atX, int atY) {
 	return b;
 }
 void Level::createPlaceable() {
-	Placeable *p = new Placeable(gamemap, levelview);
+	Placeable *p = new Placeable(navmap, levelview);
 	if (!levelview->requestPrivilegedEventResponderStatus(p)) {
 		delete p;
 		return;
@@ -44,13 +41,41 @@ void Level::createPlaceable() {
 	std::cout << "added placeable " << p << " (now " << placeables.size() << ")" << std::endl;
 	return;
 }
+void Level::destroyThings() {
+	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); i++)
+		if ((*i)->destroyed) {
+			levelview->removeResponder(*i);
+			navmap->removeImpassableObject(*i);
+			delete *i;
+			i = placeables.erase(i) - 1;
+		}
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
+		if ((*i)->destroyed) {
+			levelview->removeResponder(*i);
+			navmap->removeImpassableObject(*i);
+			delete *i;
+			i = buildings.erase(i) - 1;
+		}
+	for (std::vector<Unit*>::iterator i = units.begin(); i < units.end(); i++)
+		if ((*i)->destroyed) {
+			delete *i;
+			i = units.erase(i) - 1;
+		}
+}
+void Level::destroyAllThings() {
+	for (int i=0; i < placeables.size(); i++)   placeables[i]->destroyed = true;
+	for (int i=0; i < buildings.size(); i++) 	buildings[i]->destroyed = true;
+	for (int i=0; i < units.size(); i++) 	    units[i]->destroyed = true;
+	destroyThings();
+}
 
 void Level::draw()
-{
-	levelview->draw(buildings, placeables, units);
+{	
+	levelview->draw(&buildings, &placeables, &units);
 	uiview.draw();
-	//if (framecount == 1200) framecount = 0;
-	//if (50 == framecount++) this->createUnit();	// Create a new unit every 20 seconds
+
+	if (framecount == 1200) framecount = 0;
+	if (50 == framecount++) createUnit();	// Create a new unit every 20 seconds
 }
 
 ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
@@ -66,7 +91,7 @@ void Level::buildLevel(ptree levelFile)
 	std::cout << "level dimensions: " << w << " x " << h << std::endl;
 	
 	// Create map
-	gamemap = new GameMap(w, h);
+	navmap = new NavMap(w, h);
 
 	// Create levelview
 	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
@@ -93,7 +118,7 @@ void LevelView::acceptEvent(Event *ev) {
 		(*i)->receiveEvent(ev);
 }
 
-void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> placeables, std::vector<Unit*> units) {
+void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> *placeables, std::vector<Unit*> *units) {
 
 	// This is obviously a horrendous way to get info into the view, but the separation of View is nonetheless a structural
 	// improvement. The sane way to do it might be to pass the game map.
@@ -102,31 +127,19 @@ void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> p
 	drawRect(sf::Color(0, 0, 0, 50), 0, 0, blocks_w, blocks_h);
 
 	// Draw buildings
-	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++) {
-		if ((*i)->destroyed) {
-			delete (*i);
-			buildings.erase(i--);
-		}
-		else
-			drawRect(
-				(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'l' ? sf::Color::Blue : sf::Color::Black,
-				(*i)->x, (*i)->y, (*i)->w, (*i)->h
-			);
-	}
+	for (std::vector<Building*>::iterator i = buildings->begin(); i < buildings->end(); i++)
+		drawRect(
+			(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'l' ? sf::Color::Blue : sf::Color::Black,
+			(*i)->x, (*i)->y, (*i)->w, (*i)->h
+		);
 	// Draw placeables
-	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); i++) {
-		if ((*i)->destroyed) {
-			delete (*i);
-			placeables.erase(i--);
-		}
-		else
-			drawRect(
-				(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'r' ? sf::Color::Red : sf::Color::Yellow,
-				(*i)->x, (*i)->y, (*i)->w, (*i)->h
-			);
-	}
+	for (std::vector<Placeable*>::iterator i = placeables->begin(); i < placeables->end(); i++)
+		drawRect(
+			(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'r' ? sf::Color::Red : sf::Color::Yellow,
+			(*i)->x, (*i)->y, (*i)->w, (*i)->h
+		);
 	//Draw units
-	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++) {
+	for (std::vector<Unit*>::iterator i = units->begin(); i < units->end(); i++) {
 		drawRect(
 			(*i)->col() == 'r' ? sf::Color::Red : (*i)->col() == 'b' ? sf::Color::Black : sf::Color::White,
 			(*i)->x, (*i)->y, (*i)->w, (*i)->h

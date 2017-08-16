@@ -19,7 +19,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "types.h"
-#include "GameMap.hpp"
+#include "NavMap.hpp"
 #include "EventResponder.hpp"
 #include "Placeable.hpp"
 #include "Building.hpp"
@@ -34,7 +34,7 @@ public:
 	
 	// Methods
 	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
-	void draw(std::vector<Building*> buildings, std::vector<Placeable*> placeables, std::vector<Unit*> units);
+	void draw(std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *);
 	void acceptEvent(Event *);
 	
 };
@@ -51,6 +51,10 @@ public:
 	Unit* createUnit();
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
+	
+	void destroyThings();
+	void destroyAllThings();
+	
 
 	// Properties
 	int columns, rows;
@@ -69,7 +73,7 @@ protected:
 	sf::RenderWindow *window;
 	EventHandler *eventHandler;
 	
-	GameMap *gamemap;
+	NavMap *navmap;
 	LevelView *levelview;
 	View uiview;
 	

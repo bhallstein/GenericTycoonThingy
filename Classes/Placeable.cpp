@@ -1,7 +1,6 @@
 #include "Placeable.hpp"
 
-Placeable::Placeable(GameMap *_gamemap, View *_view) : gamemap(_gamemap), view(_view)
-{
+Placeable::Placeable(NavMap *_navmap, View *_view) : navmap(_navmap), view(_view) {
 	mode = PLACEMENT;
 	x = y = -1000;
 	w = 6; h = 4;
@@ -12,7 +11,8 @@ Placeable::Placeable(GameMap *_gamemap, View *_view) : gamemap(_gamemap), view(_
 }
 Placeable::~Placeable()
 {
-	gamemap->removeImpassableObject(this);
+	std::cout << "placeable destruct" << std::endl;
+	navmap->removeImpassableObject(this);
 }
 
 void Placeable::receiveEvent(Event *ev) {
@@ -23,14 +23,15 @@ void Placeable::receiveEvent(Event *ev) {
 		else if (ev->type == LEFTCLICK) {
 			for (int j=y; j < y + h; j++)
 				for (int i=x; i < x + w; i++)
-					if (!gamemap->isPassableAt(i, j))
+					if (!navmap->isPassableAt(i, j))
 						return;							// Check if area is passable
 			mode = PLACED;
 			view->relinquishPrivilegedEventResponderStatus(this);
 			view->addResponder(this);
-			gamemap->addImpassableObject(this);
+			navmap->addImpassableObject(this);
 		}
 		else if (ev->type == RIGHTCLICK) {
+			view->relinquishPrivilegedEventResponderStatus(this);
 			destroyed = true;
 		}
 	}

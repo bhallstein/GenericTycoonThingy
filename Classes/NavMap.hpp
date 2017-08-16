@@ -1,7 +1,7 @@
 /*
- * GameMap.hpp - map data for a level.
+ * NavMap.hpp - map data for a level.
  *
- * The GameMap thinks solely in "blocks" - the squares that make up the game map – it does not honour
+ * The NavMap thinks solely in "blocks" - the squares that make up the game map – it does not honour
  * the existence of pixels.
  *
  * Fundamentally, its purpose is to hold the block-coordinates of objects in the game. It implements methods
@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef GAMEMAP_H
-#define GAMEMAP_H
+#ifndef NavMap_H
+#define NavMap_H
 
 #include <iostream>
 #include <list>
@@ -52,11 +52,11 @@ protected:
 };
 
 
-class GameMap
+class NavMap
 {
 public:
-	GameMap(int w, int h);
-	~GameMap();
+	NavMap(int w, int h);
+	~NavMap();
 
 	// Properties
 	int w, h;

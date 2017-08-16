@@ -10,14 +10,14 @@
 
 #include "types.h"
 #include "EventResponder.hpp"
-#include "GameMap.hpp"
+#include "NavMap.hpp"
 #include "View.hpp"
 
 
 class Placeable : public EventResponder
 {
 public:
-	Placeable(GameMap *, View *);
+	Placeable(NavMap *, View *);
 	~Placeable();
 
 	// Methods
@@ -33,7 +33,7 @@ protected:
 	void setPosition(int _x, int _y);
 
 	// Properties
-	GameMap *gamemap;
+	NavMap *navmap;
 	View *view;
 	enum mode_types { PLACEMENT, PLACED } mode;
 	bool clicked;

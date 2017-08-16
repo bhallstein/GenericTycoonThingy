@@ -50,7 +50,8 @@ bool View::requestPrivilegedEventResponderStatus(EventResponder *resp) {
 	return true;
 }
 void View::relinquishPrivilegedEventResponderStatus(EventResponder *resp) {
-	privileged_event_responder = NULL;
+	if (privileged_event_responder == resp)
+		privileged_event_responder = NULL;
 }
 
 void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall) {
