@@ -8,20 +8,11 @@ Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file)
 	
 	settings = new SettingsManager(theW);
-	
-	if (settings->fullscreen.value)
-		system("say fullscreen");
-	else
-		system("say not fullscreen");
-	//if (settings->fullscreen.value)
-	//	theW->goFullscreen();
-	//else
+	if (settings->fullscreen.value)	{ }	// The value of this somehow seems to be getting *randomly generated* at
+										// startup, at present. :S
 	theW->goWindowed();
-	
 	theW->setWindowTitle(game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
-	
 	prev_w = theW->width(), prev_h = theW->height();
-	
 //	theW->setDefaultWindowSize(settings->Screen_Width.value, settings->Screen_Height.value);
 }
 

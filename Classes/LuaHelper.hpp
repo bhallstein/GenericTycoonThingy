@@ -18,11 +18,11 @@ public:
 	LuaHelper(W *);
 	~LuaHelper();
 
-	bool loadFile(std::string &fileName);
+	bool loadFile(const char *);
 
 //lua helper function templates
-	int pushtable(const char *key);
-	int pushSubtable(const char *key);
+	bool pushtable(const char *key);
+	bool pushSubtable(const char *key);
 
 	template <typename T>
 		T to(int index);
@@ -59,7 +59,7 @@ inline T LuaHelper::getfield(const char *table, const char *key) //can return in
 	lua_pop(LuaInstance, 2);  //pop the value and the table
 	return result;
 }
-//get a basic field from a lua table
+//get a basic field from a lua table, assuming table is at index -1
 template <typename T>
 inline T LuaHelper::getfield(const char *key) //can return int,double,string,char[],bool
 {

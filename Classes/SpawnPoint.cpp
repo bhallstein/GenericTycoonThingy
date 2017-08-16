@@ -1,26 +1,15 @@
 #include "SpawnPoint.hpp"
 
-SpawnPoint::SpawnPoint(LuaHelper *mrLua)
+SpawnPoint::SpawnPoint(int _x, int _y, std::string _name, int _rate) :
+	x(_x), y(_y), name(_name), rate(_rate), rateCounter(0)
 {
-	//what's in the box?
-	name = mrLua->getfield<std::string>("name");
-	x = mrLua->getfield<int>("x");
-	y = mrLua->getfield<int>("y");
-	rate = mrLua->getfield<int>("rate");
-
-	rateCounter = 0;
+	// hai, spawny
 }
 
-std::vector<int> SpawnPoint::Spawn()
+bool SpawnPoint::spawn(intcoord *c)
 {
-	std::vector<int> thereturnofthespawn;
-
-	if(rate == rateCounter++)
-	{
-		thereturnofthespawn.push_back(x);
-		thereturnofthespawn.push_back(y);
-		rateCounter = 0; //reset :)
-	}
-
-	return thereturnofthespawn;
+	bool spawn_alert = rate == ++rateCounter;
+	if (spawn_alert)
+		c->x = x, c->y = y;
+	return spawn_alert;
 }

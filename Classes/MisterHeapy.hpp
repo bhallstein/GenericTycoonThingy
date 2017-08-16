@@ -1,9 +1,28 @@
 /*
- * MisterHeapy.hpp – a dynamic, sorted binary heap
+ * Copyright (C) 2012 - Ben Hallstein - http://ben.am - :-)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *  
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+ * the Software.
+ *  
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+ * THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ */
+
+/*
+ * ABOUT MISTERHEAPY
  *
  * MisterHeapy is a binary heap for storing pointers to objects.
  *
- * It is bog standard, but has capabilities not provided by std’s heap functions:
+ * It is bog standard, but has capabilities not provided by std's heap functions:
  *
  *     1. It supports live updating of elements by index in O(logN) time with `update_at(index, new_value)`.
  *     2. By maintaining a lookup table, MisterHeapy enables you to update any object in the heap directly,
@@ -13,23 +32,23 @@
  *
  * ~~ Crafting Your Objects ~~
  *
- * DEFINITION: the “comparand” of an object is the property by which it will be ordered in the heap.
- *     i.e. if A’s comparand is greater than B’s comparand, A will be ‘above’ B in the heap.
- *     For instance, a MapLoc’s comparand is a float called min_dist.
+ * DEFINITION: the "comparand" of an object is the property by which it will be ordered in the heap.
+ *     i.e. if A's comparand is greater than B's comparand, A will be 'above' B in the heap.
+ *     For instance, a MapLoc's comparand is a float called min_dist.
  *
- * To be used with MisterHeapy, your objects must:
- *     1. Implement the function void setComparand(new_value)
- *           This should overwrite the object’s comparand.
+ * To be used with MisterHeapy, your objects must implement:
+ *     1. The function `void setComparand(new_value)`
+ *           This should overwrite the object's comparand.
  *           e.g. for MapLoc: `void setComparand(float new_dist) { min_dist = new_dist; }
- *     2. Implement the operator `<`
- *           Your function should take a pointer p to another object of the same class, and compare its 
- *           own comparand to p’s, e.g. `bool operator< (MapLoc *p) { return min_dist < p->min_dist; }`
+ *     2. The operator `<`
+ *           This should take a pointer p to another object of the same class, and compare its 
+ *           own comparand to p's, e.g. `bool operator< (MapLoc *p) { return min_dist < p->min_dist; }`
  * 
  * ~~ Creating Your MisterHeapy Instance ~~
  * 
- * MisterHeapy is a templated class, adapting to the type of your object, and of your object’s comparand.
- * So, if your objects are MapLocs, and MapLoc’s comparand min_dist is a float:
- *     `MisterHeapy<MapLoc*, float> myheap(32);`
+ * MisterHeapy is a templated class, adapting to the type of your object, and of your object's comparand.
+ * So, if your object type is `Node`, and a Node's comparand `dist` is a float:
+ *     `MisterHeapy<Node*, float> myheapy(32);`
  * The parameter is the maximum size of your heap. Attempting to push elements beyond this limit will fail.
  *
  * ~~ Initializing Your Heap ~~
@@ -38,21 +57,21 @@
  *   - If you need to feed it a large initial dataset, you may use fast_push instead, which prevents objects from
  *     being sorted as they are added.
  *   - Since this disorders the heap, though, you MUST then call `reheapify`, which is O(n).
- *   - WARNING: MisterHeapy assumes some things about your elements:
- *         - that they are all continguous in memory (i.e. they are held in a vector or contiguously allocated)
- *         - that the first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said
- *           contiguous area of memory
- *         - obviously enough, that your elements do not move in memory after you have added pointers to them to the heap
+ * 
+ * ~~ IMPORTANT WARNING ~~
+ * 
+ * MisterHeapy assumes some things about your elements:
+ *   - that they are all contiguous in memory (i.e. they are held in a vector or contiguously allocated)
+ *   - that the first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said
+ *     contiguous area of memory
+ *   - obviously enough, that your elements do not move in memory after you have added pointers to them to the heap
  *
  */
 
 #ifndef MISTERHEAPY_H
 #define MISTERHEAPY_H
 
-#include <iostream>
-
-#include "types.hpp"
-
+#include <vector>
 
 inline int log_base2(unsigned int x) {
 	int ind = 0;
@@ -88,7 +107,6 @@ public:
 	//void print();
 
 protected:
-	
 	// Methods
 	void swap_nodes(int ind1, int ind2);
 	void up_heap(int _ind);
@@ -104,11 +122,10 @@ protected:
 };
 
 
-/* Implementation (a templated class’s implementation must be in the same file as its declaration.) */
+/* Implementation (a templated class's implementation must be in the same file as its declaration.) */
 
 template <class nodetype, typename comparandtype>
 MisterHeapy<nodetype, comparandtype>::MisterHeapy(int _n) : n(_n) {
-	heap.resize(n);
 	indices_in_heap = (int*) malloc(sizeof(int) * n);	// Allocate node-lookup array
 	reset();
 }
@@ -128,10 +145,8 @@ void MisterHeapy<nodetype, comparandtype>::reset() {
 
 template <class nodetype, typename comparandtype>
 void MisterHeapy<nodetype, comparandtype>::fast_push(nodetype x) {
-	if (length >= n) {
-		std::cout << "Binary heap error: fast_push called, but heap is full!" << std::endl;
+	if (length >= n)
 		return;
-	}
 	int i = length++;
 	if (i == 0) x_start = x;
 	heap[i] = x;
@@ -187,10 +202,8 @@ nodetype MisterHeapy<nodetype, comparandtype>::pop() {
 }
 template <class nodetype, typename comparandtype>
 void MisterHeapy<nodetype, comparandtype>::push(nodetype x) {
-	if (length >= n) {
-		std::cout << "Binary heap error: push called, but heap is full!" << std::endl;
+	if (length >= n)
 		return;
-	}
 	if (length == 0) x_start = x;
 	heap[length] = x;
 	indices_in_heap[x - x_start] = length++;	

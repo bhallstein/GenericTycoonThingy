@@ -6,11 +6,11 @@
 #include "Placeable.hpp"
 #include "Unit.hpp"
 #include "Staff.hpp"
+#include "LuaHelper.hpp"
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
 
-	theW->log("Calling buildLevel...");
 	buildLevel(levelpath);
 	
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
@@ -35,19 +35,22 @@ Level::~Level() {
 	delete uibarview;
 }
 
-void Level::buildLevel(std::string levelname)
-{
+void Level::buildLevel(std::string levelname) {
+	theW->log("Level::buildLevel() called...");
+
 	LuaHelper mrLua(theW);
 	
 	std::string path = theW->resourcesPath;
 	path.append(levelname);
-	theW->log(path.c_str());
 	
-	if (!mrLua.loadFile(path)) {
-		// Get error from Mr Lua: mrLua.to<std::string>(-1).c_str()
-		throw MsgException("Could not read level file.");	// Might actually be neater to return a bool, & throw in the constructor.
-	}
+	if (!mrLua.loadFile(path.c_str()))
+		throw MsgException("Could not read level file.");	// To get error from Mr Lua: mrLua.to<std::string>(-1).c_str()
+	lua_State *L = mrLua.LuaInstance;
 
+	// Initialize Building class
+	if (!Building::initialize(theW))
+		throw MsgException("Could not read building info.");
+	
 	// Set level width and height
 	w = mrLua.getvalue<int>("width");
 	h = mrLua.getvalue<int>("height");
@@ -61,91 +64,47 @@ void Level::buildLevel(std::string levelname)
 	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &placeables, &units, w, h);
 	responderMap.addResponder(levelview);
 	
-	//building templates
-	mrLua.pushtable("availableBuildings");
-	
-	lua_pushnil(mrLua.LuaInstance);
-	while(lua_next(mrLua.LuaInstance,1) != 0)
-	{
-		Building* ab = new Building();
-		
-		ab->type = mrLua.getfield<std::string>("type");
-		ab->defaultCol.red   = mrLua.getSubfield<int>("colour", "r");
-		ab->defaultCol.green = mrLua.getSubfield<int>("colour", "g");
-		ab->defaultCol.blue  = mrLua.getSubfield<int>("colour", "b");
-		ab->defaultCol.alpha = mrLua.getSubfield<int>("colour", "a");
-
-		//add other template properties here
-
-		//add this template
-		availableBuildings[ab->type] = ab;
-		
-		//pop the table, leaving the key ready for next iteration
-		lua_pop(mrLua.LuaInstance, 1);
+	// Get allowed buildings
+	mrLua.pushtable("allowedBuildings");
+	lua_pushnil(L);									// S: -1 nil; -2 table
+	while (lua_next(L, -2) != 0) {					// S: -1 val; -2 key; -3 table
+		if (!lua_isstring(L, -1)) continue;
+		allowedBuildings.push_back(lua_tostring(L, -1));
+		std::string s = "allowedBuildings: added "; s.append(lua_tostring(L, -1));
+		theW->log(s.c_str());
+		lua_pop(L, 1);								// S: -1 key; -2 table
 	}
+	lua_settop(L, 0);	// S: empty
 	
-	//empty the stack for safety?
-	lua_settop(mrLua.LuaInstance, 0);
-	
-	//buildings
+	// Populate level with buildings
 	mrLua.pushtable("buildings");
-	
-	lua_pushnil(mrLua.LuaInstance); //start at the start
-	while(lua_next(mrLua.LuaInstance,1) != 0) //"buildings" table is at index 1 in the stack
-	{
-		int x,y; //temp. since we need these to even construct building!
+	lua_pushnil(L);						// S: -1 nil; -2 table
+	while (lua_next(L, -2) != 0) {		// S: -1 val; -2 key; -3 table
+		if (lua_type(L, -1) != LUA_TTABLE)
+			continue;
 		
-		//x and y
-		x = mrLua.getfield<int>("x");
-		y = mrLua.getfield<int>("y");
+		// Get Building position & type
+		int x = mrLua.getfield<int>("x");
+		int y = mrLua.getfield<int>("y");
+		const char *bType = mrLua.getfield<const char *>("type");
 		
-		Building* b = createBuilding(x, y);
+		createBuilding(x, y, bType);
 		
-		//type
-		Building* ab; //don't like this here as we only use it for string'd types below
-		lua_getfield(mrLua.LuaInstance,-1,"type"); //push the type table to the stack
-		switch(lua_type(mrLua.LuaInstance,-1))
-		{
-			case LUA_TSTRING:
-				//look up properties from the named template class
-				ab = availableBuildings[lua_tostring(mrLua.LuaInstance,-1)];
-				
-				//set properties from the template
-				b->type = ab->type;
-				b->defaultCol = ab->defaultCol;
-				
-				//we should rewrite this so b = ab; then override properties with building specific stuff?
-				break;
-			case LUA_TTABLE:
-				//set properties as returned from lua
-				b->type = mrLua.getfield<std::string>("type");
-				b->defaultCol.red   = mrLua.getSubfield<int>("colour", "r");
-				b->defaultCol.green = mrLua.getSubfield<int>("colour", "g");
-				b->defaultCol.blue  = mrLua.getSubfield<int>("colour", "b");
-				b->defaultCol.alpha = mrLua.getSubfield<int>("colour", "a");
-				break;
-		}
-		//pop the type table
-		lua_pop(mrLua.LuaInstance, 1);
-		
-		//any other properties that aren't templated here
-		
-		//pop the table, leaving the key ready for next iteration
-		lua_pop(mrLua.LuaInstance, 1);
+		lua_pop(L, 1);					// S: -1 key; -2 table
 	}
+	lua_settop(L, 0);	// S: empty
 	
-	//empty the stack
-	lua_settop(mrLua.LuaInstance,0);
-	
-	//Spawn Points!
+	// Add spawn points
 	mrLua.pushtable("spawnPoints");
-	lua_pushnil(mrLua.LuaInstance); //start at the start
-	while (lua_next(mrLua.LuaInstance,1) != 0) //spawnpointicles
-	{
-		spawnPoints.push_back(new SpawnPoint(&mrLua));
-		
-		//pop the table, leaving the key ready for next iteration
-		lua_pop(mrLua.LuaInstance, 1);
+	lua_pushnil(L);						// S: -1 nil; -2 table
+	while (lua_next(L,1) != 0) {		// S: -1 val; -2 key; -3 table
+		spawnPoints.push_back(new SpawnPoint(
+			mrLua.getfield<int>("x"),
+			mrLua.getfield<int>("y"),
+			mrLua.getfield<std::string>("name"),
+			mrLua.getfield<int>("rate")
+		));
+		lua_pop(L, 1);					// S: -1 key; -2 table
 	}
 }
 
@@ -160,12 +119,10 @@ void Level::update() {
 	if (framecount == 60) framecount = 0;
 	if (framecount++ == 10) createUnit(rand()%w, rand()%h);		// Create a new unit every so often
 	
+	intcoord c;
 	for(int i=0; i < spawnPoints.size(); i++)
-	{
-		std::vector<int> spawnLoc = spawnPoints[i]->Spawn();
-		if(spawnLoc.size() > 1) //does it have both co-ords?
-			createUnit(spawnLoc[0], spawnLoc[1]);
-	}
+		if (spawnPoints[i]->spawn(&c))
+			createUnit(c.x, c.y);
 	
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();					// Call update() on all TLOs
@@ -181,7 +138,7 @@ void Level::setResolution(int _w, int _h) {
 	levelview->updatePosition();
 	uibarview->updatePosition();
 }
-	
+
 void Level::receiveEvent(Event *ev) {
 	if (ev->type == Event::SCREENEDGE_LEFT)			levelview->scroll(LEFTWARD);
 	else if (ev->type == Event::SCREENEDGE_RIGHT)	levelview->scroll(RIGHTWARD);
@@ -207,10 +164,10 @@ Unit* Level::createUnit(int atX, int atY) {
 	levelResponderMap->addMappedObj(u);
 	return u;
 }
-Staff* Level::createStaff()
-{
-	int atX, atY; //co-ords required by unit's ctor
-	//find the asylum (spawn building) amongst our buildings //note: this method only reliably works while we only have 1 asylum per level
+Staff* Level::createStaff() {
+	int atX, atY; // co-ords required by unit's ctor
+	//find the asylum (spawn building) amongst our buildings
+	//note: this method only reliably works while we only have 1 asylum per level
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
 		if ((*i)->type == "Asylum") {
 			atX = (*i)->x;
@@ -219,13 +176,13 @@ Staff* Level::createStaff()
 		}
 		else i++;
 
-	Staff* s = new Staff(navmap,atX,atY); //create the Staff with the found co-ords
+	Staff* s = new Staff(navmap, atX, atY); //create the Staff with the found co-ords
 	units.push_back(s); //add the staff to the level's unit list
 	levelResponderMap->addMappedObj(s);
 	return s;
 }
-Building* Level::createBuilding(int atX, int atY) {
-	Building *b = new Building(atX, atY);
+Building* Level::createBuilding(int atX, int atY, const char *type) {
+	Building *b = new Building(atX, atY, type);
 	buildings.push_back(b);
 	levelResponderMap->addMappedObj(b);
 	responderMap.subscribeToKey(b, Event::K_L);

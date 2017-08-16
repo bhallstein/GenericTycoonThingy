@@ -38,7 +38,8 @@ public:
 	void addResponder(EventResponder *);
 	void removeResponder(EventResponder *);
 	void addMappedObj(MappedObj *);				// Use these methods for objects with a ground plan
-	void removeMappedObj(MappedObj *);			// rather than a simple width/height
+	void removeMappedObj(MappedObj *);			
+	// rather than a simple width/height
 	
 	bool requestPrivilegedEventResponderStatus(EventResponder *);		// lol
 	void relinquishPrivilegedEventResponderStatus(EventResponder *);	//
