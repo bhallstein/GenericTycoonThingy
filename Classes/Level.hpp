@@ -32,6 +32,7 @@ class LevelView;
 class UIBarView;
 class FurnishingPurchasingUIView;
 class HiringUIView;
+class GTTHelpView;
 namespace Ogre { class Timer; }
 
 class Level : public GameState, public EventResponder {
@@ -72,6 +73,8 @@ public:
 	Building *currentlyEditedBuilding;
 	void openHiringView();
 	void closeHiringView();
+	void openHelpView();
+	void closeHelpView();
 
 	// Money
 	void payPlayer(int);
@@ -100,6 +103,7 @@ protected:
 	UIBarView *uibarview;
 	FurnishingPurchasingUIView *furnishingPurchasingView;
 	HiringUIView *hiringUIView;
+	GTTHelpView *helpView;
 	LevelScore *levelScore;
 	
 	int money;
@@ -168,6 +172,12 @@ protected:
 class HiringUIView : public UIView {
 public:
 	HiringUIView(W *, JenniferAniston &, ResponderMap *);
+	void draw();
+};
+
+class GTTHelpView : public UIView {
+public:
+	GTTHelpView(W *, JenniferAniston &, ResponderMap *);
 	void draw();
 };
 

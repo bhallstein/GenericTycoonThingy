@@ -28,13 +28,16 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	this->initializePaths();
 	W::logfile.open(logfilePath.c_str());
 	
-	std::string s = "W: settingsPath: "; s += settingsPath;
-	s += "W: resourcesPath: "; s += resourcesPath; s += "\n";
+	std::string s = "W settingsPath: "; s += settingsPath; s += "\n";
+	s += "W luaPath: "; s += luaPath; s += "\n";
 	log(s.c_str());
+	
+	sound_engine = irrklang::createIrrKlangDevice();
 }
 W::~W() {
 	log("W destruct");
 	logfile.close();
+	sound_engine->drop();
 }
 
 bool W::goWindowed() {
@@ -404,6 +407,10 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 	}
 }
 
+void W::playSound(const char *soundfile) {
+	sound_engine->play2D((dataPath + soundfile).c_str(), false);
+}
+
 void W::addEvent(Event &ev) {
 	events.push_back(ev);
 }
@@ -426,10 +433,13 @@ void W::initializePaths() {
 	settingsPath = path;
 	settingsPath.append("/Library/Application Support/Demon Barber Tycoon/");
 	
-	// Resources path
+	// Lua path
 	[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
-	resourcesPath = path;
-	resourcesPath.append("/Data/");
+	std::string resourcesPath = path;
+	luaPath = resourcesPath + "/Lua/";
+	
+	// Data path
+	dataPath = resourcesPath + "/Data/";
 #elif defined _WIN32 || _WIN64
 	// Log path
 	char path[MAX_PATH] = "";
@@ -442,11 +452,15 @@ void W::initializePaths() {
 	settingsPath = path;
 	settingsPath.append("/Demon Barber Tycoon/");
 	
-	// Resources path
+	// Lua path
 	GetModuleFileName(0, path, sizeof(path) - 1);
-	resourcesPath = path;
+	std::string resourcesPath = path;
 	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
-	resourcesPath.append("/../Demon Barber Tycoon/Data/");		// When installed, will want to be "/Data/" - or...?
+	resourcesPath.append("/../Demon Barber Tycoon/");		// When installed, will want to be "/Data/" - or...?
+	luaPath = resourcesPath + "Lua/";
+	
+	// Data path
+	dataPath = resoursPath + "Data/";
 #endif
 }
 bool W::isValidDir(const char *dir) {

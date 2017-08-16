@@ -17,6 +17,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	uibarview = NULL;
 	furnishingPurchasingView = NULL;
 	hiringUIView = NULL;
+	helpView = NULL;
 
 	buildLevel(levelpath);
 	
@@ -36,12 +37,15 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	responderMap.subscribeToKey(this, Event::K_Q);
 	responderMap.subscribeToKey(this, Event::K_C);
 	responderMap.subscribeToKey(this, Event::K_S);
+	responderMap.subscribeToKey(this, Event::K_H);
 	
 	// Time
 	framecount = 0;
 	timeRemaining = 0;
 	realtimetime = 0.0;
 	realtimetimer = new Ogre::Timer();
+	
+	openHelpView();
 }
 Level::~Level()
 {
@@ -57,7 +61,7 @@ void Level::buildLevel(std::string levelname) {
 	theW->log("Level::buildLevel() called...");
 	LuaHelper mrLua(theW);
 	
-	std::string path = theW->resourcesPath;
+	std::string path = theW->luaPath;
 	path.append(levelname);
 	
 	if (!mrLua.loadFile(path.c_str()))
@@ -272,6 +276,7 @@ void Level::draw() {
 	uibarview->_draw();
 	if (furnishingPurchasingView != NULL) furnishingPurchasingView->_draw();
 	if (hiringUIView != NULL) hiringUIView->_draw();
+	if (helpView != NULL) helpView->_draw();
 }
 void Level::setResolution(int _w, int _h) {
 	GameState::setResolution(_w, _h);
@@ -285,15 +290,15 @@ void Level::receiveEvent(Event *ev) {
 	else if (ev->type == Event::SCREENEDGE_TOP)    levelview->scroll(Direction::UPWARD);
 	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(Direction::DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
-		if (ev->key == Event::K_Q)   game->stateFinished(this, Returny(Returny::killer_returny));
-		if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
-		if (ev->key == Event::K_C)   createFurnishing("barberschair");
-		if (ev->key == Event::K_S)   createFurnishing("sofa");
+		if (ev->key == Event::K_Q)        game->stateFinished(this, Returny(Returny::killer_returny));
+		else if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
+		else if (ev->key == Event::K_H)   openHelpView();
 	}
 	else if (ev->type == Event::BUTTONCLICK) {
 		if (ev->payload == "open hiring ui view")                      openHiringView();
 		else if (ev->payload == "close hiring ui view")                closeHiringView();
 		else if (ev->payload == "close furnishing purchasing ui view") closeFurnishingPurchasingView();
+		else if (ev->payload == "close help view")                     closeHelpView();
 		else if (ev->payload == "hire staff") hireStaff("staff");
 		else if (ev->payload == "buy furnishing barberschair") purchaseFurnishing("barberschair");
 		else if (ev->payload == "buy furnishing sofa")         purchaseFurnishing("sofa");
@@ -421,7 +426,8 @@ Building* Level::buildingAtLocation(int x, int y) {
 }
 
 void Level::openFurnishingPurchasingView(Building *b) {
-	if (furnishingPurchasingView != NULL) return;
+	if (currentlyEditedBuilding == b) return;
+	closeFurnishingPurchasingView();
 	currentlyEditedBuilding = b;
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
 	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, &responderMap, b->b_allowedFurnishings);
@@ -445,6 +451,18 @@ void Level::closeHiringView() {
 	responderMap.removeResponder(hiringUIView);
 	delete hiringUIView;
 	hiringUIView = NULL;
+}
+void Level::openHelpView() {
+	if (helpView != NULL) return;
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 140, 77, 520, 400);
+	helpView = new GTTHelpView(theW, aniston, &responderMap);
+	responderMap.addResponder(helpView);
+	helpView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
+}
+void Level::closeHelpView() {
+	responderMap.removeResponder(helpView);
+	delete helpView;
+	helpView = NULL;
 }
 
 //Money stuff
@@ -595,3 +613,17 @@ void HiringUIView::draw() {
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 }
+
+GTTHelpView::GTTHelpView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, ALLOW_DRAG)
+{
+	buttons.push_back(new Button(7, 7, 12, 12, "close help view"));
+}
+void GTTHelpView::draw() {
+	theW->drawRect(0, 0, width, height, "black");
+	for (int i=0, n = buttons.size(); i < n; i++) {
+		Button *b = buttons[i];
+		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	}
+//	theW->drawText(<#float x#>, <#float y#>, <#const char *col#>, <#char *text#>)
+}
+

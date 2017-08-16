@@ -61,6 +61,7 @@ void Menu::startLevel(std::string path) {
 		level = new Level(game, theW, path);
 		game->pushState(level);
 		W::log("Level started.\n");
+		theW->playSound("Scream.wav");
 	} catch (MsgException &ex) {
 		std::string msg = "Oh noes! ";
 		msg.append(ex.msg);

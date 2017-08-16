@@ -22,7 +22,7 @@ bool LuaHelper::loadFile(const char *filename)
 	lua_getglobal(LuaInstance, "package");
 	lua_getfield(LuaInstance, -1, "path");
 	std::string path = lua_tostring(LuaInstance, -1);	// Grab path string from top of stack
-	path.append(";"); path.append(theW->resourcesPath); path.append("?.lua");
+	path.append(";"); path.append(theW->luaPath); path.append("?.lua");
 	lua_pop(LuaInstance, 1);					// Pop previous path from stack
 	lua_pushstring(LuaInstance, path.c_str());	// Push new path onto stack
 	lua_setfield(LuaInstance, -2, "path");		// Set the "path" of table at -2 to value at top of stack (value is then popped)

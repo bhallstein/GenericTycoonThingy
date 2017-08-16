@@ -182,7 +182,7 @@ bool Unit::initialize(W *_W) {
 	W::log("  Unit::initialize() called...");
 	LuaHelper mrLua(_W);
 	
-	std::string path = _W->resourcesPath;
+	std::string path = _W->luaPath;
 	path.append("units.lua");
 	if (!mrLua.loadFile(path.c_str())) {
 		W::log("Could not read units.lua");

@@ -13,6 +13,8 @@ LevelScore::LevelScore(Game *_game, W *_theW, bool _victory) : GameState(_game, 
 	scoreview->subscribeToButtons(new Callback(&LevelScore::receiveEvent, this));
 	
 	victory = _victory;
+	
+	theW->playSound(victory ? "Mission accomplished.wav" : "Scream.wav");
 
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);

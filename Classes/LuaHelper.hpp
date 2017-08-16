@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 
-#include <Lua.hpp>
+#include "Lua.hpp"
 #include "types.hpp"
 
 class W;

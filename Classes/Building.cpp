@@ -141,7 +141,7 @@ bool Building::initialize(W *_W) {
 	W::log("  Building::initialize() called...");
 	LuaHelper mrLua(_W);
 	
-	std::string path = _W->resourcesPath;
+	std::string path = _W->luaPath;
 	path.append("buildings.lua");
 	if (!mrLua.loadFile(path.c_str())) {
 		W::log("Could not read buildings.lua");

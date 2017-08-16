@@ -13,6 +13,7 @@
 	void *game;
 	NSTimer *timer;
 	bool quit;
+	IBOutlet NSWindow *window;
 }
 -(void)sendEventsToW;
 -(void)sendQuitEvent;

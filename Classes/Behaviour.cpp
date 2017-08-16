@@ -46,7 +46,7 @@ bool BehaviourBase::initialize(W *_W) {
 	W::log("  BehaviourBase::initialize() called...");
 	mrLua = new LuaHelper(_W);
 	
-	std::string path = _W->resourcesPath;
+	std::string path = _W->luaPath;
 	path.append("behaviours.lua");
 	if (!mrLua->loadFile(path.c_str())) {
 		W::log("Could not read behaviours.lua");
