@@ -166,7 +166,7 @@ void W::initializePaths() {
 	GetModuleFileName(0, path, sizeof(path) - 1);
 	resourcesPath = path;
 	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
-	resourcesPath.append("/../Data/");		// When installed, will want to be "/Data/" - or...?
+	resourcesPath.append("/../Demon Barber Tycoon/Data/");		// When installed, will want to be "/Data/" - or...?
 #endif
 }
 bool W::isValidDir(const char *dir) {
