@@ -1,7 +1,7 @@
-#import "MyView.h"
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
 
+#import "MyView.h"
 #include "Event.hpp"
 
 struct NativeObjs {
@@ -30,21 +30,16 @@ Event::key_code convertNativeStringToKeycode(NSString *str) {
 
 W::W() : mode(NONE), quit_event(false), opengl_needs_setting_up(true) {
 	a_lion_is_here = false;
-	
 	objs = new NativeObjs;
 	
 	// Create OpenGL context
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
 	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
-	if (pf == nil) {
-		std::cout << "couldn't create pf" << std::endl;
-		// throw exception
-	}
+	if (pf == nil)
+		std::cout << "couldn't create pf" << std::endl;	// throw exception
 	objs->context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
-	if (objs->context == nil) {
-		std::cout << "couldn't create opengl context" << std::endl;
-		// throw exception
-	}
+	if (objs->context == nil)
+		std::cout << "couldn't create opengl context" << std::endl;	// throw exception
 }
 
 W::~W() {

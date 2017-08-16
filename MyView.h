@@ -1,3 +1,8 @@
+/*
+ * MyView.h - MyView, our custom view, and MyWindowDelegate, our custom window delegate
+ *
+ */
+
 #import <Cocoa/Cocoa.h>
 
 @interface MyView : NSView {

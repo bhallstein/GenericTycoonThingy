@@ -16,8 +16,8 @@ public:
 		KEYPRESS,
 		MOUSEMOVE, LEFTCLICK, RIGHTCLICK,
 		SCREENEDGE_TOP, SCREENEDGE_BOTTOM, SCREENEDGE_LEFT, SCREENEDGE_RIGHT,
-		UNKNOWN_EVENT,
 		CLOSED,
+		UNKNOWN_EVENT
 	} type;
 	enum key_code {
 		K_A,	K_B,	K_C,	K_D,
@@ -43,7 +43,7 @@ public:
 	float a, b;		// Float coords (offset)
 	
 	// Methods
-	void setCoords(int _x, int _y, int _a=0, int _b=0) {
+	void setCoords(int _x, int _y, int _a = 0, int _b = 0) {
 		x = _x, y = _y;
 		a = _a, b = _b;
 	}
