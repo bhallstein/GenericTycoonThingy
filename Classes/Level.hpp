@@ -24,7 +24,6 @@ class NavMap;
 class Building;
 class Placeable;
 class Unit;
-class Staff;
 
 class LevelView;
 class UIBarView;
@@ -52,7 +51,7 @@ public:
 	
 	// Top-level-object stuff
 	Unit* createUnit(int atX, int atY);
-	Staff* createStaff();
+	Unit* createStaff();
 	Building* createBuilding(int atX, int atY, const char *type);
 	void createPlaceable();
 	
@@ -64,6 +63,7 @@ public:
 	std::vector<Building*>   buildings;
 	std::vector<Placeable*>  placeables;
 	std::vector<Unit*>		 units;
+	std::vector<Unit*>		 staff;
 	std::vector<SpawnPoint*> spawnPoints;
 	
 protected:
@@ -93,7 +93,8 @@ public:
 	// Methods
 	LevelView(
 		W *, JenniferAniston &,
-		ResponderMap *_levelRM, std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *,
+		ResponderMap *_levelRM,
+		std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 		int _level_width, int _level_height
 	);
 	void draw();
@@ -107,9 +108,10 @@ public:
 	int scroll_x, scroll_y;
 	ResponderMap *levelResponderMap;
 
-	std::vector<Building*>		*buildings;
-	std::vector<Placeable*>		*placeables;
-	std::vector<Unit*>			*units;
+	std::vector<Building*>	*buildings;
+	std::vector<Placeable*>	*placeables;
+	std::vector<Unit*>		*units;
+	std::vector<Unit*>		*staff;
 	
 };
 

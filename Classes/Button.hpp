@@ -23,7 +23,7 @@ public:
 	// Methods
 	void receiveEvent(Event *);
 	void update() { }
-	colour col();
+	const char * col();
 
 protected:
 	// Properties

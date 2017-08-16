@@ -1,3 +1,4 @@
+-- Building definitions
 
 defaultColour = "black"
 defaultHoverColour = "black"

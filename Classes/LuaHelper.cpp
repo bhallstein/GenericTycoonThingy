@@ -13,9 +13,8 @@ bool LuaHelper::loadFile(const char *filename)
 {
 	bool loadingSuccess = !luaL_loadfile(LuaInstance, filename);
 	if (!loadingSuccess) {
-		std::string s = "LuaHelper: could not load file '"; s.append(filename); s.append("'; error was: ");
-		std::string t; to<std::string>(-1, t);
-		s.append(t);
+		std::string s = "LuaHelper: could not load file '", t; s.append(filename); s.append("'; error was: ");
+		to<std::string>(-1, t); s.append(t);
 		theW->log(s.c_str());
 		return false;
 	}
@@ -31,9 +30,8 @@ bool LuaHelper::loadFile(const char *filename)
 	
 	bool callingSuccess = !lua_pcall(LuaInstance, 0, 0, 0);
 	if (!callingSuccess) {
-		std::string s = "LuaHelper: could not execute file '"; s.append(filename); s.append("'; error was: ");
-		std::string t; to<std::string>(-1, t);
-		s.append(t);
+		std::string s = "LuaHelper: could not execute file '", t; s.append(filename); s.append("'; error was: ");
+		to<std::string>(-1, t); s.append(t);
 		theW->log(s.c_str());
 		return false;
 	}

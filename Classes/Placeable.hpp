@@ -22,7 +22,7 @@ public:
 	// Methods
 	void receiveEvent(Event *ev);
 	void update() { }
-	colour col();
+	const char * col();
 
 	// Properties
 	bool destroyed;

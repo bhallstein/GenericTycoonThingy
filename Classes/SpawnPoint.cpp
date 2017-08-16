@@ -8,11 +8,8 @@ SpawnPoint::SpawnPoint(int _x, int _y, std::string _name, int _rate) :
 
 bool SpawnPoint::spawn(intcoord *c)
 {
-	bool spawn_alert = rate == ++rateCounter;
-	if (spawn_alert)
-	{
-		c->x = x, c->y = y;
-		rateCounter = 0; //reset rateCounter as we hit it
-	}
-	return spawn_alert;
+	bool spawn_ahoy = rate == ++rateCounter;
+	if (spawn_ahoy)
+		rateCounter = 0, c->x = x, c->y = y;
+	return spawn_ahoy;
 }

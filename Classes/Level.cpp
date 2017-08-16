@@ -5,7 +5,6 @@
 #include "Building.hpp"
 #include "Placeable.hpp"
 #include "Unit.hpp"
-#include "Staff.hpp"
 #include "LuaHelper.hpp"
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
@@ -47,9 +46,9 @@ void Level::buildLevel(std::string levelname) {
 		throw MsgException("Could not read level file.");	// To get error from Mr Lua: mrLua.to<std::string>(-1).c_str()
 	lua_State *L = mrLua.LuaInstance;
 
-	// Initialize Building class
-	if (!Building::initialize(theW))
-		throw MsgException("Couldn't read building info.");
+	// Initialize TLO classes
+	if (!Building::initialize(theW))	throw MsgException("Couldn't read building info.");
+	if (!Unit::initialize(theW))		throw MsgException("Couldn't read unit info.");
 	
 	// Set level width and height
 	try {
@@ -68,7 +67,7 @@ void Level::buildLevel(std::string levelname) {
 	
 	// Create levelview
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &placeables, &units, w, h);
+	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &placeables, &units, &staff, w, h);
 	responderMap.addResponder(levelview);
 	
 	// Get allowed buildings
@@ -142,12 +141,13 @@ void Level::resume(Returny *returny) {
 }
 void Level::update() {
 	intcoord c;
-	for(int i=0; i < spawnPoints.size(); i++)
+	for (int i=0, n = spawnPoints.size(); i < n; i++)
 		if (spawnPoints[i]->spawn(&c))
 			createUnit(c.x, c.y);
 	
-	for (int i=0; i < units.size(); i++)
-		units[i]->update();					// Call update() on all TLOs
+	// Update TLOs
+	for (int i=0, n = units.size(); i < n; i++) units[i]->update();
+	for (int i=0, n = staff.size(); i < n; i++) staff[i]->update();
 	
 	destroyThings();	// Removed destroyed objects.
 }
@@ -181,12 +181,13 @@ void Level::handleCloseEvent() {
 }
 
 Unit* Level::createUnit(int atX, int atY) {
-	Unit *u = new Unit(navmap, atX, atY);
+	Unit *u = new Unit(navmap, atX, atY, "civilian");
 	units.push_back(u);
 	levelResponderMap->addMappedObj(u);
+	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
 }
-Staff* Level::createStaff() {
+Unit* Level::createStaff() {
 	int atX, atY; // co-ords required by unit's ctor
 	//find the asylum (spawn building) amongst our buildings
 	//note: this method only reliably works while we only have 1 asylum per level
@@ -197,9 +198,10 @@ Staff* Level::createStaff() {
 			break;
 		}
 
-	Staff* s = new Staff(navmap, atX, atY); //create the Staff with the found co-ords
-	units.push_back(s); //add the staff to the level's unit list
+	Unit* s = new Unit(navmap, atX, atY, "staff"); //create the Staff with the found co-ords
+	staff.push_back(s); //add the staff to the level's unit list
 	levelResponderMap->addMappedObj(s);
+	std::cout << "added staff unit " << s << " (now " << staff.size() << ")" << std::endl;
 	return s;
 }
 Building* Level::createBuilding(int atX, int atY, const char *type) {
@@ -259,11 +261,12 @@ void Level::destroyAllThings() {
 
 LevelView::LevelView(
 	W *_theW, JenniferAniston &_aniston,
-	ResponderMap *_levelRM, std::vector<Building*> *_buildings, std::vector<Placeable*> *_placeables, std::vector<Unit*> *_units,
+	ResponderMap *_levelRM,
+	std::vector<Building*> *_buildings, std::vector<Placeable*> *_placeables, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 	int _level_width, int _level_height
 ) :
 	View(_theW, _aniston),
-	levelResponderMap(_levelRM), buildings(_buildings), placeables(_placeables), units(_units),
+	levelResponderMap(_levelRM), buildings(_buildings), placeables(_placeables), units(_units), staff(_staff), 
 	level_width(_level_width), level_height(_level_height),
 	scroll_x(0), scroll_y(0)
 {
@@ -282,10 +285,11 @@ void LevelView::drawMappedObj(MappedObj *obj) {
 }
 
 void LevelView::draw() {
-	theW->drawRect(0, 0, width, height, colour(_BLACK_));
+	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buildings->size(); i < n; i++)	drawMappedObj((*buildings)[i]);
 	for (int i=0, n = placeables->size(); i < n; i++)	drawMappedObj((*placeables)[i]);
 	for (int i=0, n = units->size(); i < n; i++)		drawMappedObj((*units)[i]);
+	for (int i=0, n = staff->size(); i < n; i++)		drawMappedObj((*staff)[i]);
 }
 
 void LevelView::processMouseEvent(Event *ev) {
@@ -336,10 +340,8 @@ UIBarView::~UIBarView()
 }
 
 void UIBarView::buttonClick(Button *btn) {
-	if (btn == createplaceable_btn)
-		level->createPlaceable();
-	if (btn == createstaff_btn)
-		level->createStaff();
+	if (btn == createplaceable_btn) level->createPlaceable();
+	if (btn == createstaff_btn)     level->createStaff();
 }
 
 void UIBarView::processMouseEvent(Event *ev) {
@@ -347,7 +349,7 @@ void UIBarView::processMouseEvent(Event *ev) {
 }
 
 void UIBarView::draw() {
-	theW->drawRect(0, 0, width, height, colour(_BLACK_));
+	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0; i < buttons.size(); i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());

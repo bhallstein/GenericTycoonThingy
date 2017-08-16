@@ -19,7 +19,7 @@ public:
 	
 	// Methods
 	virtual void update() = 0;			// TLOs will generally want to handle updates
-	virtual colour col() = 0;			// Temporary: override to return colour the object should be drawn
+	virtual const char * col() = 0;		// Temporary: override to return colour the object should be drawn
 	
 	// Properties
 	float a, b;							// Floating pt offset from integer location (default 0)

@@ -29,8 +29,8 @@ void View::draw() {
 			theW->drawRect(
 				i, j, 20, 20,
 				(j/20)%2
-					? ((i/20)%2 ? colour(_WHITE_) : colour(_BLACK_))
-					: ((i/20)%2 ? colour(_BLACK_) : colour(_WHITE_))
+					? ((i/20)%2 ? "white" : "black")
+					: ((i/20)%2 ? "black" : "white")
 			);
 }
 
