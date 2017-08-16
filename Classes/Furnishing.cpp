@@ -16,11 +16,8 @@ Furnishing::Furnishing(W::EventHandler *_eh, W::NavMap *_navmap, const char *_ty
 	animationFinished(false), purchased(false)
 {
 	// Set properties for this Furnishing type
-	plan = furnishingTypes[type].plan;
-	f_colour               = furnishingTypes[type].col;
-	f_hoverColour          = furnishingTypes[type].hoverCol;
-	f_compatibleBehaviours = &furnishingTypes[type].compatibleBehaviours;
-	f_interactionPoints    = &furnishingTypes[type].interactionPoints;
+	fInfo = &furnishingTypes[type];
+	plan = fInfo->plan;
 }
 Furnishing::~Furnishing()
 {
@@ -75,21 +72,24 @@ void Furnishing::finalizePlacement() {
 }
 
 W::Colour& Furnishing::col() {
-	if (hover) { hover = false; return f_hoverColour; }
-	return f_colour;
+	if (hover) { hover = false; return fInfo->hoverCol; }
+	return fInfo->col;
 }
 
-void Furnishing::getInteractionPoint(const char *uType, int *_x, int *_y) {
-	std::map<std::string, W::position>::iterator it = f_interactionPoints->find(uType);
-	if (it == f_interactionPoints->end())
-		*_x = *_y = -1;
+void Furnishing::getInteractionPoint(const char *uType, W::position &p) {
+	std::map<std::string, W::position>::iterator it = fInfo->interactionPoints.find(uType);
+	if (it == fInfo->interactionPoints.end()) {
+		char s[200];
+		sprintf(s, "No interaction point for unit type %s in furnishing type %s", uType, type.c_str());
+		throw W::Exception(s);
+	}
 	else {
-		*_x = it->second.x + pos.x;
-		*_y = it->second.y + pos.y;
+		p.x = it->second.x + pos.x;
+		p.y = it->second.y + pos.y;
 	}
 }
 bool Furnishing::requiresStaff(const char *uType) {
-	return f_interactionPoints->count(uType);
+	return fInfo->interactionPoints.count(uType);
 }
 void Furnishing::runAnimation(int duration) {
 //	animationDuration = duration;
@@ -98,7 +98,7 @@ void Furnishing::runAnimation(int duration) {
 }
 
 std::vector<std::string>* Furnishing::getCompatibleBehaviours() {
-	return f_compatibleBehaviours;
+	return &fInfo->compatibleBehaviours;
 }
 
 bool Furnishing::initialize() {
@@ -120,7 +120,7 @@ bool Furnishing::initialize() {
 		Furnishing::defaultColour      = strToColour(mrLua.getvalue<const char *>("defaultColour"));
 		Furnishing::defaultHoverColour = strToColour(mrLua.getvalue<const char *>("defaultHoverColour"));
 	} catch (W::Exception &exc) {
-		W::log << "In furnishings.lua, could not get defaults. Error: " << exc.msg << std::endl;
+		W::log << "In furnishings.lua, could not get defaults. Error: " << exc.what() << std::endl;
 	}
 	
 	// Construct furnishingTypes map

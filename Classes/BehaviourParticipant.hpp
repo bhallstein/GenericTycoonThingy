@@ -24,7 +24,11 @@ public:
 		return capableOfBehaviour(bTypestring);
 	}
 	void capture() {
-		if (!available) throw W::Exception("Attempt to capture unavailable BehaviourParticipant");
+		if (!available) {
+			char s[200];
+			sprintf(s, "Attempt to capture unavailable BehaviourParticipant %p", this);
+			throw W::Exception(s);
+		}
 		available = false;
 	}
 	void release() { available = true; }

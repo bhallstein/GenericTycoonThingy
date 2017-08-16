@@ -36,9 +36,11 @@ public:
 	
 	// Properties
 	std::string type;
-	int prev_x, prev_y;
-	int dest_x, dest_y;
+	W::position prev_pos;
+	W::position dest;
 	Building *dest_building;
+	
+	ShopKeeperBehaviour *skBehaviour;	// Only used by shopkeepers
 	
 	// Methods
 	void receiveEvent(W::Event *);
@@ -48,21 +50,19 @@ public:
 	W::Colour& col();
 	
 	// Utility methods
-	void getDespawnPoint(int *x, int *y);
+	void getDespawnPoint(W::position &);
 	void destroy();
-	bool voyage(int _x, int _y);
+	bool voyage(const W::position &_dest);
 	bool arrived;
 	void runAnimation(/* Animation...? */);
 	bool animation_finished;
 	
-	Building* getContextBuilding() { return contextBuilding; }
+//	Building* getContextBuilding() { return contextBuilding; }
 	
 	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
-	
-	std::string nextBehaviour;
 
-	static int hireCostForType(const char *);
+	static unitInfo * infoForType(const char *);
 
 protected:
 	enum Mode {
@@ -84,22 +84,18 @@ protected:
 	inline bool inHinterland();
 	
 	// Properties
-	W::Colour u_colour;
-	W::Colour u_hoverColour;
-	std::vector<std::string> *u_compatibleBehaviours;
+	struct unitInfo *uInfo;
 	std::vector<std::string>* getCompatibleBehaviours();
-	bool u_isStaff;
-	int u_hireCost;
 	
 	bool hired;
 	
 	W::NavMap *navmap;
 	std::vector<W::position> route;
 	Level *level;
-	Building *contextBuilding;
+//	Building *contextBuilding;
 	
 	// Static members
-	static std::map<std::string, unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }
+	static std::map<std::string, unitInfo> unitTypes;
 	static W::Colour defaultColour;
 	static W::Colour defaultHoverColour;
 	

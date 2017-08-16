@@ -14,14 +14,14 @@ allowedBuildings = {	-- buildings which are allowed to appear in the level
 -- level contents
 buildings = {
 	{
-		["type"] = "barber",
+		["type"] = "shop",
 		position = {2,2},
 		plan = {
 			{ pos = {0,0}, sz = {5,3} }
 		}
 	},
 	{
-		["type"] = "pieshop",
+		["type"] = "shop",
 		position = {2,10},
 		plan = {
 			{ pos = {0,0}, sz = {5,3} }

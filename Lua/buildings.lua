@@ -8,23 +8,23 @@ universalFurnishings = {
 }
 
 buildingTypes = {
-	barber = {
-		colour = "red",
+	shop = {
+		colour = "yellow",
 		hoverColour = "black",
 		allowedFurnishings = { "barberschair" }
 	},
-	pieshop = {
-		colour = "yellow",
-		allowedFurnishings = { "piecounter" }
-	},
-	home = {
-		colour = "black",
-		allowedFurnishings = {  }
-	},
-	asylum = {
-		colour = "purple",
-		allowedFurnishings = {  }
-	}
+	-- pieshop = {
+	-- 	colour = "yellow",
+	-- 	allowedFurnishings = { "piecounter" }
+	-- },
+	-- home = {
+	-- 	colour = "black",
+	-- 	allowedFurnishings = {  }
+	-- },
+	-- asylum = {
+	-- 	colour = "purple",
+	-- 	allowedFurnishings = {  }
+	-- }
 }
 
 numberOfAubergines = 4

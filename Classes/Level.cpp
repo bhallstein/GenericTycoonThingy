@@ -99,7 +99,7 @@ void Level::buildLevel(std::string levelname) {
 		h = mrLua.getvalue<int>("height");
 	} catch (W::Exception &exc) {
 		std::string s = "Couldn't get level's dimensions: ";
-		throw W::Exception((s + exc.msg).c_str());
+		throw W::Exception((s + exc.what()).c_str());
 	}
 
 	// Set level (player's) money to the starting balance
@@ -107,8 +107,7 @@ void Level::buildLevel(std::string levelname) {
 		money = mrLua.getvalue<int>("startingBalance");
 	} catch (W::Exception &exc) {
 		std::string s = "Couldn't get level's starting balance: ";
-		s.append(exc.msg);
-		throw W::Exception(s.c_str());
+		throw W::Exception((s + exc.what()).c_str());
 	}
 
 	// Set victory conditions and other level stuff (e.g. time limit)
@@ -116,13 +115,13 @@ void Level::buildLevel(std::string levelname) {
 		moneyLimit = mrLua.getvalue<int>("moneyLimit");
 	} catch (W::Exception &exc) {
 		std::string s = "Couldn't get level's money target: ";
-		throw W::Exception((s + exc.msg).c_str());
+		throw W::Exception((s + exc.what()).c_str());
 	}
 	try {
 		timeLimit = mrLua.getvalue<int>("timeLimit");
 	} catch (W::Exception &exc) {
 		std::string s = "Couldn't get level's time limit: ";
-		throw W::Exception((s + exc.msg).c_str());
+		throw W::Exception((s + exc.what()).c_str());
 	}
 	
 	// Create map
@@ -149,8 +148,7 @@ void Level::buildLevel(std::string levelname) {
 		lua_settop(L, 0);	// S: ~
 	} catch (W::Exception &exc) {
 		std::string s = "Error getting list of allowed buildings for level: ";
-		s.append(exc.msg);
-		throw W::Exception(s.c_str());
+		throw W::Exception((s + exc.what()).c_str());
 	}
 	
 	// Add buildings
@@ -195,8 +193,7 @@ void Level::buildLevel(std::string levelname) {
 			lua_settop(L, 0);	// S: ~
 		} catch (W::Exception &exc) {
 			std::string s = "Couldn't load buildings: ";
-			s.append(exc.msg);
-			throw W::Exception(s.c_str());
+			throw W::Exception((s + exc.what()).c_str());
 		}
 	}
 	if (buildings.size() == 0)
@@ -223,8 +220,7 @@ void Level::buildLevel(std::string levelname) {
 			lua_settop(L, 0);	// S: ~
 		} catch (W::Exception &exc) {
 			std::string s = "Couldn't load furnishings: ";
-			s.append(exc.msg);
-			throw W::Exception(s.c_str());
+			throw W::Exception((s + exc.what()).c_str());
 		}
 	}
 	if (furnishings.size() == 0)
@@ -247,8 +243,7 @@ void Level::buildLevel(std::string levelname) {
 			}
 		} catch (W::Exception &exc) {
 			std::string s = "Couldn't add spawn points: ";
-			s.append(exc.msg);
-			throw W::Exception(s.c_str());
+			throw W::Exception((s + exc.what()).c_str());
 		}
 	}
 	if (spawnPoints.size() == 0)
@@ -273,30 +268,27 @@ void Level::resume(W::Returny *ret) {
 void Level::update() {
 	if (paused) return;
 	
-	++framecount;
+	framecount++;
 	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
 	realtimetimer->reset();
 	timeRemaining = timeLimit - (int) realtimetime;
 	
-//	if (framecount == 5) {
-//		W::position p;
-//		spawnPoints[0]->getCoords(&p);
-//		Unit *u = createUnit(p.x, p.y, "civilian");
-//		createBehaviour("seek:haircut")->init(this, u);
-//	}
-	float some_coefficient = 0.2;
-	float spawnRate = realtimetime / timeLimit * some_coefficient;
-	if (W::randUpTo(100) < spawnRate * 100) {
+	if (framecount == 5) {
 		W::position p;
-		SpawnPoint *sp = spawnPoints[W::randUpTo(spawnPoints.size())];
-		sp->getCoords(&p);
-		
-		Unit *u = createUnit(p.x, p.y, "civilian");
-		int q = W::randUpTo(3);
-		if (q == 0)      createBehaviour("despawn")->init(u);
-		else if (q == 1) createBehaviour("seek:haircut")->init(this, u);
-		else             createBehaviour("seek:pie")->init(this, u);
+		spawnPoints[0]->getCoords(&p);
+		Unit *u = createUnit(p.x, p.y, "customer");
+		addBehaviour(new CustomerBehaviour(&eh, u, this));
 	}
+//	float some_coefficient = 0.2;
+//	float spawnRate = realtimetime / timeLimit * some_coefficient;
+//	if (W::randUpTo(100) < spawnRate * 100) {
+//		W::position p;
+//		SpawnPoint *sp = spawnPoints[W::randUpTo(spawnPoints.size())];
+//		sp->getCoords(&p);
+//		
+//		Unit *u = createUnit(p.x, p.y, "customer");
+//		addBehaviour(new CustomerBehaviour(&eh, u, this));
+//	}
 	
 	// Update TLOs
 	for (int i=0; i < units.size(); i++)      units[i]->update();
@@ -344,7 +336,7 @@ void Level::buttonEvent(W::Event *ev) {
 	else if (*((std::string*)ev->_payload) == "close hiring ui view")                closeHiringView();
 	else if (*((std::string*)ev->_payload) == "close furnishing purchasing ui view") closeFurnishingPurchasingView();
 	else if (*((std::string*)ev->_payload) == "close help view")                     closeHelpView();
-	else if (*((std::string*)ev->_payload) == "hire staff") hireStaff("staff");
+	else if (*((std::string*)ev->_payload) == "hire staff") hireStaff("shopkeeper");
 	else if (*((std::string*)ev->_payload) == "buy furnishing barberschair") purchaseFurnishing("barberschair");
 	else if (*((std::string*)ev->_payload) == "buy furnishing sofa")         purchaseFurnishing("sofa");
 	else if (*((std::string*)ev->_payload) == "buy furnishing piecounter")   purchaseFurnishing("piecounter");
@@ -358,7 +350,7 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 	Unit *u;
 	std::vector<Unit*> *vctr;
 	bool initsuccess;
-	if (strcmp(type, "staff") == 0) {
+	if (Unit::infoForType(type)->isStaff) {
 		u = new Unit(&eh, navmap, type, this, true);
 		vctr = &staff;
 		initsuccess = u->init(-100, -100);
@@ -371,7 +363,7 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 	
 	if (initsuccess) {
 		vctr->push_back(u);
-		printf("added unit %p of type '%s' (now %ld)\n", u, type, vctr->size());
+		printf("added unit %p of type \"%s\" (now %ld)\n", u, type, vctr->size());
 		return u;
 	}
 	// TODO: deallocate on init failure?
@@ -407,10 +399,8 @@ Furnishing* Level::createFurnishing(const char *type, bool placeableMode, int at
 	// TODO: deallocate on init failure?
 	return NULL;
 }
-Behaviour* Level::createBehaviour(const char *_type) {
-	Behaviour *bhvr = new Behaviour(_type, &eh);
-	behaviours.push_back(bhvr);
-	return bhvr;
+void Level::addBehaviour(Behaviour *_b) {
+	behaviours.push_back(_b);
 }
 void Level::purchaseFurnishing(const char *type) {
 	if (Furnishing::costForType(type) <= money)
@@ -419,8 +409,10 @@ void Level::purchaseFurnishing(const char *type) {
 		std::cout << "not enough money to buy a " << type << std::endl;
 }
 void Level::hireStaff(const char *type) { 
-	if(Unit::hireCostForType(type) <= money)
-		createUnit(0, 0, type);
+	if(Unit::infoForType(type)->hireCost <= money) {
+		Unit *u = createUnit(0, 0, type);
+		addBehaviour(new ShopKeeperBehaviour(&eh, u, this));
+	}
 	else
 		std::cout << "not enough money to hire a " << type << std::endl;
 }
@@ -450,12 +442,12 @@ void Level::destroyThings() {
 			i = staff.erase(i);
 		}
 		else i++;
-	for (std::vector<Behaviour*>::iterator i = behaviours.begin(); i < behaviours.end(); )
-		if ((*i)->destroyed()) {
-			delete *i;
-			i = behaviours.erase(i);
+	for (std::vector<Behaviour*>::iterator it = behaviours.begin(); it < behaviours.end(); )
+		if ((*it)->destroyed) {
+			delete *it;
+			it = behaviours.erase(it);
 		}
-		else i++;
+		else it++;
 }
 void Level::destroyAllThings() {
 	for (int i=0; i < furnishings.size(); i++) furnishings[i]->destroyed = true;
@@ -472,12 +464,10 @@ Building* Level::randomBuildingWithType(const char *_type) {
 			indices[nOfType++] = i;
 	return nOfType == 0 ? NULL : buildings[indices[W::randUpTo(nOfType)]];
 }
-Building* Level::buildingAtLocation(int x, int y) {
-	for (int i=0; i < buildings.size(); i++) {
-		Building *b = buildings[i];
-		if (b->overlapsWith(x, y))
-			return b;
-	}
+Building* Level::buildingAtPosition(const W::position &p) {
+	for (std::vector<Building*>::iterator it = buildings.begin(); it < buildings.end(); it++)
+		if ((*it)->overlapsWith(p))
+			return *it;
 	return NULL;
 }
 
@@ -485,7 +475,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	if (b == currentlyEditedBuilding) return;
 	closeFurnishingPurchasingView();
 	currentlyEditedBuilding = b;
-	furnishingPurchasingView = new FurnishingPurchasingUIView(win, &eh, b->b_allowedFurnishings);
+	furnishingPurchasingView = new FurnishingPurchasingUIView(win, &eh, &b->bInfo->allowedFurnishings);
 	addView(furnishingPurchasingView);
 	furnishingPurchasingView->subscribeToButtons(new W::Callback(&Level::buttonEvent, this));
 }
