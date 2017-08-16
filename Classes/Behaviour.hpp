@@ -72,6 +72,7 @@ protected:
 		waiting = true;
 	}
 	ResponderMap *levelRM;
+	static W *theW;
 	
 	static LuaHelper *mrLua;
 	static bool lua_initialized;

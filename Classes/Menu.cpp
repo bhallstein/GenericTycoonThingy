@@ -93,17 +93,19 @@ MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, Menu 
 	alpha = 0;
 	mode = MNONE;
 	mrandom_prerandomised = false;
+	mtransbars_heights = (int*) malloc(sizeof(int) * 40);
 	mr_hov = false;
 }
 MenuView::~MenuView() {
 	free(colour_squares);
 	free(colour_cycle_array);
+	free(mtransbars_heights);
 }
 
 void MenuView::draw() {
 	// Swirly colours
 	
-	if (alpha < 0.8) alpha += 0.01;
+	if (alpha < 0.8) alpha += 0.005;
 	
 	if (mode == MNONE || ++framecount > 100)
 		switchMode();
@@ -111,18 +113,44 @@ void MenuView::draw() {
 		for (int i=0; i < 40 * 30; i++) incrementColour(&colour_squares[i], 1);
 	else if (mode == MSTRIPESH) for (int i=0; i < 40*30; i++) incrementColour(&colour_squares[i], 2);
 	else if (mode == MSTRIPESREV) for (int i=0; i < 40*30; i++) decrementColour(&colour_squares[i], 2);
-	else if (mode == MTURNY) {
-		float angle = framecount/10.0;
-		int cx = 20, cy = 15;
-		float diff = 0.2;
-		for (float _x = cx, _y = cy;
-			 _x >= 0 && _y >= 0 && _x < 40 && _y < 30;
-			 _x -= diff * sin(angle), _y -= diff * cos(angle)) {
-			int _xx = _x, _yy = _y;
-			colour_squares[_yy * 40 + _xx] = W::randUpTo(colour_cycle_length);
+//	else if (mode == MTURNY) {
+//		float angle = framecount/10.0;
+//		int cx = 20, cy = 15;
+//		float diff = 0.2;
+//		for (float _x = cx, _y = cy;
+//			 _x >= 0 && _y >= 0 && _x < 40 && _y < 30;
+//			 _x -= diff * sin(angle), _y -= diff * cos(angle)) {
+//			int _xx = _x, _yy = _y;
+//			colour_squares[_yy * 40 + _xx] = W::randUpTo(colour_cycle_length);
+//		}
+//		for (int i=0; i < 40*30; i++) incrementColour(&colour_squares[i]);
+//	}
+	else if (mode == MTRANSWIPE) {
+		int _x = 40 - framecount;
+		if (_x >= 0)
+			for (int y=0; y < 30; y++)
+				colour_squares[y*40+_x] = W::randUpTo(colour_cycle_length);			
+		for (int i=0; i < 40*30; i++) incrementColour(&colour_squares[i]);
+	}
+	else if (mode == MTRANSCIRC) {
+		int outer_radius = 40 - framecount, inner_radius = outer_radius - 2;
+		for (int i=0; i < 40*30; i++) {
+			int _x = i%40-20, _y = i/40-15;
+			int dist = sqrt((double)(_x*_x + _y*_y));
+			if (dist < outer_radius && dist >= inner_radius)
+				colour_squares[i] = W::randUpTo(colour_cycle_length);
+			incrementColour(&colour_squares[i]);
+		}
+	}
+	else if (mode == MTRANSBARS) {
+		for (int _x=0; _x < 40; _x++) {
+			int _y = framecount - mtransbars_heights[_x] - 1;
+			if (_y >= 0 && _y < 30)
+				colour_squares[_y*40+_x] = W::randUpTo(colour_cycle_length);
 		}
 		for (int i=0; i < 40*30; i++) incrementColour(&colour_squares[i]);
 	}
+	
 	// Draw
 	for (int i=0; i < 40 * 30; i++) {
 		int _x = i%40 * width/40, _y = i/40 * height/30;
@@ -150,14 +178,27 @@ void MenuView::processMouseEvent(Event *ev) {
 }
 void MenuView::switchMode() {
 	framecount = 0;
-	int m = (_modes) mode;
-	mode = (_modes) ++m;
-	if (mode == MLAST) mode = (_modes) 1;
+	if (mode == MTRANSCIRC || mode == MTRANSWIPE || mode == MTRANSBARS)
+		mode = MRANDOM;
+	else {
+		int m = (_modes) mode;
+		mode = (_modes) ++m;
+		if (mode == MLAST) mode = (_modes) 1;
+		if (mode == MTRANSWIPE) {
+			int r = W::randUpTo(3);
+			switch (r) {
+				case 0 : mode = MTRANSWIPE; break;
+				case 1 : mode = MTRANSCIRC; break;
+				case 2 : mode = MTRANSBARS; break;
+			}	
+		}
+	}
 	// setupses
 	if (mode == MRANDOM) {
 		if (mrandom_prerandomised) return;
 		for (int i=0; i < 40 * 30; i++)
 			colour_squares[i] = W::randUpTo(colour_cycle_length);
+		mrandom_prerandomised = true;
 	}
 	else if (mode == MSTRIPESH) {
 		for (int x=0; x < 40 + 30; x++)
@@ -183,7 +224,16 @@ void MenuView::switchMode() {
 			colour_squares[i] = _h%colour_cycle_length;
 		}
 	}
-	else if (mode == MTURNY) {
-		mrandom_prerandomised = true;
+	else if (mode == MTRANSWIPE) {
+		
 	}
+	else if (mode == MTRANSCIRC) {
+		
+	}
+	else if (mode == MTRANSBARS) {
+		for (int i=0; i < 40; i++) mtransbars_heights[i] = W::randUpTo(15);
+	}
+//	else if (mode == MTURNY) {
+//		
+//	}
 }

@@ -40,8 +40,11 @@ void Behaviour::init(Level *l, Unit *u1, Unit *u2, Furnishing *f) { b->init(l, u
 
 bool BehaviourBase::lua_initialized = false;
 LuaHelper *BehaviourBase::mrLua;
+W* BehaviourBase::theW;
 bool BehaviourBase::initialize(W *_W) {
 	if (BehaviourBase::lua_initialized) return true;
+	
+	theW = _W;
 	
 	W::log("  BehaviourBase::initialize() called...");
 	mrLua = new LuaHelper(_W);
@@ -197,7 +200,7 @@ void ServiceBehaviour::_update() {
 	}
 	else if (stage == 1) {	// Run animations
 		if (unit->arrived && staff->arrived)
-			unit->runAnimation(), staff->runAnimation(), stage++;
+			theW->playSound("Scream.wav"), unit->runAnimation(), staff->runAnimation(), stage++;
 	}
 	else if (stage == 2) {	// Release things
 		if (unit->animation_finished && staff->animation_finished) {

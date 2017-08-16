@@ -65,11 +65,12 @@ private:
 	int framecount;
 	
 	enum _modes {
-		MNONE, MRANDOM, MSTRIPESH, MSTRIPESREV, MFADE, /*MSTRIPESD,*/ MPULSE, MTURNY, MLAST
+		MNONE,
+		MRANDOM, MSTRIPESH, MSTRIPESREV, MFADE, /*MSTRIPESD,*/ MPULSE, /*MTURNY,*/
+		MTRANSWIPE, MTRANSCIRC, MTRANSBARS,
+		MLAST
 	} mode;
 	void switchMode();
-	void switchToRandom();
-	void switchToStripes();
 	
 	void incrementColour(int *sq, int n = 1) {
 		*sq += n;
@@ -84,6 +85,7 @@ private:
 	bool mrandom_prerandomised;
 	bool mr_hov;
 	Menu *menu;
+	int *mtransbars_heights;
 };
 
 #endif
