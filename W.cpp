@@ -117,18 +117,18 @@ void W::drawRect(float x, float y, float w, float h, const char *colname, float 
 		glVertex2f(-w/2, h/2);
 	glEnd();
 }
-void W::drawText(float x, float y, const char *colname, const char *text) {
-	int char_width = 14;	
+void W::drawText(float x, float y, const char *colname, char *text, bool rAlign) {
+	int char_width = 14;
+	// work out total width & hence position
+	int tw = 0, c;
+	for (int i=0; (c = text[i]); i++)
+		if (c == 'I' | c == 'i' || c == '1' || c == ':') tw += char_width - 4;
+		else if (c == 'L' || c == 'l')                   tw += char_width - 2;
+		else                                             tw += char_width;
+	if (rAlign) x -= tw;
+	
 	for (int i=0; text[i] != '\0'; i++) {
 		char c = text[i];
-		if (i != 0) {
-			if (c == 'I' | c == 'i' || c == '1' || c == ':')
-				x += char_width - 4;
-			else if (c == 'L' || c == 'l')
-				x += char_width - 2;
-			else
-				x += char_width;
-		}
 		switch(c) {
 			case 'A' : case 'a' : {
 				drawRect(x, y, 10, 2, colname);
@@ -185,10 +185,10 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 				break;
 			}
 			case '1' : {
-				drawRect(x+4, y, 2, 2, colname);
+				drawRect(x, y, 2, 2, colname);
 			}
 			case 'I' : case 'i' : {
-				drawRect(x+6, y, 2, 10, colname);
+				drawRect(x+2, y, 2, 10, colname);
 				break;
 			}
 			case 'J' : case 'j' : {
@@ -374,30 +374,33 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 				drawRect(x, y+8, 8, 2, colname);
 				break;
 			}
-			case '$' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x, y+4, 10, 2, colname);
-				drawRect(x, y+8, 10, 2, colname);
-				drawRect(x, y+2, 2, 2, colname);
-				drawRect(x+8, y+6, 2, 2, colname);
-				drawRect(x+4, y-1, 2, 12, colname);
-				break;
-			}
-			case '£' : {
-				drawRect(x+3, y-1, 6, 2, colname);
-				drawRect(x, y+9, 10, 2, colname);
+//			case '$' : {
+//				drawRect(x, y, 10, 2, colname);
+//				drawRect(x, y+4, 10, 2, colname);
+//				drawRect(x, y+8, 10, 2, colname);
+//				drawRect(x, y+2, 2, 2, colname);
+//				drawRect(x+8, y+6, 2, 2, colname);
+//				drawRect(x+4, y-1, 2, 12, colname);
+//				break;
+//			}
+			case MR_CURRENCY /* £ */ : {
+				drawRect(x+4, y, 6, 2, colname);
+				drawRect(x+2, y+2, 2, 2, colname);
 				drawRect(x, y+4, 8, 2, colname);
-				drawRect(x+9, y, 2, 2, colname);
-				drawRect(x+2, y, 2, 10, colname);
+				drawRect(x+2, y+6, 2, 4, colname);
+				drawRect(x, y+8, 10, 2, colname);
 				break;
 			}
 			case ':' : {
-				drawRect(x+6, y+4, 2, 2, colname);
-				drawRect(x+6, y+8, 2, 2, colname);
+				drawRect(x+2, y+4, 2, 2, colname);
+				drawRect(x+2, y+8, 2, 2, colname);
 				break;
 			}
 			default: break;
 		}
+		if (c == 'I' | c == 'i' || c == '1' || c == ':') x += char_width - 4;
+		else if (c == 'L' || c == 'l')                   x += char_width - 2;
+		else                                             x += char_width;
 	}
 }
 

@@ -4,8 +4,8 @@ require("buildings")
 width  = 50
 height = 40
 startingBalance = 70
-moneyLimit = 60 --victory when reached
-timeLimit = 21 --in seconds for now
+moneyLimit = 300 --victory when reached
+timeLimit = 180 --in seconds for now
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"

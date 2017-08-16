@@ -511,9 +511,8 @@ void LevelView::draw() {
 	int time_minutes = *time_remaining / 60;
 	int time_seconds = *time_remaining%60;
 
-	char * timerColour = (*time_remaining <= 20) ? "red" : "white"; //change the timer colour as it gets low
 	sprintf(s, "%02d:%02d", time_minutes, time_seconds);
-	theW->drawText(10, 10, timerColour, s);
+	theW->drawText(10, 10, *time_remaining <= 20 ? "red" : "white", s);
 }
 
 void LevelView::processMouseEvent(Event *ev) {
@@ -558,8 +557,8 @@ void UIBarView::draw() {
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 	char econ[10];
-	sprintf(econ, "£%d", *economy);
-	theW->drawText(743, 10, "white", econ);
+	sprintf(econ, "%c%d", MR_CURRENCY, *economy);
+	theW->drawText(790, 10, "white", econ, true);
 }
 
 

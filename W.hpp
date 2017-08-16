@@ -14,6 +14,8 @@
 #include "WindowManager.hpp"
 #include "mtrand.h"
 
+#define MR_CURRENCY '$'
+
 class View;
 class Event;
 
@@ -41,7 +43,7 @@ public:
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
 	void drawRect(float x, float y, float _width, float _height, const char *colour, float rot = 0);
 	__colour stringToColour(const char *);
-	void drawText(float x, float y, const char *col, const char *);
+	void drawText(float x, float y, const char *col, char *text, bool rAlign = false);
 
 	// Event shizzle
 	void addEvent(Event &);
