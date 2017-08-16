@@ -1,5 +1,8 @@
-#include "Address.h"
-
+/*
+ * Building.h
+ *
+ */
+ 
 class Building
 {
 public:

@@ -1,28 +1,25 @@
-#pragma once
-#include "Builder.h"
-#include "Tutorial.h"
-#include "Level.h"
-#include <string.h>
+/*
+ * Game.h - Game class, the main class for running the game, really.
+ *
+ */
+
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+
 
 class Game
 {
 public:
-	Game(void);
-	~Game(void);
-	
-	int Run();
+	Game();
+	~Game();
 
-	int m_AddressNumb;
-	int m_BarberNumb;
-	int M_PieshopNumb;
-	void BuildingReport(Builder& bill);
+	// Instance methods
+	void Run();
 
-	bool Action(char x[256], Builder& bill);
-
-	void GatherIncome(Builder& bill);
-
-	int m_Money;
 private:
 	
-	int m_Days;
+	// Instance Variables
+	sf::RenderWindow DBTWindow;
+	
 };

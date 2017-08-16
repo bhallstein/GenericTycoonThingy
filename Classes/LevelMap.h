@@ -1,18 +1,10 @@
 /*
- * 
+ * LevelMap.h - Defines the map data, including buildings and units, for a level
  *
  */
 
-#include <iostream>
-#include <string>
-#include <map>
 #include <vector>
-
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
-#include "Building.h"
+#include "Building.h" 
 
 using namespace std;
 
@@ -25,7 +17,7 @@ public:
 
 	// Properties
 	int Columns, Rows;
-	vector<Building> Buildings;
+	vector<Building> Buildings;	// Can this be replaced with an array of pointers?
 
 	// Getters
 	int numberOfBuildings();
