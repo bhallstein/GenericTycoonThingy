@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef BUILDING_H
-#define BUILDING_H
+#ifndef PLACEABLE_H
+#define PLACEABLE_H
 
 #include <iostream>
 
@@ -14,17 +14,15 @@
 #include "GameMap.hpp"
 
 
-class Building : public EventResponder
+class Placeable : public EventResponder
 {
 public:
-	Building(GameMap *);
-	~Building();
+	Placeable(GameMap *);
+	~Placeable();
 
 	// Methods
 	void receiveEvent(Event *ev, EventResponder **p_e_r);	// Override to handle events
 	char col();		// Temporary coloration-signifier thingum
-	
-	void setPosition(int x, int y);
 
 	// Properties
 	bool destroyed;
@@ -32,11 +30,11 @@ public:
 protected:
 
 	// Methods
-	
+	void setPosition(int x, int y);
 
 	// Properties
 	GameMap *gamemap;
-	//enum mode_types { PLACEMENT, PLACED } mode;
+	enum mode_types { PLACEMENT, PLACED } mode;
 	bool clicked;
 	
 };

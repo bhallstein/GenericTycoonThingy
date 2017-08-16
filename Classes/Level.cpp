@@ -1,9 +1,12 @@
 #include "Level.hpp"
 
-Level::Level(int _w, int _h, GameMap *_gamemap)
+Level::Level(std::string fileName, GameMap *_gamemap)
 {
-	w = _w, h = _h;
 	gamemap = _gamemap;
+
+	//Read in from level file
+	buildLevel(readLevel(fileName));
+
 	framecount = 0;
 }
 Level::~Level()
@@ -11,16 +14,18 @@ Level::~Level()
 	// Buildings & units are allocated on the heap with `new` – so must be manually `delete`d.
 	for (std::vector<Building*>::iterator i = buildings.begin(); i != buildings.end(); i++)
 		delete (*i);	
+	for (std::vector<Placeable*>::iterator i = placeables.begin(); i != placeables.end(); i++)
+		delete (*i);	
 	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++)
 		delete (*i);
 }
 
-Building* Level::createBuilding()
+Placeable* Level::createPlaceable()
 {
-	std::cout << "adding new building (currently " << buildings.size() << ")... ";
-	buildings.push_back( new Building(gamemap) );
-	std::cout << "now: " << buildings.size() << std::endl;
-	return buildings.back();
+	std::cout << "adding new placeable (currently " << placeables.size() << ")... ";
+	placeables.push_back( new Placeable(gamemap) );
+	std::cout << "now: " << placeables.size() << std::endl;
+	return placeables.back();
 }
 
 Unit* Level::createUnit() {
@@ -46,6 +51,22 @@ void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 			);
 		}
 	}
+	// Draw placeables
+	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); i++) {
+		if ((*i)->destroyed) {
+			delete (*i);
+			placeables.erase(i--);
+		}
+		else {
+			window.Draw(
+				sf::Shape::Rectangle(
+					(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height,
+					(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'r' ? sf::Color::Red : sf::Color::Yellow
+				)
+			);
+		}
+	}
+	//Draw units
 	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++) {
 		window.Draw(
 			sf::Shape::Rectangle(
@@ -58,6 +79,42 @@ void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 	if (50 == framecount++) this->createUnit();	// Create a new unit every 20 seconds
 }
 
+//Stuff about loading levels
+
+boost::property_tree::ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
+{
+	boost::property_tree::ptree pt;
+	read_xml(fileName, pt);
+
+	return pt;
+}
+
+void Level::buildLevel(boost::property_tree::ptree levelFile)
+{
+	//Get width and height from attributes of 'level'
+	w = 50; //levelFile.get<int>("<xmlattr>.width");
+	h = 40; //levelFile.get<int>("<xmlattr>.height");
+
+	gamemap->setDimensions(w,h);
+
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &obj,levelFile.get_child("level"))
+	{
+		//type checks
+		//if(obj.first == "width") w = boost::lexical_cast<int>(obj.first);
+		//if(obj.first == "width") w = boost::lexical_cast<int>(obj.first);
+
+		if(obj.first == "building")
+		{
+			//Create this building (add it to level.buildings)
+			buildings.push_back( new Building(gamemap) );
+
+			Building *b = buildings.back();
+
+			//place it at its block co-ords
+			b->setPosition(obj.second.get<int>("x",0),obj.second.get<int>("y",0));
+		}
+	}
+}
 
 #ifdef here_is_a_small_note_about_drawing_and_coordinates
 

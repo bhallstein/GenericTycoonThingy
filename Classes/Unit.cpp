@@ -10,7 +10,7 @@ Unit::Unit(GameMap *map) {
 	gamemap = map;
 	
 	// Generate random destination
-	goSomewhere(rand()%map->w, rand()%map->h);
+//	goSomewhere(rand()%map->w, rand()%map->h);
 	
 }
 

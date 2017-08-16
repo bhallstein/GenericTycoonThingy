@@ -11,15 +11,15 @@ MapLoc::~MapLoc() {
 
 void MapLoc::addResponder(EventResponder *resp) {
 	// Add an eventresponder to the list thereof
-	// cout << responderList.size() << " -> ";
+	 //cout << responderList.size() << " -> ";
 	responderList.push_back(resp);
-	// cout << responderList.size() << endl;
+	 //cout << responderList.size() << endl;
 }
 void MapLoc::removeResponder(EventResponder *resp) {
 	// Remove an eventresponder from the list thereof
-	// cout << responderList.size() << " -> ";
+	 //cout << responderList.size() << " -> ";
 	responderList.remove(resp);
-	// cout << responderList.size() << endl;
+	 //cout << responderList.size() << endl;
 }
 void MapLoc::dispatchEvent(Event *ev, EventResponder **p_e_r) {
 	for (std::list<EventResponder*>::iterator i = responderList.begin(); i != responderList.end(); i++)
@@ -129,14 +129,20 @@ void GameMap::makeImpassable(int atX, int atY) {
 			else maplocs[j*w + i].removeNeighbour(maploc);
 }
 void GameMap::addImpassableObject(EventResponder *resp) {
+	int x = resp->x, y = resp->y;
+	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)
 			this->makeImpassable(i, j);
 }
 void GameMap::removeImpassableObject(EventResponder *resp) {
+	int x = resp->x, y = resp->y;
+	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)
-			this->makeImpassable(i, j);
+			this->makePassable(i, j);
 }
 bool GameMap::isPassableAt(int atX, int atY) {
 	return maplocs[atY*w + atX].passable;

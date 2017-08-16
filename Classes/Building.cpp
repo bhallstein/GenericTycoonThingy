@@ -2,7 +2,6 @@
 
 Building::Building(GameMap *map)
 {
-	mode = PLACEMENT;
 	x = y = -1000;
 	w = 6; h = 4;
 	clicked = false;
@@ -20,33 +19,12 @@ Building::~Building()
 }
 
 void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
-	if (mode == PLACEMENT) {
-		if (ev->type == MOUSEMOVE) {
-			this->setPosition(ev->x, ev->y);
-		}
-		else if (ev->type == LEFTCLICK) {
-			for (int j=y; j < y + h; j++)
-				for (int i=x; i < x + w; i++)
-					if (!gamemap->isPassableAt(i, j))
-						return;							// Check if area is passable
-			mode = PLACED;
-			gamemap->addImpassableObject(this);
-			*p_e_r = NULL;
-		}
-		else if (ev->type == RIGHTCLICK) {
-			destroyed = true;
-			*p_e_r = NULL;
-		}
+	if (ev->type == MOUSEMOVE) {
+		//mouseover = true;	// ...but how to unset?
 	}
-	else if (mode == PLACED) {
-		if (ev->type == MOUSEMOVE) {
-			//mouseover = true;	// ...but how to unset?
-		}
-		else if (ev->type == LEFTCLICK) {
-			clicked = !clicked;
-		}
+	else if (ev->type == LEFTCLICK) {
+		clicked = !clicked;
 	}
-	// std::cout << "Building pos: " << x << "," << y << std::endl;
 }
 
 void Building::setPosition(int _x, int _y) {
@@ -56,8 +34,9 @@ void Building::setPosition(int _x, int _y) {
 	gamemap->addResponder(this);
 }
 
+
 char Building::col() {
-	return (mode == PLACEMENT ? 'w' : clicked ? 'l' : 'b');
+	return (clicked ? 'l' : 'b');
 }
 
 
@@ -72,11 +51,11 @@ char Building::col() {
   A building also defines behaviours of some other objects.
   A staff unit may seek out or be assigned to a building
   
-  A building generates its own internal mapping region, also â€“Â i.e. they define a free movement zone,
-  and form a node in the pathfinding systemâ€™s nodelist.
+  A building generates its own internal mapping region, also – i.e. they define a free movement zone,
+  and form a node in the pathfinding system’s nodelist.
   
   Buildings are like other things in the game (units, obstacles, implements, furniture...) in
-  some key respects â€“Â for example, each has a sprite, and managed the display of that sprite
+  some key respects – for example, each has a sprite, and managed the display of that sprite
   (or returns it for display by some more powerful parent class.)
 
 #endif

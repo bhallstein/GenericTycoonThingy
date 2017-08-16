@@ -108,7 +108,7 @@ protected:
 
 template <class nodetype, typename comparandtype>
 BinaryHeap<nodetype, comparandtype>::BinaryHeap(int _n) : n(_n) {
-	heap.reserve(n);
+	heap.resize(n);
 	indices_in_heap = (int*) malloc(sizeof(int) * n);	// Allocate node-lookup array
 	reset();
 }
@@ -122,6 +122,7 @@ template <class nodetype, typename comparandtype>
 void BinaryHeap<nodetype, comparandtype>::reset() {
 	heap.clear();
 	length = 0;
+	heap.reserve(n);
 }
 
 template <class nodetype, typename comparandtype>

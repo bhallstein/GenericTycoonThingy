@@ -5,7 +5,6 @@ Game::Game()
 	/* Window setup */
 
 	// Set defaults (manually for now)
-	w = 50; h = 40;
 	block_w = 16; block_h = 16;	// Can calculate these otherwise: pixel_w/w and pixel_h/h
 	std::string window_name = "Demon Barber Tycoon";
 	
@@ -17,7 +16,7 @@ Game::Game()
 		windowStyle = sf::Style::Close;
 	else windowStyle = sf::Style::Fullscreen;
 	
- 	DBTWindow.Create(sf::VideoMode(w * block_w, h * block_h), window_name, windowStyle);
+ 	DBTWindow.Create(sf::VideoMode(50 * block_w, 40 * block_h), window_name, windowStyle);
 	DBTWindow.SetFramerateLimit(60);
 }
 
@@ -28,14 +27,12 @@ Game::~Game()
 
 void Game::Run()
 {
-	// Create responder map
-	gamemap.setDimensions(w, h);
+	// Create Level
+	Level level("Data/level1.xml",&gamemap);
 	
 	bool should_quit = false;
 	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
 															// the receiveEvent(sf::Event *ev) method
-	// Create Level
-	Level level(w, h, &gamemap);
 	
 	int pixel_w = w * block_w;
 	int pixel_h = h * block_h;
@@ -71,7 +68,7 @@ void Game::Run()
 						should_quit = true;
 					}
 					else if (event.key == K_B) {
-						privileged_event_responder = (EventResponder*) level.createBuilding();
+						privileged_event_responder = (EventResponder*) level.createPlaceable();
 					}
 				}
 				// Mouse
