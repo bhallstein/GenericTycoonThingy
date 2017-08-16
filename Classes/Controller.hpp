@@ -45,6 +45,9 @@ public:
 		sd["passbackMap"] = makeSerializer(&Controller::passbackMap);
 	}
 	
+	virtual void unitPickedUp(Unit *) = 0;
+	virtual void unitPutDown(Unit *) = 0;
+	
 protected:
 	// Unit dispatch/pass-back
 	virtual bool canDispatch(const std::string &) = 0;
@@ -91,6 +94,9 @@ public:
 		sd["timeWaited"] = makeSerializer(&CustomerController::timeWaited);
 		sd["customer"] = makeSerializer(&CustomerController::customer);
 	}
+	
+	void unitPickedUp(Unit *);
+	void unitPutDown(Unit *);
 	
 protected:
 	bool canDispatch(const std::string &);

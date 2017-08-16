@@ -100,6 +100,11 @@ void CustomerController::update() {
 	else if (stage == 100) {
 		stage = 3;	// Wait 2s then try again
 	}
+	
+	/* Unit has been picked up */
+	else if (stage == 500) {
+		
+	}
 }
 
 bool CustomerController::canDispatch(const std::string &type) {
@@ -107,5 +112,14 @@ bool CustomerController::canDispatch(const std::string &type) {
 }
 void CustomerController::_dispatchUnit(Unit *u) {
 	customer = u->uid;
+	if (u->placeableMode) stage = 500;
+	else stage = 1;
+}
+
+void CustomerController::unitPickedUp(Unit *u) {
+	stage = 500;
+}
+void CustomerController::unitPutDown(Unit *u) {
 	stage = 1;
+	// May want to check context, do things here.
 }

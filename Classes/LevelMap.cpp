@@ -142,7 +142,7 @@ std::string LevelMap::save() {
 	if (inactiveControllers.size() == 0) ss << "\n";
 	for (tloVec::iterator it = inactiveControllers.begin(), itend = inactiveControllers.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
-	ss << "},\n";
+	ss << "}\n";
 	
 	return ss.str();
 }
@@ -256,7 +256,7 @@ Controller* LevelMap::createController(const std::string &type, bool active) {
 }
 Controller* LevelMap::createController(LuaObj &o, bool active) {
 	Controller *c = NULL;
-	std::string &type = o["type"].str_value;
+	const std::string &type = o["type"].str_value;
 	if (type == "CustomerController") {
 		c = new CustomerController(levelState, this, levelView, navmap);
 		c->deserialize(o);
@@ -271,14 +271,10 @@ Controller* LevelMap::createController(LuaObj &o, bool active) {
 Controller* LevelMap::createControllerForUnit(Unit *u) {
 	using std::string;
 	
-	string &type = u->type;
+	const string &type = u->type;
 	Controller *c = NULL;
-	if (type == "customer") {
-		c = createController("CustomerController");
-	}
-	else if (type == "blah") {
-		// ...
-	}
+	if (type == "customer") c = createController("CustomerController");
+	else if (type == "blah") { } // ...
 	
 	if (c == NULL) throw W::Exception(
 		string("Error: couldn't create unit behaviour - unrecognised type ") +

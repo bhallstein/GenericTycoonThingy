@@ -27,5 +27,5 @@ mapData = {
 	},
 	inactiveControllers = {
 		
-	},
+	}
 }

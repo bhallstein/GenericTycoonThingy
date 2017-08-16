@@ -146,6 +146,8 @@ bool Unit::voyage(const W::position &_dest) {
 
 void Unit::placementLoopStarted() {
 	drawnUnit->setOpac(0.2);		// Put DU in placement-loop mode
+	if (Controller *c = controllerPtr())
+		c->unitPickedUp(this);
 }
 void Unit::placementLoopUpdate() {
 	W::position p(placeable.pos.x, placeable.pos.y, 0, 0);
@@ -159,6 +161,8 @@ void Unit::placementLoopCancelled() {
 	// Otherwise, put the unit back where we found it
 	else drawnUnit->setPosn(rct.pos);
 	drawnUnit->setOpac(1);		// Put DrawnUnit back in normal mode
+	if (Controller *c = controllerPtr())
+		c->unitPutDown(this);
 }
 void Unit::placementLoopSucceeded() {
 	if (!hired && typeInfo->isStaff) {
@@ -168,8 +172,10 @@ void Unit::placementLoopSucceeded() {
 	}
 	drawnUnit->setPosn(rct.pos);	// Update DrawnUnit to new position
 	drawnUnit->setOpac(1);			// Put D.U. back in normal mode
-	// TODO: If voyaging, should recalculate route when placed
+	// TODO: if voyaging, should recalculate route when placed
 	// TODO: notify behaviour of placement event: may want to change associations to other TLOs, etc.
+	if (Controller *c = controllerPtr())
+		c->unitPutDown(this);
 }
 bool Unit::canPlace(const W::position &_pos) {
 	return navmap->isPassableAt(_pos);
