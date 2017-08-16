@@ -4,7 +4,7 @@ require("buildings")
 width  = 55
 height = 45
 startingBalance = 70
-moneyLimit = 2000		--victory when reached
+moneyLimit = 1200		--victory when reached
 timeLimit = 300			--in seconds for now
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
@@ -85,8 +85,8 @@ rotated270ShopLayout = {
 	       {1,5}, {2,5}, {3,5}, {4,5}
 }
 rotated270ShopDoors = {
-	{0,2, "rightward"},
-	{0,3, "rightward"}
+	{0,2, "leftward"},
+	{0,3, "leftward"}
 }
 
 

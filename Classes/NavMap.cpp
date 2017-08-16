@@ -22,6 +22,7 @@ bool NavNode::hasNeighbour(NavNode *n) {
 			return true;
 	return false;
 }
+// MisterHeapy object properties
 bool NavNode::operator< (NavNode *m) {
 	return min_dist > m->min_dist;		// Heap orders larger items first by default. We want the opposite.
 }
@@ -33,7 +34,8 @@ void NavNode::setComparand(float _min_dist) {
 #include "MappedObj.hpp"
 #include "Building.hpp"
 
-NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h) {
+NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h)
+{
 	w = _w, h = _h;
 	int n = w * h;
 	nodes.resize(n);
@@ -53,7 +55,8 @@ NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h) {
 		}
 	}
 }
-NavMap::~NavMap() {
+NavMap::~NavMap()
+{
 	nodes.clear();
 }
 

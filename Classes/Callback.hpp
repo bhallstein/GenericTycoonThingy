@@ -12,6 +12,7 @@
 
 class CallbackBase {
 public:
+	virtual ~CallbackBase() { }
 	virtual void call(Event *) = 0;
 };
 
@@ -32,6 +33,7 @@ class Callback {
 public:
 	template <class T>
 	Callback(void (T::*_f)(Event *), T *_o) : s(new MFCallback<T>(_f, _o)) { }
+	~Callback() { delete s; }
 	void call(Event *ev) {
 		s->call(ev);
 	}
