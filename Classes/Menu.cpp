@@ -34,6 +34,8 @@ void Menu::resume(Returny *returny) {
 	delete level;
 	if (returny->type == Returny::killer_returny)
 		game->stateFinished(this, Returny(Returny::killer_returny));
+	else if (returny->type == Returny::payload_returny)
+		startLevel("level1.lua");
 }
 void Menu::update() {
 
@@ -135,7 +137,7 @@ MenuBackgroundView::~MenuBackgroundView() {
 void MenuBackgroundView::draw() {
 	// Swirly colours
 	
-	if (alpha < 0.8) alpha += 0.005;
+	if (alpha < 0.8) alpha += 0.008;
 	
 	if (mode == MNONE || ++framecount > 100)
 		switchMode();

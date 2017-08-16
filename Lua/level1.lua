@@ -5,7 +5,7 @@ width  = 50
 height = 40
 startingBalance = 70
 moneyLimit = 300 --victory when reached
-timeLimit = 180 --in seconds for now
+timeLimit = 18 --in seconds for now
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"

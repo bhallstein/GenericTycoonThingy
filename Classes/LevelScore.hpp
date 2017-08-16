@@ -38,6 +38,9 @@ public:
 	void startLevel(std::string path);
 	void startLevelOne();
 	
+	void exitToMenu();
+	void replayLevel();
+	
 protected:
 	// Properties
 	ScoreView *scoreview;
