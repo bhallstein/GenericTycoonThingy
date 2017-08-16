@@ -456,11 +456,15 @@ void W::initializePaths() {
 	GetModuleFileName(0, path, sizeof(path) - 1);
 	std::string resourcesPath = path;
 	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
-	resourcesPath.append("/../Demon Barber Tycoon/");		// When installed, will want to be "/Data/" - or...?
-	luaPath = resourcesPath + "Lua/";
+
+#ifdef _DEBUG //debug builds adjust to VS folder structure; Release builds use /Data/ or /Lua/ relative to the .exe
+	resourcesPath.append("/../Demon Barber Tycoon");
+#endif
+
+	luaPath = resourcesPath + "/Lua/";
 	
 	// Data path
-	dataPath = resourcesPath + "Data/";
+	dataPath = resourcesPath + "/Data/";
 #endif
 }
 bool W::isValidDir(const char *dir) {
