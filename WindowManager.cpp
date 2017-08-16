@@ -15,6 +15,7 @@ struct NativeObjs {
 	NSWindow *window;
 	MyWindowDelegate *windowDelegate;
 	MyView *view;
+	NSOpenGLPixelFormat *pf;
 	NSOpenGLContext *context;
 };
 
@@ -23,18 +24,20 @@ WindowManager::WindowManager() : mode(WINDOWED) {
 	
 	// Create OpenGL context
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
-	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
-	if (pf == nil)
+	objs->pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
+	if (objs->pf == nil)
 		throw MsgException("Couldn't get an appropriate pixel format");
-	objs->context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
-	if (objs->context == nil)
+	objs->context = [[NSOpenGLContext alloc] initWithFormat:objs->pf shareContext:nil];
+	if (objs->context == nil) {
+		[objs->pf release];
 		throw MsgException("Couldn't create opengl context");
+	}
 	
 	// Create window
 	createWindow();
 }
 WindowManager::~WindowManager() {
-	
+	[objs->pf release];
 }
 
 void WindowManager::createWindow() {

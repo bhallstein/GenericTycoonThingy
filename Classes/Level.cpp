@@ -23,6 +23,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	responderMap.subscribeToEventType(this, Event::SCREENEDGE_BOTTOM);
 	
 	// Key subscriptions
+	responderMap.subscribeToKey(this, Event::K_ESC);
 	responderMap.subscribeToKey(this, Event::K_Q);
 	responderMap.subscribeToKey(this, Event::K_C);
 	responderMap.subscribeToKey(this, Event::K_S);
@@ -83,7 +84,7 @@ void Level::buildLevel(std::string levelname) {
 			theW->log(s.c_str());
 			lua_pop(L, 1);								// S: -1 key; -2 table
 		}
-		lua_settop(L, 0);	// S: empty
+		lua_settop(L, 0);	// S: ~
 	} catch (MsgException &exc) {
 		std::string s = "Error getting list of allowed buildings for level: ";
 		s.append(exc.msg);
@@ -310,6 +311,8 @@ void LevelView::drawMappedObj(MappedObj *obj) {
 	int atX = (obj->x + obj->a) * gridsize - scroll_x;
 	int atY = (obj->y + obj->b) * gridsize - scroll_y;
 	
+	if (atX >= width + gridsize || atY >= height + gridsize) return;
+	
 	const char *col = obj->col();
 	for (int i=0; i < obj->groundplan.size(); i++) {
 		intcoord c = obj->groundplan[i];
@@ -319,10 +322,10 @@ void LevelView::drawMappedObj(MappedObj *obj) {
 
 void LevelView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
-	for (int i=0, n = buildings->size(); i < n; i++)	drawMappedObj((*buildings)[i]);
-	for (int i=0, n = placeables->size(); i < n; i++)	drawMappedObj((*placeables)[i]);
-	for (int i=0, n = units->size(); i < n; i++)		drawMappedObj((*units)[i]);
-	for (int i=0, n = staff->size(); i < n; i++)		drawMappedObj((*staff)[i]);
+	for (int i=0, n = buildings->size(); i < n; i++)  drawMappedObj((*buildings)[i]);
+	for (int i=0, n = placeables->size(); i < n; i++) drawMappedObj((*placeables)[i]);
+	for (int i=0, n = units->size(); i < n; i++)      drawMappedObj((*units)[i]);
+	for (int i=0, n = staff->size(); i < n; i++)      drawMappedObj((*staff)[i]);
 }
 
 void LevelView::processMouseEvent(Event *ev) {
@@ -340,10 +343,10 @@ void LevelView::processMouseEvent(Event *ev) {
 void LevelView::scroll(direction dir) {
 	int scrolldist = 10;
 	
-	if (dir == UPWARD)			scroll_y -= scrolldist;
-	else if (dir == DOWNWARD)	scroll_y += scrolldist;
-	else if (dir == LEFTWARD)	scroll_x -= scrolldist;
-	else if (dir == RIGHTWARD)	scroll_x += scrolldist;
+	if (dir == UPWARD)         scroll_y -= scrolldist;
+	else if (dir == DOWNWARD)  scroll_y += scrolldist;
+	else if (dir == LEFTWARD)  scroll_x -= scrolldist;
+	else if (dir == RIGHTWARD) scroll_x += scrolldist;
 	
 	if (scroll_x < 0) scroll_x = 0;
 	if (scroll_y < 0) scroll_y = 0;

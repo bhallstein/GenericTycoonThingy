@@ -1,8 +1,8 @@
 require("buildings")
 
 --level properties
-width=100
-height=80
+width  = 50
+height = 40
 allowedBuildings = {	-- buildings which are allowed to appear in the level
 	"barber",
 	"pieshop"
@@ -12,8 +12,8 @@ allowedBuildings = {	-- buildings which are allowed to appear in the level
 buildings = {
 	{
 		["type"] = "barber",
-		x = 1,
-		y = 2,
+		x = 5,
+		y = 5,
 		groundplan = {
 			{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
 			{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1},
@@ -29,8 +29,8 @@ buildings = {
 	},
 	{
 		["type"] = "pieshop",
-		x = 12,
-		y = 15,
+		x = 11,
+		y = 14,
 		groundplan = {
 			{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0}, {6,0}, {7,0},
 			{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1},
@@ -52,34 +52,36 @@ buildings = {
 	},
 	{
 		["type"] = "home",
-		x = 28,
-		y = 31,
+		x = 32,
+		y = 10,
 		groundplan = {
-			{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
-			{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
+			       {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
+			       {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
 			{0,2}, {1,2}, {2,2}, {3,2}, {4,2}, {5,2},
 			{0,3}, {1,3}, {2,3}, {3,3}, {4,3}, {5,3},
-						  {2,4}, {3,4}
+			       {1,4}, {2,4}, {3,4}, {4,4}, {5,4},
+			       {1,5}, {2,5}, {3,5}, {4,5}, {5,5},
 		},
 		doors = {
-			{ 2,4, "downward" },
-			{ 3,4, "downward" },
+			{ 0,2, "leftward" },
+			{ 0,3, "leftward" }
 		}
 	},
 	{
 		["type"] = "home",
-		x = 37,
-		y = 18,
+		x = 32,
+		y = 20,
 		groundplan = {
-			{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
-			{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
+			       {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
+			       {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
 			{0,2}, {1,2}, {2,2}, {3,2}, {4,2}, {5,2},
 			{0,3}, {1,3}, {2,3}, {3,3}, {4,3}, {5,3},
-						  {2,4}, {3,4}
+			       {1,4}, {2,4}, {3,4}, {4,4}, {5,4},
+			       {1,5}, {2,5}, {3,5}, {4,5}, {5,5},
 		},
 		doors = {
-			{ 2,4, "downward" },
-			{ 3,4, "downward" },
+			{ 0,2, "leftward" },
+			{ 0,3, "leftward" }
 		}
 	},
 	{
@@ -103,8 +105,8 @@ spawnPoints = {
 	{
 		name = "OffTheEdgeOfTheMap1EndNameHere",
 		x = 0,
-		y = 0,
-		rate = 30,
+		y = 15,
+		rate = 70,
 		types = {
 			{ Peasants, 5 },
 			{ Judges, 8 },
@@ -112,9 +114,9 @@ spawnPoints = {
 	},
 	{
 		name = "InAHouse",
-		x = 37,
-		y = 18,
-		rate = 20,
+		x = 33,
+		y = 11,
+		rate = 80,
 		types = {
 			{ Peasants, 5 },
 			{ Judges, 8 },
@@ -122,22 +124,12 @@ spawnPoints = {
 	},
 	{
 		name = "InAHouse1",
-		x = 12,
-		y = 15,
-		rate = 40,
+		x = 33,
+		y = 21,
+		rate = 90,
 		types = {
 			{ Peasants, 5 },
 			{ Judges, 8 },
 		},
-	},
-	{
-		name = "InAHouse2",
-		x = 1,
-		y = 2,
-		rate = 30,
-		types = {
-			{ Peasants, 5 },
-			{ Judges, 8 },
-		},
-	},
+	}
 }

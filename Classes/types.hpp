@@ -18,8 +18,10 @@
 #define TUTORIAL_STAGE 2649
 #define DEMON_STAGE 2651
 
-// Coordinates
+// Hinterland
+#define HINTERLAND_WIDTH 2
 
+// Coordinates
 typedef struct intcoord {
 	int x, y;
 } intcoord;
