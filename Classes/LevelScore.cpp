@@ -14,7 +14,7 @@ LevelScore::LevelScore(Game *_game, W *_theW, bool _victory) : GameState(_game, 
 	
 	victory = _victory;
 	
-	theW->playSound(victory ? "Mission accomplished.wav" : "Scream.wav");
+	theW->playSound(victory ? "Mission accomplished.wav" : "Mission failed.wav");
 
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
