@@ -1,5 +1,5 @@
 /*
- * WindowManager.hpp - Cross-platform window functions
+ * WindowManager.hpp - cross-platform window functions
  *
  */
 

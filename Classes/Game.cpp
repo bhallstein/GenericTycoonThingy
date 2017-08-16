@@ -77,7 +77,7 @@ void Game::draw() {
 	int w = theW->width(), h = theW->height();
 	if (w != prev_w || h != prev_h) {
 		prev_w = w, prev_h = h;
-		for (int i = 0; i < n; i++)
+		for (int i=0; i < n; i++)
 			states[i]->setResolution(w, h);
 	}
 	

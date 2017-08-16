@@ -26,8 +26,8 @@ void View::_draw() {
 
 void View::draw() {
 	// Everybody loves a checkerboard pattern
-	for (int i = 0; i < width; i += 20)
-		for (int j = 0; j < height; j += 20)
+	for (int i=0; i < width; i += 20)
+		for (int j=0; j < height; j += 20)
 			theW->drawRect(
 				i, j, 20, 20,
 				(j/20)%2

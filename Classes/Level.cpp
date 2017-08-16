@@ -37,6 +37,9 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	responderMap.subscribeToKey(this, Event::K_Q);
 	responderMap.subscribeToKey(this, Event::K_C);
 	responderMap.subscribeToKey(this, Event::K_S);
+	
+	// Time
+	time(&time_levelstart);
 }
 Level::~Level()
 {

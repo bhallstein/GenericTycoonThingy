@@ -73,11 +73,13 @@ void Menu::startLevel(std::string path) {
 
 MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
 {
-	buttons.push_back(new Button(100, 200, 240, 135, "start level 1"));
+	buttons.push_back(new Button(280, 160, 240, 110, "start level 1"));
 }
 void MenuView::draw() {
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
+	theW->drawText(186, 340, "black", "Welcome to Generic Tycoon Thingy");
+	theW->drawText(308, 380, "white", "Click to begin");
 }

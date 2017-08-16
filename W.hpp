@@ -39,8 +39,9 @@ public:
 	void startDrawing();
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
-	void drawRect(float _x, float _y, float _width, float _height, const char *colour, float rot = 0);
+	void drawRect(float x, float y, float _width, float _height, const char *colour, float rot = 0);
 	__colour stringToColour(const char *);
+	void drawText(float x, float y, const char *col, const char *);
 
 	// Event shizzle
 	void addEvent(Event &);
@@ -77,7 +78,7 @@ protected:
 	//enum mode_type { WINDOWED, FULLSCREEN, NONE } mode;
 	WindowManager *winManager;
 	bool opengl_needs_setting_up;
-	View *current_drawn_view;
+	View *current_drawn_view;	
 
 	std::vector<Event> events;
 	

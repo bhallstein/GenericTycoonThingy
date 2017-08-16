@@ -10,6 +10,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <ctime>
 
 #include "types.hpp"
 #include "GameState.hpp"
@@ -101,6 +102,7 @@ protected:
 	int money;
 
 	int framecount;
+	time_t time_levelstart;
 	
 	std::list<std::string> allowedBuildings;
 };
