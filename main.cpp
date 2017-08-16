@@ -172,8 +172,13 @@ LRESULT CALLBACK WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lPar
 	else if (msg == WM_KEYUP) {
 		return 0;
 	}
-	else if (msg == WM_SIZE) {
-		dealWithResize(NULL);	// Seems on win just to need to deal with resize
+	else if (msg == WM_GETMINMAXINFO) {
+		MINMAXINFO *minmaxinfo = (MINMAXINFO*) lParam;
+		minmaxinfo->ptMaxTrackSize.x = minmaxinfo->ptMinTrackSize.x = minmaxinfo->ptMaxSize.x = 816;	// ptMin/MaxTrackSize used while resizing, ptMaxSize used while maximizing
+		minmaxinfo->ptMaxTrackSize.y = minmaxinfo->ptMinTrackSize.y = minmaxinfo->ptMaxSize.y = 638;
+	}
+	else if (msg == WM_SIZE) {	// Sent after resize
+		dealWithResize(NULL);	// Seems on win this is all we need to do
 		return 0;
 	}
 	else if (msg == WM_ACTIVATE) {

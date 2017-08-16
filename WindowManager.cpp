@@ -272,7 +272,7 @@ bool WindowManager::goWindowed() {
 		if (ChangeDisplaySettings(NULL, 0) != DISP_CHANGE_SUCCESSFUL)
 			return false;
 		
-		DWORD windowStyle = WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU; /*WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;*/
+		DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 		DWORD extendedWindowStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		
 		SetWindowLongPtr(this->windowHandle, GWL_STYLE, windowStyle);
