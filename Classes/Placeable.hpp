@@ -1,6 +1,5 @@
 /*
- * Building.h
- * - a building
+ * Placeable.h
  *
  */
 

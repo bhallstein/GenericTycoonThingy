@@ -40,8 +40,9 @@
  *   - Since this disorders the heap, though, you MUST then call `reheapify`, which is O(n).
  *   - WARNING: BinaryHeap assumes some things about your elements:
  *         - that they are all continguous in memory (i.e. they are held in a vector or contiguously allocated)
- *         - that first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said contiguous area of memory
- *         - obviously enough, that your elements do not move in memory after you have added pointers to them
+ *         - that the first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said
+ *           contiguous area of memory
+ *         - obviously enough, that your elements do not move in memory after you have added pointers to them to the heap
  */
 
 #ifndef BINARYHEAP_H
@@ -73,8 +74,8 @@ public:
 	BinaryHeap(int max_size);
 	~BinaryHeap();
 	void reset();				// Makes the heap effectively as-new.
-								// Reusing heaps is better than creating new ones repeatedly, since a BinaryHeap must
-								// allocate memory at construction time.
+								// Where possible, reuse heaps rather than creating new ones – this is faster, since
+								// it misses out the memory allocations that occur on construct.
 
 	void fast_push(nodetype x);	// Push onto the heap without sorting into place. Use to initialize, then call...
 	void reheapify();			// Set the heap back in order.
@@ -121,6 +122,7 @@ BinaryHeap<nodetype, comparandtype>::~BinaryHeap() {
 template <class nodetype, typename comparandtype>
 void BinaryHeap<nodetype, comparandtype>::reset() {
 	heap.clear();
+	heap.resize(n);
 	length = 0;
 	heap.reserve(n);
 }

@@ -22,15 +22,14 @@ Level::~Level()
 
 Placeable* Level::createPlaceable()
 {
-	std::cout << "adding new placeable (currently " << placeables.size() << ")... ";
 	placeables.push_back( new Placeable(gamemap) );
-	std::cout << "now: " << placeables.size() << std::endl;
+	std::cout << "added new placeable (now " << placeables.size() << ")" << std::endl;
 	return placeables.back();
 }
 
 Unit* Level::createUnit() {
-	std::cout << "adding new unit (currently " << units.size() << ")" << std::endl;
 	units.push_back( new Unit(gamemap) );
+	std::cout << "added new unit (now " << units.size() << ")" << std::endl;
 	return units.back();
 }
 
@@ -116,21 +115,11 @@ void Level::buildLevel(boost::property_tree::ptree levelFile)
 	}
 }
 
-#ifdef here_is_a_small_note_about_drawing_and_coordinates
+#ifdef here_is_a_small_note_about_drawing_and_coordinates_why_here_you_ask_ill_get_back_to_you_on_that_one
 
 Two coordinate systems:
 	block coordinates: x, y
 	floating point coords  (offset from the block): a, b
-
-Level:
-	w, h	blocks wide/tall: intcoord
-Drawn Object:
-	x, y	block coordinate
-	[a, b	floating point coordinate within block: floatcoord]
-
-GameMap makes x,y coords available.
-Drawn Objects make x,y & a,b coord available.
-Level makes all objects currently in play available.
 
 Display code:
 	x, y, a, b

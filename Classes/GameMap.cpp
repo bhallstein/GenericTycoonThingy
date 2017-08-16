@@ -11,15 +11,11 @@ MapLoc::~MapLoc() {
 
 void MapLoc::addResponder(EventResponder *resp) {
 	// Add an eventresponder to the list thereof
-	 //cout << responderList.size() << " -> ";
 	responderList.push_back(resp);
-	 //cout << responderList.size() << endl;
 }
 void MapLoc::removeResponder(EventResponder *resp) {
 	// Remove an eventresponder from the list thereof
-	 //cout << responderList.size() << " -> ";
 	responderList.remove(resp);
-	 //cout << responderList.size() << endl;
 }
 void MapLoc::dispatchEvent(Event *ev, EventResponder **p_e_r) {
 	for (std::list<EventResponder*>::iterator i = responderList.begin(); i != responderList.end(); i++)
@@ -54,15 +50,6 @@ void GameMap::setDimensions(int _w, int _h) {
 	int n = w * h;
 	maplocs.resize(n);
 
-	// Test binary heap ordering
-	//BinaryHeap<MapLoc*, float> heap;
-	//srand(time(0));
-	//for (int a = 0; a < 15; a++) {
-	//	maplocs[a].min_dist = rand()%10;
-	//	heap.push(&maplocs[a]);
-	//}
-	//heap.print(); heap.pop(); heap.print();
-
 	int i, j, x, y;
 	MapLoc *maploc;
 	for (int j=0; j < h; j++) {
@@ -84,23 +71,19 @@ void GameMap::setDimensions(int _w, int _h) {
 
 void GameMap::addResponder(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
-	// cout << "Adding object to responders at " << atX << "," << atY << "... " << endl;
 	for (int j = y; j < y + resp->h; j++)
 		for (int i = x; i < x + resp->w; i++)
 			maplocs[j*w + i].addResponder(resp);
-	// cout << endl << endl;
 }
 void GameMap::removeResponder(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
-	// cout << "Removing object from responders at " << atX << "," << atY << "... " << endl;
 	for (int j = y; j < y + resp->h; j++)
 		for (int i = x; i < x + resp->w; i++)
 			maplocs[j*w + i].removeResponder(resp);
-	// cout << endl;
 }
 void GameMap::dispatchEvent(Event *ev, EventResponder **p_e_r) {
 	maplocs[w*ev->y + ev->x].dispatchEvent(ev, p_e_r);
@@ -130,7 +113,7 @@ void GameMap::makeImpassable(int atX, int atY) {
 }
 void GameMap::addImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)
@@ -138,7 +121,7 @@ void GameMap::addImpassableObject(EventResponder *resp) {
 }
 void GameMap::removeImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0  || x + resp->w >= w || y + resp->h >= h)
+	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
 		return;
 	for (int j = resp->y; j < resp->y + resp->h; j++)
 		for (int i = resp->x; i < resp->x + resp->w; i++)

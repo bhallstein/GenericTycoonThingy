@@ -28,12 +28,11 @@ Game::~Game()
 void Game::Run()
 {
 	// Create Level
-	Level level("Data/level1.xml",&gamemap);
+	Level level("Data/level1.xml", &gamemap);
 	
 	bool should_quit = false;
 	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
 															// the receiveEvent(sf::Event *ev) method
-	
 	int pixel_w = w * block_w;
 	int pixel_h = h * block_h;
 	

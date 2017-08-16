@@ -31,12 +31,8 @@ public:
 
 protected:
 
-	// Methods
-	
-
 	// Properties
 	GameMap *gamemap;
-	//enum mode_types { PLACEMENT, PLACED } mode;
 	bool clicked;
 	
 };
