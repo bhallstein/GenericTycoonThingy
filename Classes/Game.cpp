@@ -11,7 +11,8 @@ Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 	if (settings->fullscreen.value)	{ }	// The value of this somehow seems to be getting *randomly generated* at
 										// startup, at present. :S
 	theW->goWindowed();
-	theW->setWindowTitle(game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
+//	theW->setWindowTitle(game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
+	theW->setWindowTitle(TYCOON_NAME);
 	prev_w = theW->width(), prev_h = theW->height();
 //	theW->setDefaultWindowSize(settings->Screen_Width.value, settings->Screen_Height.value);
 }

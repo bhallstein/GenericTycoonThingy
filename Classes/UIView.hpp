@@ -36,7 +36,7 @@ protected:
 	bool allowDrag, dragloop;
 	intcoord drag_initial;
 	
-	std::vector<Button *> buttons;
+	std::vector<Button*> buttons;
 	std::vector<Callback*> subscribers;
 };
 

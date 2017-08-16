@@ -431,7 +431,9 @@ void W::initializePaths() {
 	
 	// Settings path
 	settingsPath = path;
-	settingsPath.append("/Library/Application Support/Demon Barber Tycoon/");
+	settingsPath.append("/Library/Application Support/");
+	settingsPath.append(TYCOON_NAME);
+	settingsPath.append("/");
 	
 	// Lua path
 	[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
@@ -450,13 +452,17 @@ void W::initializePaths() {
 	// Settings path
 	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
 	settingsPath = path;
-	settingsPath.append("/Demon Barber Tycoon/");
+	settingsPath.append("/");
+	settingsPath.append(TYCOON_NAME);
+	settingsPath.append("/");
+
+	/* The following are debug-only: need specifying for debug/release using ifdefs */
 	
 	// Lua path
 	GetModuleFileName(0, path, sizeof(path) - 1);
 	std::string resourcesPath = path;
 	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
-	resourcesPath.append("/../Demon Barber Tycoon/");		// When installed, will want to be "/Data/" - or...?
+	resourcesPath.append("/../Demon Barber Tycoon/");
 	luaPath = resourcesPath + "Lua/";
 	
 	// Data path
