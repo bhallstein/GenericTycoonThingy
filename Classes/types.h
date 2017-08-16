@@ -80,5 +80,6 @@ typedef int dbt_event;
 //#define K_ESC    -30192
 //#define K_ESC    -30193
 //#define K_ESC    -30194
+#define K_OTHER -32475
 
 #endif

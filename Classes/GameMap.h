@@ -32,7 +32,7 @@ public:
 	void removeObject(EventResponder *x);
 	
 protected:
-	std::list<EventResponder*> things;
+	std::list<EventResponder*> responderList;
 	
 };
 
@@ -40,18 +40,18 @@ protected:
 class GameMap
 {
 public:
-	GameMap(int columns, int rows);
+	GameMap();
 	~GameMap();
 
 	// Properties
 	int w, h;
 	
 	// Methods
-	void addObject(EventResponder *object, int atX, int atY);
-	void removeObject(EventResponder *object, int atX, int atY);
+	void setDimensions(int _w, int _h);
+	void addObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
+	void removeObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
 
 protected:
-	
 	// Properties
 	std::vector<MapLoc> maplocs;	// A [w*h]-sized array of MapLocs
 	

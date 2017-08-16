@@ -37,7 +37,6 @@ void Event::setCoords(int pixel_x, int pixel_y, int block_width, int block_heigh
 
 
 
-
 // This is a horrendous function to convert SFML key codes to DBT’s own.
 // At some point a swap-out of SFML will obviate the need for it.
 dbt_event keyFromSFKeyCode(sf::Keyboard::Key sf_key_code) {
@@ -158,6 +157,7 @@ dbt_event keyFromSFKeyCode(sf::Keyboard::Key sf_key_code) {
 			k = K_RETURN;
 			break;
 		default:
+			k = K_OTHER;
 			break;
 	}
 	return k;
