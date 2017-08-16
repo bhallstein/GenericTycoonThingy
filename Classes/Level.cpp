@@ -169,7 +169,7 @@ Staff* Level::createStaff() {
 	//find the asylum (spawn building) amongst our buildings
 	//note: this method only reliably works while we only have 1 asylum per level
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
-		if ((*i)->type == "Asylum") {
+		if ((*i)->type == "asylum") {
 			atX = (*i)->x;
 			atY = (*i)->y;
 			i = buildings.end();
