@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include "types.h"
-#include "EventResponder.h"
+#include "EventResponder.hpp"
 
 
 class Building : EventResponder

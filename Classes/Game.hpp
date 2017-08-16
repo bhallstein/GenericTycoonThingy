@@ -12,9 +12,9 @@
 
 #include "types.h"
 
-#include "SettingsManager.h"
-#include "Level.h"
-#include "Event.h"
+#include "SettingsManager.hpp"
+#include "Level.hpp"
+#include "Event.hpp"
 
 
 class Game

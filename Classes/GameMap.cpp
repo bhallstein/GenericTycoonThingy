@@ -1,4 +1,4 @@
-#include "GameMap.h"
+#include "GameMap.hpp"
 
 /*********************************
  *     MapLoc implementation     *

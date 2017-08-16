@@ -11,7 +11,7 @@
 
 #include <SFML/Window.hpp>
 
-#include "Event.h"
+#include "Event.hpp"
 
 class EventResponder
 {

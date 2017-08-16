@@ -8,7 +8,7 @@
 // #include <map>
 // #include <vector>
 
-#include "Classes/Game.h"
+#include "Classes/Game.hpp"
 
 
 int main(int argc, char *argv[], char *envp[])

@@ -13,8 +13,8 @@
 #include <SFML/Graphics.hpp>
 
 #include "types.h"
-#include "GameMap.h"
-#include "Building.h"
+#include "GameMap.hpp"
+#include "Building.hpp"
 
 
 class Level

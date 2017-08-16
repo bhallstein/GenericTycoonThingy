@@ -12,7 +12,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include "EventResponder.h"
+#include "EventResponder.hpp"
 
  
 class Unit : EventResponder

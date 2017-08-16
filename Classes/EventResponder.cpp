@@ -1,4 +1,4 @@
-#include "EventResponder.h"
+#include "EventResponder.hpp"
 
 EventResponder::EventResponder() { }
 EventResponder::~EventResponder() { }
