@@ -18,6 +18,7 @@ public:
 	static struct init *initializer;
 	
 private:
+	static bool device_available;
 	static irrklang::ISoundEngine *sound_engine;
 	static irrklang::ISound *bgm; // Background music sound instance
 
