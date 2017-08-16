@@ -45,6 +45,7 @@ void Controller::releaseUnit(Unit *u, ControllerCompletion::T succ) {
 	else {
 		Controller *c = (Controller*) it->second.get();
 		levelMap->reactivateController(c);
+		c->resume(u, succ);
 	}
 }
 
