@@ -29,7 +29,7 @@ public:
 protected:
 
 	// Methods
-	void setPosition(int x, int y);
+	void setPosition(int _x, int _y);
 
 	// Properties
 	GameMap *gamemap;

@@ -41,8 +41,10 @@ void Placeable::receiveEvent(Event *ev, EventResponder **p_e_r) {
 	else if (mode == PLACED) {
 		if (ev->type == MOUSEMOVE) {
 			//mouseover = true;	// ...but how to unset?
-			// Think a better event would be "mouse is over" – avails the object of the fact once per frame,
+			// Think a better event would be "mouse is over" – simply avails the object of the fact,
 			// so it (or the drawing class) can respond accordingly (highlighted drawing, for instance.)
+			// An alternative method to manage highlight-what’s-under-mouse would be to look up the object
+			// in the event responder map (if any), and pass that object to the drawing function.
 		}
 		else if (ev->type == LEFTCLICK) {
 			clicked = !clicked;
@@ -60,7 +62,7 @@ void Placeable::setPosition(int _x, int _y) {
 
 
 char Placeable::col() {
-	return (mode == PLACEMENT ? 'w' : clicked ? 'l' : 'b');
+	return (mode == PLACEMENT ? 'w' : clicked ? 'r' : 'b');
 }
 
 

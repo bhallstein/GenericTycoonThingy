@@ -46,6 +46,7 @@ public:
 	std::vector<Unit*> units;
 
 protected:
+	
 	int w, h; 					// Blocks wide/tall.
 	GameMap *gamemap;
 	int framecount;

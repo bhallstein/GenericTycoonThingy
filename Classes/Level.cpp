@@ -1,21 +1,17 @@
 #include "Level.hpp"
 
-Level::Level(std::string fileName, GameMap *_gamemap)
+Level::Level(std::string fileName, GameMap *_gamemap) : gamemap(_gamemap)
 {
-	gamemap = _gamemap;
-
-	//Read in from level file
-	buildLevel(readLevel(fileName));
-
+	buildLevel(readLevel(fileName));	// Read in from level file
 	framecount = 0;
 }
 Level::~Level()
 {
 	// Buildings & units are allocated on the heap with `new` – so must be manually `delete`d.
 	for (std::vector<Building*>::iterator i = buildings.begin(); i != buildings.end(); i++)
-		delete (*i);	
+		delete (*i);
 	for (std::vector<Placeable*>::iterator i = placeables.begin(); i != placeables.end(); i++)
-		delete (*i);	
+		delete (*i);
 	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++)
 		delete (*i);
 }
