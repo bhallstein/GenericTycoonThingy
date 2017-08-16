@@ -2,12 +2,10 @@
 #include "EventResponder.hpp"
 #include "MappedObj.hpp"
 
-ResponderMap::ResponderMap(int _w, int _h) : w(_w), h(_h), privileged_event_responder(NULL)
-{
+ResponderMap::ResponderMap(int _w, int _h) : w(_w), h(_h), privileged_event_responder(NULL) {
 	
 }
-ResponderMap::~ResponderMap()
-{
+ResponderMap::~ResponderMap() {
 	
 }
 
@@ -28,7 +26,7 @@ void ResponderMap::addMappedObj(MappedObj *obj) {
 	subscribed_mappedobjs.push_back(obj);
 }
 void ResponderMap::removeMappedObj(MappedObj *obj) {
-	subscribed_mappedobjs.push_back(obj);
+	subscribed_mappedobjs.remove(obj);
 }
 
 bool ResponderMap::requestPrivilegedEventResponderStatus(EventResponder *resp) {
@@ -88,7 +86,7 @@ void ResponderMap::dispatchMouseEvent(Event *ev) {
 	MappedObj *last_obj = NULL, *o;
 	for (mo_list::iterator it = subscribed_mappedobjs.begin(); it != subscribed_mappedobjs.end(); it++) {
 		o = *it;
-		for (int i=0; i < o-> ground_plan.size(); i++) {
+		for (int i=0; i < o->ground_plan.size(); i++) {
 			intcoord c = o->ground_plan[i];
 			c.x += o->x, c.y += o->y;
 			floatcoord c_ev = { ev->x + ev->a, ev->y + ev->b }, c_obj = { c.x + o->a, c.y + o->b };

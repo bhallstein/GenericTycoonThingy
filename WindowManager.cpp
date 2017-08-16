@@ -1,3 +1,160 @@
+#ifdef __APPLE__
+
+/* Mac */
+
+#import <Cocoa/Cocoa.h>
+#import <Quartz/Quartz.h>
+
+#include <iostream>
+
+#include "WindowManager.hpp"
+#include "MyView.h"
+
+struct NativeObjs {
+	NSWindow *window;
+	MyWindowDelegate *windowDelegate;
+	MyView *view;
+	NSOpenGLContext *context;
+};
+
+WindowManager::WindowManager() : mode(WINDOWED) {
+	objs = new NativeObjs();
+	
+	a_lion_is_here = false;
+	
+	// Create OpenGL context
+	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
+	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
+	if (pf == nil)
+		std::cout << "couldn't create pf" << std::endl;	// throw exception
+	objs->context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
+	if (objs->context == nil)
+		std::cout << "couldn't create opengl context" << std::endl;	// throw exception
+	
+	// Create window
+	createWindow();
+}
+WindowManager::~WindowManager() {
+	
+}
+
+void WindowManager::createWindow() {
+	NSRect frame = NSMakeRect(0, 0, 800, 600);
+	objs->window = [[NSWindow alloc] initWithContentRect:frame
+											   styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
+												 backing:NSBackingStoreBuffered
+												   defer:NO];
+	[objs->window center];
+	
+	NSRect viewRect = NSMakeRect(0, 0, frame.size.width, frame.size.height);
+	objs->view = [[MyView alloc] initWithFrame:viewRect];
+	
+	[objs->window setContentView:objs->view];	// Add view to window
+	
+	[objs->context setView:objs->view];			// Set view as context’s drawable object
+	
+	objs->windowDelegate = [[MyWindowDelegate alloc] init];	// Create delegate to handle window close
+	[objs->window setDelegate:objs->windowDelegate];
+	
+	[objs->window makeKeyAndOrderFront:NSApp];
+	[objs->window makeFirstResponder:objs->view];
+}
+void WindowManager::closeWindow() {
+	[objs->context clearDrawable];
+	[objs->window release];
+	[objs->windowDelegate release];
+}
+
+bool WindowManager::goWindowed() {
+	if (mode == WINDOWED) return true;
+	
+	if (a_lion_is_here) {
+		// Lion fullscreen shizzle
+	}
+	else {
+		closeWindow();
+		createWindow();
+	}
+	return true;
+}
+bool WindowManager::goFullscreen() {
+	if (mode == FULLSCREEN) return true;
+	
+	if (a_lion_is_here) {
+		// Lion fullscreen shizzle
+	}
+	else {
+		// Snow leopard fullscreen shizzle
+		closeWindow();
+		
+		NSRect mainDisplayRect = [[NSScreen mainScreen] frame];			// Create fullscreen window
+		objs->window = [[NSWindow alloc] initWithContentRect:mainDisplayRect
+												   styleMask:NSBorderlessWindowMask
+													 backing:NSBackingStoreBuffered
+													   defer:NO];
+		[objs->window setLevel:NSMainMenuWindowLevel+1];
+		[objs->window setOpaque:YES];
+		[objs->window setHidesOnDeactivate:YES];
+		
+		NSRect viewRect = NSMakeRect(0.0, 0.0, mainDisplayRect.size.width, mainDisplayRect.size.height);
+		objs->view = [[MyView alloc] initWithFrame:viewRect];
+		[objs->window setContentView:objs->view];	// Add view to window
+		
+		[objs->context setView:objs->view];			// Set view as context’s drawable object
+		
+		objs->windowDelegate = [[MyWindowDelegate alloc] init];	// Create delegate to handle window close
+		[objs->window setDelegate:objs->windowDelegate];
+		
+		[objs->window makeKeyAndOrderFront:NSApp];
+		[objs->window makeFirstResponder:objs->view];
+	}
+	return true;
+}
+
+void WindowManager::setTitle(const char *t) {
+	[objs->window setTitle:[NSString stringWithUTF8String:t]];
+}
+void WindowManager::enableDrawing() {
+	[objs->context makeCurrentContext];
+}
+void WindowManager::endDrawing() {
+	[NSOpenGLContext clearCurrentContext];
+	[objs->context flushBuffer];
+}
+
+int WindowManager::width() {
+	return [objs->view bounds].size.width;
+}
+int WindowManager::height() {
+	return [objs->view bounds].size.height;
+}
+
+void* WindowManager::getEvents() {
+	return [objs->view getEvents];
+}
+void WindowManager::clearEvents() {
+	[objs->view clearEvents];
+}
+void* WindowManager::getView() {
+	return objs->view;
+}
+void WindowManager::frameChanged() {
+	[objs->context update];
+	if (mode == WINDOWED)
+		setBackBufferSize(width(), height());
+}
+void WindowManager::setBackBufferSize(int _x, int _y) {
+	GLint size[] = { _x, _y };
+	CGLContextObj ctx = (CGLContextObj) [objs->context CGLContextObj];
+	CGLSetParameter(ctx, kCGLCPSurfaceBackingSize, size);
+	CGLEnable(ctx, kCGLCESurfaceBackingSize);
+}
+
+
+#elif defined _WIN32 || _WIN64
+
+/* Windows Me */
+
 #include "WindowManager.hpp"
 
 WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
@@ -208,3 +365,5 @@ HWND WindowManager::getWindowHandle() {
 HDC WindowManager::getDeviceContext() {
 	return this->deviceContext;
 }
+
+#endif

@@ -24,7 +24,7 @@
 -(NSPoint)convertMouseCoords:(NSPoint)point {
 	point = [self convertPoint:point toView:self];
 	point.y -= 1;										// The y-axis is 1-based, for some reason
-	point.y = [self bounds].size.height - point.y;		// Oh and btw it's also inverted
+	point.y = [self bounds].size.height - point.y;		// Plus it's inverted
 	return point;
 }
 

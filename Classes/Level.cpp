@@ -121,11 +121,11 @@ void Level::setResolution(int _w, int _h) {
 }
 	
 void Level::receiveEvent(Event *ev) {
-	if (ev->type == Event::SCREENEDGE_LEFT)		levelview->scroll(LEFTWARD);
-	if (ev->type == Event::SCREENEDGE_RIGHT)	levelview->scroll(RIGHTWARD);
-	if (ev->type == Event::SCREENEDGE_TOP)		levelview->scroll(UPWARD);
-	if (ev->type == Event::SCREENEDGE_BOTTOM)	levelview->scroll(DOWNWARD);
-	if (ev->type == Event::KEYPRESS) {
+	if (ev->type == Event::SCREENEDGE_LEFT)			levelview->scroll(LEFTWARD);
+	else if (ev->type == Event::SCREENEDGE_RIGHT)	levelview->scroll(RIGHTWARD);
+	else if (ev->type == Event::SCREENEDGE_TOP)		levelview->scroll(UPWARD);
+	else if (ev->type == Event::SCREENEDGE_BOTTOM)	levelview->scroll(DOWNWARD);
+	else if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q)
 			game->stateFinished(this, Returny(Returny::killer_returny));
 		if (ev->key == Event::K_ESC)

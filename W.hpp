@@ -30,7 +30,6 @@ public:
 	
 	// Drawing shizzle
 	void setUpOpenGL();
-	void frameChanged();
 	void startDrawing();
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view

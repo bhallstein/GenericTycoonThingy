@@ -8,11 +8,14 @@
 #import <Cocoa/Cocoa.h>
 
 @interface DBTAppDelegate : NSObject <NSApplicationDelegate> {
+	void *winManager;
 	void *theW;
 	void *game;
 	NSTimer *timer;
 	bool quit;
 }
+-(void)sendEventsToW;
 -(void)sendQuitEvent;
+-(void)synthesizeMousemoveEvent;
 @property (assign) IBOutlet NSWindow *window;
 @end

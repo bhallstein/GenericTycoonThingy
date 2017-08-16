@@ -76,7 +76,7 @@ void convertToDBTEvent(Event &ev, UINT msg, WPARAM wParam, LPARAM lParam) {
 	else
 		ev.type = Event::UNKNOWN_EVENT;
 }
-void synthesizeMouseEvent(WindowManager *_winManager) {
+void synthesizeMousemoveEvent(WindowManager *_winManager) {
 	POINT p;
 	GetCursorPos(&p);
 	ScreenToClient(_winManager->getWindowHandle(), &p);
@@ -110,7 +110,6 @@ void synthesizeMouseEvent(WindowManager *_winManager) {
 			sendEventToW(ev, NULL);
 		}
 	}
-
 }
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -136,7 +135,7 @@ int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, i
 			}
 		}
 		else {
-			synthesizeMouseEvent(winManager);
+			synthesizeMousemoveEvent(winManager);
 			keep_running = game->update();
 			theW->clearEvents();
 			if (keep_running) {
@@ -166,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	}
 	else if (msg == WM_ACTIVATE) {
-		bool active = HIWORD(wParam) ? false : true;	// May want to pause the game loop
+		bool active = HIWORD(wParam) ? false : true;	// May want to un/pause the game loop
 		return 0;
 	}
 	if (msg == WM_SYSCOMMAND && (wParam == SC_SCREENSAVE || wParam == SC_MONITORPOWER))
