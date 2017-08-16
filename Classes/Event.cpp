@@ -34,14 +34,6 @@ void Event::loadFromMousePos(sf::Vector2i p) {
 	x = p.x, y = p.y;
 }
 
-void Event::convertCoords(int block_width, int block_height, int offset_x, int offset_y) {
-	x += offset_x, y += offset_y;
-	a = (float) (x%block_width) / (float) block_width;
-	b = (float) (y%block_height) / (float) block_height;
-	x = x/block_width;
-	y = y/block_height;
-}
-
 
 // This is a horrendous function to convert SFML key codes to DBT’s own.
 // At some point a swap-out of SFML will obviate the need for it.

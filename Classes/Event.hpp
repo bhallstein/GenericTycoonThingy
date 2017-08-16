@@ -20,7 +20,6 @@ public:
 	// Methods
 	void loadFromSFEvent(sf::Event *sf_event);
 	void loadFromMousePos(sf::Vector2i);
-	void convertCoords(int block_width, int block_height, int offset_x = 0, int offset_y = 0);
 	
 	// Properties
 	dbt_event_code type;

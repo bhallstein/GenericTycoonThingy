@@ -4,8 +4,8 @@
  * Subclass this to create your own views.
  *
  * Internal coordinates
- *  - It’s very convenient to divide a View into a grid of blocks.
- *  - This simplifies both drawing and eventresponse.
+ *  - Because it’s convenient, we divide a View into a grid of blocks.
+ *  - This simplifies both drawing and event response.
  *
  * Offsets from the window edge
  *  - A View’s position within the window is specified using offsets from the edges
@@ -20,6 +20,8 @@
  * Drawing:
  *  - To implement your subclass’s drawing behaviour, override draw()
  *  - From inside draw(), you can use View’s convenience drawing function(s):
+ *		- drawMappedObj(MappedObj *)
+ * 			- draw an object. uses the object’s own position info
  *  	- drawRect(colour, x, y, width, height)
  * 			- (takes block coordinates)
  *  - You’re not limited to drawing in the block coordinate system, though. You can also draw directly to the window using pixel values.
@@ -27,6 +29,8 @@
  * Event Response functions
  *  - Can be subscribed to an EventHandler, which will pass it mouse events.
  *  - Can use View::addResponder() & removeResponder() to objects for mouse events
+ *  - Events are then passed automatically to the appropriate responders, with pixel precision.
+ *  - If your subclass does something wacky, you may like to override convertEventToBlockCoordinates().
  * 
  * To prepare your View for event response:
  *  - Create the instance
@@ -52,35 +56,33 @@
 
 class View {
 public:
-	View(sf::RenderWindow *, int _blocks_w = 10, int _blocks_h = 10, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0);
+	View(sf::RenderWindow *, int _grid_w = 10, int _grid_h = 10, int _offsetL = 0, int _offsetT = 0, int _offsetR = 0, int _offsetB = 0);
 	~View();
 	
 	// Methods
-	virtual void draw();					// Your subclass should override this
-
-	void dispatchMouseEvent(Event *);
-	virtual void _dispatchMouseEvent(Event *);	// EventHandler calls this, allowing View & subclasses to do some
-												// shit before calling dispatchMouseEvent function
+	virtual void draw();					// Override this to implement your subclass’s drawing behaviour
 	
 	void addResponder(MappedObj *);
 	void removeResponder(MappedObj *);
+	void dispatchMouseEvent(Event *);
 	
 	bool requestPrivilegedEventResponderStatus(EventResponder *);		// lol
 	void relinquishPrivilegedEventResponderStatus(EventResponder *);	//
 	
 	// Properties
 	int l_pos, t_pos, r_pos, b_pos;
-	int l_offset, t_offset, r_offset, b_offset;
+	int offset_L, offset_T, offset_R, offset_B;
 
 protected:
 	// Methods
-	virtual void drawRect(sf::Color color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
+	virtual void drawRect(sf::Color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 	virtual void drawMappedObj(MappedObj *);
-	
+	virtual void convertEventToBlockCoordinates(Event *ev);		// Convert an event’s coords (pixels, rel. to window) to coords in the internal grid
+																// (override if subclass does something non-standard with the grid)
 	// Properties
 	sf::RenderWindow *window;
-	
-	int blocks_w, blocks_h;
+	int grid_w, grid_h;
+
 	std::vector<std::list<MappedObj *> > responderMap;
 	EventResponder *privileged_event_responder;
 	
@@ -92,15 +94,13 @@ public:
 	ScrollingView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
 	~ScrollingView();
 	
-	// Methods
-	void _dispatchMouseEvent(Event *);
-	
 protected:
 	// Methods
-	void drawRect(sf::Color colour, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);	
+	void drawRect(sf::Color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
+	void convertEventToBlockCoordinates(Event *ev);
 	
 	// Properties
-	int block_size_x, block_size_y;		// Subclasses should override. Default is 20.
+	int block_pixel_width, block_pixel_height;		// Width/height of a "block". Default is 20.
 	int scroll_x, scroll_y;
 	
 };

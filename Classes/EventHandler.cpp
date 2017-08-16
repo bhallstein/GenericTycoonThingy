@@ -41,6 +41,6 @@ void EventHandler::dispatchEvent(Event *ev) {
 		for (std::list<View*>::iterator i = subscribed_views.begin(); i != subscribed_views.end(); i++) {
 			view = (*i);
 			if (ev->x >= view->l_pos && ev->x <= view->r_pos && ev->y >= view->t_pos && ev->y <= view->b_pos)
-				view->_dispatchMouseEvent(ev);
+				view->dispatchMouseEvent(ev);
 		}
 }

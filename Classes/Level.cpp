@@ -151,7 +151,7 @@ void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> 
 	// improvement. The sane way to do it might be to pass the game map.
 	
 	// Draw background
-	drawRect(sf::Color(0, 0, 0, 50), 0, 0, blocks_w, blocks_h);
+	drawRect(sf::Color(0, 0, 0, 50), 0, 0, grid_w, grid_h);
 
 	// Draw buildings
 	for (int i=0, n = buildings->size(); i < n; i++)
