@@ -11,6 +11,7 @@
 #include "types.h"
 #include "MappedObj.hpp"
 
+enum BuildingType { DERELICT, HOME, BARBER, PIESHOP };
 
 class Building : public MappedObj
 {
@@ -23,6 +24,7 @@ public:
 	char col();						// Temporary coloration-signifier
 
 	// Properties
+	BuildingType type;
 	bool destroyed;
 	std::vector<door> doors;		// Doors. These should be on the edge of the building. lol.
 									// See types.h for what a door looks like.

@@ -19,12 +19,13 @@ public: //this may need changing?
 	std::vector<std::string> options; //Valid Options (e.g. for Combos)
 	int range[2]; //array [0]=min value [1]=max value ??
 	T value; //return different types for value :)
-	//std::string displayType; //enum this actually. not used yet, when we have an options menu
+	//std::string displayType; //enum this actually. not used yet; when we have an options menu
 	std::string displayText;
 	std::string tooltip;
 	bool enabled; //Is this setting available to change?
 	bool dev; //Is this a developer setting?
 	bool detect; //should this setting be detected on this load?
+	bool overridden; //has this setting been overridden by cfg/cmdline?
 };
 
 #endif

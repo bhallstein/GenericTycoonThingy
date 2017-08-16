@@ -30,5 +30,20 @@ void Building::receiveEvent(Event *ev) {
 }
 
 char Building::col() {
-	return (clicked ? 'l' : 'b');
+	char defaultCol;
+	switch(type)
+	{
+	case HOME:
+		defaultCol = 'w';
+		break;
+	case BARBER:
+		defaultCol = 'r';
+		break;
+	case PIESHOP:
+		defaultCol = 'y';
+		break;
+	default:
+		defaultCol = 'b';
+	}
+	return (clicked ? 'l' : defaultCol);
 }

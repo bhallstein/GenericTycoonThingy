@@ -37,8 +37,27 @@ void Level::buildLevel(ptree levelFile)
 
 	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
 	{
+		
 		if(obj.first == "building")
-			createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
+		{
+			Building* b = createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
+
+			switch(obj.second.get<int>("type",0))
+			{
+			case 1:
+				b->type = HOME;
+				break;
+			case 2:
+				b->type = BARBER;
+				break;
+			case 3:
+				b->type = PIESHOP;
+				break;
+			default:
+				b->type = DERELICT;
+				break;
+			}
+		}
 	}
 }
 

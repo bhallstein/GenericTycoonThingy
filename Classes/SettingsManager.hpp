@@ -41,10 +41,10 @@ public:
 		//Ultimately we will set more than just values! ;)
 
 		//Screen_Width
-		Screen_Width.value = 800;
+		Screen_Width.value = 1280;
 
 		//Screen_Height
-		Screen_Height.value = 600;
+		Screen_Height.value = 720;
 
 		//Windowed
 		Windowed.value = true;
