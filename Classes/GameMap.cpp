@@ -147,7 +147,7 @@ bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLo
 	
 	/* Initialisation */
 	int n = w * h, _i = 0;
-	BinaryHeap<MapLoc*, float> open_nodes(n);
+	MisterHeapy<MapLoc*, float> open_nodes(n);
 	for (int i=0; i < n; i++) {
 		MapLoc *maploc = &maplocs[i];
 		maploc->min_dist = (maploc == A ? 0 : INFINITAH);	// Set nodes’ min_dist to inifinity

@@ -1,12 +1,12 @@
 /*
- * BinaryHeap.hpp – a dynamic, sorted binary heap
+ * MisterHeapy.hpp – a dynamic, sorted binary heap
  *
- * BinaryHeap is a binary heap for storing pointers to objects.
+ * MisterHeapy is a binary heap for storing pointers to objects.
  *
  * It is bog standard, but has capabilities not provided by std’s heap functions:
  *
  *     1. It supports live updating of elements by index in O(logN) time with `update_at(index, new_value)`.
- *     2. By maintaining a lookup table, BinaryHeap enables you to update any object in the heap directly,
+ *     2. By maintaining a lookup table, MisterHeapy enables you to update any object in the heap directly,
  *        without knowing its index.
  *        For instance, to update an object *x, you can simply call `update(x, 12)`.
  *        And this is virtually as fast as updating by index.
@@ -17,7 +17,7 @@
  *     i.e. if A’s comparand is greater than B’s comparand, A will be ‘above’ B in the heap.
  *     For instance, a MapLoc’s comparand is a float called min_dist.
  *
- * To be used with BinaryHeap, your objects must:
+ * To be used with MisterHeapy, your objects must:
  *     1. Implement the function void setComparand(new_value)
  *           This should overwrite the object’s comparand.
  *           e.g. for MapLoc: `void setComparand(float new_dist) { min_dist = new_dist; }
@@ -25,11 +25,11 @@
  *           Your function should take a pointer p to another object of the same class, and compare its 
  *           own comparand to p’s, e.g. `bool operator< (MapLoc *p) { return min_dist < p->min_dist; }`
  * 
- * ~~ Creating Your BinaryHeap Instance ~~
+ * ~~ Creating Your MisterHeapy Instance ~~
  * 
- * BinaryHeap is a templated class, adapting to the type of your object, and of your object’s comparand.
+ * MisterHeapy is a templated class, adapting to the type of your object, and of your object’s comparand.
  * So, if your objects are MapLocs, and MapLoc’s comparand min_dist is a float:
- *     `BinaryHeap<MapLoc*, float> myheap(32);`
+ *     `MisterHeapy<MapLoc*, float> myheap(32);`
  * The parameter is the maximum size of your heap. Attempting to push elements beyond this limit will fail.
  *
  * ~~ Initializing Your Heap ~~
@@ -38,15 +38,15 @@
  *   - If you need to feed it a large initial dataset, you may use fast_push instead, which prevents objects from
  *     being sorted as they are added.
  *   - Since this disorders the heap, though, you MUST then call `reheapify`, which is O(n).
- *   - WARNING: BinaryHeap assumes some things about your elements:
+ *   - WARNING: MisterHeapy assumes some things about your elements:
  *         - that they are all continguous in memory (i.e. they are held in a vector or contiguously allocated)
  *         - that the first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said
  *           contiguous area of memory
  *         - obviously enough, that your elements do not move in memory after you have added pointers to them to the heap
  */
 
-#ifndef BINARYHEAP_H
-#define BINARYHEAP_H
+#ifndef MISTERHEAPY_H
+#define MISTERHEAPY_H
 
 #include <iostream>
 #include <queue>
@@ -66,13 +66,13 @@ inline int twotothepowerof(unsigned int x) {
 
 
 template <class nodetype, typename comparandtype>
-class BinaryHeap {
+class MisterHeapy {
 public:
 	typedef std::vector<nodetype> queue_type;
 	
 	// Methods
-	BinaryHeap(int max_size);
-	~BinaryHeap();
+	MisterHeapy(int max_size);
+	~MisterHeapy();
 	void reset();				// Makes the heap effectively as-new.
 								// Where possible, reuse heaps rather than creating new ones – this is faster, since
 								// it misses out the memory allocations that occur on construct.
@@ -108,19 +108,19 @@ protected:
 /* Implementation (a templated class’s implementation must be in the same file as its declaration.) */
 
 template <class nodetype, typename comparandtype>
-BinaryHeap<nodetype, comparandtype>::BinaryHeap(int _n) : n(_n) {
+MisterHeapy<nodetype, comparandtype>::MisterHeapy(int _n) : n(_n) {
 	heap.resize(n);
 	indices_in_heap = (int*) malloc(sizeof(int) * n);	// Allocate node-lookup array
 	reset();
 }
 
 template <class nodetype, typename comparandtype>
-BinaryHeap<nodetype, comparandtype>::~BinaryHeap() {
+MisterHeapy<nodetype, comparandtype>::~MisterHeapy() {
 	free(indices_in_heap);
 }
 
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::reset() {
+void MisterHeapy<nodetype, comparandtype>::reset() {
 	heap.clear();
 	heap.resize(n);
 	length = 0;
@@ -128,7 +128,7 @@ void BinaryHeap<nodetype, comparandtype>::reset() {
 }
 
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::fast_push(nodetype x) {
+void MisterHeapy<nodetype, comparandtype>::fast_push(nodetype x) {
 	if (length >= n) {
 		std::cout << "Binary heap error: fast_push called, but heap is full!" << std::endl;
 		return;
@@ -140,7 +140,7 @@ void BinaryHeap<nodetype, comparandtype>::fast_push(nodetype x) {
 }
 
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::swap_nodes(int ind1, int ind2) {
+void MisterHeapy<nodetype, comparandtype>::swap_nodes(int ind1, int ind2) {
 	nodetype x1 = heap[ind1], x2 = heap[ind2];
 	// Update at ind1
 	heap[ind1] = x2;
@@ -150,7 +150,7 @@ void BinaryHeap<nodetype, comparandtype>::swap_nodes(int ind1, int ind2) {
 	indices_in_heap[x1 - x_start] = ind2;
 }
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::up_heap(int _ind) {
+void MisterHeapy<nodetype, comparandtype>::up_heap(int _ind) {
 	int ind = _ind, parent_ind = (ind-1)/2;
 	
 	while (ind > 0 && *heap[parent_ind] < heap[ind]) {
@@ -160,7 +160,7 @@ void BinaryHeap<nodetype, comparandtype>::up_heap(int _ind) {
 	}
 }
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::down_heap(int _ind) {
+void MisterHeapy<nodetype, comparandtype>::down_heap(int _ind) {
 	int ind = _ind, l_child_ind = ind*2+1, r_child_ind = ind*2+2, larger_child_ind;
 	nodetype our_node = heap[ind];
 	
@@ -180,14 +180,14 @@ void BinaryHeap<nodetype, comparandtype>::down_heap(int _ind) {
 }
 
 template <class nodetype, typename comparandtype>
-nodetype BinaryHeap<nodetype, comparandtype>::pop() {
+nodetype MisterHeapy<nodetype, comparandtype>::pop() {
 	nodetype popsicle = heap[0];
 	swap_nodes(0, --length);
 	down_heap(0);
 	return popsicle;
 }
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::push(nodetype x) {
+void MisterHeapy<nodetype, comparandtype>::push(nodetype x) {
 	if (length >= n) {
 		std::cout << "Binary heap error: push called, but heap is full!" << std::endl;
 		return;
@@ -210,7 +210,7 @@ void BinaryHeap<nodetype, comparandtype>::push(nodetype x) {
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::reheapify() {
+void MisterHeapy<nodetype, comparandtype>::reheapify() {
 	// To sort a heap: start at the lowest level, calling down_heap on the root of each subtree,
 	// and do this for each level until the top of the tree is reached
 	int i, j, depth, greatest_depth = log_base2(length);
@@ -221,7 +221,7 @@ void BinaryHeap<nodetype, comparandtype>::reheapify() {
 				down_heap(i);
 }
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::update_at(int i, comparandtype new_val) {
+void MisterHeapy<nodetype, comparandtype>::update_at(int i, comparandtype new_val) {
 	if (i < 0 || i >= length) return;
 	heap[i]->setComparand(new_val);
 	int parent_i = (i-1)/2;	
@@ -231,17 +231,17 @@ void BinaryHeap<nodetype, comparandtype>::update_at(int i, comparandtype new_val
 		up_heap(i);
 }
 template <class nodetype, typename comparandtype>
-void BinaryHeap<nodetype, comparandtype>::update(nodetype x, comparandtype new_val) {
+void MisterHeapy<nodetype, comparandtype>::update(nodetype x, comparandtype new_val) {
 	int i = indices_in_heap[x - x_start];
 	update_at(i, new_val);
 }
 template <class nodetype, typename comparandtype>
-int BinaryHeap<nodetype, comparandtype>::size() {
+int MisterHeapy<nodetype, comparandtype>::size() {
 	return length;
 }
 
 //template <class nodetype, typename comparandtype>
-//void BinaryHeap<nodetype, comparandtype>::print() {
+//void MisterHeapy<nodetype, comparandtype>::print() {
 //	int i, j, depth, greatest_depth = log_base2(length);
 //	for (depth = greatest_depth; depth >= 0; depth--) {
 //		for (int i = twotothepowerof(depth) - 1, j = twotothepowerof(depth + 1) - 2; i <= j; i++)

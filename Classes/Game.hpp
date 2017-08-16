@@ -31,6 +31,8 @@ public:
 	SettingsManager Settings;
 
 protected:
+	
+	// Properties
 	sf::RenderWindow DBTWindow;
 	int w, h; 				// Blocks wide/tall
 	int block_w, block_h;	// Pixels per block
