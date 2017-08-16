@@ -192,7 +192,7 @@ void Level::buildLevel(std::string levelname) {
 					d.coord.x = mrLua.getfield<int>(1);
 					d.coord.y = mrLua.getfield<int>(2);
 					const char *dir = mrLua.getfield<const char *>(3);
-					if (strcmp(dir, "upward") == 0)         d.orientation = Direction::UPWARD;
+					if      (strcmp(dir, "upward") == 0)    d.orientation = Direction::UPWARD;
 					else if (strcmp(dir, "downward") == 0)  d.orientation = Direction::DOWNWARD;
 					else if (strcmp(dir, "leftward") == 0)  d.orientation = Direction::LEFTWARD;
 					else if (strcmp(dir, "rightward") == 0) d.orientation = Direction::RIGHTWARD;
@@ -360,7 +360,7 @@ Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<
 	Building *b = new Building(levelResponderMap, navmap, type, groundplan, doors, this);
 	if (b->init(atX, atY)) {
 		buildings.push_back(b);
-		char s[50]; sprintf(s, "added building %p of type '%s' (now %ld)", b, type, buildings.size());
+		char s[75]; sprintf(s, "added building %p of type '%s' (now %ld) at %d,%d", b, type, buildings.size(), atX, atY);
 		std::cout << s << std::endl;
 		return b;
 	}
@@ -453,7 +453,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	if (currentlyEditedBuilding == b) return;
 	closeFurnishingPurchasingView();
 	currentlyEditedBuilding = b;
-	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 190, 320, 140, 200);
 	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, &responderMap, b->b_allowedFurnishings);
 	responderMap.addResponder(furnishingPurchasingView);
 	furnishingPurchasingView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
@@ -566,6 +566,8 @@ void LevelView::processMouseEvent(Event *ev) {
 	ev->b = (float) (ev->y%gridsize) / (float) gridsize;
 	ev->x = ev->x / gridsize;
 	ev->y = ev->y / gridsize;
+	if (ev->type == Event::LEFTCLICK)
+		std::cout << "click at " << ev->x << "," << ev->y << std::endl;
 	
 	levelResponderMap->dispatchEvent(ev);
 }
@@ -619,7 +621,7 @@ FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston
 	}
 }
 void FurnishingPurchasingUIView::draw() {
-	theW->drawRect(0, 0, width, height, "black", 0, 0.3);
+	theW->drawRect(0, 0, width, height, "white", 0, 0.6);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		if (i == 0) {
@@ -638,7 +640,7 @@ HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_r
 	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));
 }
 void HiringUIView::draw() {
-	theW->drawRect(0, 0, width, height, "black", 0, 0.3);
+	theW->drawRect(0, 0, width, height, "white", 0, 0.6);
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		if (i==0) {
