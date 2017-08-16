@@ -19,7 +19,7 @@ SettingsManager::SettingsManager(W *_theW /*char* argv[]*/) : theW(_theW)
 	}
 	// If we have a valid directory, try to load the settings file.
 	if (!usedefaults) {
-		mrLua = new LuaHelper();
+		mrLua = new LuaHelper(theW);
 		if (mrLua->loadFile(filename))
 			usedefaults = false;
 		else 

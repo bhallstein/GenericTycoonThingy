@@ -9,6 +9,7 @@
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
 
+	theW->log("Calling buildLevel...");
 	buildLevel(levelpath);
 	
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
@@ -35,15 +36,15 @@ Level::~Level() {
 
 void Level::buildLevel(std::string levelname)
 {
-	LuaHelper mrLua;
+	LuaHelper mrLua(theW);
 	
 	std::string path = theW->resourcesPath;
 	path.append(levelname);
-
+	theW->log(path.c_str());
+	
 	if (!mrLua.loadFile(path)) {
-		theW->warning("Error opening level file.");
-		theW->log(mrLua.stackdump(mrLua.LuaInstance).c_str());
-		throw MsgException("Could not read level file");		// Might actually be neater to return a bool, & throw in the constructor.
+		// Get error from Mr Lua: mrLua.to<std::string>(-1).c_str()
+		throw MsgException("Could not read level file.");	// Might actually be neater to return a bool, & throw in the constructor.
 	}
 
 	// Set level width and height
@@ -68,10 +69,10 @@ void Level::buildLevel(std::string levelname)
 		Building* ab = new Building();
 		
 		ab->type = mrLua.getfield<std::string>("type");
-		ab->defaultCol.red   = mrLua.getSubfield<int>("colour","r");
-		ab->defaultCol.green = mrLua.getSubfield<int>("colour","g");
-		ab->defaultCol.blue  = mrLua.getSubfield<int>("colour","b");
-		ab->defaultCol.alpha = mrLua.getSubfield<int>("colour","a");
+		ab->defaultCol.red   = mrLua.getSubfield<int>("colour", "r");
+		ab->defaultCol.green = mrLua.getSubfield<int>("colour", "g");
+		ab->defaultCol.blue  = mrLua.getSubfield<int>("colour", "b");
+		ab->defaultCol.alpha = mrLua.getSubfield<int>("colour", "a");
 
 		//add other template properties here
 
@@ -83,7 +84,7 @@ void Level::buildLevel(std::string levelname)
 	}
 	
 	//empty the stack for safety?
-	lua_settop(mrLua.LuaInstance,0);
+	lua_settop(mrLua.LuaInstance, 0);
 	
 	//buildings
 	mrLua.pushtable("buildings");
@@ -117,10 +118,10 @@ void Level::buildLevel(std::string levelname)
 			case LUA_TTABLE:
 				//set properties as returned from lua
 				b->type = mrLua.getfield<std::string>("type");
-				b->defaultCol.red   = mrLua.getSubfield<int>("colour","r");
-				b->defaultCol.green = mrLua.getSubfield<int>("colour","g");
-				b->defaultCol.blue  = mrLua.getSubfield<int>("colour","b");
-				b->defaultCol.alpha = mrLua.getSubfield<int>("colour","a");
+				b->defaultCol.red   = mrLua.getSubfield<int>("colour", "r");
+				b->defaultCol.green = mrLua.getSubfield<int>("colour", "g");
+				b->defaultCol.blue  = mrLua.getSubfield<int>("colour", "b");
+				b->defaultCol.alpha = mrLua.getSubfield<int>("colour", "a");
 				break;
 		}
 		//pop the type table

@@ -16,6 +16,7 @@
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
 	this->initializePaths();
 	logfile.open(logfilePath.c_str());
+	log(settingsPath.c_str());
 	log(resourcesPath.c_str());
 }
 W::~W() {
@@ -106,12 +107,12 @@ void W::initializePaths() {
 	
 	// Settings path
 	settingsPath = path;
-	settingsPath.append("/Library/Application Support/Demon Barber Tycoon");
+	settingsPath.append("/Library/Application Support/Demon Barber Tycoon/");
 	
 	// Resources path
 	[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
 	resourcesPath = path;
-	resourcesPath.append("/");
+	resourcesPath.append("/Data/");
 #elif defined _WIN32 || _WIN64
 	// Log path
 	char path[MAX_PATH] = "";

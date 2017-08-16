@@ -92,7 +92,7 @@ void ResponderMap::dispatchMouseEvent(Event *ev) {
 			floatcoord c_ev = { ev->x + ev->a, ev->y + ev->b }, c_obj = { c.x + o->a, c.y + o->b };
 			if (c_ev.a >= c_obj.a && c_ev.b >= c_obj.b && c_ev.a <= c_obj.a + 1 && c_ev.b <= c_obj.b + 1)
 				last_obj = o;
-		}	
+		}
 	}
 	if (last_obj != NULL) {
 		last_obj->receiveEvent(ev);
