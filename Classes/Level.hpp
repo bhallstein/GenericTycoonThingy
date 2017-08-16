@@ -28,6 +28,7 @@ class Unit;
 class LevelView;
 class UIBarView;
 class FurniturePurchasingUIView;
+class HiringUIView;
 
 class Level : public GameState, public EventResponder {
 public:
@@ -65,6 +66,8 @@ public:
 	void openFurniturePurchasingView(Building *);
 	void closeFurniturePurchasingView();
 	Building *currentlyEditedBuilding;
+	void openHiringView();
+	void closeHiringView();
 	
 	// Properties
 	int columns, rows;
@@ -86,11 +89,11 @@ protected:
 	LevelView *levelview;
 	UIBarView *uibarview;
 	FurniturePurchasingUIView *furniturePurchasingView;
+	HiringUIView *hiringUIView;
 	
 	int framecount;
 	
 	std::list<std::string> allowedBuildings;
-	
 };
 
 
@@ -121,7 +124,6 @@ public:
 	std::vector<Placeable*>	*placeables;
 	std::vector<Unit*>		*units;
 	std::vector<Unit*>		*staff;
-	
 };
 
 
@@ -139,6 +141,12 @@ public:
 	void draw();
 protected:
 	std::vector<std::string> *placeableTypes;
+};
+
+class HiringUIView : public UIView {
+public:
+	HiringUIView(W *, JenniferAniston &);
+	void draw();
 };
 
 #endif

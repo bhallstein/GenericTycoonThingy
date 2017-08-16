@@ -8,13 +8,15 @@
 #include "LuaHelper.hpp"
 #include "Callback.hpp"
 
-Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
+Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW)
+{
 	framecount = 0;
 	
 	currentlyEditedBuilding = NULL;
 	levelview = NULL;
 	uibarview = NULL;
 	furniturePurchasingView = NULL;
+	hiringUIView = NULL;
 
 	buildLevel(levelpath);
 	
@@ -22,7 +24,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	uibarview = new UIBarView(theW, aniston);
 	responderMap.addResponder(uibarview);
 	uibarview->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
-	uibarview->subscribe("add staff unit", new Callback(&Level::createStaffUnit, this));
+	uibarview->subscribe("open hiring ui view", new Callback(&Level::openHiringView, this));
 	
 	// Subscribe to screenedge events
 	responderMap.subscribeToEventType(this, Event::SCREENEDGE_LEFT);
@@ -36,7 +38,8 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	responderMap.subscribeToKey(this, Event::K_C);
 	responderMap.subscribeToKey(this, Event::K_S);
 }
-Level::~Level() {
+Level::~Level()
+{
 	std::cout << "level destruct" << std::endl;
 	destroyAllThings();
 	delete navmap;
@@ -47,7 +50,6 @@ Level::~Level() {
 
 void Level::buildLevel(std::string levelname) {
 	theW->log("Level::buildLevel() called...");
-
 	LuaHelper mrLua(theW);
 	
 	std::string path = theW->resourcesPath;
@@ -56,7 +58,7 @@ void Level::buildLevel(std::string levelname) {
 	if (!mrLua.loadFile(path.c_str()))
 		throw MsgException("Could not read level file.");	// To get error from Mr Lua: mrLua.to<std::string>(-1).c_str()
 	lua_State *L = mrLua.LuaInstance;
-
+	
 	// Initialize TLO classes
 	if (!Building::initialize(theW))  throw MsgException("Couldn't read building info.");
 	if (!Unit::initialize(theW))      throw MsgException("Couldn't read unit info.");
@@ -214,6 +216,7 @@ void Level::draw() {
 	levelview->_draw();
 	uibarview->_draw();
 	if (furniturePurchasingView != NULL) furniturePurchasingView->_draw();
+	if (hiringUIView != NULL) hiringUIView->_draw();
 }
 void Level::setResolution(int _w, int _h) {
 	GameState::setResolution(_w, _h);
@@ -337,6 +340,21 @@ void Level::closeFurniturePurchasingView() {
 	furniturePurchasingView = NULL;
 	currentlyEditedBuilding = NULL;
 }
+void Level::openHiringView() {
+	if (hiringUIView != NULL) closeHiringView();
+	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PFIXED, 10, 90, 140, 200);
+	hiringUIView = new HiringUIView(theW, aniston);
+	responderMap.addResponder(hiringUIView);
+	
+	// Subscriptions
+	hiringUIView->subscribe("close", new Callback(&Level::closeHiringView, this));
+	hiringUIView->subscribe("hire staff", new Callback(&Level::createStaffUnit, this));
+}
+void Level::closeHiringView() {
+	delete hiringUIView;
+	hiringUIView = NULL;
+}
+
 
 #include "Button.hpp"
 
@@ -409,7 +427,7 @@ void LevelView::scroll(direction dir) {
 UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
 {
 //	buttons.push_back(new Button(10, 10, 20, 20, "create barberschair"));
-	buttons.push_back(new Button(10, 10, 20, 20, "add staff unit"));
+	buttons.push_back(new Button(10, 10, 20, 20, "open hiring ui view"));
 }
 
 void UIBarView::draw() {
@@ -436,6 +454,20 @@ FurniturePurchasingUIView::FurniturePurchasingUIView(W *_theW, JenniferAniston &
 }
 
 void FurniturePurchasingUIView::draw() {
+	theW->drawRect(0, 0, width, height, "black");
+	for (int i=0, n = buttons.size(); i < n; i++) {
+		Button *b = buttons[i];
+		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	}
+}
+
+HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
+{
+	buttons.push_back(new Button(7, 7, 12, 12, "close"));
+	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));
+}
+
+void HiringUIView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
