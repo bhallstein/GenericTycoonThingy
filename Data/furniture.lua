@@ -2,9 +2,8 @@
 
 defaultColour = "black"
 defaultHoverColour = "blue"
-defaultColourWhilePlacing = "white"
 
-placeableTypes = {
+furnitureTypes = {
 	barberschair = {
 		groundplan = {
 			{0,0}, {1,0},
@@ -12,8 +11,8 @@ placeableTypes = {
 		}
 	},
 	sofa = {
-		colour = "red",
-		colourWhilePlacing = "purple",
+		colour = "purple",
+		hoverColour = "green",
 		groundplan = {
 			{0,0}, {1,0}
 		}

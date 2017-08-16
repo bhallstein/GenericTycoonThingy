@@ -224,6 +224,14 @@ void NavMap::removeBuilding(Building *b) {
 bool NavMap::isPassableAt(int atX, int atY) {
 	return nodes[atY*w + atX].passable;
 }
+bool NavMap::isPassableUnder(std::vector<intcoord> *gp, int x, int y) {
+	for (int i=0, n = gp->size(); i < n; i++) {
+		intcoord c = gp->at(i);
+		if (!isPassableAt(c.x + x, c.y + y))
+			return false;
+	}
+	return true;
+}
 bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route) {
 	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
 		W::log("Navmap asked to find route to or from an out of bounds location.");

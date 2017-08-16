@@ -2,25 +2,34 @@
 #include "LuaHelper.hpp"
 #include "../W.hpp"
 #include "Level.hpp"
+#include "NavMap.hpp"
 
 // Initialize static members
 std::map<std::string, struct buildingInfo> Building::buildingTypes;
 std::string Building::defaultColour;
 std::string Building::defaultHoverColour;
 
-Building::Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *_level) :
-	MappedObj(_x, _y), type(_type), level(_level), clicked(false), time_hovered(0)
+Building::Building(ResponderMap *_rm, NavMap *_nm, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *_level) :
+	MappedObj(_rm, false), navmap(_nm), type(_type), level(_level), clicked(false), time_hovered(0)
 {	
 	setGroundPlan(_groundplan);
 	doors = *_doors;
 	// Get properties for this building type
-	b_colour            = &Building::buildingTypes[type].col;
-	b_hoverColour       = &Building::buildingTypes[type].hoverCol;
-	b_allowedPlaceables = &Building::buildingTypes[type].allowedPlaceables;
+	b_colour           = &Building::buildingTypes[type].col;
+	b_hoverColour      = &Building::buildingTypes[type].hoverCol;
+	b_allowedFurniture = &Building::buildingTypes[type].allowedFurniture;
 }
 Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
+	navmap->removeImpassableObject(this);
+}
+
+bool Building::canPlace(int _x, int _y) {
+	return navmap->isPassableUnder(&groundplan, _x, _y);
+}
+void Building::finalizePlacement() {
+	navmap->addBuilding(this);
 }
 
 void Building::receiveEvent(Event *ev) {
@@ -77,20 +86,20 @@ bool Building::initialize(W *_W) {
 		bInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Building::defaultHoverColour;
 		lua_pop(L, 1);							// S: -1 buildingtype; -2 key; -3 buildingTypes
 
-		if (mrLua.pushSubtable("allowedPlaceables")) {
-			lua_pushnil(L);						// S: -1 nil; -2 allowedPlaceables; -3 buildingtype; ...
+		if (mrLua.pushSubtable("allowedFurniture")) {
+			lua_pushnil(L);						// S: -1 nil; -2 allowedFurniture; -3 buildingtype; ...
 			int n = 0;
-			std::string s = b_type; s += ": allowedPlaceables: ";
-			while (lua_next(L, -2)) {			// S: -1 value; -2 key; -3 allowedPlaceables
+			std::string s = b_type; s += ": allowedFurniture: ";
+			while (lua_next(L, -2)) {			// S: -1 value; -2 key; -3 allowedFurniture
 				if (!lua_isstring(L, -1)) {
 					lua_pop(L, 1);
 					continue;
 				}
-				bInfo->allowedPlaceables.push_back(lua_tostring(L, -1));
-				s += bInfo->allowedPlaceables.back(); s += ", ";
+				bInfo->allowedFurniture.push_back(lua_tostring(L, -1));
+				s += bInfo->allowedFurniture.back(); s += ", ";
 				n++;
-				lua_pop(L, 1);					// S: -1 key; -2 allowedPlaceables; -3 buildingtype; ...
-			}									// S: -1 allowedPlaceables; -2 buildingtype; ...
+				lua_pop(L, 1);					// S: -1 key; -2 allowedFurniture; -3 buildingtype; ...
+			}									// S: -1 allowedFurniture; -2 buildingtype; ...
 			lua_pop(L, 1);						// S: -1 buildingtype; -2 key; -3 buildingTypes
 			if (n > 0) {
 				s.erase(s.size() - 2);

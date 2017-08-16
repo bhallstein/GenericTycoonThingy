@@ -1,6 +1,7 @@
 /*
-	spawnPoint.hpp - a spawn point.
-*/
+ * SpawnPoint.hpp - a spawn point
+ * 
+ */
 
 #ifndef SPAWNPOINT_H
 #define SPAWNPOINT_H

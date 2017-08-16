@@ -22,8 +22,9 @@ class ResponderMap;
 class Button;
 class NavMap;
 class Building;
-class Placeable;
+class Furniture;
 class Unit;
+class Placeable;
 
 class LevelView;
 class UIBarView;
@@ -54,7 +55,7 @@ public:
 	// TLO stuff
 	Unit*     createUnit(int atX, int atY, const char *type);
 	Building* createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
-	void      createPlaceable(const char *type);
+	void      createFurniture(const char *type);
 	void createBarbersChair();
 	void createSofa();
 	void createStaffUnit();
@@ -72,7 +73,7 @@ public:
 	// Properties
 	int columns, rows;
 	std::vector<Building*>   buildings;
-	std::vector<Placeable*>  placeables;
+	std::vector<Furniture*>  furniture;
 	std::vector<Unit*>		 units;
 	std::vector<Unit*>		 staff;
 	std::vector<SpawnPoint*> spawnPoints;
@@ -106,7 +107,7 @@ public:
 	LevelView(
 		W *, JenniferAniston &,
 		ResponderMap *_levelRM,
-		std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
+		std::vector<Building*> *, std::vector<Furniture*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 		int _level_width, int _level_height
 	);
 	void draw();
@@ -121,7 +122,7 @@ public:
 	ResponderMap *levelResponderMap;
 
 	std::vector<Building*>	*buildings;
-	std::vector<Placeable*>	*placeables;
+	std::vector<Furniture*>	*furniture;
 	std::vector<Unit*>		*units;
 	std::vector<Unit*>		*staff;
 };
@@ -137,10 +138,10 @@ public:
 
 class FurniturePurchasingUIView : public UIView {
 public:
-	FurniturePurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_placeableTypes);
+	FurniturePurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_furnitureTypes);
 	void draw();
 protected:
-	std::vector<std::string> *placeableTypes;
+	std::vector<std::string> *furnitureTypes;
 };
 
 class HiringUIView : public UIView {

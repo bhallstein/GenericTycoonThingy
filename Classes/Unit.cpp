@@ -7,18 +7,12 @@ std::string Unit::defaultColour;
 std::string Unit::defaultHoverColour;
 std::string Unit::defaultColourWhenMoving;
 
-Unit::Unit(NavMap *_navmap, int _x, int _y, const char *_type) :
-	MappedObj(_x, _y),
-	navmap(_navmap),
-	dest_x(_x),
-	dest_y(_y),
-	type(_type),
-	state(S_IDLE),
-	hover(false)
+Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type) :
+	MappedObj(_rm, false), navmap(_navmap), type(_type),
+	state(S_IDLE), hover(false)
 {
-	std::vector<intcoord> p;
-	intcoord c = {0,0}; p.push_back(c);
-	setGroundPlan(&p);
+	intcoord c = {0,0};
+	groundplan.push_back(c);
 	
 	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 	
@@ -28,6 +22,10 @@ Unit::Unit(NavMap *_navmap, int _x, int _y, const char *_type) :
 	u_colourWhenMoving = &Unit::unitTypes[type].colWhenMoving;
 }
 Unit::~Unit() { }
+
+bool Unit::canPlace(int _x, int _y) {
+	return navmap->isPassableAt(_x, _y);
+}
 
 void Unit::receiveEvent(Event *ev) {
 	if (ev->type == Event::MOUSEMOVE)

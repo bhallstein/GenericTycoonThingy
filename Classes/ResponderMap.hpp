@@ -1,5 +1,5 @@
 /* 
- * ResponderMap.h - manages event subscriptions
+ * ResponderMap.hpp - manages event subscriptions
  *
  */
 

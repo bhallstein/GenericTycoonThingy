@@ -1,5 +1,5 @@
 /*
- * EventResponder.h - abstract base class for event responders
+ * EventResponder.hpp - abstract base class for event responders
  *
  */
 

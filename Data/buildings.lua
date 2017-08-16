@@ -7,7 +7,7 @@ buildingTypes = {
 	barber = {
 		colour = "red",
 		hoverColour = "black",
-		allowedPlaceables = { "barberschair", "sofa" }
+		allowedFurniture = { "barberschair", "sofa" }
 	},
 	pieshop = {
 		colour = "yellow"

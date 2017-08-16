@@ -22,7 +22,7 @@ struct unitInfo {
 
 class Unit : public MappedObj {
 public:
-	Unit(NavMap *, int _x, int _y, const char *type);
+	Unit(ResponderMap *, NavMap *, const char *_type);
 	~Unit();
 	
 	// Properties
@@ -31,8 +31,9 @@ public:
 	
 	// Methods
 	void receiveEvent(Event *);
-	const char * col();
 	void update();
+	bool canPlace(int _x, int _y);
+	const char * col();
 	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
 	
@@ -47,14 +48,14 @@ protected:
 	bool inHinterland();
 	
 	// Properties
+	std::string *u_colour;
+	std::string *u_hoverColour;
+	std::string *u_colourWhenMoving;
 	enum state_types { S_IDLE, S_TRAVELING, S_WAITING } state;
 	int frames_waited;
 	NavMap *navmap;
 	std::vector<NavNode *> route;
 	bool hover;
-	std::string *u_colour;
-	std::string *u_hoverColour;
-	std::string *u_colourWhenMoving;
 	
 	// Static members
 	static std::map<std::string, struct unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }

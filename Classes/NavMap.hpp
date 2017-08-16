@@ -26,9 +26,9 @@ public:
 	~NavNode();
 	
 	// Methods
-	void addNeighbour(NavNode *neighbour);
-	void removeNeighbour(NavNode *neighbour);
-	bool hasNeighbour(NavNode *n);
+	void addNeighbour(NavNode *);
+	void removeNeighbour(NavNode *);
+	bool hasNeighbour(NavNode *);
 	
 	bool operator< (NavNode *);		// For ordering in MisterHeapy
 	void setComparand(float);		// For updating by MisterHeapy
@@ -64,6 +64,7 @@ public:
 	void addBuilding(Building *);
 	void removeBuilding(Building *);
 	bool isPassableAt(int atX, int atY);
+	bool isPassableUnder(std::vector<intcoord> *gp, int x, int y);
 	NavNode* nodeAt(int atX, int atY);
 	
 	bool getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route);

@@ -1,5 +1,5 @@
 /*
- * Button.hpp - buttons
+ * Button.hpp
  *
  */
 
@@ -17,7 +17,6 @@ public:
 
 	// Methods
 	void setHover();
-	void update() { }
 	const char * col();
 	
 	// Properties

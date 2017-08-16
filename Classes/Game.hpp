@@ -1,5 +1,5 @@
 /*
- * Game.h - Game class, the main class for running the game, really.
+ * Game.hpp - Game class, the main class for running the game, really.
  *
  */
 

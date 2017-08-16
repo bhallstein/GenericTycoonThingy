@@ -1,5 +1,5 @@
 /*
- * Placeable.h
+ * Placeable.hpp - sort of an abstract placement manager for MappedObj
  *
  */
 
@@ -10,46 +10,17 @@
 #include <map>
 
 #include "types.hpp"
-#include "MappedObj.hpp"
+#include "EventResponder.hpp"
+#include "ResponderMap.hpp"
 
-class NavMap;
-class ResponderMap;
-class W;
-class Building;
+class MappedObj;
 
-struct placeableInfo {
-	std::string col, hoverCol, colWhilePlacing;
-	std::vector<intcoord> groundplan;
-};
-
-class Placeable : public MappedObj {
+class Placeable : public EventResponder {
 public:
-	Placeable(NavMap *, ResponderMap *, const char *_type, Building *_context);
-	~Placeable();
-	
-	// Methods
+	Placeable(MappedObj *, ResponderMap *);
 	void receiveEvent(Event *ev);
-	void update() { }
-	const char * col();
-	
-	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
-
-protected:
-	// Properties
-	enum mode_types { PLACEMENT, PLACED } mode;
-	NavMap *navmap;
-	ResponderMap *levelResponderMap;
-	Building *contextBuilding;
-	std::string type;
-	std::string *p_colour;
-	std::string *p_hoverColour;
-	std::string *p_colourWhilePlacing;
-	
-	// Static members
-	static std::map<std::string, struct placeableInfo> placeableTypes;	// e.g. "barber's chair" => struct unitInfo { }
-	static std::string defaultColour;
-	static std::string defaultHoverColour;
-	static std::string defaultColourWhilePlacing;
+	MappedObj *mo;
+	ResponderMap *rm;
 };
 
 #endif
