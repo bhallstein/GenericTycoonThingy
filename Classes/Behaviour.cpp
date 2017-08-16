@@ -90,6 +90,9 @@ void ServiceBehaviour::init(Level *_l, Unit *_u, Unit *_s, Furnishing *_f) {
 	}
 	unit->capture(), staff->capture(), furnishing->capture();
 	initialized = true;
+
+	//take the nice patron's money
+	_l->payPlayer(serviceCharge());
 }
 void ServiceBehaviour::_update() {
 	if (stage == 0) {		// Send units to interaction points

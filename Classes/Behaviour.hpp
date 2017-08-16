@@ -106,6 +106,7 @@ public:
 	void init(Level *, Unit *u, Unit *s, Furnishing *f);
 	void _update();
 protected:
+	virtual int serviceCharge() = 0; //the charge for this "service"
 	Level *level;
 	Unit *unit, *staff;
 	Furnishing *furnishing;
@@ -115,10 +116,12 @@ protected:
 class HaveHaircutBehaviour : public ServiceBehaviour {
 protected:
 	const char * typestring() { return "havehaircut"; }
+	int serviceCharge() { return 1; }
 };
 class PieSaleBehaviour : public ServiceBehaviour {
 protected:
 	const char * typestring() { return "piesale"; }
+	int serviceCharge() { return 3; }
 };
 
 #endif

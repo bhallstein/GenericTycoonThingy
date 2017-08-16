@@ -141,6 +141,11 @@ bool Furnishing::initialize(W *_W) {
 		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
 		fInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Furnishing::defaultHoverColour;
 		lua_pop(L, 1);
+
+		lua_getfield(L, -1, "cost");			// S: -1 colour; 2 subtable; -3 key; -4 table
+		fInfo->cost = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
+		lua_pop(L, 1);								// S: -1 subtable; -2 key; -3 table
+
 		
 		// Ground plans
 		if (!mrLua.pushSubtable("groundplan")) {
@@ -221,4 +226,7 @@ bool Furnishing::initialize(W *_W) {
 
 	Furnishing::initialized = true;
 	return true;
+}
+int Furnishing::getFurnishingCost(std::string _furnishingKey) {
+	return furnishingTypes[_furnishingKey].cost;
 }

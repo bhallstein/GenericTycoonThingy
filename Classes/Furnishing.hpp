@@ -23,6 +23,7 @@ struct furnishingInfo {
 	std::vector<intcoord> groundplan;
 	std::vector<std::string> compatibleBehaviours;
 	std::map<std::string, intcoord> interactionPoints;
+	int cost;
 };
 
 class Furnishing : public MappedObj, public BehaviourParticipant {
@@ -48,6 +49,8 @@ public:
 	static bool initialize(W *);	// Populate our static furnishingTypes map from furnishing.lua
 	static bool initialized;
 
+	// UnitInfo gets
+	static int getFurnishingCost(std::string); //lookup a FurnishingInfo cost from furnishingTypes
 protected:
 	std::string *f_colour;
 	std::string *f_hoverColour;

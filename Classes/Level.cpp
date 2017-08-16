@@ -303,9 +303,24 @@ Behaviour* Level::createBehaviour(const char *_type) {
 	behaviours.push_back(bhvr);
 	return bhvr;
 }
-void Level::createBarbersChair() { createFurnishing("barberschair"); }
-void Level::createSofa() { createFurnishing("sofa"); }
-void Level::createPieCounter() { createFurnishing("piecounter"); }
+void Level::createBarbersChair() { 
+	if(chargePlayer(Furnishing::getFurnishingCost("barberschair")))
+		createFurnishing("barberschair");
+	else
+		W::log("Not enough money to buy a Barber's Chair!");
+}
+void Level::createSofa() { 
+	if(chargePlayer(Furnishing::getFurnishingCost("sofa")))
+		createFurnishing("sofa");
+	else
+		W::log("Not enough money to buy a Sofa!");
+}
+void Level::createPieCounter() { 
+	if(chargePlayer(Furnishing::getFurnishingCost("piecounter")))
+		createFurnishing("piecounter");
+	else
+		W::log("Not enough money to buy a Pie Counter!");
+}
 void Level::createStaffUnit() { 
 	if(chargePlayer(Unit::getUnitHireCost("staff")))
 		createUnit(0, 0, "staff");

@@ -13,7 +13,8 @@ furnishingTypes = {
 		interactionPoints = {
 			civilian = {-1,0},
 			staff = {0,-1}
-		}
+		},
+		cost=20
 	},
 	sofa = {
 		colour = "purple",
@@ -22,7 +23,8 @@ furnishingTypes = {
 			{0,0}, {1,0}
 		},
 		compatibleBehaviours = {  },
-		interactionPoints = {  }
+		interactionPoints = {  },
+		cost=5
 	},
 	piecounter = {
 		colour = "red",
@@ -34,7 +36,8 @@ furnishingTypes = {
 		interactionPoints = {
 			staff = {1,-1},
 			civilian = {1,1}
-		}
+		},
+		cost=20
 	}
 }
 
