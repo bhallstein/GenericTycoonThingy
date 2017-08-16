@@ -14,9 +14,9 @@ Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM, const char *_type)
 {	
 	// Set properties for this Placeable type
 	groundplan = placeableTypes[_type].groundplan;
-	p_colour             = placeableTypes[_type].col;
-	p_hoverColour        = placeableTypes[_type].hoverCol;
-	p_colourWhilePlacing = placeableTypes[_type].colWhilePlacing;
+	p_colour             = &placeableTypes[_type].col;
+	p_hoverColour        = &placeableTypes[_type].hoverCol;
+	p_colourWhilePlacing = &placeableTypes[_type].colWhilePlacing;
 }
 Placeable::~Placeable()
 {
@@ -51,9 +51,9 @@ void Placeable::receiveEvent(Event *ev) {
 }
 
 const char * Placeable::col() {
-	if (mode == PLACEMENT) return p_colourWhilePlacing.c_str();
-	if (hover) { hover = false; return p_hoverColour.c_str(); }
-	return p_colour.c_str();
+	if (mode == PLACEMENT) return p_colourWhilePlacing->c_str();
+	if (hover) { hover = false; return p_hoverColour->c_str(); }
+	return p_colour->c_str();
 }
 
 bool Placeable::initialize(W *_W) {

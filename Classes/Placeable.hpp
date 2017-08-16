@@ -43,9 +43,9 @@ protected:
 	NavMap *navmap;
 	ResponderMap *levelResponderMap;
 	std::string type;
-	std::string p_colour;
-	std::string p_hoverColour;
-	std::string p_colourWhilePlacing;
+	std::string *p_colour;
+	std::string *p_hoverColour;
+	std::string *p_colourWhilePlacing;
 	
 	// Static members
 	static std::map<std::string, struct placeableInfo> placeableTypes;	// e.g. "barber's chair" => struct unitInfo { }

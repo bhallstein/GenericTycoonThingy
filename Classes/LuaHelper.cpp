@@ -53,8 +53,8 @@ bool LuaHelper::pushSubtable(const char *key)
 	lua_gettable(LuaInstance, -2);		// S: -1 subtable; -2 supertable
 	bool error = !lua_istable(LuaInstance, -1);
 	if (error)
-		lua_pop(LuaInstance, 2);
-	return !error;						// S: -1 subtable; -2 key; -3 supertable (or if error: -1 supertable)
+		lua_pop(LuaInstance, 1);
+	return !error;						// S: -1 subtable; -2 supertable (or if error: -1 supertable)
 }
 std::string LuaHelper::stackdump()
 {

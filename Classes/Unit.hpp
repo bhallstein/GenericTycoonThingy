@@ -53,9 +53,9 @@ protected:
 	NavMap *navmap;
 	std::vector<NavNode *> route;
 	bool hover;
-	std::string u_colour;
-	std::string u_hoverColour;
-	std::string u_colourWhenMoving;
+	std::string *u_colour;
+	std::string *u_hoverColour;
+	std::string *u_colourWhenMoving;
 	
 	// Static members
 	static std::map<std::string, struct unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }

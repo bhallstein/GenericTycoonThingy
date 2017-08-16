@@ -5,7 +5,7 @@ defaultHoverColour = "blue"
 defaultColourWhilePlacing = "white"
 
 placeableTypes = {
-	["barberschair"] = {
+	barberschair = {
 		groundplan = {
 			{0,0}, {1,0},
 			{0,1}, {1,1}

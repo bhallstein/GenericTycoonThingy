@@ -18,7 +18,7 @@ class LuaHelper;
 
 struct buildingInfo {
 	std::string col, hoverCol;
-	//allowedPlaceables;
+	std::vector<std::string> allowedPlaceables;
 };
 
 class Building : public MappedObj {
@@ -42,8 +42,9 @@ protected:
 	// Properties
 	bool clicked;
 	int time_hovered;
-	std::string b_colour;
-	std::string b_hoverColour;
+	std::string *b_colour;
+	std::string *b_hoverColour;
+	std::vector<std::string> *b_allowedPlaceables;
 	
 	// Info on building types, saved as static members for private use by Building & its instances.
 	static std::map<std::string, struct buildingInfo> buildingTypes;	// e.g. "pieshop" => struct buildingInfo { }

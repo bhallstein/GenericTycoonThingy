@@ -24,9 +24,9 @@ Unit::Unit(NavMap *_navmap, int _x, int _y, const char *_type) :
 	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 	
 	// Get properties for this unit type
-	u_colour           = Unit::unitTypes[type].col;
-	u_hoverColour      = Unit::unitTypes[type].hoverCol;
-	u_colourWhenMoving = Unit::unitTypes[type].colWhenMoving;
+	u_colour           = &Unit::unitTypes[type].col;
+	u_hoverColour      = &Unit::unitTypes[type].hoverCol;
+	u_colourWhenMoving = &Unit::unitTypes[type].colWhenMoving;
 }
 Unit::~Unit() { }
 
@@ -36,9 +36,9 @@ void Unit::receiveEvent(Event *ev) {
 }
 
 const char * Unit::col() {
-	if (hover) { hover = false; return u_hoverColour.c_str(); }
-	else if (state == S_IDLE) return u_colour.c_str();
-	else if (state == S_TRAVELING) return u_colourWhenMoving.c_str();
+	if (hover) { hover = false; return u_hoverColour->c_str(); }
+	else if (state == S_IDLE) return u_colour->c_str();
+	else if (state == S_TRAVELING) return u_colourWhenMoving->c_str();
 	else return "red";
 }
 

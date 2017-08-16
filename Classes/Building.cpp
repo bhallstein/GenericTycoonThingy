@@ -13,8 +13,9 @@ Building::Building(int _x, int _y, const char *_type, std::vector<intcoord> *_gr
 	setGroundPlan(_groundplan);
 	doors = *_doors;
 	// Get properties for this building type
-	b_colour = Building::buildingTypes[type].col;
-	b_hoverColour = Building::buildingTypes[type].hoverCol;
+	b_colour            = &Building::buildingTypes[type].col;
+	b_hoverColour       = &Building::buildingTypes[type].hoverCol;
+	b_allowedPlaceables = &Building::buildingTypes[type].allowedPlaceables;
 }
 Building::~Building()
 {
@@ -27,8 +28,8 @@ void Building::receiveEvent(Event *ev) {
 }
 
 const char * Building::col() {
-	if (hover) { hover = false; return b_hoverColour.c_str(); }
-	return b_colour.c_str();
+	if (hover) { hover = false; return b_hoverColour->c_str(); }
+	return b_colour->c_str();
 }
 
 bool Building::initialize(W *_W) {
@@ -55,11 +56,11 @@ bool Building::initialize(W *_W) {
 	
 	// Construct Building::buildingTypes map
 	if (!mrLua.pushtable("buildingTypes")) {
-		_W->log("In buildings.lua, could not push the buildingTypes table onto the stack");
+		W::log("In buildings.lua, could not push the buildingTypes table onto the stack");
 		return false;
 	}
-	lua_pushnil(L);								// S: -1 nil; -2 table
-	while (lua_next(L, -2) != 0) {				// S: -1 subtable; -2 key; -3 table
+	lua_pushnil(L);								// S: -1 nil; -2 buildingTypes
+	while (lua_next(L, -2)) {					// S: -1 buildingtype; -2 key; -3 buildingTypes
 		if (!lua_istable(L, -1)) {		// If not a subtable, skip
 			lua_pop(L, 1);
 			continue;
@@ -67,14 +68,36 @@ bool Building::initialize(W *_W) {
 		const char *b_type = lua_tostring(L, -2);
 		struct buildingInfo *bInfo = &Building::buildingTypes[b_type];
 		
-		lua_getfield(L, -1, "colour");			// S: -1 colour; -2 subtable; -3 key; -4 table
+		lua_getfield(L, -1, "colour");			// S: -1 colour; -2 buildingtype; -3 key; -4 buildingTypes
 		bInfo->col = lua_isstring(L, -1) ? lua_tostring(L, -1) : Building::defaultColour;
 		lua_pop(L, 1);
 		
-		lua_getfield(L, -1, "hoverColour");		// S: -1 colour; -2 subtable; -3 key; -4 table
+		lua_getfield(L, -1, "hoverColour");		// S: -1 colour; -2 buildingtype; -3 key; -4 buildingTypes
 		bInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Building::defaultHoverColour;
+		lua_pop(L, 1);							// S: -1 buildingtype; -2 key; -3 buildingTypes
+
+		if (mrLua.pushSubtable("allowedPlaceables")) {
+			lua_pushnil(L);						// S: -1 nil; -2 allowedPlaceables; -3 buildingtype; ...
+			int n = 0;
+			std::string s = b_type; s += ": allowedPlaceables: ";
+			while (lua_next(L, -2)) {			// S: -1 value; -2 key; -3 allowedPlaceables
+				if (!lua_isstring(L, -1)) {
+					lua_pop(L, 1);
+					continue;
+				}
+				bInfo->allowedPlaceables.push_back(lua_tostring(L, -1));
+				s += bInfo->allowedPlaceables.back(); s += ", ";
+				n++;
+				lua_pop(L, 1);					// S: -1 key; -2 allowedPlaceables; -3 buildingtype; ...
+			}									// S: -1 allowedPlaceables; -2 buildingtype; ...
+			lua_pop(L, 1);						// S: -1 buildingtype; -2 key; -3 buildingTypes
+			if (n > 0) {
+				s.erase(s.size() - 2);
+				W::log(s.c_str());
+			}
+		}
 		
-		lua_pop(L, 2);							// S: -1 key; -2 table
+		lua_pop(L, 1);							// S: -1 key; -2 buildingTypes
 	}
 	
 	_W->log("...initialization succeeded.");
