@@ -1,14 +1,6 @@
 /*#include "SettingsManager.h"
 
-using namespace std;
-
-void Load(int argc, char *argv[]) //consider validating the overrides too - and removing invalid pairs (no need to error unnecessarily; just ignore)
-{
-  //map<string,string> theMap; //don't use any more, use SettingsManager.SetMap
-  string theKey;
-  string theValue;
-  
-  //setup our acceptable switches
+//setup our acceptable switches
   //map<string,int> numberWang; //used to convert the typed switches to numbers for the switch statement below //this is now part of the class.
   /* This data should now be populated from settings.xml
   //program settings
@@ -28,7 +20,22 @@ void Load(int argc, char *argv[]) //consider validating the overrides too - and 
   numberWang["/env"] = 31;
   numberWang["/environment"] = 31;*/
 
-  /*//first add argv[0] - always the executable path
+/*void Load()
+{
+	//First load the settings.xml, and populate settings objects from here
+
+	//populate valid arguments list
+
+	//check command line arguments against the valid list (arguments should be an object so we can assess type; only as simply as whether or not it takes a second param)
+}
+
+map<string,string> ProcessArgs(int argc, char *argv[]) //simply processes the command line arguments against a valid list
+{
+  map<string,string> theMap; //this is only used to return command line params?
+  string theKey;
+  string theValue;
+
+  //first add argv[0] - always the executable path
   theKey = "ExePath";
   theValue = argv[0];
 

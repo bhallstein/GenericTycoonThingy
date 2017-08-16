@@ -80,7 +80,7 @@ int main(int argc, char *argv[], char *envp[])
 			}
         }
     
-        DBT_Window.Clear(sf::Color::Black);
+		DBT_Window.Clear(sf::Color(138,43,226));
     
 	    //window.Draw(sprite);
     

@@ -3,11 +3,7 @@
  *
  */
 
-
-
-/*
-//#include "pugi/pugixml.hpp" //XML Parser ;)
-#include "SettingsManager.cpp"
+/*using namespace std;
 
 enum SettingType //Available Setting Types
 {
