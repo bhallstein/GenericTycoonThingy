@@ -10,7 +10,7 @@ SettingsManager::~SettingsManager()
 
 }
 
-int SettingsManager::Load(bool defaults)
+int SettingsManager::load(bool defaults)
 {
 	int error = 0;
 	std::string fileName;
@@ -35,30 +35,30 @@ int SettingsManager::Load(bool defaults)
 			Setting *x = new Setting();
 
 			//Populate it with properties from the XML
-			x->Type = set.first;
-			x->Category = cat.first;
-			x->Code = set.second.get<int>("<xmlattr>.code");
-			x->Detect = set.second.get<bool>("<xmlattr>.detect",false);
-			x->Dev = set.second.get<bool>("<xmlattr>.dev",false);
-			x->DisplayText = set.second.get<std::string>("displaytext","");
-			x->Enabled = set.second.get<bool>("<xmlattr>.enabled",true);
-			x->Key = set.second.get<std::string>("key","");
-			x->Range[0] = set.second.get<int>("min",0);
-			x->Range[1] = set.second.get<int>("max",0);
-			x->Tooltip = set.second.get<std::string>("tooltip","");
-			x->Value = set.second.get<std::string>("value","");
+			x->type = set.first;
+			x->category = cat.first;
+			x->code = set.second.get<int>("<xmlattr>.code");
+			x->detect = set.second.get<bool>("<xmlattr>.detect",false);
+			x->dev = set.second.get<bool>("<xmlattr>.dev",false);
+			x->displayText = set.second.get<std::string>("displaytext","");
+			x->enabled = set.second.get<bool>("<xmlattr>.enabled",true);
+			x->key = set.second.get<std::string>("key","");
+			x->range[0] = set.second.get<int>("min",0);
+			x->range[1] = set.second.get<int>("max",0);
+			x->tooltip = set.second.get<std::string>("tooltip","");
+			x->value = set.second.get<std::string>("value","");
 
 			//loop through all children of this setting, looking for 'arg' and 'option' keys
 			BOOST_FOREACH(ptree::value_type &key,cat.second.get_child(set.first))
 			{
 				if(key.first == "arg")
-					x->Args.push_back(key.second.get_value(""));
+					x->args.push_back(key.second.get_value(""));
 				if(key.first == "option")
-					x->Options.push_back(key.second.get_value(""));
+					x->options.push_back(key.second.get_value(""));
 			}
 
 			//add to the Settings Map, with a Key for lookups
-			SetMap[x->Key] = *x;
+			setMap[x->key] = *x;
 
 			x->~Setting(); //destroy the setting?
 		}

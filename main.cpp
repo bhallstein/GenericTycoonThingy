@@ -4,22 +4,21 @@
  */
 
 #include <string>
-// #include <iostream>
-// #include <map>
-// #include <vector>
+#include <SFML/Window.hpp>
 
 #include "Classes/Game.hpp"
-
 
 int main(int argc, char *argv[], char *envp[])
 {
 	srand(time(0));
+	
+	// Create game window
+	sf::RenderWindow dbt_window;
 
 	// Start game
-	Game g;
+	Game g(&dbt_window);
 	g.Run();
 }
-
 
 
 // map<string,string> paraMap(int argc, char *argv[], char *envp[]) //consider validating the map's contents too - and removing invalid pairs (no need to error unnecessarily; just ignore)

@@ -12,19 +12,18 @@
 #include "types.h"
 #include "EventResponder.hpp"
 #include "GameMap.hpp"
+#include "EventHandler.hpp"
 
 
 class Building : public EventResponder
 {
 public:
-	Building(GameMap *);
+	Building(GameMap *, EventHandler *, int posX, int posY);
 	~Building();
 
 	// Methods
-	void receiveEvent(Event *ev, EventResponder **p_e_r);	// Override to handle events
-	char col();		// Temporary coloration-signifier thingum
-	
-	void setPosition(int x, int y);
+	void receiveEvent(Event *ev);	// Handle events
+	char col();						// Temporary coloration-signifier thingum
 
 	// Properties
 	bool destroyed;
@@ -33,6 +32,7 @@ protected:
 
 	// Properties
 	GameMap *gamemap;
+	EventHandler *eventHandler;
 	bool clicked;
 	
 };

@@ -11,16 +11,17 @@
 #include "types.h"
 #include "EventResponder.hpp"
 #include "GameMap.hpp"
+#include "View.hpp"
 
 
 class Placeable : public EventResponder
 {
 public:
-	Placeable(GameMap *);
+	Placeable(GameMap *, View *);
 	~Placeable();
 
 	// Methods
-	void receiveEvent(Event *ev, EventResponder **p_e_r);	// Override to handle events
+	void receiveEvent(Event *ev);
 	char col();		// Temporary coloration-signifier thingum
 
 	// Properties
@@ -33,6 +34,7 @@ protected:
 
 	// Properties
 	GameMap *gamemap;
+	View *view;
 	enum mode_types { PLACEMENT, PLACED } mode;
 	bool clicked;
 	

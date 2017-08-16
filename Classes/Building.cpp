@@ -1,39 +1,28 @@
 #include "Building.hpp"
 
-Building::Building(GameMap *map)
-{
-	x = y = -1000;
-	w = 6; h = 4;
+Building::Building(GameMap *_gamemap, EventHandler *_eventHandler, int posX, int posY) {
+	eventHandler = _eventHandler;
+	x = posX, y = posY;
+	w = 6, h = 4;
 	clicked = false;
 	
-	gamemap = map;
+	gamemap = _gamemap;
 	
 	// Builing state relevant to the LevelMap.
 	destroyed = false;
 }
 Building::~Building()
 {
-	// Remove from memory map
-	gamemap->removeResponder(this);
+	//gamemap->removeResponder(this);
 	gamemap->removeImpassableObject(this);
 }
 
-void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
-	if (ev->type == MOUSEMOVE) {
-		//mouseover = true;	// ...but how to unset?
-	}
-	else if (ev->type == LEFTCLICK) {
+void Building::receiveEvent(Event *ev) {
+	if (ev->type == LEFTCLICK)
 		clicked = !clicked;
-	}
+	else if (ev->key == K_L)
+		std::cout << "Building " << this << " received L!" << std::endl;
 }
-
-void Building::setPosition(int _x, int _y) {
-	if (x == _x && y == _y) return;
-	gamemap->removeResponder(this);
-	x = _x, y = _y;
-	gamemap->addResponder(this);
-}
-
 
 char Building::col() {
 	return (clicked ? 'l' : 'b');

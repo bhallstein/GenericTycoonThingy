@@ -24,20 +24,33 @@
 #include "Placeable.hpp"
 #include "Building.hpp"
 #include "Unit.hpp"
+#include "View.hpp"
+#include "EventHandler.hpp"
 
+using boost::property_tree::ptree;
+
+class LevelView : public View {
+public:
+	
+	// Methods
+	LevelView(sf::RenderWindow *, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
+	void draw(std::vector<Building*> buildings, std::vector<Placeable*> placeables, std::vector<Unit*> units);
+	void acceptEvent(Event *);
+	
+};
 
 class Level
 {
 public:
-	Level(std::string fileName, GameMap *_gamemap); //we'll need to pass in which level to load, at a later point
+	Level(std::string fileName, sf::RenderWindow *_window, EventHandler *);
 	~Level();
 
-	// Functions
-	void draw(sf::RenderWindow& window, int block_width, int block_height);
-	Placeable *createPlaceable();
-	Unit *createUnit();
-	boost::property_tree::ptree readLevel(std::string fileName);
-	void buildLevel(boost::property_tree::ptree levelFile);
+	// Methods
+	void draw();
+
+	Unit* createUnit();
+	Building* createBuilding(int atX, int atY);
+	void createPlaceable();
 
 	// Properties
 	int columns, rows;
@@ -47,9 +60,22 @@ public:
 
 protected:
 	
+	// Methods
+	ptree readLevel(std::string fileName);
+	void buildLevel(ptree level_tree);
+	
+	// Properties
 	int w, h; 					// Blocks wide/tall.
+	sf::RenderWindow *window;
+	EventHandler *eventHandler;
+	
 	GameMap *gamemap;
-	int framecount;
+	LevelView levelview;
+	View uiview;
+	
+
+	int framecount;	
+
 };
 
 #endif

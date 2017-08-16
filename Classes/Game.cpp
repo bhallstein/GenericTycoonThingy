@@ -1,91 +1,75 @@
 #include "Game.hpp"
 
-Game::Game()
+Game::Game(sf::RenderWindow *_window)
 {
-	/* Window setup */
+	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file?)
 
-	// Set defaults (manually for now)
-	block_w = 16; block_h = 16;	// Can calculate these otherwise: pixel_w/w and pixel_h/h
-	std::string window_name = "Demon Barber Tycoon";
+	// Get game settings
+	settings.load(false);	// false = don't load defaults
 	
-	// Get settings from file and if success & values valid, replace defaults.
-	Settings.Load(false); //false = don't load defaults
-
-	int windowStyle;
-	if(Settings.SetMap["Windowed"].Value == "1")
-		windowStyle = sf::Style::Close;
-	else windowStyle = sf::Style::Fullscreen;
-	
- 	DBTWindow.Create(sf::VideoMode(50 * block_w, 40 * block_h), window_name, windowStyle);
-	DBTWindow.SetFramerateLimit(60);
+	// Window setup
+	window = _window;
+	/* 
+	 * Problem: at some point the window may be created in platform-specific code, wrapped in a C++ class
+	 * (say, 'W'), to provide a unified interface, and, thus, most importantly – outside the scope of Game.
+     * 
+	 * This leads to the necessity to do one of the following:
+	 *    1. to separate window-related settings into a different settings file,
+	 *       loaded before we enter Game scope
+	 *    2. for the W class to have the capability to switch itself on command between windowed and fullscreen modes
+	 * 
+	 * 2. is probably better – it enables us to consolidate settings into the game code. And it is 
+	 * more flexible: the game should be able most excellent-like to switch graphics modes on the fly.
+	 */
+	int windowStyle = (settings.setMap["Windowed"].value == "1" ? sf::Style::Close : sf::Style::Fullscreen);
+	std::string window_name = game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon";
+ 	window->Create(sf::VideoMode(800, 600), window_name, windowStyle);
+	window->SetFramerateLimit(60);
 }
 
 Game::~Game()
 {
-	// Destroy things - incl. DBTWindow, I guess.
+	
 }
 
 void Game::Run()
 {
 	// Create Level
-	Level level("Data/level1.xml", &gamemap);
+	Level level("Data/level1.xml", window, &eventHandler);
 	
 	bool should_quit = false;
-	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
-															// the receiveEvent(sf::Event *ev) method
-	int pixel_w = w * block_w;
-	int pixel_h = h * block_h;
-	
+
 	sf::Event sf_event;
 	Event event;
-    
-	while (DBTWindow.IsOpened() && !should_quit)
+
+	while (window->IsOpened() && !should_quit)
     {
 		// Events
-
-        while (DBTWindow.PollEvent(sf_event))
-		{
-			// Convert sfml event to our own type
-			event.loadFromSFEvent(&sf_event, block_w, block_h);
+		while (window->PollEvent(sf_event)) {
+			event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
 			
 			// Close window : exit
-            if (event.type == CLOSED)
-	   			DBTWindow.Close();
+		    if (event.type == CLOSED)
+				window->Close();
 			
-			// If there is privileged event responder: send events to it
-			if (privileged_event_responder != NULL) {
-				// The game loop can't always know what the P.E.R. should do with the event
-				// 	– it depends on what the P.E.R. is up to. We merely send the event on.
-				EventResponder *resp = (EventResponder*) privileged_event_responder;
-				resp->receiveEvent(&event, &privileged_event_responder);
+			// Keys
+			if (event.type == KEYPRESS) {
+				if (event.key == K_ESC || event.key == K_Q)
+					should_quit = true;
+				else if (event.key == K_P)
+					level.createPlaceable();
 			}
-			// Eventually, we'll send events either via the memory map, or to the game UI.
-			else {
-				// Keys
-				if (event.type == KEYPRESS) {
-					if (event.key == K_ESC || event.key == K_Q) {
-						should_quit = true;
-					}
-					else if (event.key == K_B) {
-						privileged_event_responder = (EventResponder*) level.createPlaceable();
-					}
-				}
-				// Mouse
-				else if (event.type == MOUSEMOVE || event.type == LEFTCLICK) {
-					// Send to relevant thing(s), use memory mapping
-					gamemap.dispatchEvent(&event, &privileged_event_responder);
-				}
-			}
-        }
+			
+			// Mouse events sent via eventhandler
+			eventHandler.dispatchEvent(&event);
+		}
 		
 		// Drawing
-		
-		DBTWindow.Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
-		level.draw(DBTWindow, block_w, block_h);
-
-        // Update the window
-        DBTWindow.Display();
+		window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
+		level.draw();
+        
+        window->Display();	// Refresh the window
     }
 
-	return;	// return error?
+	return;	// error?
 }

@@ -7,7 +7,7 @@ Event::~Event() {
 	// Destructor
 }
 
-void Event::loadFromSFEvent(sf::Event *sf_event, int block_width, int block_height) {
+void Event::loadFromSFEvent(sf::Event *sf_event) {
 	if (sf_event->Type == sf::Event::Closed) {
 		type = CLOSED;
 	}
@@ -17,30 +17,31 @@ void Event::loadFromSFEvent(sf::Event *sf_event, int block_width, int block_heig
 	}
 	else if (sf_event->Type == sf::Event::MouseMoved) {
 		type = MOUSEMOVE;
-		this->setCoords(sf_event->MouseMove.X, sf_event->MouseMove.Y, block_width, block_height);
+		x = sf_event->MouseMove.X;
+		y = sf_event->MouseMove.Y;
 	}
 	else if (sf_event->Type == sf::Event::MouseButtonPressed) {
 		type = sf_event->MouseButton.Button == sf::Mouse::Left ? LEFTCLICK : RIGHTCLICK;
-		this->setCoords(sf_event->MouseButton.X, sf_event->MouseButton.Y, block_width, block_height);
+		x = sf_event->MouseButton.X;
+		y = sf_event->MouseButton.Y;
 	}
 	else {
 		type = UNKNOWNEVENT;
 	}
 }
 
-void Event::setCoords(int pixel_x, int pixel_y, int block_width, int block_height) {
-	x = (pixel_x/block_width);
-	y = (pixel_y/block_height);
-	a = (float) (pixel_x%block_width) / (float) block_width;
-	b = (float) (pixel_y%block_height) / (float) block_height;
+void Event::convertCoords(int block_width, int block_height) {
+	a = (float) (x%block_width) / (float) block_width;
+	b = (float) (y%block_height) / (float) block_height;
+	x = x/block_width;
+	y = y/block_height;
 }
-
 
 
 // This is a horrendous function to convert SFML key codes to DBT’s own.
 // At some point a swap-out of SFML will obviate the need for it.
-dbt_event keyFromSFKeyCode(sf::Keyboard::Key sf_key_code) {
-	dbt_event k;
+dbt_event_code keyFromSFKeyCode(sf::Keyboard::Key sf_key_code) {
+	dbt_event_code k;
 	switch(sf_key_code) {
 		case sf::Keyboard::A:
 			k = K_A;

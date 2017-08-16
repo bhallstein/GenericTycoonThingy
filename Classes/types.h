@@ -9,19 +9,23 @@
 #define NO_PREV_POSITION -27139
 #define INFINITAH 9999999
 
+// Game stages
+#define TUTORIAL_STAGE 2649
+#define DEMON_STAGE 2651
+
 // Coordinates
 
 typedef struct intcoord {
 	int x, y;
 } intcoord;
-
 typedef struct floatcoord {
 	float a, b;
 } floatcoord;
 
 
 // Events
-typedef int dbt_event;
+
+typedef int dbt_event_code;
 
 #define UNKNOWNEVENT -30141
 #define CLOSED       -30142

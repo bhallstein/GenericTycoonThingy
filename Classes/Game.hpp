@@ -16,27 +16,26 @@
 #include "GameMap.hpp"
 #include "Level.hpp"
 #include "Event.hpp"
+#include "EventHandler.hpp"
 
 
 class Game
 {
 public:
-	Game();
+	Game(sf::RenderWindow *);
 	~Game();
 
 	// Methods
 	void Run();
 
 	// Properties
-	SettingsManager Settings;
+	SettingsManager settings;
 
 protected:
 	
 	// Properties
-	sf::RenderWindow DBTWindow;
-	int w, h; 				// Blocks wide/tall
-	int block_w, block_h;	// Pixels per block
-	GameMap gamemap;
+	sf::RenderWindow *window;
+	EventHandler eventHandler;
 };
 
 #endif

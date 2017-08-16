@@ -20,7 +20,7 @@ public:
 	~EventResponder();
 
 	// Methods
-	virtual void receiveEvent(Event *ev, EventResponder **p_e_r);
+	virtual void receiveEvent(Event *ev);
 	
 	// Properties
 	int x, y;		// Integer block coordinates

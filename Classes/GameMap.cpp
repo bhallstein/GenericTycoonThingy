@@ -9,17 +9,9 @@ MapLoc::~MapLoc() {
 	// Destructor
 }
 
-void MapLoc::addResponder(EventResponder *resp) {
-	// Add an eventresponder to the list thereof
-	responderList.push_back(resp);
-}
-void MapLoc::removeResponder(EventResponder *resp) {
-	// Remove an eventresponder from the list thereof
-	responderList.remove(resp);
-}
-void MapLoc::dispatchEvent(Event *ev, EventResponder **p_e_r) {
+void MapLoc::dispatchEvent(Event *ev) {
 	for (std::list<EventResponder*>::iterator i = responderList.begin(); i != responderList.end(); i++)
-		(*i)->receiveEvent(ev, p_e_r);
+		(*i)->receiveEvent(ev);
 }
 void MapLoc::addNeighbour(MapLoc *neighbour) {
 	neighbours.remove(neighbour);	 // This may perhaps not be necessary.
@@ -38,14 +30,7 @@ void MapLoc::setComparator(float new_min_dist) {
 
 /****   GameMap implementation   ****/
 
-GameMap::GameMap() {
-	// Constructor
-}
-GameMap::~GameMap() {
-	maplocs.clear();
-}
-
-void GameMap::setDimensions(int _w, int _h) {
+GameMap::GameMap(int _w, int _h) {
 	w = _w, h = _h;
 	int n = w * h;
 	maplocs.resize(n);
@@ -68,25 +53,12 @@ void GameMap::setDimensions(int _w, int _h) {
 		}
 	}
 }
+GameMap::~GameMap() {
+	maplocs.clear();
+}
 
-void GameMap::addResponder(EventResponder *resp) {
-	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
-		return;
-	for (int j = y; j < y + resp->h; j++)
-		for (int i = x; i < x + resp->w; i++)
-			maplocs[j*w + i].addResponder(resp);
-}
-void GameMap::removeResponder(EventResponder *resp) {
-	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
-		return;
-	for (int j = y; j < y + resp->h; j++)
-		for (int i = x; i < x + resp->w; i++)
-			maplocs[j*w + i].removeResponder(resp);
-}
-void GameMap::dispatchEvent(Event *ev, EventResponder **p_e_r) {
-	maplocs[w*ev->y + ev->x].dispatchEvent(ev, p_e_r);
+void GameMap::dispatchEvent(Event *ev) {
+	maplocs[w*ev->y + ev->x].dispatchEvent(ev);
 }
 
 void GameMap::makePassable(int atX, int atY) {

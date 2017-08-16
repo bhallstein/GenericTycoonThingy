@@ -18,22 +18,20 @@ public:
 	~Event();
 	
 	// Methods
-	void loadFromSFEvent(sf::Event *sf_event, int block_width, int block_height);
+	void loadFromSFEvent(sf::Event *sf_event);
+	void convertCoords(int block_width, int block_height);
 	
 	// Properties
-	dbt_event type;
-	dbt_event key;
+	dbt_event_code type;
+	dbt_event_code key;
 	
 	int x, y;		// Block coords
 	float a, b;		// Float coords (offset)
 	
 protected:
 	
-	// Methods
-	void setCoords(int pixel_x, int pixel_y, int block_width, int block_height);
-	
 };
 
-dbt_event keyFromSFKeyCode(sf::Keyboard::Key sf_key_code);
+dbt_event_code keyFromSFKeyCode(sf::Keyboard::Key sf_key_code);
 
 #endif

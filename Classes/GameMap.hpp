@@ -34,9 +34,7 @@ public:
 	~MapLoc();
 	
 	// Methods
-	void dispatchEvent(Event *ev, EventResponder **p_e_r);
-	void addResponder(EventResponder *x);
-	void removeResponder(EventResponder *x);
+	void dispatchEvent(Event *ev);
 	void addNeighbour(MapLoc *neighbour);
 	void removeNeighbour(MapLoc *neighbour);
 	
@@ -60,17 +58,14 @@ protected:
 class GameMap
 {
 public:
-	GameMap();
+	GameMap(int w, int h);
 	~GameMap();
 
 	// Properties
 	int w, h;
 	
 	// Methods
-	void setDimensions(int _w, int _h);	// This should be called immediately after the constructor.
-	void addResponder(EventResponder *resp);
-	void removeResponder(EventResponder *resp);
-	void dispatchEvent(Event *, EventResponder **p_e_r);
+	void dispatchEvent(Event *);
 	void makeImpassable(int atX, int atY);
 	void makePassable(int atX, int atY);
 	void addImpassableObject(EventResponder *resp);
