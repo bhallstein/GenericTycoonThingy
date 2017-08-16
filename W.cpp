@@ -122,8 +122,8 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 	for (int i=0; text[i] != '\0'; i++) {
 		char c = text[i];
 		if (i != 0) {
-			if (c == 'I' | c == 'i' || c == '1')
-				x += char_width - 6;
+			if (c == 'I' | c == 'i' || c == '1' || c == ':')
+				x += char_width - 4;
 			else if (c == 'L' || c == 'l')
 				x += char_width - 2;
 			else
@@ -381,6 +381,12 @@ void W::drawText(float x, float y, const char *colname, const char *text) {
 				drawRect(x, y+2, 2, 2, colname);
 				drawRect(x+8, y+6, 2, 2, colname);
 				drawRect(x+4, y-1, 2, 12, colname);
+				break;
+			}
+			case ':' : {
+				drawRect(x+6, y+4, 2, 2, colname);
+				drawRect(x+6, y+8, 2, 2, colname);
+				break;
 			}
 			default: break;
 		}

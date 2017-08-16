@@ -8,11 +8,10 @@
 #include "Unit.hpp"
 #include "LuaHelper.hpp"
 #include "Callback.hpp"
+#include "OgreTimer.h"
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW)
 {
-	framecount = 0;
-	
 	currentlyEditedBuilding = NULL;
 	levelview = NULL;
 	uibarview = NULL;
@@ -39,7 +38,9 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	responderMap.subscribeToKey(this, Event::K_S);
 	
 	// Time
-	time(&time_levelstart);
+	framecount = 0;
+	realtimetime = 0.0;
+	realtimetimer = new Ogre::Timer();
 }
 Level::~Level()
 {
@@ -93,7 +94,7 @@ void Level::buildLevel(std::string levelname) {
 	
 	// Create levelview
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furnishings, &units, &staff, w, h);
+	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furnishings, &units, &staff, w, h, &realtimetime);
 	responderMap.addResponder(levelview);
 	
 	// Get allowed buildings
@@ -211,6 +212,9 @@ void Level::resume(Returny *returny) {
 		game->stateFinished(this, Returny(Returny::killer_returny));
 }
 void Level::update() {
+	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
+	realtimetimer->reset();
+
 	intcoord c;
 	for (int i=0, n = spawnPoints.size(); i < n; i++)
 		if (spawnPoints[i]->spawn(&c)) {
@@ -433,12 +437,13 @@ LevelView::LevelView(
 	W *_theW, JenniferAniston &_aniston,
 	ResponderMap *_levelRM,
 	std::vector<Building*> *_buildings, std::vector<Furnishing*> *_furnishings, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
-	int _level_width, int _level_height
+	int _level_width, int _level_height,
+	float *_time_elapsed
 ) :
 	View(_theW, _aniston),
 	levelResponderMap(_levelRM), buildings(_buildings), furnishings(_furnishings), units(_units), staff(_staff), 
 	level_width(_level_width), level_height(_level_height),
-	scroll_x(0), scroll_y(0)
+	scroll_x(0), scroll_y(0), time_elapsed(_time_elapsed)
 {
 	gridsize = 20;		// Pixel size of a level block
 }
@@ -471,6 +476,12 @@ void LevelView::draw() {
 	for (int i=0, n = furnishings->size(); i < n; i++) drawMappedObj((*furnishings)[i]);
 	for (int i=0, n = units->size(); i < n; i++)       drawMappedObj((*units)[i]);
 	for (int i=0, n = staff->size(); i < n; i++)       drawMappedObj((*staff)[i]);
+	char s[100];
+	int time_seconds = (int) *time_elapsed;
+	int time_minutes = time_seconds / 60;
+	time_seconds = time_seconds%60;
+	sprintf(s, "%02d:%02d", time_minutes, time_seconds);
+	theW->drawText(10, 10, "white", s);
 }
 
 void LevelView::processMouseEvent(Event *ev) {

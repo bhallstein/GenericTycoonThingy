@@ -31,6 +31,7 @@ class LevelView;
 class UIBarView;
 class FurnishingPurchasingUIView;
 class HiringUIView;
+namespace Ogre { class Timer; }
 
 class Level : public GameState, public EventResponder {
 public:
@@ -102,7 +103,8 @@ protected:
 	int money;
 
 	int framecount;
-	time_t time_levelstart;
+	Ogre::Timer *realtimetimer;
+	float realtimetime;	// Number of real-time seconds elapsed while level running
 	
 	std::list<std::string> allowedBuildings;
 };
@@ -118,7 +120,8 @@ public:
 		W *, JenniferAniston &,
 		ResponderMap *_levelRM,
 		std::vector<Building*> *, std::vector<Furnishing*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
-		int _level_width, int _level_height
+		int _level_width, int _level_height,
+		float *_time_elapsed
 	);
 	void draw();
 	void drawMappedObj(MappedObj *obj);	// Utility fn for drawing objects
@@ -130,6 +133,7 @@ public:
 	int level_width, level_height;		// how many blocks wide/tall the level is
 	int scroll_x, scroll_y;
 	ResponderMap *levelResponderMap;
+	float *time_elapsed;
 
 	std::vector<Building*>   *buildings;
 	std::vector<Furnishing*> *furnishings;
