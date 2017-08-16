@@ -15,18 +15,20 @@ void EventResponder::receiveEvent(sf::Event *ev, EventResponder **p_e_r) { }
  *    Building implementation    *
  *********************************/
 
-Building::Building(sf::Vector2i _block_size) {
+Building::Building(sf::Vector2i _block_size)
+{
 	mode = PLACEMENT;
 	size_in_blocks.x = 6;
 	size_in_blocks.y = 4;
 	block_size = _block_size;
+	destroyed = false;
 }
 Building::~Building()
 {
 	// Destroy things
 }
 
-void Building::setPositionFromMouse(int x, int y)		// convert a pixel coordinate to a 'block' coordinate
+void Building::setPositionFromMouse(int x, int y)
 {
 	int remainder_x = x % block_size.x;
 	int remainder_y = y % block_size.y;
@@ -51,10 +53,9 @@ void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {		// how to 
 			if (ev->MouseButton.Button == sf::Mouse::Left) {
 				mode = PLACED;
 				*p_e_r = NULL;
-					
 			}
 			else if (ev->MouseButton.Button == sf::Mouse::Right) {
-				//levelmap.destroyBuilding();
+				destroyed = true;
 				*p_e_r = NULL;
 			}
 		}
@@ -62,7 +63,7 @@ void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {		// how to 
 	else if (mode == PLACED) {
 		
 	}
-	std::cout << "Building pos: " << pos.x << "," << pos.y << std::endl;
+	//std::cout << "Building pos: " << pos.x << "," << pos.y << std::endl;
 }
 
 void Building::draw(sf::RenderWindow &w)
@@ -72,7 +73,7 @@ void Building::draw(sf::RenderWindow &w)
 	//	pos = nearestBlock(m_pos.x, m_pos.y);
 	//}
 	
-	std::cout << "Draw - building pos: " << pos.x << "," << pos.y << std::endl;
+	//std::cout << "Draw - building pos: " << pos.x << "," << pos.y << std::endl;
 	
 	w.Draw(
 		sf::Shape::Rectangle(

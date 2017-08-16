@@ -26,9 +26,9 @@ void MapLocation::removeBuilding(Building *b) {
  *    LevelMap implementation    *
  *********************************/
 
-LevelMap::LevelMap(int _rows, int _columns, int _width, int _height)
+LevelMap::LevelMap(int _columns, int _rows, int _width, int _height)
 {
-	rows = rows, columns = _columns;
+	rows = _rows, columns = _columns;
 	block_size.x = _width/_columns;
 	block_size.y = _height/_rows;
 	
@@ -51,12 +51,6 @@ Building* LevelMap::createBuilding()
 	return &buildings.back();
 }
 
-void LevelMap::destroyBuilding()
-{
-	buildings.pop_back();
-	std::cout << "cancelled building creation. " << std::endl;
-}
-
 void LevelMap::moveBuilding(Building *b, int x1, int y1, int x2, int y2)
 {
 	//// Remove from current maploc
@@ -71,8 +65,12 @@ void LevelMap::moveBuilding(Building *b, int x1, int y1, int x2, int y2)
 void LevelMap::draw(sf::RenderWindow &window)
 {
 	// Draw buildings
-	for (vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++)
-		(*i).draw(window);
+	for (vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++) {
+		if ((*i).destroyed)
+			buildings.erase(i--);
+		else
+			(*i).draw(window);
+	}
 }
 
 

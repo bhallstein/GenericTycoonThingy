@@ -26,7 +26,7 @@ Game::~Game()
 void Game::Run()
 {
 	// Create LevelMap
-	int default_map_columns = 100, default_map_rows = 60;
+	int default_map_columns = 100, default_map_rows = 100;
 	LevelMap levelmap(default_map_columns, default_map_rows, pixel_width, pixel_height);
 	
 	bool should_quit = false;
@@ -50,7 +50,7 @@ void Game::Run()
 				// The game loop can't always know what the P.E.R. should do with the event
 				// 	– it depends on what the P.E.R. is up to. We merely send the event on.
 				EventResponder *resp = (EventResponder*) privileged_event_responder;
-				cout << "sending event to Privileged Responder... ";
+				//cout << "sending event to Privileged Responder... ";
 				resp->receiveEvent(&ev, &privileged_event_responder);
 			}
 			else {
