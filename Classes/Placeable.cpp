@@ -21,7 +21,7 @@ void Placeable::receiveEvent(Event *ev) {
 		else if (ev->type == LEFTCLICK) {
 			for (int i=0, n = ground_plan.size(); i < n; i++) {
 				intcoord c = ground_plan[i];
-				if (!navmap->isPassableAt(c.x, c.y))
+				if (!navmap->isPassableAt(c.x + x, c.y + y))
 					return;							// Check if area is passable
 			}
 			mode = PLACED;

@@ -30,5 +30,5 @@ void Building::receiveEvent(Event *ev) {
 }
 
 char Building::col() {
-	return (clicked ? 'l' : 'b');
+	return (clicked ? 'l' : 'b'); 
 }
