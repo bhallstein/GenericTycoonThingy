@@ -6,7 +6,6 @@
 
 @implementation DBTAppDelegate
 
-
 @synthesize window;
 
 -(BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
@@ -67,7 +66,7 @@
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:NSViewGlobalFrameDidChangeNotification
-												  object:self];
+												  object:(MyView*)((W*)theW)->getView()];
 	[super dealloc];
 }
 

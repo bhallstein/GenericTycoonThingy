@@ -1,10 +1,7 @@
-//
-//  main.m
-//  OpenGLProjet
-//
-//  Created by Ben on 05/02/2012.
-//  Copyright 2012 __MyCompanyName__. All rights reserved.
-//
+/*
+ * main.m - Mac/iOS entry point
+ *
+ */
 
 #import <Cocoa/Cocoa.h>
 

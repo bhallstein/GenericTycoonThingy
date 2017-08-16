@@ -172,19 +172,14 @@ struct NativeObjs {
 
 /*
 	a_lion_is_here = false;
-	
 	// Create OpenGL context
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
 	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
-	if (pf == nil) {
-		std::cout << "couldn't create pf" << std::endl;
-		// throw exception
-	}
+	if (pf == nil)
+		std::cout << "couldn't create pf" << std::endl;	// throw exception
 	objs->context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
-	if (objs->context == nil) {
-		std::cout << "couldn't create opengl context" << std::endl;
-		// throw exception
-	}
+	if (objs->context == nil)
+		std::cout << "couldn't create opengl context" << std::endl;	// throw exception
 #elif defined _WIN32 || _WIN64
 	objs = new NativeObjs;
 	objs->appInstance = GetModuleHandle(NULL);

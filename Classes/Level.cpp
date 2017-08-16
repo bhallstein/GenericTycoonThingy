@@ -6,9 +6,7 @@
 #include "Placeable.hpp"
 #include "Unit.hpp"
 
-Level::Level(Game *_game, W *_theW, std::string levelpath) :
-	GameState(_game, _theW)
-{
+Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
 
 	buildLevel(levelpath);
@@ -207,11 +205,11 @@ LevelView::LevelView(
 	W *_theW, JenniferAniston &_aniston,
 	ResponderMap *_levelRM, std::vector<Building*> *_buildings, std::vector<Placeable*> *_placeables, std::vector<Unit*> *_units,
 	int _level_width, int _level_height
-)
-: View(_theW, _aniston),
-  levelResponderMap(_levelRM), buildings(_buildings), placeables(_placeables), units(_units),
-  level_width(_level_width), level_height(_level_height),
-  scroll_x(0), scroll_y(0)
+) :
+	View(_theW, _aniston),
+	levelResponderMap(_levelRM), buildings(_buildings), placeables(_placeables), units(_units),
+	level_width(_level_width), level_height(_level_height),
+	scroll_x(0), scroll_y(0)
 {
 	gridsize = 20;		// Pixel size of a level block
 }

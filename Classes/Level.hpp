@@ -1,5 +1,5 @@
 /*
- * Level.h - Controls a level, including all the objects therein
+ * Level.hpp - Controls a level, including all the objects therein
  *
  */
 
