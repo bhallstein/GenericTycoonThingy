@@ -20,7 +20,6 @@ class Unit;
 class Building;
 class Furnishing;
 class Level;
-class LuaHelper;
 
 
 class Behaviour : public Serializable {

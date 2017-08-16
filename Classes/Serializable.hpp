@@ -28,8 +28,10 @@ protected:
 		// Override to return serialized versions of TDSPs in the form
 		// name => serialized property
 		// (braces are added automatically around the latter)
+	bool deserialized;
 	
 public:
+	Serializable() : deserialized(false) { }
 	std::string serialize();
 	void deserialize(LuaObj &luaObj);
 };

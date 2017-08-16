@@ -1,7 +1,7 @@
 /*
  * PlaceableManager.hpp
  *
- * Implementing Placeability is done by overriding PM's virtual methods, as follows:
+ * Implementing placeability is done by overriding PM's virtual methods, as follows:
  *
  * 1. We enter the placement loop
  *     - This may be at construct time, or when pickUp() is called.
@@ -24,6 +24,20 @@
  *		- otherwise, placementLoopSucceeded() called
  *			- set the drawn object's properties from the object's new position
  *			  and put it back in its non-placement loop drawing state
+ *
+ * Init
+ *
+ * A P.M. must be inited after being construct and set up. This is because the behaviour
+ * of the subclass’s canPlace() etc. methods may depend on type info that is not available
+ * at construct time.
+ *
+ * A P.M. can be created either in placeableMode or not: if the former, init()
+ * tries to activate the placeable; if the latter, it tries to place the object
+ * at the supplied position.
+ *
+ * In both cases init may fail: if the placeable couldn't become PER, or if
+ * the subclass's canPlace() fn returned false.
+ *
  */
 
 #ifndef PlaceableManager_H
@@ -34,13 +48,11 @@
 #include "types.hpp"
 #include "TLO.hpp"
 #include "W.h"
-
-class Placeable;
+#include "Placeable.hpp"
 
 class PlaceableManager : public TLO {
 public:
 	PlaceableManager(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
-	~PlaceableManager();
 	bool init(const W::position &);	// Attempt to init at supplied position
 	bool init(); // Attempt to init at current position
 	
@@ -56,7 +68,7 @@ public:
 	virtual bool canPlace(const W::position &) = 0;
 	
 	bool placeableMode;
-	Placeable *placeable;
+	Placeable placeable;
 };
 
 #endif

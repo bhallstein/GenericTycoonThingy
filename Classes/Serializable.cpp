@@ -45,4 +45,6 @@ void Serializable::deserialize(LuaObj &luaObj) {
 	}
 	
 	deserializeAdditionalProperties(luaObj);
+	
+	deserialized = true;
 }

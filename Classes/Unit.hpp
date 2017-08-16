@@ -11,12 +11,10 @@
 
 #include "types.hpp"
 #include "PlaceableManager.hpp"
-#include "Behaviour.hpp"
 
 namespace W { namespace EventType {
 	extern T INTERRUPT_UNITPICKUP;
 } }
-
 
 struct unitInfo {
 	unitInfo(LuaObj &);
@@ -24,10 +22,9 @@ struct unitInfo {
 	int hireCost;
 };
 
-
-class Building;
 class LevelState;
 class LevelView;
+class Behaviour;
 class Furnishing;
 
 class Unit : public PlaceableManager {
@@ -41,11 +38,12 @@ public:
 		//				- (not req’d if being deserialized)
 		//   setUp() - perform setup (after type has been set)
 		
-		// Note: then need to init() the Unit, since it is a PlaceableManager.
-	
+		// Note: then also need to init() the Unit, since it is a PlaceableManager.
 	void setUp();
 	
-	void mouseEvent(W::Event *);
+	// Event callbacks
+	W::EventPropagation::T mouseEvent(W::Event *);
+	
 	void update();
 	
 	// Utility methods
@@ -61,6 +59,7 @@ public:
 protected:
 	UnitMode::T mode;
 	Behaviour *behaviour;
+	bool hired;
 	
 	// PlaceableManager overrides
 	void placementLoopStarted();
@@ -69,44 +68,29 @@ protected:
 	void placementLoopSucceeded();
 	bool canPlace(const W::position &);
 	
+	// Voyaging-related
 	W::position dest;
-	bool incrementLocation();	// Move along route. Returns false if obstacle encountered.
-	inline bool inHinterland();
-	
-	DrawnUnit *drawnUnit;
-	struct unitInfo *typeInfo;
-	
-	bool hired;
-	
 	std::vector<W::position> route;
+	bool incrementLocation();	// Move along route. Returns false if obstacle encountered.
+	bool inHinterland();
 	
 	// Serialization
 	static serialization_descriptor sd;
-	sdvec _getSDs() {
-		sdvec vec;
-		vec.push_back(&Unit::sd);
-		return vec;
-	}
-	void deserializeAdditionalProperties(LuaObj &o) {
-		createBehaviour();
-		behaviour->deserialize(o["behaviour"]);
-	}
-	void getAdditionalSerializedProperties(std::map<std::string, std::string> &m) {
-		m["behaviour"] = behaviour->serialize();
-	}
+	sdvec _getSDs();
+	void deserializeAdditionalProperties(LuaObj &o);
+	void getAdditionalSerializedProperties(std::map<std::string, std::string> &m);
 	
+	// Type info
+	struct unitInfo *typeInfo;
 	static std::map<std::string, unitInfo*> unitTypeInfo;
 	
-	void createBehaviour() {
-		using std::string;
-		if (type == "customer")
-			behaviour = new CustomerBehaviour(this);
-		else
-			throw W::Exception(
-				string("Error: couldn't create unit behaviour - unrecognised type '") +
-				type + string("'")
-			);
-	}
+	// Drawing
+	DrawnUnit *drawnUnit;
+	
+	// Other
+	void createBehaviour();
+		// Creates the appropriate Behaviour subclass
+
 	void printDebugInfo();
 };
 

@@ -26,7 +26,6 @@
 #include "TLO.hpp"
 
 class LevelState;
-class LuaHelper;
 class Unit;
 class Furnishing;
 class Behaviour;

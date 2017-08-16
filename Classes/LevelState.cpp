@@ -8,6 +8,7 @@
 #include "Building.hpp"
 #include "Furnishing.hpp"
 #include "Unit.hpp"
+#include "Behaviour.hpp"
 
 LevelState::LevelState() :
 	levelView(NULL),
