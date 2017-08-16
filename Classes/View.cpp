@@ -54,11 +54,11 @@ void View::relinquishPrivilegedEventResponderStatus(EventResponder *resp) {
 		privileged_event_responder = NULL;
 }
 
-void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall) {
+void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall, float x_offset, float y_offset) {
 	float block_width  = (r_pos - l_pos) / blocks_w;
 	float block_height = (b_pos - t_pos) / blocks_h;
-	int atX = l_pos + block_x * block_width;
-	int atY = t_pos + block_y * block_height;
+	int atX = l_pos + (block_x + x_offset) * block_width;
+	int atY = t_pos + (block_y + y_offset) * block_height;
 	int width = blocks_wide * block_width;
 	int height = blocks_tall * block_height;
 	if (atX + width >= r_pos)  width = r_pos - atX;
@@ -139,9 +139,9 @@ void ScrollingView::_acceptEvent(Event *ev) {
 	
 	if (!moved) acceptEvent(ev);
 }
-void ScrollingView::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall) {
-	int atX = block_x * block_size_x - scroll_x;
-	int atY = block_y * block_size_y - scroll_y;
+void ScrollingView::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall, float a_offset, float b_offset) {
+	int atX = (a_offset + block_x) * block_size_x - scroll_x;
+	int atY = (b_offset + block_y) * block_size_y - scroll_y;
 	int width = blocks_wide * block_size_x;
 	int height = blocks_tall * block_size_y;
 	if (atX >= r_pos || atY >= b_pos) return;

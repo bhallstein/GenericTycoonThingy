@@ -15,6 +15,8 @@
 #include "EventResponder.hpp"
 #include "NavMap.hpp"
 
+#define S_IDLE 1
+#define S_TRAVELING 2
 
 class Unit : public EventResponder
 {
@@ -26,20 +28,24 @@ public:
 	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);	// Override to handle events
 	char col();
 	void goSomewhere(int x, int y);
+	void update();
 
 	// Properties
-	int a, b;		// Floating point offset from block
+	float a, b;		// Floating point offset from block
 	int destX, destY;
 	
 	bool destroyed;
 	
-	std::string state;
+	int state;
 
 
 protected:
+	// Methods
+	void nextInRoute();
 
 	// Properties
 	NavMap *navmap;
+	std::vector<NavNode*> route;
 	
 };
 

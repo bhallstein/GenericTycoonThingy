@@ -69,6 +69,7 @@ void Game::Run()
 			eventHandler.dispatchEvent(&event);
 		}
 		
+		level.updateObjects();
 		level.destroyThings();	// Removed destroyed objects.
 		
 		// Drawing

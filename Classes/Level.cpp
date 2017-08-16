@@ -20,7 +20,7 @@ Level::~Level()
 Unit* Level::createUnit(int atX, int atY) {
 	Unit *u = new Unit(navmap, atX, atY);
 	units.push_back(u);
-	std::cout << "added new unit (now " << units.size() << ")" << std::endl;
+	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
@@ -72,13 +72,17 @@ void Level::destroyAllThings() {
 	destroyThings();
 }
 
+void Level::updateObjects() {
+	if (framecount == 300) framecount = 0;
+	if (50 == framecount++) createUnit(0, 0);	// Create a new unit every 5 seconds
+	
+	for (int i=0; i < units.size(); i++)
+		units[i]->update();
+}
 void Level::draw()
 {
 	levelview->draw(&buildings, &placeables, &units);
 	uiview.draw();
-
-	if (framecount == 1200) framecount = 0;
-	if (50 == framecount++) createUnit(0, 0);	// Create a new unit every 20 seconds
 }
 
 ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
@@ -145,7 +149,8 @@ void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> 
 	for (std::vector<Unit*>::iterator i = units->begin(); i < units->end(); i++) {
 		drawRect(
 			(*i)->col() == 'r' ? sf::Color::Red : (*i)->col() == 'b' ? sf::Color::Black : sf::Color::White,
-			(*i)->x, (*i)->y, (*i)->w, (*i)->h
+			(*i)->x, (*i)->y, (*i)->w, (*i)->h,
+			(*i)->a, (*i)->b
 		);
 	}
 }

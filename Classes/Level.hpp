@@ -52,6 +52,8 @@ public:
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
+	void updateObjects();
+	
 	void destroyThings();
 	void destroyAllThings();
 	

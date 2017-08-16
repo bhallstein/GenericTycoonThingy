@@ -72,7 +72,7 @@ public:
 protected:
 	// Properties
 	sf::RenderWindow *window;
-	void drawRect(sf::Color color, int atX, int atY, int width, int height);
+	void drawRect(sf::Color color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 
 	bool ready_for_event_response;
 	int blocks_w, blocks_h;
@@ -89,7 +89,7 @@ public:
 	
 	// Methods
 	void _acceptEvent(Event *);
-	void drawRect(sf::Color colour, int atX, int atY, int width, int height);
+	void drawRect(sf::Color colour, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 	
 protected:
 	
