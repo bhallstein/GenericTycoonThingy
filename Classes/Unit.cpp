@@ -61,7 +61,7 @@ void Unit::update() {
 	if (y < next_y) b_diff = diff;
 	else if (y < next_y) b_diff = -diff;
 
-	if (a_diff != 0 and b_diff != 0)
+	if (a_diff != 0 && b_diff != 0)
 		a_diff *= 0.71, b_diff *= 0.71;
 
 	a += a_diff, b += b_diff;
