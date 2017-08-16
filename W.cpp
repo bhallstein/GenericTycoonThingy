@@ -21,9 +21,9 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	W::logfile.open(logfilePath.c_str());
 #ifdef __APPLE__
 	// Tail log file in a Terminal window
-	system("echo \"#!/bin/bash\" > ~/Desktop/tail_cmd");
-	system("echo \"tail -f ~/Desktop/DBTlog.txt\" >> ~/Desktop/tail_cmd");
-	system("chmod a+x ~/Desktop/tail_cmd; open -a Terminal ~/Desktop/tail_cmd");
+//	system("echo \"#!/bin/bash\" > ~/Desktop/tail_cmd");
+//	system("echo \"tail -f ~/Desktop/DBTlog.txt\" >> ~/Desktop/tail_cmd");
+//	system("chmod a+x ~/Desktop/tail_cmd; open -a Terminal ~/Desktop/tail_cmd");
 #endif
 	std::string s = "W: settingsPath: "; s.append(settingsPath);
 	std::string t = "W: resourcesPath: "; t.append(resourcesPath);
@@ -85,21 +85,23 @@ void W::setUpDrawingForView(View *v) {
 	current_drawn_view = v;
 	glScissor(v->x, height() - v->y - v->height, v->width, v->height);
 }
-__colour W::stringToColour(std::string &s) {
+inline bool streq(const char *a, const char *b) {
+	return !strcmp(a, b);
+}
+__colour W::stringToColour(const char *s) {
 	__colour c;
-	if (s == "black")		c.red = 0,    c.green = 0,    c.blue = 0;
-	else if (s == "white")  c.red = 1,    c.green = 1,    c.blue = 1;
-	else if (s == "red")    c.red = 1,    c.green = 0,    c.blue = 0;
-	else if (s == "green")  c.red = 0,    c.green = 1,    c.blue = 0;
-	else if (s == "blue")   c.red = 0,    c.green = 0,    c.blue = 1;
-	else if (s == "yellow") c.red = 1,    c.green = 1,    c.blue = 0;
-	else if (s == "purple") c.red = 0.47, c.green = 0,    c.blue = 0.78;
-	c.alpha = s == "black" ? 0.5 : 1;
+	if      (streq(s, "black" )) c.red = 0,    c.green = 0,    c.blue = 0;
+	else if (streq(s, "white" )) c.red = 1,    c.green = 1,    c.blue = 1;
+	else if (streq(s, "red"   )) c.red = 1,    c.green = 0,    c.blue = 0;
+	else if (streq(s, "green" )) c.red = 0,    c.green = 1,    c.blue = 0;
+	else if (streq(s, "blue"  )) c.red = 0,    c.green = 0,    c.blue = 1;
+	else if (streq(s, "yellow")) c.red = 1,    c.green = 1,    c.blue = 0;
+	else if (streq(s, "purple")) c.red = 0.47, c.green = 0,    c.blue = 0.78;
+	c.alpha = streq(s, "black") ? 0.5 : 1;
 	return c;
 }
 void W::drawRect(float _x, float _y, float _width, float _height, const char *colname) {
-	std::string s(colname);
-	__colour col = stringToColour(s);
+	__colour col = stringToColour(colname);
 	glColor4f(col.red, col.green, col.blue, col.alpha);
 
 	float x = _x, y = _y;

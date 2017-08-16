@@ -30,7 +30,7 @@ void Game::pushState(GameState *st)
 {
 	for (int i=0, n = states.size(); i < n; i++)
 		if (states[i] == st)
-			; 										// Throw exception if state already in stack
+			return;									// Throw exception if state already in stack?
 		
 	if (!states.empty()) states.back()->pause();	// Pause current state
 	states.push_back(st);							// Add the new state

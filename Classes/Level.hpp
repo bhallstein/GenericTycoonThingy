@@ -27,6 +27,7 @@ class Unit;
 
 class LevelView;
 class UIBarView;
+class FurniturePurchasingUIView;
 
 class Level : public GameState, public EventResponder {
 public:
@@ -54,10 +55,16 @@ public:
 	Building* createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
 	void      createPlaceable(const char *type);
 	void createBarbersChair();
+	void createSofa();
 	void createStaffUnit();
 	
 	void destroyThings();
 	void destroyAllThings();
+	
+	// View stuff
+	void openFurniturePurchasingView(Building *);
+	void closeFurniturePurchasingView();
+	Building *currentlyEditedBuilding;
 	
 	// Properties
 	int columns, rows;
@@ -78,6 +85,7 @@ protected:
 	ResponderMap *levelResponderMap;
 	LevelView *levelview;
 	UIBarView *uibarview;
+	FurniturePurchasingUIView *furniturePurchasingView;
 	
 	int framecount;
 	
@@ -127,8 +135,10 @@ public:
 
 class FurniturePurchasingUIView : public UIView {
 public:
-	FurniturePurchasingUIView(W *, JenniferAniston &);
+	FurniturePurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_placeableTypes);
 	void draw();
+protected:
+	std::vector<std::string> *placeableTypes;
 };
 
 #endif

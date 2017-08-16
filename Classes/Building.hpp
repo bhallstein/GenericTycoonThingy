@@ -31,6 +31,9 @@ public:
 	std::string type;
 	bool destroyed;
 	std::vector<door> doors;		// Doors. These should probably be on the edge of the building. lol.
+	std::string *b_colour;
+	std::string *b_hoverColour;
+	std::vector<std::string> *b_allowedPlaceables;
 									// See types.hpp for what a door looks like
 	// Methods
 	void receiveEvent(Event *);		// Handle mouse events
@@ -44,9 +47,6 @@ protected:
 	bool clicked;
 	int time_hovered;
 	Level *level;
-	std::string *b_colour;
-	std::string *b_hoverColour;
-	std::vector<std::string> *b_allowedPlaceables;
 	
 	// Info on building types, saved as static members for private use by Building & its instances.
 	static std::map<std::string, struct buildingInfo> buildingTypes;	// e.g. "pieshop" => struct buildingInfo { }

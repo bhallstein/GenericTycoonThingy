@@ -39,7 +39,7 @@ public:
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
 	void drawRect(float _x, float _y, float _width, float _height, const char *colour);
-	__colour stringToColour(std::string &s);
+	__colour stringToColour(const char *);
 
 	// Event shizzle
 	void addEvent(Event &);
@@ -47,7 +47,6 @@ public:
 	void clearEvents();
 	
 	// File shizzle
-	//FILE* filePointerToResource(std::string);	// Be sure to call fclose() when you're done
 	void initializePaths();
 	bool isValidDir(const char *);
 	bool createDir(const char *);

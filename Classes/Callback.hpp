@@ -8,10 +8,6 @@
 #ifndef CALLBACK_H
 #define CALLBACK_H
 
-#include <iostream>
-#include <list>
-#include <typeinfo>
-
 #include "types.hpp"
 
 class CallbackBase {

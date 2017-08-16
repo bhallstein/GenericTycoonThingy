@@ -10,6 +10,11 @@
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
+	
+	currentlyEditedBuilding = NULL;
+	levelview = NULL;
+	uibarview = NULL;
+	furniturePurchasingView = NULL;
 
 	buildLevel(levelpath);
 	
@@ -37,6 +42,7 @@ Level::~Level() {
 	delete navmap;
 	delete levelview;
 	delete uibarview;
+	delete furniturePurchasingView;
 }
 
 void Level::buildLevel(std::string levelname) {
@@ -207,6 +213,7 @@ void Level::update() {
 void Level::draw() {
 	levelview->_draw();
 	uibarview->_draw();
+	if (furniturePurchasingView != NULL) furniturePurchasingView->_draw();
 }
 void Level::setResolution(int _w, int _h) {
 	GameState::setResolution(_w, _h);
@@ -215,10 +222,10 @@ void Level::setResolution(int _w, int _h) {
 }
 
 void Level::receiveEvent(Event *ev) {
-	if (ev->type == Event::SCREENEDGE_LEFT)			levelview->scroll(LEFTWARD);
-	else if (ev->type == Event::SCREENEDGE_RIGHT)	levelview->scroll(RIGHTWARD);
-	else if (ev->type == Event::SCREENEDGE_TOP)		levelview->scroll(UPWARD);
-	else if (ev->type == Event::SCREENEDGE_BOTTOM)	levelview->scroll(DOWNWARD);
+	if (ev->type == Event::SCREENEDGE_LEFT)        levelview->scroll(LEFTWARD);
+	else if (ev->type == Event::SCREENEDGE_RIGHT)  levelview->scroll(RIGHTWARD);
+	else if (ev->type == Event::SCREENEDGE_TOP)    levelview->scroll(UPWARD);
+	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q) game->stateFinished(this, Returny(Returny::killer_returny));
 		if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
@@ -269,9 +276,8 @@ void Level::createPlaceable(const char *type) {
 	std::cout << "added placeable " << p << " (now " << placeables.size() << ")" << std::endl;
 	return;
 }
-void Level::createBarbersChair() {
-	createPlaceable("barberschair");
-}
+void Level::createBarbersChair() { createPlaceable("barberschair"); }
+void Level::createSofa() { createPlaceable("sofa"); }
 void Level::createStaffUnit() {
 	createUnit(0, 0, "staff");
 }
@@ -309,12 +315,28 @@ void Level::destroyThings() {
 		else i++;
 }
 void Level::destroyAllThings() {
-	for (int i=0; i < placeables.size(); i++)   placeables[i]->destroyed = true;
-	for (int i=0; i < buildings.size(); i++) 	buildings[i]->destroyed = true;
-	for (int i=0; i < units.size(); i++) 	    units[i]->destroyed = true;
+	for (int i = 0; i < placeables.size(); i++) placeables[i]->destroyed = true;
+	for (int i = 0; i < buildings.size(); i++)  buildings[i]->destroyed = true;
+	for (int i = 0; i < units.size(); i++)      units[i]->destroyed = true;
 	destroyThings();
 }
 
+void Level::openFurniturePurchasingView(Building *b) {
+	if (furniturePurchasingView != NULL) closeFurniturePurchasingView();
+	currentlyEditedBuilding = b;
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
+	furniturePurchasingView = new FurniturePurchasingUIView(theW, aniston, b->b_allowedPlaceables);
+	responderMap.addResponder(furniturePurchasingView);
+	
+	furniturePurchasingView->subscribe("close", new Callback(&Level::closeFurniturePurchasingView, this));
+	furniturePurchasingView->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
+	furniturePurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
+}
+void Level::closeFurniturePurchasingView() {
+	delete furniturePurchasingView;
+	furniturePurchasingView = NULL;
+	currentlyEditedBuilding = NULL;
+}
 
 #include "Button.hpp"
 
@@ -386,25 +408,37 @@ void LevelView::scroll(direction dir) {
 
 UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
 {
-	buttons.push_back(new Button(10, 10, 20, 20, "create barberschair"));
-	buttons.push_back(new Button(40, 10, 20, 20, "add staff unit"));
+//	buttons.push_back(new Button(10, 10, 20, 20, "create barberschair"));
+	buttons.push_back(new Button(10, 10, 20, 20, "add staff unit"));
 }
 
 void UIBarView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
-	for (int i=0; i < buttons.size(); i++) {
+	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
 }
 
 
-FurniturePurchasingUIView::FurniturePurchasingUIView(W *_theW, JenniferAniston &aniston) :
-	UIView(_theW, aniston)
+FurniturePurchasingUIView::FurniturePurchasingUIView(W *_theW, JenniferAniston &_aniston, std::vector<std::string> *_placeableTypes) :
+	UIView(_theW, _aniston), placeableTypes(_placeableTypes)
 {
-	// Add buttons...
+	buttons.push_back(new Button(7, 7, 12, 12, "close"));
+	// Add buttons for creating placeables
+	for (int i=0, n = placeableTypes->size(); i < n; i++) {
+		std::string s("create ");
+		s += placeableTypes->at(i);
+		buttons.push_back(
+			  new Button(7 + (20 + 10)*i, 30, 20, 20, s.c_str())
+		);
+	}
 }
 
 void FurniturePurchasingUIView::draw() {
-	theW->drawRect(x, y, width, height, "black");
+	theW->drawRect(0, 0, width, height, "black");
+	for (int i=0, n = buttons.size(); i < n; i++) {
+		Button *b = buttons[i];
+		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	}
 }

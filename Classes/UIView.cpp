@@ -10,7 +10,6 @@ UIView::UIView(W *_theW, JenniferAniston &_aniston) : View(_theW, _aniston)
 UIView::~UIView()
 {
 	std::cout << "uiview destruct" << std::endl;
-	
 }
 
 void UIView::processMouseEvent(Event *ev) {
@@ -33,6 +32,6 @@ void UIView::processMouseEvent(Event *ev) {
 	}
 }
 
-void UIView::subscribe(const char *_payload, Callback *_callback) {
-	subscriptions[_payload] = _callback;
+void UIView::subscribe(const char *_action, Callback *_callback) {
+	subscriptions[_action] = _callback;
 }

@@ -1,6 +1,7 @@
 #include "Building.hpp"
 #include "LuaHelper.hpp"
 #include "../W.hpp"
+#include "Level.hpp"
 
 // Initialize static members
 std::map<std::string, struct buildingInfo> Building::buildingTypes;
@@ -23,7 +24,7 @@ Building::~Building()
 }
 
 void Building::receiveEvent(Event *ev) {
-	if (ev->type == Event::LEFTCLICK) clicked = !clicked;
+	if (ev->type == Event::LEFTCLICK) level->openFurniturePurchasingView(this);
 	else if (ev->key == Event::K_L)	  std::cout << "Building " << this << " detected the L key!" << std::endl;
 }
 
