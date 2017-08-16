@@ -12,7 +12,7 @@
 #include <list>
 #include <typeinfo>
 
-#include "types.h"
+#include "types.hpp"
 #include "EventResponder.hpp"
 #include "JenniferAniston.hpp"
 

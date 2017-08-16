@@ -9,7 +9,7 @@
 
 #include "WindowManager.hpp"
 #include "MyView.h"
-#include "types.h"
+#include "types.hpp"
 
 struct NativeObjs {
 	NSWindow *window;

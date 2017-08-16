@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "types.h"
+#include "types.hpp"
 #include "MappedObj.hpp"
 
 class NavMap;

@@ -7,12 +7,15 @@
 #define LUAHELPER_H
 
 #include <string>
+#include <iostream>
 
 #include <Lua.hpp>
 
+class W;
+
 class LuaHelper {
 public:
-	LuaHelper();
+	LuaHelper(W *);
 	~LuaHelper();
 
 	bool loadFile(std::string &fileName);
@@ -39,6 +42,8 @@ public:
 
 	//stackdump
 	void stackdump(lua_State *l);
+	
+	W *theW;
 };
 
 //template implementations

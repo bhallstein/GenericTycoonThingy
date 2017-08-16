@@ -11,7 +11,7 @@
 #include <map>
 #include <iostream>
 
-#include "types.h"
+#include "types.hpp"
 #include "Event.hpp"
 
 class EventResponder;

@@ -12,7 +12,7 @@
 #include <string>
 
 #include "LuaHelper.hpp"
-#include "types.h"
+#include "types.hpp"
 #include "GameState.hpp"
 #include "EventResponder.hpp"
 #include "SpawnPoint.hpp"

@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "types.h"
+#include "types.hpp"
 #include "Returny.hpp"
 
 class W;

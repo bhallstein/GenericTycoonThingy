@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "WindowManager.hpp"
-#include "types.h"
+#include "types.hpp"
 
 class View;
 class Event;

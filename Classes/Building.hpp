@@ -8,10 +8,7 @@
 
 #include <iostream>
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
-#include "types.h"
+#include "types.hpp"
 #include "MappedObj.hpp"
 
 class Building : public MappedObj {

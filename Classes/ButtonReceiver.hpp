@@ -11,7 +11,6 @@ class Button;
 class ButtonReceiver {
 public:
 	virtual void buttonClick(Button *) = 0;
-	
 };
 
 #endif

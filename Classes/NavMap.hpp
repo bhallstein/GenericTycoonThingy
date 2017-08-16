@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 
-#include "types.h"
+#include "types.hpp"
 #include "MisterHeapy.hpp"
 
 using std::cout;
