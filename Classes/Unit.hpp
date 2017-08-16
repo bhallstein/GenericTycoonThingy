@@ -14,13 +14,16 @@
 
 #include "types.h"
 #include "MappedObj.hpp"
-#include "NavMap.hpp"
 
+
+class NavMap;
+class NavNode;
+class View;
 
 class Unit : public MappedObj
 {
 public:
-	Unit(NavMap *, int _x, int _y);
+	Unit(NavMap *, View *, int _x, int _y);
 	~Unit();
 
 	// Methods
@@ -44,7 +47,9 @@ protected:
 	enum state_types { S_IDLE, S_TRAVELING, S_WAITING } state;
 	int frames_waited;
 	NavMap *navmap;
+	View *view;
 	std::vector<NavNode*> route;
+	bool hover;
 
 };
 

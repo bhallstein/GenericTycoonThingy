@@ -1,6 +1,9 @@
 #include "Unit.hpp"
+#include "NavMap.hpp"
+#include "View.hpp"
 
-Unit::Unit(NavMap *_navmap, int _x, int _y) : MappedObj(_x, _y), navmap(_navmap), destroyed(false), dest_x(_x), dest_y(_y), state(S_IDLE)
+Unit::Unit(NavMap *_navmap, View *_view, int _x, int _y) :
+	MappedObj(_x, _y), navmap(_navmap), view(_view), destroyed(false), dest_x(_x), dest_y(_y), state(S_IDLE), hover(false)
 {
 	intcoord p[] = { {0,0}, {-1,-1} };
 	setGroundPlan(p);
@@ -12,16 +15,20 @@ Unit::~Unit() {
 }
 
 void Unit::receiveEvent(Event *ev) {
-	// Event handling shizzle
+	if (ev->type == MOUSEMOVE)
+		hover = true;
 }
 
 char Unit::col() {
-	if (state == S_IDLE) return 'b';
+	if (hover) { hover = false; return 'l'; }
+	else if (state == S_IDLE) return 'b';
 	else if (state == S_TRAVELING) return 'w';
 	else return 'r';
 }
 
 void Unit::update() {
+	if (hover) return;
+	
 	bool at_dest = (x == dest_x && y == dest_y);
 	
 	if (state == S_IDLE) {
@@ -86,8 +93,10 @@ void Unit::incrementLocation() {
 	if (reached_next) {
 		// If on point of entering next loc, check is passable
 		if (route[0]->passable) {
+			view->removeResponder(this);
 			x = next_x, y = next_y;
 			a = b = 0;
+			view->addResponder(this);
 			nextInRoute();
 		}
 		// If access denied, go back to the previous square. Waiting & recalculation will ensue upon arrival.

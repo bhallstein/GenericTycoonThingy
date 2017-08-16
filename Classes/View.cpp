@@ -1,4 +1,8 @@
 #include "View.hpp"
+#include "Unit.hpp"
+#include "Building.hpp"
+#include "Placeable.hpp"
+#include "Menu.hpp"
 
 View::View(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :
 	window(_window),
@@ -99,7 +103,7 @@ void View::draw() {
 			);
 }
 
-void View::_acceptEvent(Event *ev) {
+void View::_dispatchMouseEvent(Event *ev) {
 	if (!ready_for_event_response) return;
 
 	ev->convertCoords((r_pos - l_pos)/blocks_w, (b_pos - t_pos)/blocks_h);
@@ -111,15 +115,53 @@ void View::_acceptEvent(Event *ev) {
 		return;
 	}
 
-	acceptEvent(ev);
+	dispatchMouseEvent(ev);
 }
-void View::acceptEvent(Event *ev) {
+void View::dispatchMouseEvent(Event *ev) {
 	if (!ready_for_event_response) return;
-	std::list<MappedObj *> *resps = &responderMap[ev->y * blocks_w + ev->x];
-	for (std::list<MappedObj *>::iterator i = resps->begin(); i != resps->end(); i++)
-		(*i)->receiveEvent(ev);
+	
+	// Get unit whose centre is closest to mouse. Search this & adjacent blocks.
+	std::list<MappedObj *> *objs;
+	std::list<MappedObj *>::iterator it;
+	const std::type_info *unit_type = &typeid(Unit);
+	//const std::type_info *vehicle_type = &typeid(Vehicle);
+	float xm = ev->x + ev->a, ym = ev->y + ev->b;
+	float xdist, ydist, dist, closest_unit_dist = INFINITAH;
+	MappedObj *closest_unit = NULL, *u;
+	
+	for (int j = ym-1; j <= ym+1; j++) for (int i = xm-1; i <= xm+1; i++) {
+		if (i < 0 || i >= blocks_w || j < 0 || j >= blocks_h)
+			continue;
+		objs = &responderMap[j * blocks_w + i];
+		for (it = objs->begin(); it != objs->end(); it++)
+			if (typeid(*(u = *it)) == *unit_type) {
+				xdist = xm - (u->x + u->a + 0.5), ydist = ym - (u->y + u->b + 0.5);		// add 0.5 to (x,y) to get centre of unit
+				xdist *= xdist, ydist *= ydist;
+				if (xdist > 0.25 || ydist > 0.25) continue;			// check |xdist| & |ydist| < 0.5
+				dist = xdist*xdist + ydist*ydist;
+				if (dist < closest_unit_dist)
+					closest_unit = u, closest_unit_dist = dist;
+			}
+	}
+	
+	if (closest_unit != NULL) 			closest_unit->receiveEvent(ev);
+	//else if (closest_vehicle != NULL)	closest_vehicle->receiveEvent(ev);
+	
+	// Otherwise send to placeable, and otherwise, building, and otherwise, whatever else is there
+	MappedObj *placeable = NULL, *building = NULL, *button = NULL;
+	const std::type_info *placeable_type = &typeid(Placeable), *building_type = &typeid(Building), *button_type = &typeid(Button);
+	objs = &responderMap[ev->y * blocks_w + ev->x];
+	for (it = objs->begin(); it != objs->end(); it++)
+		if (typeid(*(*it)) == *placeable_type)
+			placeable = *it;
+		else if (typeid(*(*it)) == *building_type)
+			building = *it;
+		else if (typeid(*(*it)) == *button_type)
+			button = *it;
+	if (placeable != NULL)		placeable->receiveEvent(ev);
+	else if (building != NULL)	building->receiveEvent(ev);
+	else if (button != NULL)	button->receiveEvent(ev);
 }
-
 
 
 ScrollingView::ScrollingView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :
@@ -132,18 +174,17 @@ ScrollingView::~ScrollingView() {
 	
 }
 
-void ScrollingView::_acceptEvent(Event *ev) {
+void ScrollingView::_dispatchMouseEvent(Event *ev) {
 	if (!ready_for_event_response) return;
 	
 	if (ev->x < 0 || ev->y < 0 || ev->x >= r_pos - l_pos || ev->y >= b_pos - t_pos)
 		return;
 	
-	bool moved = false;
 	int scrollMargin = 30;
-	if (ev->x <= scrollMargin)					scroll_x -= scrollMargin - ev->x, moved = true;
-	else if (ev->x >= r_pos - scrollMargin)		scroll_x += ev->x - r_pos + scrollMargin, moved = true;
-	if (ev->y <= scrollMargin)					scroll_y -= scrollMargin - ev->y, moved = true;
-	else if (ev->y >= b_pos - scrollMargin)		scroll_y += ev->y - b_pos + scrollMargin, moved = true;
+	if (ev->x <= scrollMargin)					scroll_x -= scrollMargin - ev->x;
+	else if (ev->x >= r_pos - scrollMargin)		scroll_x += ev->x - r_pos + scrollMargin;
+	if (ev->y <= scrollMargin)					scroll_y -= scrollMargin - ev->y;
+	else if (ev->y >= b_pos - scrollMargin)		scroll_y += ev->y - b_pos + scrollMargin;
 
 	int max_scroll_x = block_size_x * blocks_w - (r_pos - l_pos);
 	int max_scroll_y = block_size_y * blocks_h - (b_pos - t_pos);
@@ -154,12 +195,9 @@ void ScrollingView::_acceptEvent(Event *ev) {
 	
 	ev->convertCoords(block_size_x, block_size_y, scroll_x, scroll_y);
 	
-	if (privileged_event_responder != NULL) {
+	if (privileged_event_responder != NULL)
 		privileged_event_responder->receiveEvent(ev);
-		return;
-	}
-	
-	if (!moved) acceptEvent(ev);
+	else dispatchMouseEvent(ev);
 }
 void ScrollingView::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall, float a_offset, float b_offset) {
 	int atX = (a_offset + block_x) * block_size_x - scroll_x;

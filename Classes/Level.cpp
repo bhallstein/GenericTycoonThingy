@@ -71,8 +71,9 @@ void Level::handleEvent(Event* event)
 }
 
 Unit* Level::createUnit(int atX, int atY) {
-	Unit *u = new Unit(navmap, atX, atY);
+	Unit *u = new Unit(navmap, levelview, atX, atY);
 	units.push_back(u);
+	levelview->addResponder(u);
 	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
 }
@@ -113,6 +114,7 @@ void Level::destroyThings() {
 		else i++;
 	for (std::vector<Unit*>::iterator i = units.begin(); i < units.end(); )
 		if ((*i)->destroyed) {
+			levelview->removeResponder(*i);
 			delete *i;
 			i = units.erase(i);
 		}

@@ -61,7 +61,7 @@ public:
 	char col();
 	
 protected:
-	bool hovered;
+	bool hover;
 	Menu *menu;
 	
 };

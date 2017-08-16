@@ -63,15 +63,13 @@ Button::~Button() {
 }
 void Button::receiveEvent(Event *ev) {
 	if (ev->type == MOUSEMOVE)
-		hovered = true;
-		
+		hover = true;
 	else if (ev->type == LEFTCLICK)
 		menu->startLevel("Data/level1.xml");
 }
 char Button::col() {
-	bool hov = hovered;
-	hovered = false;
-	return hov ? 'r' : 'b';
+	if (hover) { hover = false; return 'r'; }
+	else return 'b';
 }
 
 MenuView::MenuView(sf::RenderWindow *_win, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :

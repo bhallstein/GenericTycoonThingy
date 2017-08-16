@@ -37,6 +37,7 @@
 
 #include <iostream>
 #include <list>
+#include <typeinfo>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -45,7 +46,6 @@
 #include "Event.hpp"
 #include "EventResponder.hpp"
 #include "MappedObj.hpp"
-#include "Unit.hpp"
 
 
 class View {
@@ -56,9 +56,9 @@ public:
 	// Methods
 	virtual void draw();					// Your subclass should override this
 
-	void acceptEvent(Event *);
-	virtual void _acceptEvent(Event *);		// Wrapper for acceptEvent: EventHandler calls this, allowing View & subclasses to do some
-											// shit before calling acceptEvent function
+	void dispatchMouseEvent(Event *);
+	virtual void _dispatchMouseEvent(Event *);	// EventHandler calls this, allowing View & subclasses to do some
+												// shit before calling dispatchMouseEvent function
 	
 	void createEventResponderMap(); 		// Create structures necessary for event response
 	void addResponder(MappedObj *);
@@ -93,7 +93,7 @@ public:
 	~ScrollingView();
 	
 	// Methods
-	void _acceptEvent(Event *);
+	void _dispatchMouseEvent(Event *);
 	
 protected:
 	// Methods
