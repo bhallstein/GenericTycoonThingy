@@ -37,6 +37,9 @@ public:
 	void addNeighbour(MapLoc *neighbour);
 	void removeNeighbour(MapLoc *neighbour);
 	
+	bool operator< (MapLoc*);		// For ordering in BinaryHeap
+	void setComparator(float);      // For updating by BinaryHeap
+	
 	// Properties
 	int x, y;
 	bool passable;

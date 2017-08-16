@@ -6,23 +6,24 @@
  *
  * ~~ Crafting Your Objects ~~
  *
- * DEFINITION: the “comparand” of an object is the property using which you will compare them,
- *     i.e. the criterion by which they’ll be ordered in the heap.
+ * DEFINITION: the “comparand” of an object is the property by which they will be ordered in the heap.
+ *     i.e. if A’s comparand is greater than B’s comparand, A will be ‘above’ B in the heap.
  *     For instance, a MapLoc’s comparand is a float: min_dist.
  *
  * NOTE: BinaryHeap CANNOT hold simple types (ints, etc.), ONLY pointers to your objects.
  *
  * To be used in a BinaryHeap, your objects must:
  *     1. Implement the function void setComparand(new_value)
- *           This should overwrite the property that is used to compare this to other objects.
+ *           This should overwrite the object’s comparand.
+ *           e.g. for MapLoc: `void setComparand(float new_dist) { min_dist = new_dist; }
  *     2. Override the operator `<`
- *           Your function should take a pointer P to another object of the same type, and compare its 
- *           own comparand to that of P, e.g. `return this->min_dist < P->min_dist;`
+ *           Your function should take a pointer P to another object of the same class, and compare its 
+ *           own comparand to P’s, e.g. `return min_dist < P->min_dist;`
  * 
  * ~~ Creating Your BinaryHeap Instance ~~
  * 
- * BinaryHeap is a templated class, and needs the type of your object, and of your object’s comparand.
- * e.g. if your object is MapLoc, and MapLoc’s comparand is `float min_dist`:
+ * BinaryHeap is a templated class, taking the type of your object, and of your object’s comparand.
+ * e.g. if your objects are MapLocs, and MapLoc’s comparand min_dist is a float:
  *     BinaryHeap<MapLoc*, float> myheap;
  * 
  * ~~ Initializing Your Heap ~~

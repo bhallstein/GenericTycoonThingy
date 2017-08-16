@@ -32,6 +32,12 @@ void MapLoc::addNeighbour(MapLoc *neighbour) {
 void MapLoc::removeNeighbour(MapLoc *neighbour) {
 	neighbours.remove(neighbour);
 }
+bool MapLoc::operator< (MapLoc *m) {
+	return min_dist < m->min_dist;
+}
+void MapLoc::setComparator(float new_min_dist) {
+	min_dist = new_min_dist;
+}
 
 
 /****   GameMap implementation   ****/
@@ -131,43 +137,53 @@ bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLo
 		return false;
     
 	// Navigate from A to B
-	MapLoc *A = &maplocs[w*fromY + fromX], *B = &maplocs[w*toY + toX];
-    
-	// Initialisation
-	//int n = w*h;
-	//for (int i=0; i < n; i++) {
-	//	MapLoc *maploc = &maplocs[i];
-	//	maploc->min_dist = (maploc == A ? 0 : INFINITAH);
-	//	if (maploc->passable)
-	//		open_nodes.push(maploc);	// Nodes are 
-	//}
-	//A->min_dist = 0;			// Set start node’s min_dist to 0.
-	//
-	//MapLoc *X, *neighbour;
-	//float dist_via_X;
-	//bool route_found = false;
-	//while (open_nodes.size()) {
-	//	X = open_nodes.top();			// Pop node with lowest min_dist off
-	//	open_nodes.pop();				// the open node list.
-	//	
-	//	if (X->min_dist == INFINITAH) return false;	// No route is possible.
-	//	if (X == B) {
-	//		route_found = true;
-	//		break;
-	//	}
-	//	
-	//	// Recalc neighbours’ min_dists
-	//	for (std::list<MapLoc*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
-	//		neighbour = (*i);
-	//		dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
-	//		if (dist_via_X < neighbour->min_dist) {
-	//			neighbour->min_dist = dist_via_X;
-	//			neighbour->route_prev = X;
-	//		}
-	//	}
-	//}
-	//if (!route_found) return false;
-	//
-	//X = &maploc[w*toY + toX];
-	//while (X != )
+	// Note: pathfinding is actually done backwards: from the destination to the start.
+	// This is so we don’t have to reverse the route after extracting it, since it arrives in reverse order.
+	MapLoc *A = &maplocs[w*toY + toX], *B = &maplocs[w*fromY + fromX];
+	if (!A->passable || !B->passable) return false;
+
+	/* Initialisation */
+	int n = w * h;
+	BinaryHeap<MapLoc*, float> open_nodes;
+	std::vector<MapLoc*> *vec = open_nodes.vec;
+	vec->reserve(n);				// Reserve mem in advance (faster than expanding dynamically)
+	for (int i=0; i < n; i++) {
+		MapLoc *maploc = &maplocs[i];
+		maploc->min_dist = (maploc == A ? 0 : INFINITAH);	// Set nodes’ min_dist to inifinity
+		if (maploc->passable)
+			vec->push_back(maploc);		// Populate heap vector with passable nodes
+	}
+	A->min_dist = 0;					// Set start node’s min_dist to 0
+	open_nodes.reheapify();				// Re-sort heap
+	
+	/* Run */
+	MapLoc *X, *neighbour;
+	float dist_via_X;
+	bool route_found = false;
+	while (open_nodes.size()) {
+		X = open_nodes.top();			// Pop node with lowest min_dist off
+		open_nodes.pop();				// the open node list
+		
+		if (X->min_dist == INFINITAH) return false;		// No route is possible.
+		if (X == B) {
+			route_found = true;
+			break;
+		}
+		
+		// Recalc neighbours’ min_dists
+		for (std::list<MapLoc*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
+			neighbour = (*i);
+			dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
+			if (dist_via_X < neighbour->min_dist) {
+				neighbour->min_dist = dist_via_X;
+				neighbour->route_prev = X;
+			}
+		}
+	}
+	if (!route_found) return false;
+	
+	/* Get route */
+	for (X = B; X != A; X = X->route_prev)
+		route->push_back(X);
+	return true;
 }
