@@ -1,5 +1,5 @@
 /*
- * GameMap.h - map data for a level.
+ * GameMap.hpp - map data for a level.
  *
  * The GameMap thinks solely in "blocks" - the squares that make up the game map – it does not honour
  * the existence of pixels.
@@ -16,10 +16,12 @@
 #include <iostream>
 #include <list>
 #include <vector>
-// #include <list>
+#include <queue>
 
+#include "types.h"
 #include "Event.hpp"
 #include "EventResponder.hpp"
+#include "BinaryHeap.hpp"
 
 
 class MapLoc
@@ -38,10 +40,12 @@ public:
 	// Properties
 	int x, y;
 	bool passable;
+	std::list<MapLoc*> neighbours;		// Pointers to passable neighbour nodes. For pathfinding.
+	float min_dist;
+	MapLoc *route_prev;
 	
 protected:
 	std::list<EventResponder*> responderList;
-	std::list<MapLoc*> neighbours;		// Pointers to passable neighbour nodes. Used for pathfinding.
 	
 };
 
@@ -65,10 +69,11 @@ public:
 	void addImpassableObject(EventResponder *resp);
 	void removeImpassableObject(EventResponder *resp);
 	bool isPassableAt(int atX, int atY);
+	bool getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route);
 
 protected:
 	// Properties
-	std::vector<MapLoc> maplocs;	// A [w*h]-sized array of MapLocs
+	std::vector<MapLoc> maplocs;		// A w*h-sized array of MapLocs
 	
 };
 

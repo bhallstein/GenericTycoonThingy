@@ -126,3 +126,48 @@ void GameMap::removeImpassableObject(EventResponder *resp) {
 bool GameMap::isPassableAt(int atX, int atY) {
 	return maplocs[atY*w + atX].passable;
 }
+bool GameMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<MapLoc*> *route) {
+	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h)
+		return false;
+    
+	// Navigate from A to B
+	MapLoc *A = &maplocs[w*fromY + fromX], *B = &maplocs[w*toY + toX];
+    
+	// Initialisation
+	//int n = w*h;
+	//for (int i=0; i < n; i++) {
+	//	MapLoc *maploc = &maplocs[i];
+	//	maploc->min_dist = (maploc == A ? 0 : INFINITAH);
+	//	if (maploc->passable)
+	//		open_nodes.push(maploc);	// Nodes are 
+	//}
+	//A->min_dist = 0;			// Set start node’s min_dist to 0.
+	//
+	//MapLoc *X, *neighbour;
+	//float dist_via_X;
+	//bool route_found = false;
+	//while (open_nodes.size()) {
+	//	X = open_nodes.top();			// Pop node with lowest min_dist off
+	//	open_nodes.pop();				// the open node list.
+	//	
+	//	if (X->min_dist == INFINITAH) return false;	// No route is possible.
+	//	if (X == B) {
+	//		route_found = true;
+	//		break;
+	//	}
+	//	
+	//	// Recalc neighbours’ min_dists
+	//	for (std::list<MapLoc*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
+	//		neighbour = (*i);
+	//		dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
+	//		if (dist_via_X < neighbour->min_dist) {
+	//			neighbour->min_dist = dist_via_X;
+	//			neighbour->route_prev = X;
+	//		}
+	//	}
+	//}
+	//if (!route_found) return false;
+	//
+	//X = &maploc[w*toY + toX];
+	//while (X != )
+}
