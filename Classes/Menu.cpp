@@ -150,7 +150,9 @@ void MenuView::processMouseEvent(Event *ev) {
 }
 void MenuView::switchMode() {
 	framecount = 0;
-	if (++mode == MLAST) mode = (_modes) 1;
+	int m = (_modes) mode;
+	mode = (_modes) ++m;
+	if (mode == MLAST) mode = (_modes) 1;
 	// setupses
 	if (mode == MRANDOM) {
 		if (mrandom_prerandomised) return;
@@ -177,7 +179,7 @@ void MenuView::switchMode() {
 	else if (mode == MPULSE) {
 		for (int i=0; i < 40*30; i++) {
 			int _x = i%40 - 20, _y = i/40 - 15;
-			int _h = sqrt(_x*_x + _y*_y);
+			int _h = sqrt((double) (_x*_x + _y*_y));
 			colour_squares[i] = _h%colour_cycle_length;
 		}
 	}
