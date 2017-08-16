@@ -44,7 +44,6 @@
 #include <queue>
 #include <algorithm>
 
-using namespace std;	// Ommitting this will cause G++ to error at the template decls.
 
 template <typename nodetype>
 struct o_less {
@@ -54,9 +53,9 @@ struct o_less {
 };
 
 template <typename nodetype, typename comparandtype>
-class BinaryHeap : public priority_queue<nodetype, vector<nodetype>, o_less<nodetype> > {
+class BinaryHeap : public std::priority_queue<nodetype, std::vector<nodetype>, o_less<nodetype> > {
 public:
-	using priority_queue<nodetype, vector<nodetype>, o_less<nodetype> >::c;
+	using std::priority_queue<nodetype, std::vector<nodetype>, o_less<nodetype> >::c;
 	
 	// Methods
 	BinaryHeap();
@@ -65,7 +64,7 @@ public:
 	void print();
 	
 	// Properties
-	vector<nodetype> *vec;
+	std::vector<nodetype> *vec;
 
 protected:
 	
