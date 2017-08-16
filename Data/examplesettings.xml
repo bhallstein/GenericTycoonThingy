@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<!--This is a sample Settings file for DBT in XML format
+
+  -settings are categorised for ease of editing and for grouping in menus
+  -settings are typecast for validation purposes and for display (ui type) in menus
+
+  ATTRIBUTES:
+  -the presence of the "arg" attribute means the setting can be overridden in the command line
+  -the presence of the "detect" attribute tells the game it needs to perform a test and update the settings
+    e.g. checking for available resolutions and adding them as <option>s to the <combo> for Resolution
+    otherwise the game uses only the values in the settings file, unless an error occurs, in which case it
+    will run the relevant test or revert to a safe default in order to recover
+  -the presence of the "dev" attribute indicates a developer setting; this should not be shown as an option in game
+    so the player cannot change it, but it is still a setting, and can be changed in the settings file or the dev console
+    for development/testing purposes
+    -there is also a <dev> section where settings can be declared without the dev attribute and still be hidden.
+      the dev attribute just means if a settings SHOULD be in a certain section for organisation, it can be and yet still
+      be hidden :)
+
+  TYPES:
+  -bools require no 2nd parameter in the command line and take a value of 0 or 1, display as a check box
+  -ints take a 2nd parameter that must be numeric, display as a number spinner, or a slider?
+  -strings take a 2nd parameter, display as a text box?
+  -combos take a 2nd parameter that is validated against the options listed, display as a combo box of the options
+
+  -optionally could use an attribute to specify display options of a type - e.g. spinner vs slider for int, or
+    drop-down vs listbox for combo? but they default to one if the attribute isn't there. Of course this stuff is for GUI so don't need it yet-->
+
+<settings>
+  <graphics>
+    <bool code="1">
+	  <arg>w</arg>
+	  <arg>windowed</arg>
+      <key>Windowed</key>
+      <value>0</value>
+      <displaytext>Windowed mode</displaytext>
+    </bool>
+    <combo arg="res" detect>
+      <key>Resolution</key>
+      <value>1680x1050</value>
+      <option>1680x1050</option>
+      <option>800x600</option>
+      <displaytext>Screen Resolution</displaytext>
+    </combo>
+  </graphics>
+  
+  <sound>
+    <bool disabled>
+      <key>Sound</key>
+      <value>0</value>
+      <displaytext>Enable Sound</displaytext>
+    </bool>
+  </sound>
+  
+  <gameplay>
+    <bool>
+      <key>TimedDays</key>
+      <value>0</value>
+      <displaytext>Use Timed Days</displaytext>
+      <tooltip>Days end on a timer instead of after a fixed number of Actions</tooltip>
+    </bool>
+    <int dev>
+      <key>ActionsPerDay</key>
+      <value>4</value>
+      <displaytext>Actions per Day</displaytext>
+      <tooltip>The number of Actions before a Day ends, if Timed Days aren't used</tooltip>
+    </int>
+  </gameplay>
+  
+  <!-- ALL options declared in the <dev> section are not shown in game (but are still used, and should be editable from dev console)-->
+  <dev>
+    
+  </dev>
+</settings>
+
+<?xml version="1.0"?>
+<!--This is a sample Settings file for DBT in XML format
+
+  -settings are categorised for ease of editing and for grouping in menus
+  -settings are typecast for validation purposes and for display (ui type) in menus
+
+  ATTRIBUTES:
+  -the presence of the "arg" attribute means the setting can be overridden in the command line
+  -the presence of the "detect" attribute tells the game it needs to perform a test and update the settings
+    e.g. checking for available resolutions and adding them as <option>s to the <combo> for Resolution
+    otherwise the game uses only the values in the settings file, unless an error occurs, in which case it
+    will run the relevant test or revert to a safe default in order to recover
+  -the presence of the "dev" attribute indicates a developer setting; this should not be shown as an option in game
+    so the player cannot change it, but it is still a setting, and can be changed in the settings file or the dev console
+    for development/testing purposes
+    -there is also a <dev> section where settings can be declared without the dev attribute and still be hidden.
+      the dev attribute just means if a settings SHOULD be in a certain section for organisation, it can be and yet still
+      be hidden :)
+
+  TYPES:
+  -bools require no 2nd parameter in the command line and take a value of 0 or 1, display as a check box
+  -ints take a 2nd parameter that must be numeric, display as a number spinner
+  -ranges take a 2nd parameter that must be numeric and within a valid range, display as a slider
+  -strings take a 2nd parameter, display as a text box?
+  -combos take a 2nd parameter that is validated against the options listed, display as a combo box of the options
+
+  -optionally could use an attribute to specify display options of a type - e.g. spinner vs slider for int, or
+    drop-down vs listbox for combo? but they default to one if the attribute isn't there. Of course this stuff is for GUI so don't need it yet-->
+
+<settings>
+  <program> <!-- Settings for the actual program; reserved codes 1-10 -->
+    <string code="1">
+      <arg>i</arg>
+      <key>iPath</key>
+      <displaytext>Input File Path</displaytext>
+    </string>
+    <string code="2">
+      <arg>o</arg>
+      <key>oPath</key>
+      <displaytext>Output File Path</displaytext>
+    </string>
+    <bool code="3">
+      <arg>v</arg>
+      <arg>verbose</arg>
+      <key>Verbose</key>
+      <value>0</value>
+      <displaytext>Verbose Feedback Mode</displaytext>
+    </bool>
+  </program>
+  
+  <syntax> <!-- Syntax settings/conventions; reserved codes 11-20 -->
+    <bool code="11">
+      <arg>t</arg>
+      <arg>types</arg>
+      <arg>typed</arg>
+      <key>Typed</key>
+      <value>0</value>
+      <displaytext>Detect Typed Variables</displaytext>
+    </bool>
+  </syntax>
+  
+  <synapse> <!-- Synapse related settings; reserved codes 21-30 -->
+    <combo code="21">
+	  <arg>e</arg>
+	  <arg>env</arg>
+	  <arg>environment</arg>
+      <key>Environment</key>
+      <value>Programming</value>
+	  <option>Programming</option>
+	  <option>Test</option>
+	  <option>Client</option>
+	  <option>Live</option>
+      <displaytext>Synapse Environment</displaytext>
+    </string>
+    <int dev>
+      <key>ActionsPerDay</key>
+      <value>4</value>
+      <displaytext>Actions per Day</displaytext>
+      <tooltip>The number of Actions before a Day ends, if Timed Days aren't used</tooltip>
+    </int>
+  </synapse>
+</settings>
