@@ -77,10 +77,10 @@ Unit* Level::createUnit(int atX, int atY) {
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
-	Building *b = new Building(navmap, atX, atY);
+	Building *b = new Building(atX, atY);
 	buildings.push_back(b);
 	levelview->addResponder(b);
-	eventHandler.subscribe(b, K_L);
+	navmap->addImpassableObject(b);
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
@@ -155,13 +155,13 @@ void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> 
 
 	// Draw buildings
 	for (int i=0, n = buildings->size(); i < n; i++)
-		drawEventResp((*buildings)[i]);
+		drawMappedObj((*buildings)[i]);
 	// Draw placeables
 	for (int i=0, n = placeables->size(); i < n; i++)
-		drawEventResp((*placeables)[i]);
+		drawMappedObj((*placeables)[i]);
 	// Draw units
 	for (int i=0, n = units->size(); i < n; i++)
-		drawEventResp((*units)[i], true);
+		drawMappedObj((*units)[i]);
 }
 
 

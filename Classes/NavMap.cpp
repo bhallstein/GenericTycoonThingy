@@ -103,22 +103,22 @@ void NavMap::makeImpassable(int atX, int atY) {
 NavNode* NavMap::nodeAt(int atX, int atY) {
 	return &nodes[atY * w + atX];
 }
-void NavMap::addImpassableObject(EventResponder *resp) {
-	int x = resp->x, y = resp->y;
+void NavMap::addImpassableObject(MappedObj *obj) {
+	int x = obj->x, y = obj->y;
 	intcoord c;
-	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
-		c = resp->resp_blocks[i];
+	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
+		c = obj->ground_plan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
 			continue;
 		makeImpassable(c.x, c.y);
 	}
 }
-void NavMap::removeImpassableObject(EventResponder *resp) {
-	int x = resp->x, y = resp->y;
+void NavMap::removeImpassableObject(MappedObj *obj) {
+	int x = obj->x, y = obj->y;
 	intcoord c;
-	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
-		c = resp->resp_blocks[i];
+	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
+		c = obj->ground_plan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
 			continue;

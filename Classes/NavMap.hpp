@@ -18,8 +18,7 @@
 #include <vector>
 
 #include "types.h"
-#include "Event.hpp"
-#include "EventResponder.hpp"
+#include "MappedObj.hpp"
 #include "MisterHeapy.hpp"
 
 using std::cout;
@@ -62,8 +61,8 @@ public:
 	int w, h;
 	
 	// Methods
-	void addImpassableObject(EventResponder *resp);
-	void removeImpassableObject(EventResponder *resp);
+	void addImpassableObject(MappedObj *);
+	void removeImpassableObject(MappedObj *);
 	bool isPassableAt(int atX, int atY);
 	NavNode* nodeAt(int atX, int atY);
 	

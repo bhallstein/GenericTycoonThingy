@@ -50,13 +50,13 @@ void Menu::startLevel(std::string path) {
 }
 
 
-Button::Button(Menu *_menu, int _x, int _y) : menu(_menu) {
-	x = _x, y = _y;
-
-	// Set up resp blocks
-	intcoord c;
-	for (int j=0; j < 2; j++) for (int i=0; i < 3; i++)
-		c.x = i, c.y = j, resp_blocks.push_back(c);
+Button::Button(Menu *_menu, int _x, int _y) : MappedObj(_x, _y), menu(_menu)
+{
+	intcoord p[] = {
+		{0,0}, {1,0}, {2,0},
+		{0,1}, {1,1}, {2,1}, {-1,-1}
+	};
+	setGroundPlan(p);
 }
 Button::~Button() {
 	std::cout << "Button destruct" << std::endl;
@@ -81,5 +81,5 @@ MenuView::MenuView(sf::RenderWindow *_win, int _blocks_w, int _blocks_h, int _l_
 }
 void MenuView::draw(std::vector<Button*> *buttons) {
 	for (int i=0, n = buttons->size(); i < n; i++)
-		drawEventResp((*buttons)[i]);
+		drawMappedObj((*buttons)[i]);
 }

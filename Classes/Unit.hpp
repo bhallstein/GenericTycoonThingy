@@ -12,14 +12,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include "EventResponder.hpp"
+#include "types.h"
+#include "MappedObj.hpp"
 #include "NavMap.hpp"
 
-#define S_IDLE      1		// Doing nothing
-#define S_TRAVELING 2		// Traveling along a route
-#define S_WAITING   3		// Periodically retrying finding a path to destination
 
-class Unit : public EventResponder
+class Unit : public MappedObj
 {
 public:
 	Unit(NavMap *, int _x, int _y);
@@ -31,14 +29,9 @@ public:
 	void update();
 
 	// Properties
-	float a, b;		// Floating point offset from block
 	int dest_x, dest_y;
-	
 	bool destroyed;
 	
-	int state;
-
-
 protected:
 	// Methods
 	void nextInRoute();
@@ -48,9 +41,11 @@ protected:
 	void incrementLocation();
 
 	// Properties
+	enum state_types { S_IDLE, S_TRAVELING, S_WAITING } state;
+	int frames_waited;
 	NavMap *navmap;
 	std::vector<NavNode*> route;
-	int frames_waited;
+
 };
 
 #endif

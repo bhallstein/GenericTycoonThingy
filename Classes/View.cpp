@@ -25,25 +25,25 @@ void View::createEventResponderMap() {
 	privileged_event_responder = NULL;
 	ready_for_event_response = true;
 }
-void View::addResponder(EventResponder *resp) {
+void View::addResponder(MappedObj *obj) {
 	if (!ready_for_event_response) return;		// This is really the sort of place one should throw an exception
-	int x = resp->x, y = resp->y;
-	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
-		intcoord c = resp->resp_blocks[i];
+	int x = obj->x, y = obj->y;
+	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
+		intcoord c = obj->ground_plan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.x >= blocks_w || c.y < 0 || c.y >= blocks_h) continue;
-		responderMap[c.y * blocks_w + c.x].remove(resp);
-		responderMap[c.y * blocks_w + c.x].push_back(resp);
+		responderMap[c.y * blocks_w + c.x].remove(obj);
+		responderMap[c.y * blocks_w + c.x].push_back(obj);
 	}
 }
-void View::removeResponder(EventResponder *resp) {
+void View::removeResponder(MappedObj *obj) {
 	if (!ready_for_event_response) return;
-	int x = resp->x, y = resp->y;
-	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
-		intcoord c = resp->resp_blocks[i];
+	int x = obj->x, y = obj->y;
+	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
+		intcoord c = obj->ground_plan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.x >= blocks_w || c.y < 0 || c.y >= blocks_h) continue;
-		responderMap[c.y * blocks_w + c.x].remove(resp);
+		responderMap[c.y * blocks_w + c.x].remove(obj);
 	}
 }
 bool View::requestPrivilegedEventResponderStatus(EventResponder *resp) {
@@ -71,21 +71,19 @@ void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide,
 	);
 }
 
-void View::drawEventResp(EventResponder *resp, bool float_offset) {		// Temporary but useful function to draw an event responder
-	char c = resp->col();												// in a very generic way
+void View::drawMappedObj(MappedObj *obj) {		// Temporary but useful function to draw a top level object
+	char c = obj->col();											// in a very generic way
 	sf::Color col;
 	if (c == 'l') col = sf::Color::Blue;
 	else if (c == 'r') col = sf::Color::Red;
 	else if (c == 'w') col = sf::Color::White;
 	else col = sf::Color::Black;
 
-	int x = resp->x, y = resp->y;
+	int x = obj->x, y = obj->y;
 	intcoord b;
-	for (int i=0; i < resp->resp_blocks.size(); i++) {
-		b = resp->resp_blocks[i];
-		float_offset
-			? drawRect(col, b.x + x, b.y + y, 1, 1, ((Unit*)resp)->a, ((Unit*)resp)->b)	// Dreadful hack to draw unit offsets - ugh
-			: drawRect(col, b.x + x, b.y + y, 1, 1);
+	for (int i=0; i < obj->ground_plan.size(); i++) {
+		b = obj->ground_plan[i];
+		drawRect(col, b.x + x, b.y + y, 1, 1, obj->a, obj->b);
 	}
 }
 
@@ -117,8 +115,8 @@ void View::_acceptEvent(Event *ev) {
 }
 void View::acceptEvent(Event *ev) {
 	if (!ready_for_event_response) return;
-	std::list<EventResponder*> *resps = &responderMap[ev->y * blocks_w + ev->x];
-	for (std::list<EventResponder*>::iterator i = resps->begin(); i != resps->end(); i++)
+	std::list<MappedObj *> *resps = &responderMap[ev->y * blocks_w + ev->x];
+	for (std::list<MappedObj *>::iterator i = resps->begin(); i != resps->end(); i++)
 		(*i)->receiveEvent(ev);
 }
 

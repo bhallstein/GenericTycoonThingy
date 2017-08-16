@@ -1,6 +1,5 @@
 /*
- * Building.h
- * - a building
+ * Building.h - a building
  *
  */
 
@@ -10,15 +9,13 @@
 #include <iostream>
 
 #include "types.h"
-#include "EventResponder.hpp"
-#include "NavMap.hpp"
-#include "EventHandler.hpp"
+#include "MappedObj.hpp"
 
 
-class Building : public EventResponder
+class Building : public MappedObj
 {
 public:
-	Building(NavMap *, int posX, int posY);
+	Building(int _x, int _y);
 	~Building();
 
 	// Methods
@@ -30,9 +27,8 @@ public:
 
 protected:
 	// Properties
-	NavMap *navmap;
 	bool clicked;
-	
+
 };
 
 #endif

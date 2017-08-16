@@ -1,20 +1,12 @@
-
 #include "Unit.hpp"
 
-Unit::Unit(NavMap *_navmap, int _x, int _y) : navmap(_navmap), destroyed(false) {
-	dest_x = x = _x, dest_y = y = _y;
-	a = b = 0;
+Unit::Unit(NavMap *_navmap, int _x, int _y) : MappedObj(_x, _y), navmap(_navmap), destroyed(false), dest_x(_x), dest_y(_y), state(S_IDLE)
+{
+	intcoord p[] = { {0,0}, {-1,-1} };
+	setGroundPlan(p);
 	
-	// Units’ responder block plan is just a single intcoord.
-	intcoord c = {0,0};
-	resp_blocks.push_back(c);
-	
-	state = S_IDLE;
-	
-	// Generate random destination
-	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;
+	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 }
-
 Unit::~Unit() {
 	std::cout << "unit destruct" << std::endl;
 }
@@ -24,9 +16,9 @@ void Unit::receiveEvent(Event *ev) {
 }
 
 char Unit::col() {
-	if (state == S_IDLE) return 'r';
-	else if (state == S_TRAVELING) return 'b';
-	else return 'w';
+	if (state == S_IDLE) return 'b';
+	else if (state == S_TRAVELING) return 'w';
+	else return 'r';
 }
 
 void Unit::update() {

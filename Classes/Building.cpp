@@ -1,27 +1,19 @@
 #include "Building.hpp"
 
-Building::Building(NavMap *_navmap, int posX, int posY) {
-	x = posX, y = posY;
-	
-	// Set up event responder block list
-	intcoord c;
-	for (int j=0; j < 4; j++) for (int i=0; i < 6; i++)
-		c.x = i, c.y = j, resp_blocks.push_back(c);
-	c.x = 2, c.y = 4, resp_blocks.push_back(c);
-	c.x = 3, c.y = 4, resp_blocks.push_back(c);
-
-	clicked = false;
-	
-	navmap = _navmap;
-	navmap->addImpassableObject(this);
-	
-	// Builing state relevant to the LevelMap.
-	destroyed = false;
+Building::Building(int _x, int _y) : MappedObj(_x, _y), clicked(false), destroyed(false)
+{
+	intcoord p[] = {
+		{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
+		{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
+		{0,2}, {1,2}, {2,2}, {3,2}, {4,2}, {5,2},
+		{0,3}, {1,3}, {2,3}, {3,3}, {4,3}, {5,3},
+		              {2,4}, {3,4},					{-1,-1}
+	};
+	setGroundPlan(p);
 }
 Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
-	navmap->removeImpassableObject(this);
 }
 
 void Building::receiveEvent(Event *ev) {

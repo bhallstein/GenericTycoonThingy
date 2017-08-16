@@ -44,6 +44,7 @@
 #include "types.h"
 #include "Event.hpp"
 #include "EventResponder.hpp"
+#include "MappedObj.hpp"
 #include "Unit.hpp"
 
 
@@ -60,8 +61,8 @@ public:
 											// shit before calling acceptEvent function
 	
 	void createEventResponderMap(); 		// Create structures necessary for event response
-	void addResponder(EventResponder *);
-	void removeResponder(EventResponder *);
+	void addResponder(MappedObj *);
+	void removeResponder(MappedObj *);
 	
 	bool requestPrivilegedEventResponderStatus(EventResponder *);		// lol
 	void relinquishPrivilegedEventResponderStatus(EventResponder *);	//
@@ -73,14 +74,14 @@ public:
 protected:
 	// Methods
 	virtual void drawRect(sf::Color color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
-	virtual void drawEventResp(EventResponder *resp, bool floatoffset = false);
-
+	virtual void drawMappedObj(MappedObj *);
+	
 	// Properties
 	sf::RenderWindow *window;
-
+	
 	bool ready_for_event_response;
 	int blocks_w, blocks_h;
-	std::vector<std::list<EventResponder*> > responderMap;
+	std::vector<std::list<MappedObj *> > responderMap;
 	EventResponder *privileged_event_responder;
 	
 };
