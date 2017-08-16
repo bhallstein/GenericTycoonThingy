@@ -31,11 +31,14 @@ furnishingInfo::furnishingInfo(LuaObj &o) {
 }
 
 
-/* Furnishing impl */
+/* Furnishing: static properties */
 
 std::map<std::string, furnishingInfo*> Furnishing::furnishingTypeInfo;
 Serializable::serialization_descriptor Furnishing::sd;
 bool Furnishing::initialized = false;
+
+
+/*** Furnishing ***/
 
 Furnishing::Furnishing(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode),
@@ -134,7 +137,7 @@ void Furnishing::placementLoopStarted() {
 	navmap->makePassable(rct);			// Make previous location passable
 }
 void Furnishing::placementLoopUpdate() {
-	drawnFurnishing->setPosn(placeable->pos);
+	drawnFurnishing->setPosn(placeable.pos);
 }
 void Furnishing::placementLoopCancelled() {
 	// If were purchasing a new furnishing: destroy it

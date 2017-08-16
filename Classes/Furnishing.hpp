@@ -11,7 +11,6 @@
 #include "types.hpp"
 #include "PlaceableManager.hpp"
 
-class ResponderMap;
 class Building;
 class Unit;
 
@@ -25,10 +24,12 @@ class Furnishing : public PlaceableManager {
 public:
 	Furnishing(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Furnishing();
-	
 	void setUp();
+		// See note in Unit.hpp on creation & setup
 	
+	// Event callbacks
 	W::EventPropagation::T mouseEvent(W::Event *);
+
 	void update();
 	
 	static bool initialize();
@@ -39,9 +40,6 @@ public:
 	class DrawnFurnishing;
 	
 protected:
-	DrawnFurnishing *drawnFurnishing;
-	struct furnishingInfo *typeInfo;
-	
 	bool purchased;
 	
 	// PlaceableManager overrides
@@ -51,16 +49,20 @@ protected:
 	void placementLoopSucceeded();
 	bool canPlace(const W::position &);
 	
+	// Serialization
 	sdvec _getSDs() {
 		sdvec vec;
 		vec.push_back(&Furnishing::sd);
 		return vec;
 	}
-	
-private:
-	static std::map<std::string, furnishingInfo*> furnishingTypeInfo;
 	static serialization_descriptor sd;
 	
+	// Type info
+	struct furnishingInfo *typeInfo;
+	static std::map<std::string, furnishingInfo*> furnishingTypeInfo;
+	
+	// Drawing
+	DrawnFurnishing *drawnFurnishing;
 };
 
 

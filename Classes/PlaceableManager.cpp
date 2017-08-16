@@ -1,15 +1,10 @@
 #include "PlaceableManager.hpp"
-#include "Placeable.hpp"
 
 PlaceableManager::PlaceableManager(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	TLO(_ls, _lm, _lv, _nm),
-	placeableMode(_placeableMode), placeable(NULL)
+	placeableMode(_placeableMode), placeable(this)
 {
-	placeable = new Placeable(this);
-}
-PlaceableManager::~PlaceableManager()
-{
-	if (placeable) delete placeable;
+	// Hai managey
 }
 
 bool PlaceableManager::init(const W::position &_pos) {
@@ -23,8 +18,8 @@ bool PlaceableManager::init() {
 }
 
 bool PlaceableManager::pickUp() {
-	if ((placeableMode = placeable->activate())) {
-		placeable->pos = rct.pos;
+	if ((placeableMode = placeable.activate())) {
+		placeable.pos = rct.pos;
 		placementLoopStarted();
 	}
 	else W::log << "Couldn't initialize PlaceableManager: placeable would not activate" << std::endl;

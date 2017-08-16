@@ -8,6 +8,7 @@
 #include "LevelState.hpp"
 #include "LevelView.hpp"
 #include "Placeable.hpp"
+#include "Behaviour.hpp"
 
 W::EventType::T W::EventType::INTERRUPT_UNITPICKUP = W::Event::registerType();
 
@@ -27,11 +28,14 @@ unitInfo::unitInfo(LuaObj &o) {
 }
 
 
-/* Unit impl */
+/* Unit: static properties */
 
 std::map<std::string, unitInfo*> Unit::unitTypeInfo;
 Serializable::serialization_descriptor Unit::sd;
 bool Unit::initialized = false;
+
+
+/*** Unit ***/
 
 Unit::Unit(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode),
@@ -57,7 +61,6 @@ Unit::~Unit()
 	if (behaviour) delete behaviour;
 	delete drawnUnit;
 }
-
 void Unit::setUp() {
 	if (type == NO_TYPE)
 		throw W::Exception("setUp() called on Unit with type NO_TYPE. Call setType() or deserialize first.");
@@ -71,27 +74,28 @@ void Unit::setUp() {
 	}
 	typeInfo = Unit::unitTypeInfo[type];
 	
-	// Create new Behaviour if has not already been created
-	if (!behaviour) createBehaviour();
-		// (We need to do this here, because the type is not known at construct,
-		// and the actual Behaviour subclass constructed depends on unit type.
-		// If the unit has been deserialized, the behaviour has aready been
-		// created & loaded in deserializeAdditionalProperties().)
+	// Perform set-up for units constructed programmatically
+	if (!deserialized) {
+		createBehaviour();
+	}
 	
 	// Set up state of DrawnUnit
 	// e.g. du.setSpriteSet()...
 }
 
-
-void Unit::mouseEvent(W::Event *ev) {
+W::EventPropagation::T Unit::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
+	
+	W::EventPropagation::T v = W::EventPropagation::SHOULD_STOP;
 
-	if (mode == UnitMode::ANIMATING) return;
+	if (mode == UnitMode::ANIMATING) return v;
 	if      (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
 	else if (ev->type == LV_LEFTMOUSEDOWN) printDebugInfo();
 	else if (ev->type == LV_RIGHTMOUSEDOWN) {
 		if (typeInfo->isStaff) pickUp();
 	}
+	
+	return v;
 }
 
 void Unit::update() {
@@ -99,10 +103,11 @@ void Unit::update() {
 	
 	if (mode == UnitMode::IDLE) { }
 	else if (mode == UnitMode::VOYAGING) { incrementLocation(); }
-//	else if (mode == ANIMATING) { incrementAnimation(); }
+	//	else if (mode == ANIMATING) { incrementAnimation(); }
 	
 	behaviour->update();
 }
+
 
 /*** Utility methods ***/
 
@@ -138,13 +143,14 @@ bool Unit::voyage(const W::position &_dest) {
 //	}
 //}
 
-/* PlaceableManager overrides*/
+
+/*** PlaceableManager overrides ***/
 
 void Unit::placementLoopStarted() {
 	drawnUnit->setOpac(0.2);		// Put DU in placement-loop mode
 }
 void Unit::placementLoopUpdate() {
-	W::position p(placeable->pos.x, placeable->pos.y, 0, 0);
+	W::position p(placeable.pos.x, placeable.pos.y, 0, 0);
 	drawnUnit->setPosn(p);
 }
 void Unit::placementLoopCancelled() {
@@ -170,6 +176,9 @@ void Unit::placementLoopSucceeded() {
 bool Unit::canPlace(const W::position &_pos) {
 	return navmap->isPassableAt(_pos);
 }
+
+
+/*** Voyaging-related ***/
 
 bool Unit::incrementLocation() {
 	if (rct.pos == dest) {
@@ -227,18 +236,20 @@ bool Unit::incrementLocation() {
 	drawnUnit->setPosn(rct.pos);
 	return true;
 }
-inline bool Unit::inHinterland() {
+bool Unit::inHinterland() {
 	return (
 		rct.pos.x < HINTERLAND_WIDTH || rct.pos.x >= navmap->width()-HINTERLAND_WIDTH ||
 		rct.pos.y < HINTERLAND_WIDTH || rct.pos.y >= navmap->height()-HINTERLAND_WIDTH
 	);
 }
 
+
+/*** Unit: static initialization ***/
+
 bool Unit::initialize() {
 	if (Unit::initialized) return true;
 
-	// 1. Get LuaObj & save unitTypeInfo map
-	
+	/* 1. Get LuaObj & save unitTypeInfo map */
 	std::string path = MrPaths::resourcesPath + "Lua/units.lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
@@ -255,16 +266,43 @@ bool Unit::initialize() {
 	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it)
 		unitTypeInfo[it->first] = new unitInfo(it->second);
 	
-	// 2. Set up Serialization Descriptor
+	/* 2. Set up Serialization Descriptor */
 	sd["dest"]  = makeSerializer(&Unit::dest);
 	sd["route"] = makeSerializer(&Unit::route);
 	sd["hired"] = makeSerializer(&Unit::hired);
 	sd["mode"]  = makeSerializer(&Unit::mode);
 	
-	Unit::initialized = true;
-	return true;
+	return Unit::initialized = true;
 }
 
+
+/* Unit: Serialization-related */
+
+TLO::sdvec Unit::_getSDs() {
+	sdvec vec;
+	vec.push_back(&Unit::sd);
+	return vec;
+}
+void Unit::deserializeAdditionalProperties(LuaObj &o) {
+	createBehaviour();
+	behaviour->deserialize(o["behaviour"]);
+}
+void Unit::getAdditionalSerializedProperties(std::map<std::string, std::string> &m) {
+	m["behaviour"] = behaviour->serialize();
+}
+
+/* Unit: Other */
+
+void Unit::createBehaviour() {
+	using std::string;
+	if (type == "customer")
+		behaviour = new CustomerBehaviour(this);
+	else
+		throw W::Exception(
+			string("Error: couldn't create unit behaviour - unrecognised type '") +
+			type + string("'")
+		);
+}
 void Unit::printDebugInfo() {
 	printf("\nUnit %p - x,y:%d,%d a,b:%.1f,%.1f dest:%d,%d mode:%s\n\n",
 		this, rct.pos.x, rct.pos.y, rct.pos.a, rct.pos.b, dest.x, dest.y,
