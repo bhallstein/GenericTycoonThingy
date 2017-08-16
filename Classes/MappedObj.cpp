@@ -33,7 +33,6 @@ bool MappedObj::attemptToPlace(int _x, int _y) {
 	rm->addMappedObj(this);
 	finalizePlacement();
 	placeableMode = false;
-	if (placeable) { delete placeable; placeable = NULL; }
 	return true;
 }
 

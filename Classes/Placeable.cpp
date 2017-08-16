@@ -1,5 +1,6 @@
 #include "Placeable.hpp"
 #include "MappedObj.hpp"
+#include "../W.hpp"
 
 Placeable::Placeable(MappedObj *_mo, ResponderMap *_rm) : mo(_mo), rm(_rm) {
 	if (!rm->requestPrivilegedEventResponderStatus(this))
