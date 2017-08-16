@@ -12,7 +12,7 @@
 #define MAX_PATH 200
 #endif
 
-#define INFINITAH 9999999
+#define INFINITAH 99999999
 
 // Game stages
 #define TUTORIAL_STAGE 2649

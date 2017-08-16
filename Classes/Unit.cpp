@@ -10,7 +10,6 @@ std::string Unit::defaultColourWhenMoving;
 Unit::Unit(NavMap *_navmap, int _x, int _y, const char *_type) :
 	MappedObj(_x, _y),
 	navmap(_navmap),
-	destroyed(false),
 	dest_x(_x),
 	dest_y(_y),
 	type(_type),
@@ -60,9 +59,7 @@ void Unit::update() {
 			frames_waited = 0, setToTraveling();
 	}
 	else if (at_dest) {
-		if(inHinterland())
-			destroyed = true;
-
+		if(inHinterland()) destroyed = true;
 		setToIdle();
 	}
 	else if (state == S_TRAVELING) {

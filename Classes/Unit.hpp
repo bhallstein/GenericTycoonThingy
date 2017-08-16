@@ -27,7 +27,6 @@ public:
 	
 	// Properties
 	std::string type;
-	bool destroyed;
 	int dest_x, dest_y;
 	
 	// Methods

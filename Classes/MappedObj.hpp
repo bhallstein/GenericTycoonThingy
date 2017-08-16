@@ -15,7 +15,7 @@
 class MappedObj : public EventResponder
 {
 public:
-	MappedObj(int _x, int _y) : a(0), b(0) { x = _x, y = _y; }
+	MappedObj(int _x, int _y) : a(0), b(0), destroyed(false) { x = _x, y = _y; }
 	~MappedObj() { }
 	
 	// Methods
@@ -28,6 +28,7 @@ public:
 	// Properties
 	float a, b;							// Floating pt offset from integer location (default 0)
 	std::vector<intcoord> groundplan;	// Blocks (relative to to top left corner) taken up by the object
+	bool destroyed;
 	
 protected:
 	// Properties

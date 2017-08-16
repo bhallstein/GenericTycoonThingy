@@ -29,7 +29,6 @@ public:
 	
 	// Properties
 	std::string type;
-	bool destroyed;
 	std::vector<door> doors;		// Doors. These should probably be on the edge of the building. lol.
 	std::string *b_colour;
 	std::string *b_hoverColour;

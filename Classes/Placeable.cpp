@@ -3,15 +3,17 @@
 #include "ResponderMap.hpp"
 #include "../W.hpp"
 #include "LuaHelper.hpp"
+#include "Building.hpp"
 
 std::map<std::string, struct placeableInfo> Placeable::placeableTypes;
 std::string Placeable::defaultColour;
 std::string Placeable::defaultHoverColour;
 std::string Placeable::defaultColourWhilePlacing;
 
-Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM, const char *_type) :
-	MappedObj(-100, -100), navmap(_navmap), levelResponderMap(_levelRM), type(_type), clicked(false), destroyed(false), mode(PLACEMENT)
-{	
+Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM, const char *_type, Building *_context) :
+	MappedObj(-100, -100), navmap(_navmap), levelResponderMap(_levelRM), type(_type), contextBuilding(_context),
+	mode(PLACEMENT)
+{
 	// Set properties for this Placeable type
 	groundplan = placeableTypes[_type].groundplan;
 	p_colour             = &placeableTypes[_type].col;
@@ -23,17 +25,36 @@ Placeable::~Placeable()
 	std::cout << "placeable destruct" << std::endl;
 }
 
+bool placeableIsEntirelyInsideBuilding(Placeable *placeable, Building *building) {
+	std::vector<intcoord> *p_gp = &placeable->groundplan, *b_gp = &building->groundplan;
+	intcoord p_pos = {placeable->x, placeable->y}, b_pos = {building->x, building->y};
+	for (int i=0, n = p_gp->size(); i < n; i++) {
+		int x = p_pos.x + p_gp->at(i).x, y = p_pos.y + p_gp->at(i).y;
+		bool in_building_gp = false;
+		for (int j=0, n = b_gp->size(); j < n; j++)
+			if (b_pos.x + b_gp->at(j).x == x && b_pos.y + b_gp->at(j).y == y) {
+				in_building_gp = true;
+				break;
+			}
+		if (!in_building_gp) return false;
+	}
+	return true;
+}
 void Placeable::receiveEvent(Event *ev) {
 	if (mode == PLACEMENT) {
 		if (ev->type == Event::MOUSEMOVE) {
 			x = ev->x, y = ev->y;
 		}
 		else if (ev->type == Event::LEFTCLICK) {
+			// Check passability (change to buildability in future?)
 			for (int i=0, n = groundplan.size(); i < n; i++) {
 				intcoord c = groundplan[i];
 				if (!navmap->isPassableAt(c.x + x, c.y + y))
 					return;
 			}
+			// Check placeable is inside context building
+			if (!placeableIsEntirelyInsideBuilding(this, contextBuilding))
+				return;
 			mode = PLACED;
 			levelResponderMap->relinquishPrivilegedEventResponderStatus(this);
 			levelResponderMap->addMappedObj(this);
@@ -45,8 +66,7 @@ void Placeable::receiveEvent(Event *ev) {
 		}
 	}
 	else if (mode == PLACED) {
-		if (ev->type == Event::LEFTCLICK)      clicked = !clicked;
-		else if (ev->type == Event::MOUSEMOVE) hover = true;
+		if (ev->type == Event::MOUSEMOVE) hover = true;
 	}
 }
 

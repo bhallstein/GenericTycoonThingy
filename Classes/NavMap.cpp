@@ -1,4 +1,5 @@
 #include "NavMap.hpp"
+#include "../W.hpp"
 
 NavNode::NavNode() {
 	passable = true;
@@ -96,9 +97,9 @@ void NavMap::makeImpassable(int atX, int atY) {
 				if (i == atX || j == atY) diagonalia.push_back(&nodes[j*w + i]);
 			}
 	// Sever nodelinks between adjacent diagonals
-	for (int a=0; a < diagonalia.size(); a++) {
+	for (int a=0, n = diagonalia.size(); a < n; a++) {
 		m1 = diagonalia[a];
-		for (int b=0; b < diagonalia.size(); b++) {
+		for (int b=0, nn = diagonalia.size(); b < nn; b++) {
 			m2 = diagonalia[b];
 			if (m1->x != m2->x || m1->y != m2->y) m1->removeNeighbour(m2);
 		}
@@ -225,7 +226,7 @@ bool NavMap::isPassableAt(int atX, int atY) {
 }
 bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route) {
 	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
-		cout << "out of bounds" << endl;
+		W::log("Navmap asked to find route to or from an out of bounds location.");
 		return false;
 	}
     
@@ -233,10 +234,8 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNod
 	// Note: pathfinding is actually done backwards: from the destination to the start.
 	// This is so we don’t have to reverse the route after extracting it, since it arrives in reverse order.
 	NavNode *A = &nodes[w*toY + toX], *B = &nodes[w*fromY + fromX];
-	if (!A->passable || !B->passable) {
-		//cout << (A->passable ? "B" : "A") << " impassable!" << endl;
+	if (!A->passable || !B->passable)
 		return false;
-	}
 	
 	/* Initialisation */
 	int n = w * h, _i = 0;

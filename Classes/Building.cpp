@@ -9,7 +9,7 @@ std::string Building::defaultColour;
 std::string Building::defaultHoverColour;
 
 Building::Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *_level) :
-	MappedObj(_x, _y), type(_type), level(_level), clicked(false), destroyed(false), time_hovered(0)
+	MappedObj(_x, _y), type(_type), level(_level), clicked(false), time_hovered(0)
 {	
 	setGroundPlan(_groundplan);
 	doors = *_doors;

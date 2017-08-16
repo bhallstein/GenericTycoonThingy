@@ -267,7 +267,7 @@ Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<
 	return b;
 }
 void Level::createPlaceable(const char *type) {
-	Placeable *p = new Placeable(navmap, levelResponderMap, type);
+	Placeable *p = new Placeable(navmap, levelResponderMap, type, currentlyEditedBuilding);
 	if (!levelResponderMap->requestPrivilegedEventResponderStatus(p)) {
 		delete p;
 		return;

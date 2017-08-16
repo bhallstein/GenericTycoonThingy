@@ -15,6 +15,7 @@
 class NavMap;
 class ResponderMap;
 class W;
+class Building;
 
 struct placeableInfo {
 	std::string col, hoverCol, colWhilePlacing;
@@ -23,11 +24,8 @@ struct placeableInfo {
 
 class Placeable : public MappedObj {
 public:
-	Placeable(NavMap *, ResponderMap *, const char *_type);
+	Placeable(NavMap *, ResponderMap *, const char *_type, Building *_context);
 	~Placeable();
-	
-	// Properties
-	bool destroyed;
 	
 	// Methods
 	void receiveEvent(Event *ev);
@@ -39,9 +37,9 @@ public:
 protected:
 	// Properties
 	enum mode_types { PLACEMENT, PLACED } mode;
-	bool clicked;
 	NavMap *navmap;
 	ResponderMap *levelResponderMap;
+	Building *contextBuilding;
 	std::string type;
 	std::string *p_colour;
 	std::string *p_hoverColour;

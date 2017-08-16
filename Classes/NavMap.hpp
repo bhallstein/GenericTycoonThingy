@@ -19,9 +19,6 @@
 #include "types.hpp"
 #include "MisterHeapy.hpp"
 
-using std::cout;
-using std::endl;
-
 class NavNode
 {
 public:
