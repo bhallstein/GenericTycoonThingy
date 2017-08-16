@@ -12,7 +12,7 @@
 #include "Classes/MrPaths.hpp"
 
 int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, int nCmdShow) {
-	W::setLogFile(MrPaths::desktopPath + "DBTlog.txt");
+	W::setLogFile(MrPaths::desktopPath + "GTTlog.txt");
 	W::log << "settings file path: " << MrPaths::settingsPath  << std::endl;
 	W::log << "resources path: "     << MrPaths::resourcesPath << std::endl;
 	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;

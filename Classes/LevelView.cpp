@@ -24,6 +24,7 @@ LevelView::LevelView() :
 	level_width(-1), level_height(-1)
 {
 	bgRect = new W::DrawnRect(this, rct.pos, rct.sz, W::Colour::White);
+	addDO(bgRect);
 	
 	// Screenedge scrolling
 	W::Callback scrCb(&LevelView::scrollEvent, this);
