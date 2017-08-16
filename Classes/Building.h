@@ -20,10 +20,6 @@ public:
 	~Building();
 
 	// Methods
-	void handleMouseMove(int x, int y);
- 	void setPositionFromMouse(int x, int y);
-	void getBounds(int *x1, int *y1, int *x2, int *y2);
-
 	void receiveEvent(Event *ev, EventResponder **p_e_r);		// Override receive event method
 	char col();		// Temporary coloration-signifier thingum
 

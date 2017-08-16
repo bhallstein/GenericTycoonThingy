@@ -13,6 +13,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "types.h"
+#include "GameMap.h"
 #include "Building.h"
 
 
@@ -32,6 +33,7 @@ public:
 
 protected:
 	int w, h; 					// Blocks wide/tall.
+	GameMap gamemap;
 };
 
 #endif

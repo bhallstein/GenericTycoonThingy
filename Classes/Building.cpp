@@ -41,7 +41,7 @@ char Building::col() {
 }
 
 
-#ifdef yeah_this_doesnt_need_compiling_either_sorry
+#ifdef what_is_a_building
 
   What is a building?
   

@@ -2,8 +2,10 @@
 
 Level::Level(int _w, int _h)
 {
-	// Constructor
 	w = _w, h = _h;
+	
+	// Load GameMap
+	gamemap.setDimensions(w, h);
 }
 Level::~Level()
 {

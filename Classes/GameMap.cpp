@@ -13,37 +13,39 @@ MapLoc::~MapLoc() {
 
 void MapLoc::addObject(EventResponder *x) {
 	// Add an eventresponder to the list thereof
-	things.push_back(x);
+	responderList.push_back(x);
 }
 void MapLoc::removeObject(EventResponder *x) {
 	// Remove an eventresponder from the list thereof
-	things.remove(x);
+	responderList.remove(x);
 }
-
 
 
 /*********************************
  *    GameMap implementation    *
  *********************************/
 
-GameMap::GameMap(int columns, int rows)
+GameMap::GameMap()
 {
-	w = columns, h = rows;
-	maplocs.resize(w * h);
+	// Constructor
 }
 GameMap::~GameMap()
 {
-	// Destructor
 	maplocs.clear();
 }
 
-void GameMap::addObject(EventResponder *object, int atX, int atY) {
-	if (atX < 0 || atX >= w || atY < 0 || atY >= h)
+void GameMap::setDimensions(int _w, int _h) {
+	w = _w, h = _h;
+	maplocs.resize(w * h);
+}
+
+void GameMap::addObject(EventResponder *object, int atX, int atY, int obj_w, int obj_h) {
+	if (atX < 0 || atY < 0  || atX >= w - obj_w || atY >= h - obj_h)
 		return;
 	maplocs[atY * w + atX].addObject(object);
 }
-void GameMap::removeObject(EventResponder *object, int atX, int atY) {
-	if (atX < 0 || atX >= w || atY < 0 || atY >= h)
+void GameMap::removeObject(EventResponder *object, int atX, int atY, int obj_w, int obj_h) {
+	if (atX < 0 || atY < 0  || atX >= w - obj_w || atY >= h - obj_h)
 		return;
 	maplocs[atY * w + atX].removeObject(object);
 }

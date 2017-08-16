@@ -6,15 +6,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "SettingsManager.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include "types.h"
+
+#include "SettingsManager.h"
 #include "Level.h"
 #include "Event.h"
-
-#include "types.h"
 
 
 class Game
@@ -23,10 +23,10 @@ public:
 	Game();
 	~Game();
 
-	// Instance methods
+	// Methods
 	void Run();
 
-	// Instance Properties
+	// Properties
 	SettingsManager Settings;
 
 protected:
