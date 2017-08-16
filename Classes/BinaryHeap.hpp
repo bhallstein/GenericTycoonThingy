@@ -83,8 +83,8 @@ public:
 	nodetype pop();
 	int size();
 
-	void update_at(int i, comparandtype new_val);		// Update at a known location in the memory array
 	void update(nodetype x, comparandtype new_val);		// Update a stored object to a new comparand value
+	void update_at(int i, comparandtype new_val);		// Update at a known location in the underlying array
 	//void print();
 
 protected:
@@ -194,6 +194,18 @@ void BinaryHeap<nodetype, comparandtype>::push(nodetype x) {
 	indices_in_heap[x - x_start] = length++;	
 	up_heap(length - 1);
 }
+
+/* * * * Interlude – some useful heap-related formulae * * * *
+ *                                                           *
+ *  (indices and depth are zero-based)                       *
+ *                                                           *
+ *  depth given a number of nodes n:    log(n)               *
+ *  depth at a given index x:           log(x+1)             *
+ *  index of first element at row d:    2^(d) - 1            *
+ *  index of last element at row d:     2^(d+1) - 2          *
+ *                                                           *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 template <class nodetype, typename comparandtype>
 void BinaryHeap<nodetype, comparandtype>::reheapify() {
 	// To sort a heap: start at the lowest level, calling down_heap on the root of each subtree,
@@ -237,5 +249,4 @@ int BinaryHeap<nodetype, comparandtype>::size() {
 //	std::cout << std::endl;
 //}
 
- 
 #endif
