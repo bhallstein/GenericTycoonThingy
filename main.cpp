@@ -2,6 +2,7 @@
  * main.cpp – main game loop thinger
  *
  */
+
 #include <iostream>
 #include <string>
 #include <map>

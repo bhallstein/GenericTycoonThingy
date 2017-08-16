@@ -1,59 +1,29 @@
 #include "Building.h"
-int Building::s_Building = 0;
-	Building::Building()
-	{
-	++s_Building;
-	m_pLeft = 0;
-	m_pRight = 0;
-	m_Service = false;
-	}
 
-int Building::GetTotal()
-{
-	return s_Building;
+Building::Building() {
+	// initialize building
+	// see LevelMap.cpp for part of this process
 }
 
-int Building::GetIncome()
-{
-	return m_Income;
-}
 
-void Building::SetLeft(Building* Left)
-{
-	m_pLeft = Left;
-}
 
-void Building::SetRight(Building* Right)
-{	
-	m_pRight = Right;
-}
-Building* Building::GetLeft()
-{
-	return m_pLeft;
-}
-Building* Building::GetRight()
-{
-	return m_pRight;
-}
+#ifdef yeah_this_doesnt_need_compiling_either_sorry
 
-void Building::SetService()//service changes for each building - maybe should be virtual?
-{
-	if(m_Service)
-	{
-		m_Service = false;
-	}
-	else
-	{
-		m_Service = true;
-	}
-}
+  What is a building?
+  
+  A building is an area displayed at a paticular location on the map.
+  When it is created, the user has the chance to specify where it can be built.
+  	- some parts of the map may be buildable, others not
+  
+  A building also defines behaviours of some other objects.
+  A staff unit may seek out or be assigned to a building
+  
+  A building generates its own internal mapping region, also – i.e. they define a free movement zone,
+  and form a node in the pathfinding system’s nodelist.
+  
+  
+  Buildings are like other things in the game, like units, obstacles, implements, furniture in
+  some key respects – each object must have a sprite, and the code for managing the display of that sprite
+  (or returning it for display by some more powerful, parent drawing class.)
 
-bool Building::GetService()
-{
-	return m_Service;
-}
-
-std::string Building::GetType()
-{
-	return m_Type;
-}
+#endif
