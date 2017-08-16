@@ -11,24 +11,24 @@ MenuState::MenuState() : W::GameState(W::GS_OPAQUE)
 	addView(clicktobeginview);
 	
 	// Key subscriptions
-	W::Messenger::subscribeToEventType(W::EventType::KEYUP, W::Callback(&MenuState::keyEvent, this));
-	W::Messenger::subscribeToUIEvent("LevelStartBtn", W::EventType::BUTTONCLICK, W::Callback(&MenuState::uiEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&MenuState::keyEvent, this));
+	W::Messenger::subscribeToUIEvent("LevelStartBtn", W::EventType::ButtonClick, W::Callback(&MenuState::uiEvent, this));
 	
-	MrKlangy::playBGM("menu.xm");
+//	MrKlangy::playBGM("menu.xm");
 }
 MenuState::~MenuState()
 {
 //	removeView(menubackgroundview); delete menubackgroundview;
 	removeView(clicktobeginview);   delete clicktobeginview;
-	MrKlangy::stopBGM();
+//	MrKlangy::stopBGM();
 }
 
 void MenuState::resume(W::Returny *ret) {
-	MrKlangy::playBGM("menu.xm");
-	if (ret->type == W::ReturnyType::KILLER_RETURNY) {
+//	MrKlangy::playBGM("menu.xm");
+	if (ret->type == W::ReturnyType::Killer) {
 		W::popState(W::KillerReturny);
 	}
-	else if (ret->type == W::ReturnyType::PAYLOAD_RETURNY) {
+	else if (ret->type == W::ReturnyType::Payload) {
 		if (ret->payload == "replay") startLevel("level1");
 	}
 }
@@ -39,11 +39,11 @@ void MenuState::update() {
 W::EventPropagation::T MenuState::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_Q || ev->key == W::KeyCode::ESC)
 		W::popState(W::EmptyReturny);
-	return W::EventPropagation::SHOULD_CONTINUE;
+	return W::EventPropagation::ShouldContinue;
 }
 W::EventPropagation::T MenuState::uiEvent(W::Event *ev) {
 	startLevel("level1");
-	return W::EventPropagation::SHOULD_CONTINUE;
+	return W::EventPropagation::ShouldContinue;
 }
 
 void MenuState::startLevel(const std::string &levelName) {
@@ -64,10 +64,8 @@ ClickToBeginView::ClickToBeginView(MenuState *_ms) :
 	W::UIView(MrPaths::resourcesPath + "Data/UIViews/Menu_ClickToBeginView.lua"),
 	menuState(_ms)
 {
-	t1 = new W::DrawnText(this, W::position(186,30), "Welcome to Generic Tycoon Thingy", W::Colour::Black);
-	t2 = new W::DrawnText(this, W::position(308,60), "Click to begin", W::Colour::White);
-	addDO(t1);
-	addDO(t2);
+	t1 = new W::DText(this, W::position(186,30), "Welcome to Generic Tycoon Thingy", W::Colour::Black);
+	t2 = new W::DText(this, W::position(308,60), "Click to begin", W::Colour::White);
 }
 
 

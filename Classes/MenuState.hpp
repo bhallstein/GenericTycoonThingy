@@ -44,7 +44,7 @@ public:
 	void draw();
 private:
 	MenuState *menuState;
-	W::DrawnText *t1, *t2;
+	W::DText *t1, *t2;
 };
 
 

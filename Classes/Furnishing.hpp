@@ -73,7 +73,7 @@ public:
 	void setOpac(float);
 private:
 	LevelView *lv;
-	W::DrawnRect *r;
+	W::DRect *r;
 };
 
 

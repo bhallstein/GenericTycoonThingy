@@ -136,8 +136,8 @@ void _deserialize(LuaObj &o, std::map<UID,UID> &m) {
 		UID u1, u2;
 		unsigned int x;
 		std::stringstream(it->first) >> x;
-		_deserialize(it->second, u2);
-		m[UID(u1)] = UID(u2);
+		_deserialize(it->second, u2);		// TODO: check this
+		m[UID(u1)] = UID(u2);				// Seems like an error
 	}
 }
 

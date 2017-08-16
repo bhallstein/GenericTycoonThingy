@@ -109,7 +109,7 @@ public:
 	
 private:
 	LevelView *lv;
-	W::DrawnRect *r;
+	W::DRect *r;
 };
 
 #endif

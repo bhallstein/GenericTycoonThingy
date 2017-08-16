@@ -29,9 +29,9 @@ LevelState::LevelState() :
 	realtimetime = 0.0;
 	realtimetimer = new W::Timer();
 	
-	MrKlangy::playBGM("level.mod");
+//	MrKlangy::playBGM("level.mod");
 	
-	W::Messenger::subscribeToEventType(W::EventType::KEYUP, W::Callback(&LevelState::keyEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
 }
 LevelState::~LevelState()
 {
@@ -40,21 +40,21 @@ LevelState::~LevelState()
 	
 	delete levelMap;
 	
-	MrKlangy::stopBGM();
+//	MrKlangy::stopBGM();
 }
 
 W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_S) saveLevel("a save game");
 	else if (ev->key == W::KeyCode::ESC) W::popState(W::EmptyReturny);
 	else if (ev->key == W::KeyCode::_Q)  W::popState(W::KillerReturny);
-	return W::EventPropagation::SHOULD_CONTINUE;
+	return W::EventPropagation::ShouldContinue;
 }
 
 void LevelState::update() {
 	// Time
 	if (paused) return;
 	++framecount;
-	realtimetime += realtimetimer->getMicroseconds() / 1000000.;
+	realtimetime += realtimetimer->getMicroseconds() / 1000000.0;
 	realtimetimer->reset();
 	timeRemaining = timeLimit - (int) realtimetime;
 	
@@ -63,7 +63,7 @@ void LevelState::update() {
 		levelMap->update();
 }
 void LevelState::resume(W::Returny *ret) {
-	if (ret->type == W::ReturnyType::PAYLOAD_RETURNY) {
+	if (ret->type == W::ReturnyType::Payload) {
 		if (ret->payload == "exit to menu") W::popState(W::EmptyReturny);
 		else if (ret->payload == "replay")  W::popState(*ret);
 	}

@@ -10,7 +10,7 @@ LevelMap::LevelMap(LevelState *_ls, LevelView *_lv) :
 	levelView(_lv),
 	loaded(false)
 {
-	W::Messenger::subscribeToEventType(W::EventType::KEYUP, W::Callback(&LevelMap::keyEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&LevelMap::keyEvent, this));
 }
 LevelMap::~LevelMap()
 {
@@ -26,7 +26,7 @@ void LevelMap::update() {
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_U) createUnit(true, "customer");
 	else if (ev->key == W::KeyCode::_F) createFurnishing(true, "barberschair");
-	return W::EventPropagation::SHOULD_CONTINUE;
+	return W::EventPropagation::ShouldContinue;
 }
 
 bool LevelMap::load(LuaObj &mapData) {

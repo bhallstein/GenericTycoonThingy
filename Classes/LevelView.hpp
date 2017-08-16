@@ -37,7 +37,7 @@ public:
 protected:
 	void updatePosition(const W::size &winsize);
 	
-	W::DrawnRect *bgRect;
+	W::DRect *bgRect;
 	
 	int gridsize;
 	int level_width, level_height;	// -1 until set with setLevelSize()
@@ -80,8 +80,8 @@ public:
 private:
 	int timeRemaining, monetaryTarget;
 	void setTimeRemainingText();
-	W::DrawnText *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9;
-	W::DrawnRect *r1;
+	W::DText *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9;
+	W::DRect *r1;
 };
 
 #endif

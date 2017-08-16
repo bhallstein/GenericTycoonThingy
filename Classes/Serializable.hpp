@@ -24,7 +24,7 @@ protected:
 	virtual void deserializeAdditionalProperties(LuaObj &o) { }
 		// Override to deserialize properties that cannot be deserialized
 		// automatically, i.e. Type-Dependent Subclass Properties
-	virtual void getAdditionalSerializedProperties(std::map<std::string, std::string> &m) { }
+	virtual void getAdditionalSerializedProperties(std::map<std::string,std::string> &m) { }
 		// Override to return serialized versions of TDSPs in the form
 		// name => serialized property
 		// (braces are added automatically around the latter)

@@ -7,7 +7,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	W::setLogFile(MrPaths::desktopPath + "GTTlog.txt");
+	W::setLogPath(MrPaths::desktopPath + "GTTlog.txt");
 	W::log << "settings file path: " << MrPaths::settingsPath  << std::endl;
 	W::log << "resources path: "     << MrPaths::resourcesPath << std::endl;
 	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;

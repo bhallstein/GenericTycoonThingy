@@ -50,7 +50,7 @@ W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
 	if (ev->type == W::EventType::LV_LEFTMOUSEDOWN) {
 //		level->openFurnishingPurchasingView(this);
 	}
-	return W::EventPropagation::SHOULD_CONTINUE;
+	return W::EventPropagation::ShouldContinue;
 }
 
 bool Building::initialize() {

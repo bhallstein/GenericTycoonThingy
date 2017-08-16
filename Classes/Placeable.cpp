@@ -29,7 +29,7 @@ W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
 		deactivate();
 		mngr->cancel();
 	}
-	return W::EventPropagation::SHOULD_STOP;
+	return W::EventPropagation::ShouldStop;
 		// Doesn't really matter which -- placeable only ever receives events
 		// while Privileged Event Responder.
 }

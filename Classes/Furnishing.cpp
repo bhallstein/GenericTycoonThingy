@@ -95,7 +95,7 @@ W::EventPropagation::T Furnishing::mouseEvent(W::Event *ev) {
 	else if (ev->type == LV_LEFTMOUSEUP)
 		std::cout << "furnishing " << uid.id << " detected left mouse up" << std::endl;
 	
-	return W::EventPropagation::SHOULD_STOP;
+	return W::EventPropagation::ShouldStop;
 }
 
 void Furnishing::update() {
@@ -184,14 +184,13 @@ bool Furnishing::canPlace(const W::position &_pos) {
 
 Furnishing::DrawnFurnishing::DrawnFurnishing(LevelView *_lv) : lv(_lv)
 {
-	r = new W::DrawnRect(
+	r = new W::DRect(
 		lv, W::position(), lv->convertGridToPixelCoords(W::size(2,2)), W::Colour::Blue
 	);
-	lv->addDO(r);
 }
 Furnishing::DrawnFurnishing::~DrawnFurnishing()
 {
-	lv->removeDO(r);
+	delete r;
 }
 void Furnishing::DrawnFurnishing::setPosn(const W::position &p) {
 	r->setPos(lv->convertGridToPixelCoords(p));

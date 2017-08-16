@@ -83,7 +83,7 @@ void Unit::_setUp() {
 W::EventPropagation::T Unit::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
 	
-	W::EventPropagation::T v = W::EventPropagation::SHOULD_STOP;
+	W::EventPropagation::T v = W::EventPropagation::ShouldStop;
 
 	if (mode == UnitMode::ANIMATING) return v;
 	if      (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
@@ -108,14 +108,14 @@ void Unit::update() {
 
 void Unit::wanderToRandomMapDestination() {
 	W::position _dest(
-		(int)W::randUpTo(levelMap->width()),
-		(int)W::randUpTo(levelMap->height())
+		W::Rand::intUpTo(levelMap->width()),
+		W::Rand::intUpTo(levelMap->height())
 	);
 	voyage(_dest);
 		// TODO: call bhvr.failure if cannot voyage, or if obstacle encountered
 }
 void Unit::getDespawnPoint(W::position &p) {
-	int w = navmap->width(), h = navmap->height(), n = W::randUpTo(2*w + 2*h - 4);
+	int w = navmap->width(), h = navmap->height(), n = W::Rand::intUpTo(2*w + 2*h - 4);
 	if (n < w)            p.x = n,     p.y = 0;
 	else if (n < 2*w)     p.x = n - w, p.y = h - 1;
 	else if (n < 2*w + h) p.x = 0,     p.y = n - 2*w;
@@ -294,13 +294,12 @@ void Unit::printDebugInfo() {
 
 Unit::DrawnUnit::DrawnUnit(LevelView *_lv) : lv(_lv)
 {
-	r = new W::DrawnRect(
+	r = new W::DRect(
 		lv, W::position(), lv->convertGridToPixelCoords(W::size(1,1)), W::Colour::Black
 	);
-	lv->addDO(r);
 }
 Unit::DrawnUnit::~DrawnUnit() {
-	lv->removeDO(r);
+	delete r;
 }
 void Unit::DrawnUnit::setPosn(const W::position &p) {
 	r->setPos(lv->convertGridToPixelCoords(p));
@@ -311,5 +310,5 @@ void Unit::DrawnUnit::setOpac(float x) {
 	r->setCol(c);
 }
 void Unit::DrawnUnit::incRot() {
-	r->setRot(r->rot + 3);
+	r->setRot(r->rotation + 3);
 }
