@@ -1,4 +1,4 @@
-require([[Data\buildingactions]])
+require([[buildingactions]])
 
 function barber()
 	building = {}

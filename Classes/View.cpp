@@ -42,5 +42,5 @@ void View::receiveEvent(Event *ev) {
 }
 
 void View::processMouseEvent(Event *ev) {
-	
+	// Hello, event. Want to be friends?
 }

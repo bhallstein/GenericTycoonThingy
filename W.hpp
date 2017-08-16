@@ -12,6 +12,7 @@
 
 #include "Classes/types.hpp"
 #include "WindowManager.hpp"
+#include "types.hpp"
 
 class View;
 class Event;

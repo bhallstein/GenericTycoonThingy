@@ -1,6 +1,7 @@
 #include "LuaHelper.hpp"
+#include "../W.hpp"
 
-LuaHelper::LuaHelper() {
+LuaHelper::LuaHelper(W *_theW) : theW(_theW) {
 	LuaInstance = luaL_newstate();
 	luaL_openlibs(LuaInstance);
 }
@@ -8,9 +9,23 @@ LuaHelper::~LuaHelper() {
 	lua_close(LuaInstance);
 }
 
-bool LuaHelper::loadFile(std::string &fileName)
+bool LuaHelper::loadFile(std::string &filename)
 {
-	return !(luaL_loadfile(LuaInstance, fileName.c_str()) || lua_pcall(LuaInstance, 0, 0, 0));
+	int loadingSuccess = !luaL_loadfile(LuaInstance, filename.c_str());
+	// Set the Lua path to our Resources folder
+	lua_getglobal(LuaInstance, "package");
+	lua_getfield(LuaInstance, -1, "path");
+	std::string path = lua_tostring(LuaInstance, -1);	// grab path string from top of stack
+	path.append(";");
+	path.append(theW->resourcesPath);
+	path.append("?.lua");
+	theW->log(path.c_str());
+	lua_pop(LuaInstance, 1);					// get rid of the string on the stack we just pushed on line 5
+	lua_pushstring(LuaInstance, path.c_str());	// push the new one
+	lua_setfield(LuaInstance, -2, "path");		// set the field "path" in table at -2 with value at top of stack
+	lua_pop(LuaInstance, 1);					// get rid of package table from top of stack
+	int callingSuccess = !lua_pcall(LuaInstance, 0, 0, 0);
+	return (loadingSuccess && callingSuccess);
 }
 //push a table onto the stack, or error if nil;
 int LuaHelper::pushtable(const char *key)
