@@ -2,7 +2,6 @@
  * main.cpp – main game loop thinger
  *
  */
-
 #include <iostream>
 #include <string>
 #include <map>
@@ -12,25 +11,19 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+using namespace std;
+
 /* Game classes */
 // #include "Classes/Address.h"
 // #include "Classes/Builder.h"
 // #include "Classes/Building.h"
-// #include "Classes/Game.h"
+#include "Classes/Game.h"
 // #include "Classes/Level.h"
+//#include "Classes/LevelMap.h"
 // #include "Classes/SettingsManager.h"
 // #include "Classes/Structure.h"
 // #include "Classes/Tutorial.h"
 
-// using namespace std;
-using std::cin;
-using std::cout;
-using std::ifstream;
-using std::ofstream;
-
-using std::string;
-using std::vector;
-using std::map;
 
 
 int main(int argc, char *argv[], char *envp[])
@@ -75,7 +68,9 @@ int main(int argc, char *argv[], char *envp[])
 				if (keycode == sf::Keyboard::Escape)
 					should_quit = true;
 				if (keycode == 'b')
-					; // activate barbershop building
+				{
+
+				} // activate barbershop building
 				
 			}
         }
