@@ -11,16 +11,9 @@ std::string Placeable::defaultColourWhilePlacing;
 
 Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM, const char *_type) :
 	MappedObj(-100, -100), navmap(_navmap), levelResponderMap(_levelRM), type(_type), clicked(false), destroyed(false), mode(PLACEMENT)
-{
-	std::vector<intcoord> p;
-	intcoord c = {0,0}, d = {1,0}, e = {0,1}, f = {1,1};
-	p.push_back(c);
-	p.push_back(d);
-	p.push_back(e);
-	p.push_back(f);
-	setGroundPlan(&p);
-	
+{	
 	// Set properties for this Placeable type
+	groundplan = placeableTypes[_type].groundplan;
 	p_colour             = placeableTypes[_type].col;
 	p_hoverColour        = placeableTypes[_type].hoverCol;
 	p_colourWhilePlacing = placeableTypes[_type].colWhilePlacing;
@@ -36,8 +29,8 @@ void Placeable::receiveEvent(Event *ev) {
 			x = ev->x, y = ev->y;
 		}
 		else if (ev->type == Event::LEFTCLICK) {
-			for (int i=0, n = ground_plan.size(); i < n; i++) {
-				intcoord c = ground_plan[i];
+			for (int i=0, n = groundplan.size(); i < n; i++) {
+				intcoord c = groundplan[i];
 				if (!navmap->isPassableAt(c.x + x, c.y + y))
 					return;
 			}
@@ -127,6 +120,20 @@ bool Placeable::initialize(W *_W) {
 		
 		lua_getfield(L, -1, "colourWhilePlacing");	// S: -1 colour; -2 subtable; -3 key; -4 table
 		pInfo->colWhilePlacing = lua_isstring(L, -1) ? lua_tostring(L, -1) : Placeable::defaultColourWhilePlacing;
+		lua_pop(L, 1);
+		
+		// Ground plans
+		if (!mrLua.pushSubtable("groundplan")) {
+			char s[100]; sprintf(s, "In placeables.lua, could not find groundplan for '%s' type", p_type);
+			W::log(s);
+			return false;
+		}											// S: -1 groundplan; -2 subtable; -3 key; -4 table
+		lua_pushnil(L);								// S: -1 nil; -2 groundplan; ...
+		while (lua_next(L, -2)) {					// S: -1 value; -2 key; -3 groundplan
+			intcoord c = { mrLua.getfield<int>(1), mrLua.getfield<int>(2) };
+			pInfo->groundplan.push_back(c);
+			lua_pop(L, 1);
+		}											// S: -1 groundplan; -2 subtable; -3 key; -4 table
 		
 		lua_pop(L, 2);								// S: -1 key; -2 table
 	}

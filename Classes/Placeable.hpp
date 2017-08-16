@@ -18,6 +18,7 @@ class W;
 
 struct placeableInfo {
 	std::string col, hoverCol, colWhilePlacing;
+	std::vector<intcoord> groundplan;
 };
 
 class Placeable : public MappedObj {

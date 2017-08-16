@@ -6,11 +6,17 @@ defaultColourWhilePlacing = "white"
 
 placeableTypes = {
 	["barberschair"] = {
-		
+		groundplan = {
+			{0,0}, {1,0},
+			{0,1}, {1,1}
+		}
 	},
 	sofa = {
 		colour = "red",
-		colourWhilePlacing = "purple"
+		colourWhilePlacing = "purple",
+		groundplan = {
+			{0,0}, {1,0}
+		}
 	}
 }
 

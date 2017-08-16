@@ -131,7 +131,6 @@ void Level::buildLevel(std::string levelname) {
 					}
 					d.coord.x = mrLua.getfield<int>(1);
 					d.coord.y = mrLua.getfield<int>(2);
-					std::cout << "d: " << d.coord.x << "," << d.coord.y << std::endl;
 					const char *dir = mrLua.getfield<const char *>(3);
 					if (strcmp(dir, "upward") == 0)         d.orientation = UPWARD;
 					else if (strcmp(dir, "downward") == 0)  d.orientation = DOWNWARD;
@@ -143,7 +142,7 @@ void Level::buildLevel(std::string levelname) {
 			}
 			lua_pop(L, 2);									// S: -1 key; buildings
 			
-			Building *b = createBuilding(bX, bY, bType, &gp, &doors);
+			createBuilding(bX, bY, bType, &gp, &doors);
 		}
 		lua_settop(L, 0);	// S: ~
 	} catch (MsgException &exc) {
@@ -312,8 +311,8 @@ void LevelView::drawMappedObj(MappedObj *obj) {
 	int atY = (obj->y + obj->b) * gridsize - scroll_y;
 	
 	const char *col = obj->col();
-	for (int i=0; i < obj->ground_plan.size(); i++) {
-		intcoord c = obj->ground_plan[i];
+	for (int i=0; i < obj->groundplan.size(); i++) {
+		intcoord c = obj->groundplan[i];
 		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, col);
 	}
 }

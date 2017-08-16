@@ -22,12 +22,12 @@ public:
 	virtual void update() = 0;			// TLOs will generally want to handle updates
 	virtual const char * col() = 0;		// Temporary: override to return colour the object should be drawn
 	void setGroundPlan(std::vector<intcoord> *p) {
-		ground_plan = *p;
+		groundplan = *p;
 	}
 	
 	// Properties
 	float a, b;							// Floating pt offset from integer location (default 0)
-	std::vector<intcoord> ground_plan;	// Blocks (relative to to top left corner) taken up by the object
+	std::vector<intcoord> groundplan;	// Blocks (relative to to top left corner) taken up by the object
 	
 protected:
 	// Properties

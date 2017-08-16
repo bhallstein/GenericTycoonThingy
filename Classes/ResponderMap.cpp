@@ -86,8 +86,8 @@ void ResponderMap::dispatchMouseEvent(Event *ev) {
 	MappedObj *last_obj = NULL, *o;
 	for (mo_list::iterator it = subscribed_mappedobjs.begin(); it != subscribed_mappedobjs.end(); it++) {
 		o = *it;
-		for (int i=0; i < o->ground_plan.size(); i++) {
-			intcoord c = o->ground_plan[i];
+		for (int i=0; i < o->groundplan.size(); i++) {
+			intcoord c = o->groundplan[i];
 			c.x += o->x, c.y += o->y;
 			floatcoord c_ev = { ev->x + ev->a, ev->y + ev->b }, c_obj = { c.x + o->a, c.y + o->b };
 			if (c_ev.a >= c_obj.a && c_ev.b >= c_obj.b && c_ev.a <= c_obj.a + 1 && c_ev.b <= c_obj.b + 1)

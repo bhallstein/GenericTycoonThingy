@@ -110,8 +110,8 @@ NavNode* NavMap::nodeAt(int atX, int atY) {
 void NavMap::addImpassableObject(MappedObj *obj) {
 	int x = obj->x, y = obj->y;
 	intcoord c;
-	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
-		c = obj->ground_plan[i];
+	for (int i=0, n = obj->groundplan.size(); i < n; i++) {
+		c = obj->groundplan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
 			continue;
@@ -121,8 +121,8 @@ void NavMap::addImpassableObject(MappedObj *obj) {
 void NavMap::removeImpassableObject(MappedObj *obj) {
 	int x = obj->x, y = obj->y;
 	intcoord c;
-	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
-		c = obj->ground_plan[i];
+	for (int i=0, n = obj->groundplan.size(); i < n; i++) {
+		c = obj->groundplan[i];
 		c.x += x, c.y += y;
 		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
 			continue;
@@ -131,7 +131,7 @@ void NavMap::removeImpassableObject(MappedObj *obj) {
 }
 void NavMap::addBuilding(Building *b) {
 	std::vector<NavNode *> edgey_nodes;
-	std::vector<intcoord> *plan = &b->ground_plan;
+	std::vector<intcoord> *plan = &b->groundplan;
 	int bx = b->x, by = b->y;
 	
 	// for each node X in ground plan
