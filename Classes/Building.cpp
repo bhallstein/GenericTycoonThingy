@@ -1,25 +1,27 @@
 #include "Building.hpp"
 
-Building::Building()
+Building::Building(GameMap *map)
 {
 	mode = PLACEMENT;
 	x = y = -1000;
-	w = 6;
-	h = 4;
-
+	w = 6; h = 4;
+	clicked = false;
+	
+	gamemap = map;
+	
 	// Builing state relevant to the LevelMap.
 	destroyed = false;
 }
 Building::~Building()
 {
-	// Destroy things
+	// Remove from memory map
+	gamemap->removeObject(this, x, y, w, h);
 }
 
 void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
 	if (mode == PLACEMENT) {
 		if (ev->type == MOUSEMOVE) {
-			x = ev->x;
-			y = ev->y;
+			this->setPosition(ev->x, ev->y);
 		}
 		else if (ev->type == LEFTCLICK) {
 			mode = PLACED;
@@ -31,13 +33,25 @@ void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
 		}
 	}
 	else if (mode == PLACED) {
-		
+		if (ev->type == MOUSEMOVE) {
+			//mouseover = true;	// ...but how to unset?
+		}
+		else if (ev->type == LEFTCLICK) {
+			clicked = !clicked;
+		}
 	}
-	// std::cout << "Building pos: " << x << "," << y << std::endl;
+	// std::cout << "Buildingb pos: " << x << "," << y << std::endl;
+}
+
+void Building::setPosition(int _x, int _y) {
+	if (x == _x && y == _y) return;
+	gamemap->removeObject(this, x, y, w, h);
+	x = _x, y = _y;
+	gamemap->addObject(this, x, y, w, h);
 }
 
 char Building::col() {
-	return (mode == PLACEMENT ? 'w' : 'b');
+	return (mode == PLACEMENT ? 'w' : clicked ? 'l' : 'b');
 }
 
 

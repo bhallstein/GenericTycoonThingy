@@ -13,11 +13,12 @@
 #ifndef GAMEMAP_H
 #define GAMEMAP_H
 
-// #include <iostream>
+#include <iostream>
 #include <list>
 #include <vector>
 // #include <list>
 
+#include "Event.hpp"
 #include "EventResponder.hpp"
 
 
@@ -28,8 +29,9 @@ public:
 	~MapLoc();
 	
 	// Methods
-	void addObject(EventResponder *x);
-	void removeObject(EventResponder *x);
+	void addResponder(EventResponder *x);
+	void removeResponder(EventResponder *x);
+	void dispatchEvent(Event *ev, EventResponder **p_e_r);
 	
 protected:
 	std::list<EventResponder*> responderList;
@@ -50,6 +52,7 @@ public:
 	void setDimensions(int _w, int _h);
 	void addObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
 	void removeObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
+	void dispatchEvent(Event *, EventResponder **p_e_r);
 
 protected:
 	// Properties

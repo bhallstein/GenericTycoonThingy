@@ -14,13 +14,14 @@
 
 #include "types.h"
 #include "GameMap.hpp"
+#include "EventResponder.hpp"
 #include "Building.hpp"
 
 
 class Level
 {
 public:
-	Level(int _w, int _h);
+	Level(int _w, int _h, GameMap *_gamemap);
 	~Level();
 
 	// Functions
@@ -29,11 +30,12 @@ public:
 
 	// Properties
 	int columns, rows;
-	std::vector<Building> buildings;
+	std::vector<Building*> buildings;
 
 protected:
 	int w, h; 					// Blocks wide/tall.
-	GameMap gamemap;
+	GameMap *gamemap;
+	
 };
 
 #endif

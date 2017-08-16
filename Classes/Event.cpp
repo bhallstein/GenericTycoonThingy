@@ -21,7 +21,7 @@ void Event::loadFromSFEvent(sf::Event *sf_event, int block_width, int block_heig
 	}
 	else if (sf_event->Type == sf::Event::MouseButtonPressed) {
 		type = sf_event->MouseButton.Button == sf::Mouse::Left ? LEFTCLICK : RIGHTCLICK;
-		this->setCoords(sf_event->MouseMove.Y, sf_event->MouseMove.Y, block_width, block_height);
+		this->setCoords(sf_event->MouseButton.X, sf_event->MouseButton.Y, block_width, block_height);
 	}
 	else {
 		type = UNKNOWNEVENT;

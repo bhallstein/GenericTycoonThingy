@@ -13,6 +13,7 @@
 #include "types.h"
 
 #include "SettingsManager.hpp"
+#include "GameMap.hpp"
 #include "Level.hpp"
 #include "Event.hpp"
 
@@ -33,6 +34,7 @@ protected:
 	sf::RenderWindow DBTWindow;
 	int w, h; 				// Blocks wide/tall
 	int block_w, block_h;	// Pixels per block
+	GameMap gamemap;
 };
 
 #endif

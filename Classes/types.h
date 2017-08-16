@@ -23,11 +23,11 @@ typedef struct floatcoord {
 typedef int dbt_event;
 
 #define UNKNOWNEVENT -30141
-#define CLOSED     -30142
-#define KEYPRESS   -30143
-#define MOUSEMOVE  -30144
-#define LEFTCLICK  -30145
-#define RIGHTCLICK -30146
+#define CLOSED       -30142
+#define KEYPRESS     -30143
+#define MOUSEMOVE    -30144
+#define LEFTCLICK    -30145
+#define RIGHTCLICK   -30146
 
 // Keys
 

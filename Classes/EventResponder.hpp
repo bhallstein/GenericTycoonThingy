@@ -22,7 +22,7 @@ public:
 	virtual void receiveEvent(Event *ev, EventResponder **p_e_r);
 
 protected:
-	
+
 };
 
 #endif

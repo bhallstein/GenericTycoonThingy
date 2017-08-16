@@ -1,37 +1,39 @@
 #include "Level.hpp"
 
-Level::Level(int _w, int _h)
+Level::Level(int _w, int _h, GameMap *_gamemap)
 {
 	w = _w, h = _h;
-	
-	// Load GameMap
-	gamemap.setDimensions(w, h);
+	gamemap = _gamemap;
 }
 Level::~Level()
 {
 	// Destructor
+	for (std::vector<Building*>::iterator i = buildings.begin(); i != buildings.end(); i++)
+		delete (*i);	// Buildings are allocated on heap with `new` – so must be manually `delete`d.
 }
 
 Building* Level::createBuilding()
 {
-	Building b;
-	buildings.push_back(b);
-	std::cout << "created building: " << buildings.size() << std::endl;
-	return &buildings.back();
+	std::cout << "adding new building, currently: " << buildings.size() << "... ";
+	buildings.push_back( new Building(gamemap) );
+	std::cout << "done. now: " << buildings.size() << std::endl;
+	return buildings.back();
 }
 
 
 void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 {
 	// Draw buildings
-	for (std::vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++) {
-		if ((*i).destroyed)
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++) {
+		if ((*i)->destroyed) {
+			delete (*i);
 			buildings.erase(i--);
+		}
 		else {
 			window.Draw(
 				sf::Shape::Rectangle(
-					(*i).x * block_width, (*i).y * block_height, (*i).w * block_width, (*i).h * block_height,
-					(*i).col() == 'w' ? sf::Color::White : sf::Color::Black
+					(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height,
+					(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'l' ? sf::Color::Blue : sf::Color::Black
 				)
 			);
 		}
@@ -60,6 +62,5 @@ Display code:
 
 Route finding:
 	x, y
-
 
 #endif
