@@ -27,21 +27,24 @@ void View::createEventResponderMap() {
 }
 void View::addResponder(EventResponder *resp) {
 	if (!ready_for_event_response) return;		// This is really the sort of place one should throw an exception
-	int x = resp->x, y = resp->y, w = resp->w, h = resp->h;
-	for (int j = y; j < y + h; j++)
-		for (int i = x; i < x + w; i++)
-			if (i >= 0 && i < blocks_w && j >= 0 && j < blocks_h) {
-				responderMap[j * blocks_w + i].remove(resp);
-				responderMap[j * blocks_w + i].push_back(resp);
-			}
+	int x = resp->x, y = resp->y;
+	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
+		intcoord c = resp->resp_blocks[i];
+		c.x += x, c.y += y;
+		if (c.x < 0 || c.x >= blocks_w || c.y < 0 || c.y >= blocks_h) continue;
+		responderMap[c.y * blocks_w + c.x].remove(resp);
+		responderMap[c.y * blocks_w + c.x].push_back(resp);
+	}
 }
 void View::removeResponder(EventResponder *resp) {
 	if (!ready_for_event_response) return;
-	int x = resp->x, y = resp->y, w = resp->w, h = resp->h;
-	for (int j = y; j < y + h; j++)
-		for (int i = x; i < x + w; i++)
-			if (i >= 0 && i < blocks_w && j >= 0 && j < blocks_h)
-				responderMap[j * blocks_w + i].remove(resp);
+	int x = resp->x, y = resp->y;
+	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
+		intcoord c = resp->resp_blocks[i];
+		c.x += x, c.y += y;
+		if (c.x < 0 || c.x >= blocks_w || c.y < 0 || c.y >= blocks_h) continue;
+		responderMap[c.y * blocks_w + c.x].remove(resp);
+	}
 }
 bool View::requestPrivilegedEventResponderStatus(EventResponder *resp) {
 	if (!ready_for_event_response) return false;
@@ -66,6 +69,24 @@ void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide,
 	window->Draw(
 		sf::Shape::Rectangle(atX, atY, width, height, colour)
 	);
+}
+
+void View::drawEventResp(EventResponder *resp, bool float_offset) {		// Temporary but useful function to draw an event responder
+	char c = resp->col();												// in a very generic way
+	sf::Color col;
+	if (c == 'l') col = sf::Color::Blue;
+	else if (c == 'r') col = sf::Color::Red;
+	else if (c == 'w') col = sf::Color::White;
+	else col = sf::Color::Black;
+
+	int x = resp->x, y = resp->y;
+	intcoord b;
+	for (int i=0; i < resp->resp_blocks.size(); i++) {
+		b = resp->resp_blocks[i];
+		float_offset
+			? drawRect(col, b.x + x, b.y + y, 1, 1, ((Unit*)resp)->a, ((Unit*)resp)->b)	// Dreadful hack to draw unit offsets - ugh
+			: drawRect(col, b.x + x, b.y + y, 1, 1);
+	}
 }
 
 void View::draw() {

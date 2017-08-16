@@ -52,7 +52,11 @@ void Menu::startLevel(std::string path) {
 
 Button::Button(Menu *_menu, int _x, int _y) : menu(_menu) {
 	x = _x, y = _y;
-	w = 4, h = 2;
+
+	// Set up resp blocks
+	intcoord c;
+	for (int j=0; j < 2; j++) for (int i=0; i < 3; i++)
+		c.x = i, c.y = j, resp_blocks.push_back(c);
 }
 Button::~Button() {
 	std::cout << "Button destruct" << std::endl;
@@ -76,9 +80,6 @@ MenuView::MenuView(sf::RenderWindow *_win, int _blocks_w, int _blocks_h, int _l_
 	
 }
 void MenuView::draw(std::vector<Button*> *buttons) {
-	for (std::vector<Button*>::iterator i = buttons->begin(); i < buttons->end(); i++)
-		drawRect(
-			(*i)->col() == 'r' ? sf::Color::Red : sf::Color::Blue,
-			(*i)->x, (*i)->y, (*i)->w, (*i)->h
-		);
+	for (int i=0, n = buttons->size(); i < n; i++)
+		drawEventResp((*buttons)[i]);
 }

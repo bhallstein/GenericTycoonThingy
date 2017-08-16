@@ -2,7 +2,14 @@
 
 Building::Building(NavMap *_navmap, int posX, int posY) {
 	x = posX, y = posY;
-	w = 6, h = 4;
+	
+	// Set up event responder block list
+	intcoord c;
+	for (int j=0; j < 4; j++) for (int i=0; i < 6; i++)
+		c.x = i, c.y = j, resp_blocks.push_back(c);
+	c.x = 2, c.y = 4, resp_blocks.push_back(c);
+	c.x = 3, c.y = 4, resp_blocks.push_back(c);
+
 	clicked = false;
 	
 	navmap = _navmap;

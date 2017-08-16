@@ -1,8 +1,5 @@
 /*
- * EventResponder.h
- *
- * An abstract class, for subclassing, to allow objects to handle events.
- * To define a subclass’s event behaviours, override receiveEvent().
+ * EventResponder.h - abstract base class for memory mapped event responders
  *
  */
 
@@ -11,6 +8,7 @@
 
 #include <SFML/Window.hpp>
 
+#include "types.h"
 #include "Event.hpp"
 
 class EventResponder
@@ -21,10 +19,11 @@ public:
 
 	// Methods
 	virtual void receiveEvent(Event *) = 0;
+	virtual char col() = 0;
 	
 	// Properties
-	int x, y;		// Integer block coordinates
-	int w, h;		// 
+	int x, y;							// Coordinates of top left corner
+	std::vector<intcoord> resp_blocks;	// List of blocks (relative to to top left corner) considered part of the responder
 
 protected:
 	

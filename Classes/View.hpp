@@ -44,6 +44,7 @@
 #include "types.h"
 #include "Event.hpp"
 #include "EventResponder.hpp"
+#include "Unit.hpp"
 
 
 class View {
@@ -70,9 +71,12 @@ public:
 	int l_offset, t_offset, r_offset, b_offset;
 
 protected:
+	// Methods
+	virtual void drawRect(sf::Color color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
+	virtual void drawEventResp(EventResponder *resp, bool floatoffset = false);
+
 	// Properties
 	sf::RenderWindow *window;
-	void drawRect(sf::Color color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 
 	bool ready_for_event_response;
 	int blocks_w, blocks_h;
@@ -89,9 +93,11 @@ public:
 	
 	// Methods
 	void _acceptEvent(Event *);
-	void drawRect(sf::Color colour, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
 	
 protected:
+	// Methods
+	void drawRect(sf::Color colour, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);	
+	
 	// Properties
 	int block_size_x, block_size_y;		// Subclasses should override. Default is 20.
 	int scroll_x, scroll_y;

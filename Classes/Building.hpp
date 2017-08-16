@@ -22,14 +22,13 @@ public:
 	~Building();
 
 	// Methods
-	void receiveEvent(Event *ev);	// Handle events
-	char col();						// Temporary coloration-signifier thingum
+	void receiveEvent(Event *ev);	// Handle mouse events
+	char col();						// Temporary coloration-signifier
 
 	// Properties
 	bool destroyed;
 
 protected:
-
 	// Properties
 	NavMap *navmap;
 	bool clicked;

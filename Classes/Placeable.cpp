@@ -3,7 +3,12 @@
 Placeable::Placeable(NavMap *_navmap, View *_view) : navmap(_navmap), view(_view) {
 	mode = PLACEMENT;
 	x = y = -1000;
-	w = 6; h = 4;
+
+	// Set up responder blocks
+	intcoord c;
+	for (int j=0; j < 2; j++) for (int i=0; i < 2; i++)
+		c.x = i, c.y = j, resp_blocks.push_back(c);
+
 	clicked = false;
 	
 	// Placeable state relevant to the LevelMap.
@@ -21,10 +26,11 @@ void Placeable::receiveEvent(Event *ev) {
 			setPosition(ev->x, ev->y);
 		}
 		else if (ev->type == LEFTCLICK) {
-			for (int j=y; j < y + h; j++)
-				for (int i=x; i < x + w; i++)
-					if (!navmap->isPassableAt(i, j))
-						return;							// Check if area is passable
+			for (int i=0, n = resp_blocks.size(); i < n; i++) {
+				intcoord *c = &resp_blocks[i];
+				if (!navmap->isPassableAt(c->x, c->y))
+					return;							// Check if area is passable
+			}
 			mode = PLACED;
 			view->relinquishPrivilegedEventResponderStatus(this);
 			view->addResponder(this);

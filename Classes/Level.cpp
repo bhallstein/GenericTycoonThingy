@@ -154,25 +154,14 @@ void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> 
 	drawRect(sf::Color(0, 0, 0, 50), 0, 0, blocks_w, blocks_h);
 
 	// Draw buildings
-	for (std::vector<Building*>::iterator i = buildings->begin(); i < buildings->end(); i++)
-		drawRect(
-			(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'l' ? sf::Color::Blue : sf::Color::Black,
-			(*i)->x, (*i)->y, (*i)->w, (*i)->h
-		);
+	for (int i=0, n = buildings->size(); i < n; i++)
+		drawEventResp((*buildings)[i]);
 	// Draw placeables
-	for (std::vector<Placeable*>::iterator i = placeables->begin(); i < placeables->end(); i++)
-		drawRect(
-			(*i)->col() == 'w' ? sf::Color::White : (*i)->col() == 'r' ? sf::Color::Red : sf::Color::Yellow,
-			(*i)->x, (*i)->y, (*i)->w, (*i)->h
-		);
-	//Draw units
-	for (std::vector<Unit*>::iterator i = units->begin(); i < units->end(); i++) {
-		drawRect(
-			(*i)->col() == 'r' ? sf::Color::Red : (*i)->col() == 'b' ? sf::Color::Black : sf::Color::White,
-			(*i)->x, (*i)->y, (*i)->w, (*i)->h,
-			(*i)->a, (*i)->b
-		);
-	}
+	for (int i=0, n = placeables->size(); i < n; i++)
+		drawEventResp((*placeables)[i]);
+	// Draw units
+	for (int i=0, n = units->size(); i < n; i++)
+		drawEventResp((*units)[i], true);
 }
 
 

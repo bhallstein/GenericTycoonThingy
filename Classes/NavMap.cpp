@@ -105,19 +105,25 @@ NavNode* NavMap::nodeAt(int atX, int atY) {
 }
 void NavMap::addImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
-		return;
-	for (int j = resp->y; j < resp->y + resp->h; j++)
-		for (int i = resp->x; i < resp->x + resp->w; i++)
-			makeImpassable(i, j);
+	intcoord c;
+	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
+		c = resp->resp_blocks[i];
+		c.x += x, c.y += y;
+		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
+			continue;
+		makeImpassable(c.x, c.y);
+	}
 }
 void NavMap::removeImpassableObject(EventResponder *resp) {
 	int x = resp->x, y = resp->y;
-	if (x < 0 || y < 0 || x + resp->w >= w || y + resp->h >= h)
-		return;
-	for (int j = resp->y; j < resp->y + resp->h; j++)
-		for (int i = resp->x; i < resp->x + resp->w; i++)
-			makePassable(i, j);
+	intcoord c;
+	for (int i=0, n = resp->resp_blocks.size(); i < n; i++) {
+		c = resp->resp_blocks[i];
+		c.x += x, c.y += y;
+		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h)
+			continue;
+		makePassable(c.x, c.y);
+	}
 }
 bool NavMap::isPassableAt(int atX, int atY) {
 	return nodes[atY*w + atX].passable;

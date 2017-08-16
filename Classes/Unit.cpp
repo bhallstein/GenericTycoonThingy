@@ -3,8 +3,11 @@
 
 Unit::Unit(NavMap *_navmap, int _x, int _y) : navmap(_navmap), destroyed(false) {
 	dest_x = x = _x, dest_y = y = _y;
-	w = h = 1;
 	a = b = 0;
+	
+	// Units’ responder block plan is just a single intcoord.
+	intcoord c = {0,0};
+	resp_blocks.push_back(c);
 	
 	state = S_IDLE;
 	

@@ -29,16 +29,10 @@
 #include "GameState.hpp"
 #include "Game.hpp"
 
+
 using boost::property_tree::ptree;
 
-class LevelView : public ScrollingView
-{
-public:
-	// Methods
-	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
-	void draw(std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *);
-	
-};
+class LevelView;
 
 class Level : public GameState
 {
@@ -85,6 +79,16 @@ protected:
 	
 	int framecount;
 
+};
+
+
+class LevelView : public ScrollingView
+{
+public:
+	// Methods
+	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
+	void draw(std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *);
+	
 };
 
 #endif
