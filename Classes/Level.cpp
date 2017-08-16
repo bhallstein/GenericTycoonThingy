@@ -39,14 +39,7 @@ Level::Level(W::Window *_win, std::string levelpath) : win(_win)
 	eh.subscribeToEventType(W::EventType::SCREENEDGE_BOTTOM, c);
 	
 	// Key subscriptions
-	W::Callback c2(&Level::keyEvent, this);
-	eh.subscribeToKey(W::KeyCode::K_ESC, c2);
-	eh.subscribeToKey(W::KeyCode::K_Q, c2);
-	eh.subscribeToKey(W::KeyCode::K_C, c2);
-	eh.subscribeToKey(W::KeyCode::K_S, c2);
-	eh.subscribeToKey(W::KeyCode::K_H, c2);
-	
-	eh.subscribeToKey(W::KeyCode::K_W, c2);
+	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Level::keyEvent, this));
 	
 	// Time
 	framecount = 0;
@@ -317,15 +310,15 @@ void Level::scrollEvent(W::Event *ev) {
 	else if (ev->type == W::EventType::SCREENEDGE_BOTTOM) levelview->scroll(Direction::DOWNWARD);
 }
 void Level::keyEvent(W::Event *ev) {
-	if      (ev->key == W::KeyCode::K_Q)   W::popState(W::KillerReturny);
-	else if (ev->key == W::KeyCode::K_H)   openHelpView();
-	else if (ev->key == W::KeyCode::K_ESC) {
+	if      (ev->key == W::KeyCode::_Q)   W::popState(W::KillerReturny);
+	else if (ev->key == W::KeyCode::_H)   openHelpView();
+	else if (ev->key == W::KeyCode::ESC) {
 		if (helpView != NULL) closeHelpView();
 		else if (furnishingPurchasingView != NULL) closeFurnishingPurchasingView();
 		else if (hiringUIView != NULL) closeHiringView();
 		else W::popState(W::EmptyReturny);
 	}
-	else if (ev->key == W::KeyCode::K_W) {
+	else if (ev->key == W::KeyCode::_W) {
 		levelScore = new LevelScore(win, true);
 		W::pushState(levelScore);
 	}
@@ -655,7 +648,11 @@ UIBarView::UIBarView(W::Window *_win, W::EventHandler *_eh, int *_econ) :
 	),
 	economy(_econ)
 {
-	buttons.push_back(new W::Button(10, 10, 20, 20, "open hiring ui view"));
+	W::rect r = {
+		W::position(10, 10),
+		W::size(20, 20)
+	};
+	buttons.push_back(new W::Button(r, "open hiring ui view"));
 }
 void UIBarView::draw() {
 	drawRect(0, 0, plan[0].sz.width, plan[0].sz.height, W::Colour::TransparentBlack);
@@ -678,12 +675,20 @@ FurnishingPurchasingUIView::FurnishingPurchasingUIView(W::Window *_win, W::Event
 	),
 	furnishingTypes(_furnishingTypes)
 {
-	buttons.push_back(new W::Button(7, 7, 12, 12, "close furnishing purchasing ui view"));
+	W::rect r = {
+		W::position(7, 7),
+		W::size(12, 12)
+	};
+	buttons.push_back(new W::Button(r, "close furnishing purchasing ui view"));
 	// Add buttons for creating furnishing
 	for (int i=0; i < furnishingTypes->size(); i++) {
 		std::string s("buy furnishing ");
 		s += furnishingTypes->at(i);
-		buttons.push_back(new W::Button(7 + (20 + 10)*i, 30, 20, 20, s.c_str()));
+		W::rect r = {
+			W::position(7 + (20+10)*i, 30),
+			W::size(20, 20)
+		};
+		buttons.push_back(new W::Button(r, s.c_str()));
 	}
 }
 void FurnishingPurchasingUIView::draw() {
@@ -708,8 +713,16 @@ HiringUIView::HiringUIView(W::Window *_win, W::EventHandler *_eh) :
 		W::ALLOW_DRAG
 	)
 {
-	buttons.push_back(new W::Button(7, 7, 12, 12, "close hiring ui view"));
-	buttons.push_back(new W::Button(7, 30, 20, 20, "hire staff"));
+	W::rect r = {
+		W::position(7, 7),
+		W::size(12, 12)
+	};
+	W::rect r2 = {
+		W::position(7, 30),
+		W::size(20, 20)
+	};
+	buttons.push_back(new W::Button(r, "close hiring ui view"));
+	buttons.push_back(new W::Button(r2, "hire staff"));
 }
 void HiringUIView::draw() {
 	drawRect(0, 0, plan[0].sz.width, plan[0].sz.height, W::Colour(1,1,1,0.5));
@@ -734,7 +747,11 @@ GTTHelpView::GTTHelpView(W::Window *_win, W::EventHandler *_eh, int *_time_remai
 	),
 	time_remaining(_time_remaining), monetary_target(_monetary_target)
 {
-	buttons.push_back(new W::Button(7, 7, 12, 12, "close help view"));
+	W::rect r = {
+		W::position(7, 7),
+		W::size(12, 12)
+	};
+	buttons.push_back(new W::Button(r, "close help view"));
 }
 void GTTHelpView::draw() {
 	drawRect(0, 0, plan[0].sz.width, plan[0].sz.height, W::Colour::TransparentBlack);

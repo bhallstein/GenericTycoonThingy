@@ -12,8 +12,7 @@ Menu::Menu(W::Window *_win) : W::GameState(W::GS_OPAQUE), win(_win)
 	addView(clicktobeginview);
 	
 	// Key subscriptions
-	eh.subscribeToKey(W::KeyCode::K_Q, W::Callback(&Menu::receiveEvent, this));
-	eh.subscribeToKey(W::KeyCode::K_ESC, W::Callback(&Menu::receiveEvent, this));
+	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Menu::receiveEvent, this));
 
 	MrKlangy::playBGM("menu.xm");
 }
@@ -41,7 +40,7 @@ void Menu::update() {
 
 void Menu::receiveEvent(W::Event *ev) {
 	if (ev->type == W::EventType::KEYPRESS) {
-		if (ev->key == W::KeyCode::K_Q || ev->key == W::KeyCode::K_ESC)
+		if (ev->key == W::KeyCode::_Q || ev->key == W::KeyCode::ESC)
 			W::popState(W::EmptyReturny);
 	}
 //	else if (ev->type == W::EventType::BUTTONCLICK) {

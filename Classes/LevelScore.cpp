@@ -12,8 +12,7 @@ LevelScore::LevelScore(W::Window *_win, bool _victory) : win(_win), victory(_vic
 	MrKlangy::playBGM(victory ? "win.ogg" : "lose-b.ogg", false);
 
 	// Key subscriptions
-	eh.subscribeToKey(W::KeyCode::K_Q,   W::Callback(&LevelScore::recEv, this));
-	eh.subscribeToKey(W::KeyCode::K_ESC, W::Callback(&LevelScore::recEv, this));
+	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&LevelScore::recEv, this));
 }
 LevelScore::~LevelScore()
 {
@@ -28,7 +27,7 @@ void LevelScore::update() { }
 
 void LevelScore::recEv(W::Event *ev) {
 	if (ev->type == W::EventType::KEYPRESS) {
-		if (ev->key == W::KeyCode::K_ESC) exitToMenu();
+		if (ev->key == W::KeyCode::ESC) exitToMenu();
 	}
 	else if (ev->type == W::EventType::BUTTONCLICK) {
 		if (*((std::string*)ev->_payload) == "exit to menu") exitToMenu();
@@ -61,8 +60,16 @@ ScoreView::ScoreView(W::Window *_win, W::EventHandler *_eh, bool _victory) :
 	),
 	victory(_victory)
 {
-	buttons.push_back(new W::Button(240, 155, 120, 80, "replay"));
-	buttons.push_back(new W::Button(440, 155, 120, 80, "exit to menu"));
+	W::rect r = {
+		W::position(240, 155),
+		W::size(120, 80)
+	};
+	W::rect r2 = {
+		W::position(440, 155),
+		W::size(120, 80)
+	};
+	buttons.push_back(new W::Button(r, "replay"));
+	buttons.push_back(new W::Button(r2, "exit to menu"));
 }
 void ScoreView::draw() {
 	for (std::vector<W::Button*>::iterator it = buttons.begin(); it < buttons.end(); it++) {
