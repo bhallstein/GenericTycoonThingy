@@ -79,7 +79,7 @@ void View::drawMappedObj(MappedObj *obj) {		// Temporary but useful function to 
 	if (c == 'l') col = sf::Color::Blue;
 	else if (c == 'r') col = sf::Color::Red;
 	else if (c == 'w') col = sf::Color::White;
-	else col = sf::Color::Black;
+	else col = sf::Color(0, 0, 0, 128);
 
 	int x = obj->x, y = obj->y;
 	intcoord b;

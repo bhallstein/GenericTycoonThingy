@@ -125,7 +125,7 @@ void Level::destroyAllThings() {
 }
 
 void Level::updateObjects() {
-	if (framecount == 180) framecount = 0;
+	if (framecount == 90) framecount = 0;
 	if (10 == framecount++) createUnit(rand()%w, rand()%h);	// Create a new unit every so often
 	
 	for (int i=0; i < units.size(); i++)

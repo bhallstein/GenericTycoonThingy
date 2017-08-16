@@ -10,6 +10,12 @@ Building::Building(int _x, int _y) : MappedObj(_x, _y), clicked(false), destroye
 		              {2,4}, {3,4},					{-1,-1}
 	};
 	setGroundPlan(p);
+	door d[] = {
+		{2,4, DOWNWARD},
+		{3,4, DOWNWARD}
+	};
+	doors.push_back(d[0]);
+	doors.push_back(d[1]);
 }
 Building::~Building()
 {

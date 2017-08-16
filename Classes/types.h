@@ -22,6 +22,16 @@ typedef struct floatcoord {
 	float a, b;
 } floatcoord;
 
+#define LEFTWARD  0
+#define UPWARD    1
+#define RIGHTWARD 2
+#define DOWNWARD  3
+
+typedef int direction;
+typedef struct door {
+	intcoord coord;
+	direction orientation;
+} door;
 
 // Events
 

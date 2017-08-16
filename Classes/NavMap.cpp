@@ -141,7 +141,9 @@ void NavMap::addBuilding(Building *b) {
 	// for each node X in ground plan
 	for (int i=0; i < plan->size(); i++) {
 		intcoord c = (*plan)[i];
-		NavNode *X = nodeAt(c.x + bx, c.y + by);
+		c.x += bx, c.y += by;
+		if (c.x < 0 || c.y < 0 || c.x >= w || c.y >= h) continue;
+		NavNode *X = nodeAt(c.x, c.y);
 		
 		// for each of neighbour of X, Y
 		std::vector<NavNode *> *neighbours = &X->neighbours;
@@ -197,6 +199,26 @@ void NavMap::addBuilding(Building *b) {
 			if (!X->hasNeighbour(n1) && !X->hasNeighbour(n2))
 				n1->removeNeighbour(n2), n2->removeNeighbour(n1);
 		}
+	}
+	
+	// add door connections
+	std::vector<door> *doors = &b->doors;
+	door *d;
+	for (int i=0; i < doors->size(); i++) {
+		d = &(*doors)[i];
+		intcoord cY, cX = { d->coord.x + bx, d->coord.y + by };
+		switch (d->orientation) {
+			case LEFTWARD:  cY.x = cX.x - 1; cY.y = cX.y;     break;
+			case RIGHTWARD: cY.x = cX.x + 1; cY.y = cX.y;     break;
+			case UPWARD:    cY.x = cX.x;     cY.y = cX.y - 1; break;
+			case DOWNWARD:  cY.x = cX.x;     cY.y = cX.y + 1; break;
+			default: return;
+		}
+		if (cX.x < 0 || cX.y < 0 || cX.x >= w || cX.y >= h) return;
+		if (cY.x < 0 || cY.y < 0 || cY.x >= w || cY.y >= h) return;
+		NavNode *X = nodeAt(cX.x, cX.y), *Y = nodeAt(cY.x, cY.y);
+		X->addNeighbour(Y);
+		Y->addNeighbour(X);
 	}
 }
 void NavMap::removeBuilding(Building *b) {

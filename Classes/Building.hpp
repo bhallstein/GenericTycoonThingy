@@ -24,7 +24,8 @@ public:
 
 	// Properties
 	bool destroyed;
-
+	std::vector<door> doors;		// Doors. These should be on the edge of the building. lol.
+									// See types.h for what a door looks like.
 protected:
 	// Properties
 	bool clicked;
