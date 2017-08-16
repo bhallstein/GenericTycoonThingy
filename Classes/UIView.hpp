@@ -29,7 +29,7 @@ public:
 	~UIView();
 	
 	void processMouseEvent(Event *);
-	void subscribe(const char *, Callback *);
+	void subscribeToButtons(Callback *);
 	
 protected:
 	ResponderMap *rm;
@@ -37,7 +37,7 @@ protected:
 	intcoord drag_initial;
 	
 	std::vector<Button *> buttons;
-	std::map<std::string, Callback *> subscriptions;
+	std::vector<Callback*> subscribers;
 };
 
 #endif

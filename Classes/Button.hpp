@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "types.hpp"
+#include "Event.hpp"
 
 class Button {
 public:
@@ -18,15 +19,15 @@ public:
 	// Methods
 	void setHover();
 	const char * col();
+	Event* getEvent();
 	
 	// Properties
-	std::string action;
 	int x, y, width, height;
 
 protected:
 	// Properties
 	bool hover;
-	
+	Event event;
 };
 
 #endif

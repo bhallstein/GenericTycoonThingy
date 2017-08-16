@@ -12,16 +12,16 @@
 
 class CallbackBase {
 public:
-	virtual void call() = 0;
+	virtual void call(Event *) = 0;
 };
 
 template <class T>
 class MFCallback : public CallbackBase {
-	typedef void (T::*mftype)();
+	typedef void (T::*mftype)(Event *);
 public:
 	MFCallback(mftype _f, T *_o) : f(_f), o(_o) { }
-	void call() {
-		(o->*f)();
+	void call(Event *ev) {
+		(o->*f)(ev);
 	}
 private:
 	mftype f;
@@ -31,9 +31,9 @@ private:
 class Callback {
 public:
 	template <class T>
-	Callback(void (T::*_f)(), T *_o) : s(new MFCallback<T>(_f, _o)) { }
-	void call() {
-		s->call();
+	Callback(void (T::*_f)(Event *), T *_o) : s(new MFCallback<T>(_f, _o)) { }
+	void call(Event *ev) {
+		s->call(ev);
 	}
 private:
 	CallbackBase *s;

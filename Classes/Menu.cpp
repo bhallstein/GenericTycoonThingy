@@ -10,7 +10,7 @@ Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 	menuview = new MenuView(_theW, aniston, &responderMap);
 	responderMap.addResponder(menuview);
 	
-	menuview->subscribe("start level", new Callback(&Menu::startLevelOne, this));
+	menuview->subscribeToButtons(new Callback(&Menu::receiveEvent, this));
 	
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
@@ -48,6 +48,10 @@ void Menu::receiveEvent(Event *ev) {
 		if (ev->key == Event::K_ESC)
 			game->stateFinished(this, Returny(Returny::empty_returny));
 	}
+	else if (ev->type == Event::BUTTONCLICK) {
+		if (ev->payload == "start level 1")
+			startLevel("level1.lua");
+	}
 }
 
 void Menu::startLevel(std::string path) {
@@ -63,16 +67,13 @@ void Menu::startLevel(std::string path) {
 		theW->warning(msg.c_str());
 	}
 }
-void Menu::startLevelOne() {
-	startLevel("level1.lua");
-}
 
 
 #include "../W.hpp"
 
 MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
 {
-	buttons.push_back(new Button(100, 200, 240, 135, "start level"));
+	buttons.push_back(new Button(100, 200, 240, 135, "start level 1"));
 }
 void MenuView::draw() {
 	for (int i=0, n = buttons.size(); i < n; i++) {

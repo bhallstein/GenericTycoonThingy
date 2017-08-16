@@ -6,20 +6,22 @@
 #ifndef EVENTEROONY_H	// EVENT_H seems to be reserved on OS X
 #define EVENTEROONY_H
 
+#include <string>
+
 class Event {
 public:
 	Event() { }
 	~Event() { }
 	
-	// Properties
 	enum event_type {
 		KEYPRESS,
 		MOUSEMOVE, LEFTCLICK, RIGHTCLICK,
 		LEFTMOUSEDOWN,
 		SCREENEDGE_TOP, SCREENEDGE_BOTTOM, SCREENEDGE_LEFT, SCREENEDGE_RIGHT,
 		CLOSED,
+		BUTTONCLICK,
 		UNKNOWN_EVENT
-	} type;
+	};
 	enum key_code {
 		K_A,	K_B,	K_C,	K_D,
 		K_E,	K_F,	K_G,	K_H,
@@ -40,18 +42,21 @@ public:
 		K_HOME, K_END,
 		
 		K_OTHER
-	} key;
-	int x, y;		// Block coords
-	float a, b;		// Float coords (offset)
+	};
 	
-	// Methods
 	void setCoords(int _x, int _y, int _a = 0, int _b = 0) {
 		x = _x, y = _y;
 		a = _a, b = _b;
 	}
-	void setType(event_type _type) { type = _type; }
-	void setKey(key_code _key) { key = _key; }
+	void setType(event_type _type)  { type = _type; }
+	void setKey(key_code _key)      { key = _key; }
+	void setPayload(const char *_p) { payload = _p; }
 	
+	int x, y;		// Block coords
+	float a, b;		// Float coords (offset)
+	event_type type;
+	key_code key;
+	std::string payload;
 };
 
 #endif

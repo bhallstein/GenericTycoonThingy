@@ -96,7 +96,6 @@ void Unit::incrementAnimation() {
 		animation_finished = true;
 		rotation = 0;
 		mode = IDLE;
-		printDebugInfo();
 	}
 }
 

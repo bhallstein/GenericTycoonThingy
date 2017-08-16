@@ -24,8 +24,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
 	uibarview = new UIBarView(theW, aniston, &responderMap);
 	responderMap.addResponder(uibarview);
-	uibarview->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
-	uibarview->subscribe("open hiring ui view", new Callback(&Level::openHiringView, this));
+	uibarview->subscribeToButtons(new Callback(&Level::receiveEvent, this));
 	
 	// Subscribe to screenedge events
 	responderMap.subscribeToEventType(this, Event::SCREENEDGE_LEFT);
@@ -252,6 +251,15 @@ void Level::receiveEvent(Event *ev) {
 		if (ev->key == Event::K_C)   createFurnishing("barberschair");
 		if (ev->key == Event::K_S)   createFurnishing("sofa");
 	}
+	else if (ev->type == Event::BUTTONCLICK) {
+		if (ev->payload == "open hiring ui view") openHiringView();
+		else if (ev->payload == "close hiring ui view")               closeHiringView();
+		else if (ev->payload == "close furnishing purchasing ui view") closeFurnishingPurchasingView();
+		else if (ev->payload == "hire staff") hireStaff("staff");
+		else if (ev->payload == "buy furnishing barberschair") purchaseFurnishing("barberschair");
+		else if (ev->payload == "buy furnishing sofa")         purchaseFurnishing("sofa");
+		else if (ev->payload == "buy furnishing piecounter")   purchaseFurnishing("piecounter");
+	}
 }
 
 void Level::handleCloseEvent() {
@@ -304,29 +312,17 @@ Behaviour* Level::createBehaviour(const char *_type) {
 	behaviours.push_back(bhvr);
 	return bhvr;
 }
-void Level::createBarbersChair() { 
-	if(chargePlayer(Furnishing::getFurnishingCost("barberschair")))
-		createFurnishing("barberschair");
+void Level::purchaseFurnishing(const char *type) {
+	if (chargePlayer(Furnishing::getFurnishingCost(type)))
+		createFurnishing(type);
 	else
-		W::log("Not enough money to buy a Barber's Chair!");
+		std::cout << "not enough money to buy a " << type << std::endl;
 }
-void Level::createSofa() { 
-	if(chargePlayer(Furnishing::getFurnishingCost("sofa")))
-		createFurnishing("sofa");
+void Level::hireStaff(const char *type) { 
+	if(chargePlayer(Unit::getUnitHireCost(type)))
+		createUnit(0, 0, type);
 	else
-		W::log("Not enough money to buy a Sofa!");
-}
-void Level::createPieCounter() { 
-	if(chargePlayer(Furnishing::getFurnishingCost("piecounter")))
-		createFurnishing("piecounter");
-	else
-		W::log("Not enough money to buy a Pie Counter!");
-}
-void Level::createStaffUnit() { 
-	if(chargePlayer(Unit::getUnitHireCost("staff")))
-		createUnit(0, 0, "staff");
-	else
-		W::log("Not enough money to hire a Staff!");
+		std::cout << "not enough money to hire a " << type << std::endl;
 }
 
 void Level::destroyThings() {
@@ -391,11 +387,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
 	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, &responderMap, b->b_allowedFurnishings);
 	responderMap.addResponder(furnishingPurchasingView);
-	
-	furnishingPurchasingView->subscribe("close", new Callback(&Level::closeFurnishingPurchasingView, this));
-	furnishingPurchasingView->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
-	furnishingPurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
-	furnishingPurchasingView->subscribe("create piecounter", new Callback(&Level::createPieCounter, this));
+	furnishingPurchasingView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
 }
 void Level::closeFurnishingPurchasingView() {
 	responderMap.removeResponder(furnishingPurchasingView);
@@ -408,10 +400,7 @@ void Level::openHiringView() {
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 10, 320, 140, 200);
 	hiringUIView = new HiringUIView(theW, aniston, &responderMap);
 	responderMap.addResponder(hiringUIView);
-	
-	// Subscriptions
-	hiringUIView->subscribe("close", new Callback(&Level::closeHiringView, this));
-	hiringUIView->subscribe("hire staff", new Callback(&Level::createStaffUnit, this));
+	hiringUIView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
 }
 void Level::closeHiringView() {
 	responderMap.removeResponder(hiringUIView);
@@ -527,10 +516,10 @@ void UIBarView::draw() {
 FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, std::vector<std::string> *_furnishingTypes) :
 	UIView(_theW, _aniston, _rm, ALLOW_DRAG), furnishingTypes(_furnishingTypes)
 {
-	buttons.push_back(new Button(7, 7, 12, 12, "close"));
+	buttons.push_back(new Button(7, 7, 12, 12, "close furnishing purchasing ui view"));
 	// Add buttons for creating furnishing
 	for (int i=0, n = furnishingTypes->size(); i < n; i++) {
-		std::string s("create ");
+		std::string s("buy furnishing ");
 		s += furnishingTypes->at(i);
 		buttons.push_back(
 			new Button(7 + (20 + 10)*i, 30, 20, 20, s.c_str())
@@ -548,7 +537,7 @@ void FurnishingPurchasingUIView::draw() {
 
 HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, ALLOW_DRAG)
 {
-	buttons.push_back(new Button(7, 7, 12, 12, "close"));
+	buttons.push_back(new Button(7, 7, 12, 12, "close hiring ui view"));
 	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));
 }
 

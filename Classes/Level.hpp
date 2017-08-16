@@ -48,7 +48,6 @@ public:
 
 	void handleCloseEvent();		// Will need to prompt for save, probably
 	void receiveEvent(Event *);		// Level is also an eventresponder, so can itself subscribe directly to events
-	void buttonClick(Button *);
 	
 	void setResolution(int _w, int _h);
 	
@@ -57,10 +56,8 @@ public:
 	Building*   createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
 	Furnishing* createFurnishing(const char *type);
 	Behaviour*  createBehaviour(const char *type);
-	void createBarbersChair();
-	void createSofa();
-	void createPieCounter();
-	void createStaffUnit();
+	void purchaseFurnishing(const char *type);
+	void hireStaff(const char *type);
 	
 	void destroyThings();
 	void destroyAllThings();

@@ -12,6 +12,9 @@ UIView::UIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, bool _all
 UIView::~UIView()
 {
 	std::cout << "uiview destruct" << std::endl;
+	// Destroy callbacks
+	for (std::vector<Callback*>::iterator it = subscribers.begin(); it != subscribers.end(); it++)
+		delete *it;
 }
 
 void UIView::processMouseEvent(Event *ev) {
@@ -46,13 +49,12 @@ void UIView::processMouseEvent(Event *ev) {
 	if (ev->type == Event::MOUSEMOVE)
 		b->setHover();	// Set button to hovered
 	else if (ev->type == Event::LEFTCLICK) {
-		// Call any callbacks subcribed to that button's associated event
-		std::map<std::string, Callback *>::iterator it = subscriptions.find(b->action);
-		if (it != subscriptions.end())
-			(*it).second->call();
+		// Call callbacks
+		for (int i=0, n = subscribers.size(); i < n; i++)
+			subscribers[i]->call(b->getEvent());
 	}
 }
 
-void UIView::subscribe(const char *_action, Callback *_callback) {
-	subscriptions[_action] = _callback;
+void UIView::subscribeToButtons(Callback *_callback) {
+	subscribers.push_back(_callback);
 }
