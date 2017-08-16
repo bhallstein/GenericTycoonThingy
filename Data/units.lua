@@ -9,7 +9,7 @@ unitTypes = {
 	},
 	staff = {
 		colour = "green",
-		hoverColour = "red",
+		hoverColour = "yellow",
 		hireCost = 10
 	}
 }

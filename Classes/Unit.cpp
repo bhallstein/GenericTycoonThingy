@@ -3,14 +3,15 @@
 #include "LuaHelper.hpp"
 #include "Building.hpp"
 #include "Level.hpp"
+#include "Furnishing.hpp"
 
 std::map<std::string, struct unitInfo> Unit::unitTypes;
 std::string Unit::defaultColour;
 std::string Unit::defaultHoverColour;
 
-Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level) :
-	MappedObj(_rm, false), navmap(_navmap), type(_type), level(_level),
-	hover(false), stage(0)
+Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
+	MappedObj(_rm, _placeableMode), navmap(_navmap), type(_type), level(_level),
+	hover(false), mode(IDLE)
 {
 	intcoord c = {0,0};
 	groundplan.push_back(c);
@@ -19,10 +20,19 @@ Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level)
 	u_colour      = &Unit::unitTypes[type].col;
 	u_hoverColour = &Unit::unitTypes[type].hoverCol;
 }
-Unit::~Unit() { }
+Unit::~Unit()
+{
+	std::cout << "Unit destruct" << std::endl;
+}
 
 bool Unit::canPlace(int _x, int _y) {
 	return navmap->isPassableAt(_x, _y);
+}
+void Unit::finalizePlacement() {
+	if (placeableMode) {
+		if (Building *b = level->buildingAtLocation(x, y))
+			b->addStaff(this);
+	}
 }
 
 void Unit::receiveEvent(Event *ev) {
@@ -35,143 +45,48 @@ const char * Unit::col() {
 	return u_colour->c_str();
 }
 
-void Unit::addIntention(Intention::Enum _intention) {
-	intentions.push_back(_intention);
-}
-
 void Unit::update() {
 	if (hover) return;
-	Intention::Enum curIntention = intentions.empty() ? Intention::NONE : intentions[0];
-	if (curIntention == Intention::HAIRCUT)       intentionUpdate_Haircut();
-	else if (curIntention == Intention::PIE)      intentionUpdate_Pie();
-	else if (curIntention == Intention::DESTRUCT) intentionUpdate_Destruct();
+	else if (mode == IDLE) { }
+	else if (mode == WAITING && ++frames_waited >= 60) voyage(dest_x, dest_y);
+	else if (mode == VOYAGING) if (!incrementLocation()) wait();
 }
 
-void Unit::intentionUpdate_Haircut() {
-	if (stage == -1) {		// Waiting
-		if (++frames_waited >= 60) stage++;
-	}
-	else if (stage == 0) {	// Route to barber shop
-		dest_building = level->randomBuildingWithType("barber");
-		if (dest_building == NULL)
-			frames_waited = 0, stage = -1;
-		else {
-			dest_building->getEntryPoint(&dest_x, &dest_y);
-			if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-				stage++;
-			else
-				frames_waited = 0, stage = -1;
-		}
-	}
-	else if (stage == 1) {	// Move to destination
-		if (atDest()) stage++;
-		else if (!incrementLocation()) stage = 0;
-	}
-	else if (stage == 2) {	// Entry negotiation
-		dest_building->getQueuePoint(&dest_x, &dest_y);
-		stage += 2;
-	}
-	else if (stage == 3) {	// Waiting
-		if (++frames_waited >= 60) stage++;
-	}
-	else if (stage == 4) {	// Route to queue point
-		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-			stage++;
-		else
-			frames_waited = 0, stage = 3;
-	}
-	else if (stage == 5) {	// Move to queue point
-		if (atDest()) frames_waited = 0, stage++;
-		else if (!incrementLocation()) stage = 4;
-	}
-	else if (stage == 6) {	// Queue
-		if (++frames_waited == 60) nextIntention();
-	}
+/*** Utility methods ***/
+
+void Unit::getDespawnPoint(int *x, int *y) {
+	int w = navmap->w, h = navmap->h, n = W::randUpTo(2*w + 2*h - 4);
+	if (n < w)            *x = n,     *y = 0;
+	else if (n < 2*w)     *x = n - w, *y = h - 1;
+	else if (n < 2*w + h) *x = 0,     *y = n - 2*w;
+	else                  *x = w - 1, *y = n - (2*w + h);
 }
-void Unit::intentionUpdate_Pie() {
-	if (stage == -1) {		// Waiting
-		if (++frames_waited >= 60) stage++;
-	}
-	else if (stage == 0) {	// Route to barber shop
-		dest_building = level->randomBuildingWithType("pieshop");
-		if (dest_building == NULL)
-			frames_waited = 0, stage = -1;
-		else {
-			dest_building->getEntryPoint(&dest_x, &dest_y);
-			if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-				stage++;
-			else
-				frames_waited = 0, stage = -1;
-		}
-	}
-	else if (stage == 1) {	// Move to destination
-		if (atDest()) stage++;
-		else if (!incrementLocation()) stage = 0;
-	}
-	else if (stage == 2) {	// Entry negotiation
-		dest_building->getQueuePoint(&dest_x, &dest_y);
-		stage += 2;
-	}
-	else if (stage == 3) {	// Waiting
-		if (++frames_waited >= 60) stage++;
-	}
-	else if (stage == 4) {	// Route to queue point
-		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-			stage++;
-		else
-			frames_waited = 0, stage = 3;
-	}
-	else if (stage == 5) {	// Move to queue point
-		if (atDest()) frames_waited = 0, stage++;
-		else if (!incrementLocation()) stage = 4;
-	}
-	else if (stage == 6) {	// Queue
-		if (++frames_waited == 60) nextIntention();
-	}
+void Unit::despawn() {
+	destroyed = true;
 }
-void Unit::intentionUpdate_Destruct() {
-	if (stage == -1) {		// Waiting
-		if (++frames_waited == 60) stage++;
-	}
-	else if (stage == 0) {	// Find route to despawn loc
-		switch(W::randUpTo(4))
-		{
-			case 0: //head left
-				dest_x = 0, dest_y = W::randUpTo(navmap->h);
-				break;
-			case 1: //head right
-				dest_x = navmap->w-1, dest_y = W::randUpTo(navmap->h);
-				break;
-			case 2: //head up
-				dest_y = 0, dest_x = W::randUpTo(navmap->w);
-				break;
-			case 3: //head down
-				dest_y = navmap->h-1, dest_x = W::randUpTo(navmap->w);
-				break;
-		}
-		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-			stage++;
-		else
-			frames_waited = 0, stage = -1;
-	}
-	else if (stage == 1) {	// Move to despawn loc
-		if (atDest()) stage++;
-		else if (!incrementLocation()) stage = 0;
-	}
-	else if (stage == 2) {	// Despawn
-		destroyed = true;
-	}
+bool Unit::voyage(int _x, int _y) {
+  	arrived = false;
+	bool success = navmap->getRoute(x, y, dest_x = _x, dest_y = _y, &route);
+	if (success) mode = VOYAGING;
+	return success;
 }
-void Unit::nextIntention() {
-	stage = 0;
-	if (!intentions.empty()) intentions.erase(intentions.begin());
+void Unit::runAnimation(/* ... */) {
+	// ...
 }
 
+void Unit::wait() {
+	frames_waited = 0;
+	mode = WAITING;
+}
 
 bool Unit::incrementLocation() {
-	if (atDest()) return true;
+	if (atDest()) {
+		arrived = true;
+		mode = IDLE;
+		return true;
+	}
 	
-	float step = 0.05;
+	float step = 0.25;
 	float a_diff = 0, b_diff = 0;
 	bool diagonal = x != prev_x && y != prev_y;
 	
@@ -182,7 +97,7 @@ bool Unit::incrementLocation() {
 	bool reached_next = (diagonal && a*a + b*b < 2*step*step) || (!diagonal && t*t < step*step);
 	if (reached_next) {
 		if (route.empty())
-			a = b = 0;			// Arrived!
+			a = b = 0;		// Arrived!
 		else {
 			// Get next in route
 			int c = route[0]->x, d = route[0]->y;
@@ -221,7 +136,7 @@ inline bool Unit::inHinterland() {
 }
 
 bool Unit::initialize(W *_W) {
-	W::log("Unit::initialize() called...");
+	W::log("  Unit::initialize() called...");
 	LuaHelper mrLua(_W);
 	
 	std::string path = _W->resourcesPath;
@@ -234,8 +149,8 @@ bool Unit::initialize(W *_W) {
 	
 	try {
 		// Set Unit defaults
-		Unit::defaultColour           = mrLua.getvalue<const char *>("defaultColour");
-		Unit::defaultHoverColour      = mrLua.getvalue<const char *>("defaultHoverColour");
+		Unit::defaultColour      = mrLua.getvalue<const char *>("defaultColour");
+		Unit::defaultHoverColour = mrLua.getvalue<const char *>("defaultHoverColour");
 	} catch (MsgException &exc) {
 		std::string s = "In units.lua, could not get defaults. Error: "; s.append(exc.msg);
 		W::log(s.c_str());
@@ -263,13 +178,12 @@ bool Unit::initialize(W *_W) {
 		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
 		lua_pop(L, 1);
 
-		lua_getfield(L, -1, "hireCost");	// S: -1 colour; 2 subtable; -3 key; -4 table
+		lua_getfield(L, -1, "hireCost");			// S: -1 colour; 2 subtable; -3 key; -4 table
 		uInfo->hireCost = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
 
 		lua_pop(L, 2);								// S: -1 key; -2 table
 	}
 	
-	W::log("...initialization succeeded.");
 	return true;
 }
 int Unit::getUnitHireCost(std::string _unitKey) {

@@ -3,7 +3,7 @@
 #include "ResponderMap.hpp"
 #include "NavMap.hpp"
 #include "Building.hpp"
-#include "Furniture.hpp"
+#include "Furnishing.hpp"
 #include "Placeable.hpp"
 #include "Unit.hpp"
 #include "LuaHelper.hpp"
@@ -16,7 +16,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	currentlyEditedBuilding = NULL;
 	levelview = NULL;
 	uibarview = NULL;
-	furniturePurchasingView = NULL;
+	furnishingPurchasingView = NULL;
 	hiringUIView = NULL;
 
 	buildLevel(levelpath);
@@ -46,7 +46,7 @@ Level::~Level()
 	delete navmap;
 	delete levelview;
 	delete uibarview;
-	delete furniturePurchasingView;
+	delete furnishingPurchasingView;
 }
 
 void Level::buildLevel(std::string levelname) {
@@ -61,9 +61,9 @@ void Level::buildLevel(std::string levelname) {
 	lua_State *L = mrLua.LuaInstance;
 	
 	// Initialize TLO classes
-	if (!Building::initialize(theW))  throw MsgException("Couldn't read building info.");
-	if (!Unit::initialize(theW))      throw MsgException("Couldn't read unit info.");
-	if (!Furniture::initialize(theW)) throw MsgException("Couldn't read furniture info.");
+	if (!Building::initialize(theW))   throw MsgException("Couldn't read building info.");
+	if (!Unit::initialize(theW))       throw MsgException("Couldn't read unit info.");
+	if (!Furnishing::initialize(theW)) throw MsgException("Couldn't read furnishing info.");
 	
 	// Set level width and height
 	try {
@@ -90,7 +90,7 @@ void Level::buildLevel(std::string levelname) {
 	
 	// Create levelview
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furniture, &units, &staff, w, h);
+	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &furnishings, &units, &staff, w, h);
 	responderMap.addResponder(levelview);
 	
 	// Get allowed buildings
@@ -98,7 +98,7 @@ void Level::buildLevel(std::string levelname) {
 		mrLua.pushtable("allowedBuildings");
 		lua_pushnil(L);									// S: -1 nil; -2 table
 		int n = 0;
-		std::string s = "allowedBuildings: ";
+		std::string s = "  allowedBuildings: ";
 		while (lua_next(L, -2) != 0) {					// S: -1 val; -2 key; -3 table
 			if (!lua_isstring(L, -1)) {
 				lua_pop(L, 1);
@@ -109,12 +109,9 @@ void Level::buildLevel(std::string levelname) {
 			n++;
 			lua_pop(L, 1);								// S: -1 key; -2 table
 		}
-		if (n > 0) {
+		if (n > 0)
 			s.erase(s.size() - 2);
-			W::log(s.c_str());
-		}
-		else
-			W::log("No building types in allowedBuildings.");
+		W::log(s.c_str());
 		lua_settop(L, 0);	// S: ~
 	} catch (MsgException &exc) {
 		std::string s = "Error getting list of allowed buildings for level: ";
@@ -164,10 +161,10 @@ void Level::buildLevel(std::string levelname) {
 					d.coord.x = mrLua.getfield<int>(1);
 					d.coord.y = mrLua.getfield<int>(2);
 					const char *dir = mrLua.getfield<const char *>(3);
-					if (strcmp(dir, "upward") == 0)         d.orientation = UPWARD;
-					else if (strcmp(dir, "downward") == 0)  d.orientation = DOWNWARD;
-					else if (strcmp(dir, "leftward") == 0)  d.orientation = LEFTWARD;
-					else if (strcmp(dir, "rightward") == 0) d.orientation = RIGHTWARD;
+					if (strcmp(dir, "upward") == 0)         d.orientation = Direction::UPWARD;
+					else if (strcmp(dir, "downward") == 0)  d.orientation = Direction::DOWNWARD;
+					else if (strcmp(dir, "leftward") == 0)  d.orientation = Direction::LEFTWARD;
+					else if (strcmp(dir, "rightward") == 0) d.orientation = Direction::RIGHTWARD;
 					doors.push_back(d);
 					lua_pop(L, 1);							// S: -1 key; -2 doors; -3 building; -4 key; -5 buildings
 				}											// S: -1 doors; -2 building; -3 key; -4 buildings
@@ -213,19 +210,27 @@ void Level::resume(Returny *returny) {
 void Level::update() {
 	intcoord c;
 	for (int i=0, n = spawnPoints.size(); i < n; i++)
-		if (spawnPoints[i]->spawn(&c))
-			createUnit(c.x, c.y, "civilian");
+		if (spawnPoints[i]->spawn(&c)) {
+			Unit *u = createUnit(c.x, c.y, "civilian");
+			int q = W::randUpTo(2);
+			if (q == 0)
+				createBehaviour("despawn")->init(u);
+			else
+				createBehaviour("seekhaircut")->init(this, u);
+		}
 	
 	// Update TLOs
-	for (int i=0, n = units.size(); i < n; i++) units[i]->update();
-	for (int i=0, n = staff.size(); i < n; i++) staff[i]->update();
+	for (int i=0, n = units.size(); i < n; i++)      units[i]->update();
+	for (int i=0, n = staff.size(); i < n; i++)      staff[i]->update();
+	for (int i=0, n = buildings.size(); i < n; i++)  buildings[i]->update();
+	for (int i=0, n = behaviours.size(); i < n; i++) behaviours[i]->update();
 	
 	destroyThings();	// Removed destroyed objects.
 }
 void Level::draw() {
 	levelview->_draw();
 	uibarview->_draw();
-	if (furniturePurchasingView != NULL) furniturePurchasingView->_draw();
+	if (furnishingPurchasingView != NULL) furnishingPurchasingView->_draw();
 	if (hiringUIView != NULL) hiringUIView->_draw();
 }
 void Level::setResolution(int _w, int _h) {
@@ -235,15 +240,15 @@ void Level::setResolution(int _w, int _h) {
 }
 
 void Level::receiveEvent(Event *ev) {
-	if (ev->type == Event::SCREENEDGE_LEFT)        levelview->scroll(LEFTWARD);
-	else if (ev->type == Event::SCREENEDGE_RIGHT)  levelview->scroll(RIGHTWARD);
-	else if (ev->type == Event::SCREENEDGE_TOP)    levelview->scroll(UPWARD);
-	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(DOWNWARD);
+	if (ev->type == Event::SCREENEDGE_LEFT)        levelview->scroll(Direction::LEFTWARD);
+	else if (ev->type == Event::SCREENEDGE_RIGHT)  levelview->scroll(Direction::RIGHTWARD);
+	else if (ev->type == Event::SCREENEDGE_TOP)    levelview->scroll(Direction::UPWARD);
+	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(Direction::DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q)   game->stateFinished(this, Returny(Returny::killer_returny));
 		if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
-		if (ev->key == Event::K_C)   createFurniture("barberschair");
-		if (ev->key == Event::K_S)   createFurniture("sofa");
+		if (ev->key == Event::K_C)   createFurnishing("barberschair");
+		if (ev->key == Event::K_S)   createFurnishing("sofa");
 	}
 }
 
@@ -252,26 +257,23 @@ void Level::handleCloseEvent() {
 }
 
 Unit* Level::createUnit(int atX, int atY, const char *type) {
-	std::vector<Unit*> *vctr = &units;
-	Unit *u = new Unit(levelResponderMap, navmap, type, this);
+	Unit *u;
+	std::vector<Unit*> *vctr;
+	bool initsuccess;
 	if (strcmp(type, "staff") == 0) {
-		// Find the asylum (spawn building) amongst our buildings
-		// Note: this method will use the first asylum it finds
-		for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
-			if ((*i)->type == "asylum") {
-				atX = (*i)->x;
-				atY = (*i)->y;
-				break;
-			}
+		u = new Unit(levelResponderMap, navmap, type, this, true);
 		vctr = &staff;
+		initsuccess = u->init(0, 0);
 	}
 	else {
-		u->addIntention(W::randUpTo(2) == 0 ? Intention::HAIRCUT : Intention::PIE);
-		u->addIntention(Intention::DESTRUCT);
+		u = new Unit(levelResponderMap, navmap, type, this, false);
+		vctr = &units;
+		initsuccess = u->init(atX, atY);
 	}
-	if (u->init(atX, atY)) {
+	if (initsuccess) {
 		vctr->push_back(u);
-		std::cout << "added unit " << u << " of type '" << type << "' (now " << vctr->size() << ")" << std::endl;
+		char s[50]; sprintf(s, "added unit %p of type '%s' (now %ld)", u, type, vctr->size());
+		std::cout << s << std::endl;
 		return u;
 	}
 	return NULL;
@@ -285,15 +287,22 @@ Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<
 	}
 	return NULL;
 }
-void Level::createFurniture(const char *type) {
-	Furniture *f = new Furniture(levelResponderMap, navmap, type, currentlyEditedBuilding);
+Furnishing* Level::createFurnishing(const char *type) {
+	Furnishing *f = new Furnishing(levelResponderMap, navmap, type, currentlyEditedBuilding);
 	if (f->init(-100, -100)) {
-		furniture.push_back(f);
-		std::cout << "added furniture " << f << " (now " << furniture.size() << ")" << std::endl;
+		furnishings.push_back(f);
+		std::cout << "added furnishing " << f << " (now " << furnishings.size() << ")" << std::endl;
+		return f;
 	}
+	return NULL;
 }
-void Level::createBarbersChair() { createFurniture("barberschair"); }
-void Level::createSofa() { createFurniture("sofa"); }
+Behaviour* Level::createBehaviour(const char *_type) {
+	Behaviour *bhvr = new Behaviour(_type);
+	behaviours.push_back(bhvr);
+	return bhvr;
+}
+void Level::createBarbersChair() { createFurnishing("barberschair"); }
+void Level::createSofa() { createFurnishing("sofa"); }
 void Level::createStaffUnit() { 
 	if(chargePlayer(Unit::getUnitHireCost("staff")))
 		createUnit(0, 0, "staff");
@@ -302,10 +311,10 @@ void Level::createStaffUnit() {
 }
 
 void Level::destroyThings() {
-	for (std::vector<Furniture*>::iterator i = furniture.begin(); i < furniture.end(); )
+	for (std::vector<Furnishing*>::iterator i = furnishings.begin(); i < furnishings.end(); )
 		if ((*i)->destroyed) {
 			delete *i;
-			i = furniture.erase(i);
+			i = furnishings.erase(i);
 		}
 		else i++;
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
@@ -326,11 +335,18 @@ void Level::destroyThings() {
 			i = staff.erase(i);
 		}
 		else i++;
+	for (std::vector<Behaviour*>::iterator i = behaviours.begin(); i < behaviours.end(); )
+		if ((*i)->destroyed()) {
+			delete *i;
+			i = behaviours.erase(i);
+		}
+		else i++;
 }
 void Level::destroyAllThings() {
-	for (int i = 0; i < furniture.size(); i++) furniture[i]->destroyed = true;
-	for (int i = 0; i < buildings.size(); i++) buildings[i]->destroyed = true;
-	for (int i = 0; i < units.size(); i++)     units[i]->destroyed = true;
+	for (int i=0; i < furnishings.size(); i++) furnishings[i]->destroyed = true;
+	for (int i=0; i < buildings.size(); i++)   buildings[i]->destroyed = true;
+	for (int i=0; i < units.size(); i++)       units[i]->destroyed = true;
+	for (int i=0; i < behaviours.size(); i++)  behaviours[i]->destroy();
 	destroyThings();
 }
 
@@ -341,22 +357,30 @@ Building* Level::randomBuildingWithType(const char *_type) {
 			indices[nOfType++] = i;
 	return nOfType == 0 ? NULL : buildings[indices[W::randUpTo(nOfType)]];
 }
+Building* Level::buildingAtLocation(int x, int y) {
+	for (int i=0, n = buildings.size(); i < n; i++) {
+		Building *b = buildings[i];
+		if (b->overlapsWith(x, y))
+			return b;
+	}
+	return NULL;
+}
 
-void Level::openFurniturePurchasingView(Building *b) {
-	if (furniturePurchasingView != NULL) return;
+void Level::openFurnishingPurchasingView(Building *b) {
+	if (furnishingPurchasingView != NULL) return;
 	currentlyEditedBuilding = b;
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
-	furniturePurchasingView = new FurniturePurchasingUIView(theW, aniston, b->b_allowedFurniture);
-	responderMap.addResponder(furniturePurchasingView);
+	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, b->b_allowedFurnishings);
+	responderMap.addResponder(furnishingPurchasingView);
 	
-	furniturePurchasingView->subscribe("close", new Callback(&Level::closeFurniturePurchasingView, this));
-	furniturePurchasingView->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
-	furniturePurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
+	furnishingPurchasingView->subscribe("close", new Callback(&Level::closeFurnishingPurchasingView, this));
+	furnishingPurchasingView->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
+	furnishingPurchasingView->subscribe("create sofa", new Callback(&Level::createSofa, this));
 }
-void Level::closeFurniturePurchasingView() {
-	responderMap.removeResponder(furniturePurchasingView);
-	delete furniturePurchasingView;
-	furniturePurchasingView = NULL;
+void Level::closeFurnishingPurchasingView() {
+	responderMap.removeResponder(furnishingPurchasingView);
+	delete furnishingPurchasingView;
+	furnishingPurchasingView = NULL;
 	currentlyEditedBuilding = NULL;
 }
 void Level::openHiringView() {
@@ -394,11 +418,11 @@ void Level::decreaseMoney(int _amount) {
 LevelView::LevelView(
 	W *_theW, JenniferAniston &_aniston,
 	ResponderMap *_levelRM,
-	std::vector<Building*> *_buildings, std::vector<Furniture*> *_furniture, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
+	std::vector<Building*> *_buildings, std::vector<Furnishing*> *_furnishings, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 	int _level_width, int _level_height
 ) :
 	View(_theW, _aniston),
-	levelResponderMap(_levelRM), buildings(_buildings), furniture(_furniture), units(_units), staff(_staff), 
+	levelResponderMap(_levelRM), buildings(_buildings), furnishings(_furnishings), units(_units), staff(_staff), 
 	level_width(_level_width), level_height(_level_height),
 	scroll_x(0), scroll_y(0)
 {
@@ -429,10 +453,10 @@ void LevelView::drawMappedObj(MappedObj *mo) {
 
 void LevelView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
-	for (int i=0, n = buildings->size(); i < n; i++) drawMappedObj((*buildings)[i]);
-	for (int i=0, n = furniture->size(); i < n; i++) drawMappedObj((*furniture)[i]);
-	for (int i=0, n = units->size(); i < n; i++)     drawMappedObj((*units)[i]);
-	for (int i=0, n = staff->size(); i < n; i++)     drawMappedObj((*staff)[i]);
+	for (int i=0, n = buildings->size(); i < n; i++)   drawMappedObj((*buildings)[i]);
+	for (int i=0, n = furnishings->size(); i < n; i++) drawMappedObj((*furnishings)[i]);
+	for (int i=0, n = units->size(); i < n; i++)       drawMappedObj((*units)[i]);
+	for (int i=0, n = staff->size(); i < n; i++)       drawMappedObj((*staff)[i]);
 }
 
 void LevelView::processMouseEvent(Event *ev) {
@@ -447,13 +471,13 @@ void LevelView::processMouseEvent(Event *ev) {
 	levelResponderMap->dispatchEvent(ev);
 }
 
-void LevelView::scroll(direction dir) {
+void LevelView::scroll(Direction::Enum dir) {
 	int scrolldist = 10;
 	
-	if (dir == UPWARD)         scroll_y -= scrolldist;
-	else if (dir == DOWNWARD)  scroll_y += scrolldist;
-	else if (dir == LEFTWARD)  scroll_x -= scrolldist;
-	else if (dir == RIGHTWARD) scroll_x += scrolldist;
+	if (dir == Direction::UPWARD)         scroll_y -= scrolldist;
+	else if (dir == Direction::DOWNWARD)  scroll_y += scrolldist;
+	else if (dir == Direction::LEFTWARD)  scroll_x -= scrolldist;
+	else if (dir == Direction::RIGHTWARD) scroll_x += scrolldist;
 	
 	if (scroll_x < 0) scroll_x = 0;
 	if (scroll_y < 0) scroll_y = 0;
@@ -479,21 +503,21 @@ void UIBarView::draw() {
 }
 
 
-FurniturePurchasingUIView::FurniturePurchasingUIView(W *_theW, JenniferAniston &_aniston, std::vector<std::string> *_furnitureTypes) :
-	UIView(_theW, _aniston), furnitureTypes(_furnitureTypes)
+FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston &_aniston, std::vector<std::string> *_furnishingTypes) :
+	UIView(_theW, _aniston), furnishingTypes(_furnishingTypes)
 {
 	buttons.push_back(new Button(7, 7, 12, 12, "close"));
-	// Add buttons for creating furniture
-	for (int i=0, n = furnitureTypes->size(); i < n; i++) {
+	// Add buttons for creating furnishing
+	for (int i=0, n = furnishingTypes->size(); i < n; i++) {
 		std::string s("create ");
-		s += furnitureTypes->at(i);
+		s += furnishingTypes->at(i);
 		buttons.push_back(
 			new Button(7 + (20 + 10)*i, 30, 20, 20, s.c_str())
 		);
 	}
 }
 
-void FurniturePurchasingUIView::draw() {
+void FurnishingPurchasingUIView::draw() {
 	theW->drawRect(0, 0, width, height, "black");
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];

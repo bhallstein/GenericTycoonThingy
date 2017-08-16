@@ -11,8 +11,9 @@
 #include "types.hpp"
 #include "EventResponder.hpp"
 #include "ResponderMap.hpp"
-#include "Placeable.hpp"
 #include "../W.hpp"
+
+class Placeable;
 
 class MappedObj : public EventResponder {
 public:
@@ -25,6 +26,7 @@ public:
 	virtual bool canPlace(int _x, int _y) = 0;
 	virtual void update() = 0;
 	virtual const char * col() = 0;
+	bool overlapsWith(int _x, int _y);
 	
 	void setGroundPlan(std::vector<intcoord> *);
 	

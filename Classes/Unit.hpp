@@ -17,21 +17,16 @@ class NavMap;
 class NavNode;
 class Building;
 class Level;
+class Furnishing;
 
 struct unitInfo {
 	std::string col, hoverCol;
 	int hireCost;
 };
 
-namespace Intention {
-	enum Enum {
-		HAIRCUT, PIE, DESTRUCT, NONE
-	};
-};
-
 class Unit : public MappedObj {
 public:
-	Unit(ResponderMap *, NavMap *, const char *_type, Level *);
+	Unit(ResponderMap *, NavMap *, const char *_type, Level *, bool _placeableMode);
 	~Unit();
 	
 	// Properties
@@ -45,32 +40,39 @@ public:
 	void receiveEvent(Event *);
 	void update();
 	bool canPlace(int _x, int _y);
+	void finalizePlacement();
 	const char * col();
 	
-	void addIntention(Intention::Enum);
+	// Utility methods
+	void getDespawnPoint(int *x, int *y);
+	void despawn();
+	bool voyage(int _x, int _y);
+	bool arrived;
+	void runAnimation(/* Animation...? */);
+	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
 
-	//UnitInfo gets
+	// UnitInfo gets
 	static int getUnitHireCost(std::string); //lookup a unitInfo hireCost from unitTypes
 protected:
-	// Intention implementation
-	void intentionUpdate_Haircut();
-	void intentionUpdate_Pie();
-	void intentionUpdate_Destruct();
-	std::vector<Intention::Enum> intentions;
-	int stage;
-	void nextIntention();
+	enum Mode {
+		WAITING,	// Waiting always precedes voyaging?
+		VOYAGING,
+		ANIMATING,
+		IDLE
+	} mode;
+
+	void wait();
+	int frames_waited;
 	
 	bool incrementLocation();		// Move along route. Returns false if an obstacle is encountered.
 	inline bool atDest();
 	inline bool inHinterland();
-
 	
 	// Properties
 	std::string *u_colour;
 	std::string *u_hoverColour;
 	std::string *u_colourWhenMoving;
-	int frames_waited;
 	NavMap *navmap;
 	std::vector<NavNode *> route;
 	bool hover;

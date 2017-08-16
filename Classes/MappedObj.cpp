@@ -1,4 +1,5 @@
 #include "MappedObj.hpp"
+#include "Placeable.hpp"
 
 MappedObj::MappedObj(ResponderMap *_rm, bool _placeableMode) :
 	rm(_rm), placeableMode(_placeableMode), placeable(NULL), destroyed(false), hover(false), a(0), b(0)
@@ -38,4 +39,13 @@ bool MappedObj::attemptToPlace(int _x, int _y) {
 
 void MappedObj::setGroundPlan(std::vector<intcoord> *_p) {
 	groundplan = *_p;
+}
+
+bool MappedObj::overlapsWith(int _x, int _y) {
+	for (int i=0, n = groundplan.size(); i < n; i++) {
+		intcoord c = groundplan[i];
+		if (x + c.x == _x && y + c.y == _y)
+			return true;
+	}
+	return false;
 }

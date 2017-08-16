@@ -205,10 +205,10 @@ void NavMap::addBuilding(Building *b) {
 		d = &(*doors)[i];
 		intcoord cY, cX = { d->coord.x + bx, d->coord.y + by };
 		switch (d->orientation) {
-			case LEFTWARD:  cY.x = cX.x - 1; cY.y = cX.y;     break;
-			case RIGHTWARD: cY.x = cX.x + 1; cY.y = cX.y;     break;
-			case UPWARD:    cY.x = cX.x;     cY.y = cX.y - 1; break;
-			case DOWNWARD:  cY.x = cX.x;     cY.y = cX.y + 1; break;
+			case Direction::LEFTWARD:  cY.x = cX.x - 1; cY.y = cX.y;     break;
+			case Direction::RIGHTWARD: cY.x = cX.x + 1; cY.y = cX.y;     break;
+			case Direction::UPWARD:    cY.x = cX.x;     cY.y = cX.y - 1; break;
+			case Direction::DOWNWARD:  cY.x = cX.x;     cY.y = cX.y + 1; break;
 			default: return;
 		}
 		if (cX.x < 0 || cX.y < 0 || cX.x >= w || cX.y >= h) return;

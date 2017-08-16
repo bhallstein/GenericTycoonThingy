@@ -29,15 +29,13 @@ typedef struct floatcoord {
 	float a, b;
 } floatcoord;
 
-#define LEFTWARD  0
-#define UPWARD    1
-#define RIGHTWARD 2
-#define DOWNWARD  3
+namespace Direction {
+	enum Enum { LEFTWARD, RIGHTWARD, UPWARD, DOWNWARD };
+};
 
-typedef int direction;
 typedef struct door {
 	intcoord coord;
-	direction orientation;
+	Direction::Enum orientation;
 } door;
 
 class MsgException : public std::exception {
