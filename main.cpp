@@ -19,7 +19,7 @@
 void dealWithResize(W *_theW) {
 	static W *theW;
 	if (_theW != NULL) theW = _theW;
-	else theW->frameChanged();
+	// ...
 }
 void sendEventToW(Event *ev, W *_theW) {
 	static W *theW;
@@ -115,7 +115,14 @@ void synthesizeMousemoveEvent(WindowManager *_winManager) {
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, int nCmdShow) {
-	WindowManager *winManager = new WindowManager(WndProc);
+	WindowManager *winManager;
+	try {
+		winManager = new WindowManager(WndProc);
+	}
+	catch (MsgException &ex) {
+		MessageBox(NULL, ex.msg.c_str(), "Error", MB_OK | MB_ICONEXCLAMATION);
+		return 0;
+	}
 	W *theW = new W(winManager);
 	Game *game = new Game(theW);
 

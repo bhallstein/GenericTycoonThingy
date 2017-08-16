@@ -26,10 +26,10 @@ WindowManager::WindowManager() : mode(WINDOWED) {
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
 	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
 	if (pf == nil)
-		std::cout << "couldn't create pf" << std::endl;	// throw exception
+		throw MsgException("Couldn't get an appropriate pixel format");
 	objs->context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
 	if (objs->context == nil)
-		std::cout << "couldn't create opengl context" << std::endl;	// throw exception
+		throw MsgException("Couldn't create opengl context");
 	
 	// Create window
 	createWindow();
@@ -159,10 +159,8 @@ void WindowManager::setBackBufferSize(int _x, int _y) {
 
 WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 	this->appInstance = GetModuleHandle(NULL);
-	if (this->appInstance == NULL) {
-		MessageBox(NULL, "Couldn't get app instance.", "Error", MB_OK | MB_ICONEXCLAMATION);
-		// throw
-	}
+	if (this->appInstance == NULL)
+		throw MsgException("Couldn't get app instance.");
 
 	// Register window class
 	int width = 800, height = 600;
@@ -181,10 +179,8 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
     wc.lpszClassName = "DBTWindow";	// Window class name
     wc.hIconSm = (HICON) LoadImage(wc.hInstance, MAKEINTRESOURCE(5), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 
-	if (!RegisterClassEx(&wc)) {
-		MessageBox(NULL, "Failed to register window class.", "Error", MB_OK | MB_ICONEXCLAMATION);
-		// throw
-	}
+	if (!RegisterClassEx(&wc))
+		throw MsgException("Failed to register window class.");
 
 	// Set window style & size
 	DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
@@ -211,17 +207,15 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 	);
 	if(this->windowHandle == NULL) {
 		DWORD err = GetLastError();
-		char errorBuffer[200];
-		wsprintf(errorBuffer, "Error creating window. Error code: %d, %X.", err, err);
-		MessageBox(NULL, errorBuffer, "Error", MB_ICONEXCLAMATION);
+		char errorMsg[200];
+		wsprintf(errorMsg, "Error creating window. Error code: %d, %X.", err, err);
 		closeWindow();
-		// throw
+		throw MsgException(errorMsg);
 	}
 	// Get device context
 	if (!(this->deviceContext = GetDC(this->windowHandle))) {
-		MessageBox(NULL, "Error creating an OpenGL device context", "Error", MB_OK | MB_ICONEXCLAMATION);
 		closeWindow();
-		// throw
+		throw MsgException("Error creating an OpenGL device context");
 	}
 	// Create pixel format
 	int pf;
@@ -244,26 +238,22 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 		0, 0, 0					// Layer Masks Ignored
 	};
 	if (!(pf = ChoosePixelFormat(this->deviceContext, &pfd))) {
-		MessageBox(NULL, "Unable to get a suitable pixel format", "Error", MB_OK | MB_ICONEXCLAMATION);
 		closeWindow();
-		// throw
+		throw MsgException("Unable to get a suitable pixel format");
 	}
 	if(!SetPixelFormat(this->deviceContext, pf, &pfd)) {
-		MessageBox(NULL, "Unable to set the pixel format", "Error", MB_OK | MB_ICONEXCLAMATION);
 		closeWindow();
-		// throw
+		throw MsgException("Unable to set the pixel format");
 	}
 	// Create rendering context
 	if (!(this->renderingContext = wglCreateContext(this->deviceContext))) {
-		MessageBox(NULL, "Error creating a rendering context", "Error", MB_OK | MB_ICONEXCLAMATION);
 		closeWindow();
-		// throw
+		throw MsgException("Error creating a rendering context");
 	}
 	// Make rendering context current
 	if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
-		MessageBox(NULL, "Error activating the rendering context", "Error", MB_OK | MB_ICONEXCLAMATION);
 		closeWindow();
-		// throw
+		throw MsgException("Error activating the rendering context");
 	}
 
 	ShowWindow(this->windowHandle, SW_SHOW);

@@ -7,6 +7,8 @@
 #define WINDOWMANAGER_H
 
 #include <string>
+#include <exception>
+
 #include "Classes/types.h"
 
 #ifdef __APPLE__

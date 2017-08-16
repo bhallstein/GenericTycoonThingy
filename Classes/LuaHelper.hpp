@@ -15,7 +15,7 @@ public:
 	LuaHelper();
 	~LuaHelper();
 
-	int loadFile(std::string fileName);
+	bool loadFile(std::string &fileName);
 
 //lua helper function templates
 	int pushtable(const char *key);

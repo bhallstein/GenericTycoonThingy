@@ -33,26 +33,24 @@ Level::~Level() {
 	delete uibarview;
 }
 
-void Level::buildLevel(std::string fileName)
+void Level::buildLevel(std::string levelname)
 {
-	std::cout << "path before: " << fileName << std::endl;
-	fileName = theW->pathForResource(fileName);
-	std::cout << "path after: " << fileName << std::endl;
+	std::string path = theW->resourcesPath;
+	path.append(levelname);
+
 	LuaHelper mrLua;
-	
-	if (mrLua.loadFile(fileName))
-	{
-		//some kind of error!
-		std::cout << mrLua.to<std::string>(-1);
-		std::cin.get();
-		//throw 1;
-		return;
+	if (!mrLua.loadFile(path)) {
+		theW->warning("Error opening level file.");
+		//theW->warning(mrLua.to<std::string>(-1).c_str(), "Error");
+		//std::cin.get();	// ?
+		throw MsgException("Could not read level file");		// Might be neater to return a bool, & throw in the constructor.
 	}
 	
 	// Set level width and height
 	w = mrLua.getvalue<int>("width");
 	h = mrLua.getvalue<int>("height");
-	std::cout << "level dimensions: " << w << " x " << h << std::endl;
+	char s[100];
+	sprintf(s, "Level dimensions: %d x %d", w, h);
 	
 	// Create map
 	navmap = new NavMap(w, h);

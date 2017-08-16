@@ -23,19 +23,28 @@ class SettingsManager
 {
 public:
 	SettingsManager(W *_theW /*char* argv[]*/);
+	~SettingsManager();
 
 	// Properties
 	W *theW;
+	LuaHelper *mrLua;
+	std::string filename;
 
 	Setting<int> screenWidth;
 	Setting<int> screenHeight;
 	Setting<bool> fullscreen;
 	Setting<int> framerateLimit;
+
+	template <class sth>
+	bool get(std::string &tablename, sth &val) {
+		sth = mrLua->getSubfield<sth>(tablename.c_str(), "Value");
+		return true;
+		// How does mr lua cope with & report an error in getsubfield?
+	}
 	
 	// Methods
-	void init(/*char* argv[]*/);		// Initialise SM - this includes loading settings or defaults as appropriate
 	void save(std::string fileName);	// Save external files (Lua)
-	//void detect(); 					// Run detection routines for flagged settings
+	//void detect();					// Run detection routines for flagged settings
 
 	// loadDefaults is implemented in the header because it's important
 	// This way if we add a setting we only have to come to the header to add both it AND its defaults
@@ -50,7 +59,7 @@ public:
 
 	// loadSettings is implemented in the header because it's important
 	// This way if we add a setting we only have to come to the header to add both it AND its defaults AND its luaRead
-	void loadSettings(LuaHelper* mrLua)
+	void loadSettings()
 	{		
 		mrLua->pushtable("settings");
 		screenWidth.value = mrLua->getSubfield<int>("ScreenWidth","value");

@@ -42,12 +42,20 @@ public:
 	
 	// File shizzle
 	//FILE* filePointerToResource(std::string);	// Be sure to call fclose() when you're done
-	std::string pathForResource(std::string);
-	std::string pathToSettingsDir();
+	void initializePaths();
+	bool isValidDir(const char *);
+	bool createDir(const char *);
+
+	// Stringy output
+	void warning(const char *msg, const char *title = "Warning");
 
 	//void* getView();
 	int width();
 	int height();
+
+	// Properties
+	std::string settingsPath;
+	std::string resourcesPath;
 	
 protected:
 	// Methods

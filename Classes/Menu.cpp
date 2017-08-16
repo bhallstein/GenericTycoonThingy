@@ -64,7 +64,7 @@ void Menu::receiveEvent(Event *ev) {
 
 void Menu::buttonClick(Button *btn) {
 	if (btn == startlevel_btn)
-		startLevel("Data/level1.lua");
+		startLevel("level1.lua");
 }
 
 void Menu::startLevel(std::string path) {

@@ -2,32 +2,33 @@
 
 SettingsManager::SettingsManager(W *_theW /*char* argv[]*/) : theW(_theW)
 {
-	init();
+	bool usedefaults = true;
+	filename = theW->settingsPath;
+	
+	// Check settings directory exists. Try to create it if not. 
+	if (!theW->isValidDir(filename.c_str())) {
+		if (!theW->createDir(filename.c_str()))
+			theW->warning("Could not create settings directory.");
+		else {
+			filename.append("settings.lua");
+			// if (can create file)
+			//	usedefaults = false;
+			// else
+			//	; Try to create file (with defaults), otherwise throw up a message
+		}
+	}
+	// If we have a valid directory, try to load the settings file.
+	if (!usedefaults) {
+		mrLua = new LuaHelper();
+		if (mrLua->loadFile(filename))
+			usedefaults = false;
+		else 
+			theW->warning("Couldn't read the settings file. It looks like it's become corrupted.");
+	}
+	//std::cout << lua_tostring(mrLua->LuaInstance, -1); // read out error from the stack
 }
-
-void SettingsManager::init(/*char* argv[]*/)
-{
-	// Fixed path to local settings file
-	std::string fileName = theW->pathToSettingsDir();		// Need to catch exception here.
-	fileName.append("settings.lua");
-	std::cout << "SM: file: " << fileName << std::endl;
-
-	// Instantiate Lua for loading in
-	LuaHelper* mrLua = new LuaHelper;
-
-	// Try to open file.
-	// If fails, try to create file from defaults.
-	// If that fails, throw exception?
-	if(mrLua->loadFile(fileName))
-	{
-		loadDefaults();
-		save(fileName);		// throw if unsuccessful? or is a silent error appropriate here?
-		std::cout << lua_tostring(mrLua->LuaInstance, -1); // readout error from the stack
-	}
-	else
-	{
-		loadSettings(mrLua);
-	}
+SettingsManager::~SettingsManager() {
+	delete mrLua;
 }
 
 void SettingsManager::save(std::string fileName)

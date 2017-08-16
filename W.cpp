@@ -7,13 +7,14 @@
 #elif defined _WIN32 || _WIN64
 #include <gl\gl.h>
 #include <gl\glu.h>
+#include "shlobj.h"
 #endif
 
 #include "Classes/Event.hpp"
 #include "Classes/View.hpp"
 
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
-	
+	this->initializePaths();
 }
 W::~W() {
 	std::cout << "w destroy" << std::endl;
@@ -103,36 +104,47 @@ void W::clearEvents() {
 //	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
 //	return fopen(path, "r");
 //}
-std::string W::pathForResource(std::string s) {
+void W::initializePaths() {
 #ifdef __APPLE__
 	int len = 200; char path[len];
 	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
 	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
 	return path;
 #elif defined _WIN32 || _WIN64
-	char appPath[MAX_PATH] = "";
-	std::string appDir;
-	GetModuleFileName(0, appPath, sizeof(appPath) - 1);
-	appDir = appPath;
-	appDir = appDir.substr(0, appDir.rfind("\\"));
-	appDir.append("Data/");
-	appDir.append(s);
-	return appDir;
+	// Settings path
+	char path[MAX_PATH] = "";
+	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
+	settingsPath = path;
+	settingsPath.append("/Demon Barber Tycoon/");
+
+	// Resources path
+	GetModuleFileName(0, path, sizeof(path) - 1);
+	resourcesPath = path;
+	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
+	resourcesPath.append("/../Data/");		// When installed, will want to be "/Data/" - or...?
 #endif
 }
-std::string W::pathToSettingsDir() {
+bool W::isValidDir(const char *dir) {
 #ifdef __APPLE__
-	return "Oh, hello";
+	// ...
 #elif defined _WIN32 || _WIN64
-	char dir[] = "%APPDATA%/Demon Barber Tycoon/";
 	DWORD dw = GetFileAttributes(dir);
-	if (dw != INVALID_FILE_ATTRIBUTES && (dw & FILE_ATTRIBUTE_DIRECTORY)) {
-		std::string s = dir;
-		return s;
-	}
-	if (!CreateDirectory(dir, NULL))
-		; // throw
-	return dir;
+	return dw != INVALID_FILE_ATTRIBUTES && (dw & FILE_ATTRIBUTE_DIRECTORY);
+#endif
+}
+bool W::createDir(const char *dir) {
+#ifdef __APPLE__
+	// ...
+#elif defined _WIN32 || _WIN64
+	return CreateDirectory(dir, NULL);
+#endif
+}
+
+void W::warning(const char *msg, const char *title) {
+#ifdef __APPLE__
+	// ...
+#elif defined _WIN32 || _WIN64
+	MessageBox(NULL, msg, title, MB_OK | MB_ICONEXCLAMATION);
 #endif
 }
 

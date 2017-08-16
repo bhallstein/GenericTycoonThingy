@@ -35,4 +35,15 @@ typedef struct door {
 
 enum colour_name { BLACK, WHITE, RED, GREEN, BLUE, YELLOW };
 
+class MsgException : public std::exception {
+public:
+	MsgException(const char *s) {
+		msg = s;
+	}
+	virtual const char* what() {
+		return "Message exception";
+	}
+	std::string msg;
+};
+
 #endif
