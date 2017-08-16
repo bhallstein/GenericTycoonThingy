@@ -19,6 +19,8 @@ class Placeable : public EventResponder {
 public:
 	Placeable(MappedObj *, ResponderMap *);
 	~Placeable();
+	bool activate();
+	void deactivate();
 	void receiveEvent(Event *ev);
 	MappedObj *mo;
 	ResponderMap *rm;

@@ -21,6 +21,7 @@ public:
 	~MappedObj();
 	bool init(int _x, int _y);
 	
+	bool pickUp();
 	bool attemptToPlace(int _x, int _y);
 	virtual void finalizePlacement() { };	// Override, for instance to add to a navmap
 	virtual bool canPlace(int _x, int _y) = 0;

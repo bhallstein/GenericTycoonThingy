@@ -284,7 +284,8 @@ Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<
 	Building *b = new Building(levelResponderMap, navmap, type, groundplan, doors, this);
 	if (b->init(atX, atY)) {
 		buildings.push_back(b);
-		std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
+		char s[50]; sprintf(s, "added building %p of type '%s' (now %ld)", b, type, buildings.size());
+		std::cout << s << std::endl;
 		return b;
 	}
 	return NULL;

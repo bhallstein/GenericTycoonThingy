@@ -50,6 +50,7 @@ public:
 	void addFurnishing(Furnishing *);
 	void removeFurnishing(Furnishing *);
 	void addStaff(Unit *);
+	void removeStaff(Unit *);
 	
 	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
 	static bool initialized;

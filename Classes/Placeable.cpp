@@ -2,9 +2,9 @@
 #include "MappedObj.hpp"
 #include "../W.hpp"
 
-Placeable::Placeable(MappedObj *_mo, ResponderMap *_rm) : mo(_mo), rm(_rm) {
-	if (!rm->requestPrivilegedEventResponderStatus(this))
-		throw MsgException("Placeable couldn't get privileged event responder status.");
+Placeable::Placeable(MappedObj *_mo, ResponderMap *_rm) : mo(_mo), rm(_rm)
+{
+	
 }
 Placeable::~Placeable()
 {
@@ -18,8 +18,15 @@ void Placeable::receiveEvent(Event *ev) {
 		if (!mo->attemptToPlace(ev->x, ev->y))
 			return;
 		else
-			rm->relinquishPrivilegedEventResponderStatus(this);
+			deactivate();
 	}
 	else if (ev->type == Event::RIGHTCLICK)
 		mo->destroyed = true;
+}
+
+bool Placeable::activate() {
+	return rm->requestPrivilegedEventResponderStatus(this);
+}
+void Placeable::deactivate() {
+	rm->relinquishPrivilegedEventResponderStatus(this);
 }

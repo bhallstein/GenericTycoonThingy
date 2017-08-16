@@ -5,6 +5,7 @@ MappedObj::MappedObj(ResponderMap *_rm, bool _placeableMode) :
 	rm(_rm), placeableMode(_placeableMode), placeable(NULL), destroyed(false), hover(false), a(0), b(0)
 {
 	x = y = rotation = 0;
+	placeable = new Placeable(this, rm);
 }
 MappedObj::~MappedObj()
 {
@@ -14,20 +15,21 @@ MappedObj::~MappedObj()
 }
 
 bool MappedObj::init(int _x, int _y) {
-	if (placeableMode)
-		try {
-			placeable = new Placeable(this, rm);
-		} catch (MsgException &exc) {
-			std::string s = "Could not initialise MappedObj: ";
-			s += exc.msg;
-			W::log(s.c_str());
+	if (placeableMode) {
+		if (!placeable->activate()) {
+			W::log("Couldn't initialize MappedObj: placeable would not activate");
 			return false;
 		}
+		return true;
+	}
 	else
 		return attemptToPlace(_x, _y);
-	return true;
 }
 
+bool MappedObj::pickUp() {
+	placeable->x = x, placeable->y = y;
+	return placeableMode = placeable->activate();
+}
 bool MappedObj::attemptToPlace(int _x, int _y) {
 	if (!canPlace(_x, _y)) return false;
 	x = _x, y = _y;

@@ -74,6 +74,8 @@ protected:
 	int frames_animated;
 	void incrementAnimation();
 	
+	void pickUp();
+	
 	bool incrementLocation();		// Move along route. Returns false if an obstacle is encountered.
 	inline bool atDest();
 	inline bool inHinterland();
@@ -88,12 +90,15 @@ protected:
 	
 	NavMap *navmap;
 	std::vector<NavNode *> route;
+	Building *contextBuilding;
 	bool hover;
 	
 	// Static members
 	static std::map<std::string, unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }
 	static std::string defaultColour;
 	static std::string defaultHoverColour;
+	
+	void printDebugInfo();
 };
 
 #endif

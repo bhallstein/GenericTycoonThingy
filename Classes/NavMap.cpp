@@ -233,6 +233,8 @@ bool NavMap::isPassableUnder(std::vector<intcoord> *gp, int x, int y) {
 	return true;
 }
 bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNode*> *route) {
+	route->clear();
+	
 	if (fromX < 0 || fromX >= w || fromY < 0 || fromY >= h || toX < 0 || toX >= w || toY < 0 || toY >= h) {
 		W::log("Navmap asked to find route to or from an out of bounds location.");
 		return false;

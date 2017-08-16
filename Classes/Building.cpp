@@ -111,11 +111,9 @@ void Building::addFurnishing(Furnishing *f) {
 }
 void Building::removeFurnishing(Furnishing *f) {
 	staffBindings.erase(f);
-	for (std::vector<Furnishing *>::iterator it = furnishings.begin(); it != furnishings.end(); it++)
-		if (*it == f) {
-			furnishings.erase(it);
-			return;
-		}
+	for (std::vector<Furnishing *>::iterator it = furnishings.begin(); it != furnishings.end(); )
+		if (*it == f) it = furnishings.erase(it);
+		else ++it;
 }
 void Building::addStaff(Unit *s) {
 	staff.push_back(s);
@@ -127,6 +125,14 @@ void Building::addStaff(Unit *s) {
 			break;
 		}
 	}
+}
+void Building::removeStaff(Unit *s) {
+	for (std::vector<Unit*>::iterator it = staff.begin(); it < staff.end(); )
+		if (*it == s) it = staff.erase(it);
+		else it++;
+	for (std::map<Furnishing*, Unit*>::iterator it = staffBindings.begin(); it != staffBindings.end(); )
+		if (it->second == s) staffBindings.erase(it++);
+		else ++it;
 }
 
 bool Building::initialize(W *_W) {

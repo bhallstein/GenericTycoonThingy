@@ -12,7 +12,7 @@ bool Unit::initialized = false;
 
 Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
 	MappedObj(_rm, _placeableMode), navmap(_navmap), type(_type), level(_level),
-	hover(false), mode(IDLE)
+	contextBuilding(NULL), hover(false), mode(IDLE)
 {
 	intcoord c = {0,0};
 	groundplan.push_back(c);
@@ -34,25 +34,22 @@ bool Unit::canPlace(int _x, int _y) {
 	return navmap->isPassableAt(_x, _y);
 }
 void Unit::finalizePlacement() {
-	if (placeableMode) {
+	if (placeableMode && u_isStaff) {
 		if (Building *b = level->buildingAtLocation(x, y))
-			b->addStaff(this);
+			b->addStaff(this), contextBuilding = b;
 	}
+	prev_x = x, prev_y = y;
 }
 
 void Unit::receiveEvent(Event *ev) {
+	if (mode == ANIMATING) return;
 	if (ev->type == Event::MOUSEMOVE)
 		hover = true;
 	else if (ev->type == Event::LEFTCLICK) {
-		char s[100];
-		sprintf(s, "\nUnit %p - x,y:%d,%d a,b:%.2f,%.2f dest:%d,%d mode:%s\n",
-			this, x, y, a, b, dest_x, dest_y,
-			mode == WAITING ? "WAITING" :
-			mode == VOYAGING ? "VOYAGING" :
-			mode == ANIMATING ? "ANIMATING" :
-			mode == IDLE ? "IDLE" : "UNKNOWN"
-		);
-		std::cout << s << std::endl;
+		printDebugInfo();
+	}
+	else if (ev->type == Event::RIGHTCLICK) {
+		if (u_isStaff) pickUp();
 	}
 }
 
@@ -99,7 +96,14 @@ void Unit::incrementAnimation() {
 		animation_finished = true;
 		rotation = 0;
 		mode = IDLE;
+		printDebugInfo();
 	}
+}
+
+void Unit::pickUp() {
+	if (contextBuilding) contextBuilding->removeStaff(this);
+	contextBuilding = NULL;
+	MappedObj::pickUp();
 }
 
 void Unit::wait() {
@@ -136,10 +140,8 @@ bool Unit::incrementLocation() {
 				b = prev_y == y ? 0 : prev_y < y ? -1 : 1;
 				route.erase(route.begin());
 			}
-			else {
-				route.clear();
+			else
 				return navmap->getRoute(x, y, dest_x, dest_y, &route);
-			}
 		}
 	}
 	else {
@@ -253,4 +255,16 @@ bool Unit::initialize(W *_W) {
 }
 int Unit::getUnitHireCost(std::string _unitKey) {
 	return unitTypes[_unitKey].hireCost;
+}
+
+void Unit::printDebugInfo() {
+	char s[100];
+	sprintf(s, "\nUnit %p - x,y:%d,%d a,b:%.2f,%.2f dest:%d,%d mode:%s\n",
+			this, x, y, a, b, dest_x, dest_y,
+			mode == WAITING ? "WAITING" :
+			mode == VOYAGING ? "VOYAGING" :
+			mode == ANIMATING ? "ANIMATING" :
+			mode == IDLE ? "IDLE" : "UNKNOWN"
+			);
+	std::cout << s << std::endl;
 }
