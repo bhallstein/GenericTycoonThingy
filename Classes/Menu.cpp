@@ -7,7 +7,7 @@
 Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 {
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	menuview = new MenuView(_theW, aniston);
+	menuview = new MenuView(_theW, aniston, &responderMap);
 	responderMap.addResponder(menuview);
 	
 	menuview->subscribe("start level", new Callback(&Menu::startLevelOne, this));
@@ -70,7 +70,7 @@ void Menu::startLevelOne() {
 
 #include "../W.hpp"
 
-MenuView::MenuView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
+MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
 {
 	buttons.push_back(new Button(100, 200, 240, 135, "start level"));
 }

@@ -69,7 +69,7 @@ void ResponderMap::dispatchEvent(Event *ev) {
 	if (ev->type == Event::KEYPRESS && keycode_subscriptions.count(ev->key))
 		keycode_subscriptions[ev->key].back()->receiveEvent(ev);
 	// Mouses
-	else if (ev->type == Event::MOUSEMOVE || ev->type == Event::LEFTCLICK || ev->type == Event::RIGHTCLICK)
+	else if (ev->type == Event::MOUSEMOVE || ev->type == Event::LEFTCLICK || ev->type == Event::RIGHTCLICK || ev->type == Event::LEFTMOUSEDOWN)
 		dispatchMouseEvent(ev);
 }
 

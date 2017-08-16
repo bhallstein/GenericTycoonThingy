@@ -49,8 +49,10 @@ public:
 	bool voyage(int _x, int _y);
 	bool arrived;
 	void runAnimation(/* Animation...? */);
+	bool animation_finished;
 	
 	static bool initialize(W *); 	// Populate static unitTypes from units.lua
+	static bool initialized;
 
 	// UnitInfo gets
 	static int getUnitHireCost(std::string); //lookup a unitInfo hireCost from unitTypes
@@ -64,6 +66,8 @@ protected:
 
 	void wait();
 	int frames_waited;
+	int frames_animated;
+	void incrementAnimation();
 	
 	bool incrementLocation();		// Move along route. Returns false if an obstacle is encountered.
 	inline bool atDest();

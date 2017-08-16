@@ -8,6 +8,7 @@
 std::map<std::string, struct furnishingInfo> Furnishing::furnishingTypes;
 std::string Furnishing::defaultColour;
 std::string Furnishing::defaultHoverColour;
+bool Furnishing::initialized = false;
 
 Furnishing::Furnishing(ResponderMap *_rm, NavMap *_navmap, const char *_type, Building *_context) :
 	MappedObj(_rm, true), navmap(_navmap), type(_type), contextBuilding(_context),
@@ -24,7 +25,8 @@ Furnishing::~Furnishing()
 {
 	std::cout << "furnishing destruct" << std::endl;
 	navmap->removeImpassableObject(this);
-	contextBuilding->removeFurnishing(this);
+	if (contextBuilding)
+		contextBuilding->removeFurnishing(this);
 }
 
 void Furnishing::receiveEvent(Event *ev) {
@@ -108,8 +110,9 @@ void Furnishing::capture() { available = false; }
 void Furnishing::release() { available = true; }
 
 bool Furnishing::initialize(W *_W) {
-	W::log("  Furnishing::initialize() called...");
+	if (Furnishing::initialized) return true;
 	
+	W::log("  Furnishing::initialize() called...");
 	LuaHelper mrLua(_W);
 	
 	std::string path = _W->resourcesPath;
@@ -227,6 +230,7 @@ bool Furnishing::initialize(W *_W) {
 		
 		lua_pop(L, 2);
 	}
-	
+
+	Furnishing::initialized = true;
 	return true;
 }

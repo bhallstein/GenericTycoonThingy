@@ -8,6 +8,7 @@
 std::map<std::string, struct unitInfo> Unit::unitTypes;
 std::string Unit::defaultColour;
 std::string Unit::defaultHoverColour;
+bool Unit::initialized = false;
 
 Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
 	MappedObj(_rm, _placeableMode), navmap(_navmap), type(_type), level(_level),
@@ -38,6 +39,17 @@ void Unit::finalizePlacement() {
 void Unit::receiveEvent(Event *ev) {
 	if (ev->type == Event::MOUSEMOVE)
 		hover = true;
+	else if (ev->type == Event::LEFTCLICK) {
+		char s[100];
+		sprintf(s, "\nUnit %p - x,y:%d,%d a,b:%.2f,%.2f dest:%d,%d mode:%s\n",
+			this, x, y, a, b, dest_x, dest_y,
+			mode == WAITING ? "WAITING" :
+			mode == VOYAGING ? "VOYAGING" :
+			mode == ANIMATING ? "ANIMATING" :
+			mode == IDLE ? "IDLE" : "UNKNOWN"
+		);
+		std::cout << s << std::endl;
+	}
 }
 
 const char * Unit::col() {
@@ -49,7 +61,8 @@ void Unit::update() {
 	if (hover) return;
 	else if (mode == IDLE) { }
 	else if (mode == WAITING && ++frames_waited >= 60) voyage(dest_x, dest_y);
-	else if (mode == VOYAGING) if (!incrementLocation()) wait();
+	else if (mode == VOYAGING) { if (!incrementLocation()) wait(); }
+	else if (mode == ANIMATING) incrementAnimation();
 }
 
 /*** Utility methods ***/
@@ -71,7 +84,18 @@ bool Unit::voyage(int _x, int _y) {
 	return success;
 }
 void Unit::runAnimation(/* ... */) {
-	// ...
+	frames_animated = 0;
+	animation_finished = false;
+	mode = ANIMATING;
+}
+void Unit::incrementAnimation() {
+	int length = 60;
+	rotation += 3;
+	if (++frames_animated >= length) {
+		animation_finished = true;
+		rotation = 0;
+		mode = IDLE;
+	}
 }
 
 void Unit::wait() {
@@ -86,7 +110,7 @@ bool Unit::incrementLocation() {
 		return true;
 	}
 	
-	float step = 0.25;
+	float step = 0.10;
 	float a_diff = 0, b_diff = 0;
 	bool diagonal = x != prev_x && y != prev_y;
 	
@@ -110,7 +134,7 @@ bool Unit::incrementLocation() {
 			}
 			else {
 				route.clear();
-				return false;
+				return navmap->getRoute(x, y, dest_x, dest_y, &route);
 			}
 		}
 	}
@@ -136,6 +160,8 @@ inline bool Unit::inHinterland() {
 }
 
 bool Unit::initialize(W *_W) {
+	if (Unit::initialized) return true;
+	
 	W::log("  Unit::initialize() called...");
 	LuaHelper mrLua(_W);
 	
@@ -184,6 +210,7 @@ bool Unit::initialize(W *_W) {
 		lua_pop(L, 2);								// S: -1 key; -2 table
 	}
 	
+	Unit::initialized = true;
 	return true;
 }
 int Unit::getUnitHireCost(std::string _unitKey) {

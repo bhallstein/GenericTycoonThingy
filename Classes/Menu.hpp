@@ -51,7 +51,7 @@ protected:
 
 class MenuView : public UIView {
 public:
-	MenuView(W *, JenniferAniston &);
+	MenuView(W *, JenniferAniston &, ResponderMap *);
 	void draw();
 };
 

@@ -4,7 +4,7 @@
 MappedObj::MappedObj(ResponderMap *_rm, bool _placeableMode) :
 	rm(_rm), placeableMode(_placeableMode), placeable(NULL), destroyed(false), hover(false), a(0), b(0)
 {
-	x = y = 0;
+	x = y = rotation = 0;
 }
 MappedObj::~MappedObj()
 {

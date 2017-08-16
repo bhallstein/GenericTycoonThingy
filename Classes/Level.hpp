@@ -144,13 +144,13 @@ public:
 
 class UIBarView : public UIView {
 public:
-	UIBarView(W *, JenniferAniston &);
+	UIBarView(W *, JenniferAniston &, ResponderMap *);
 	void draw();
 };
 
 class FurnishingPurchasingUIView : public UIView {
 public:
-	FurnishingPurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_furnishingTypes);
+	FurnishingPurchasingUIView(W *, JenniferAniston &, ResponderMap *, std::vector<std::string> *_furnishingTypes);
 	void draw();
 protected:
 	std::vector<std::string> *furnishingTypes;
@@ -158,7 +158,7 @@ protected:
 
 class HiringUIView : public UIView {
 public:
-	HiringUIView(W *, JenniferAniston &);
+	HiringUIView(W *, JenniferAniston &, ResponderMap *);
 	void draw();
 };
 

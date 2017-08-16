@@ -13,6 +13,10 @@
 -(BOOL)acceptsFirstResponder {
 	return YES;
 }
+-(void)mouseDown:(NSEvent *)ev {
+	NSPoint point = [self convertMouseCoords:[ev locationInWindow]];
+	[latestEvents setObject:[NSValue valueWithPoint:point] forKey:@"mousedown"];
+}
 -(void)mouseUp:(NSEvent*)ev {
 	NSPoint point = [self convertMouseCoords:[ev locationInWindow]];
 	[latestEvents setObject:[NSValue valueWithPoint:point] forKey:@"mouseup"];

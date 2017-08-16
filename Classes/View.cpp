@@ -37,8 +37,6 @@ void View::draw() {
 }
 
 void View::receiveEvent(Event *ev) {
-	if (ev->x < x || ev->y < y || ev->x >= x + width || ev->y >= y + height)
-		return;
 	ev->x -= x, ev->y -= y;
 	processMouseEvent(ev);
 }

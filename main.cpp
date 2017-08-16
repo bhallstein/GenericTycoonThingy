@@ -51,6 +51,11 @@ void convertToDBTEvent(Event &ev, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ev.x = LOWORD(lParam);
 		ev.y = HIWORD(lParam);
 	}
+	else if (msg == WM_LBUTTONDOWN) {
+		ev.type = Event::LEFTMOUSEDOWN;
+		ev.x = LOWORD(lParam);
+		ev.y = HIWORD(lParam);
+	}
 	else if (msg == WM_RBUTTONUP) {
 		ev.type = Event::RIGHTCLICK;
 		ev.x = LOWORD(lParam);
@@ -158,7 +163,7 @@ int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, i
 }
 
 LRESULT CALLBACK WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam) {
-	if (msg == WM_LBUTTONUP || msg == WM_RBUTTONUP || msg == WM_CHAR || msg == WM_KEYDOWN || msg ==  WM_CLOSE) {
+	if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP || msg == WM_RBUTTONUP || msg == WM_CHAR || msg == WM_KEYDOWN || msg ==  WM_CLOSE) {
 		Event ev;
 		convertToDBTEvent(ev, msg, wParam, lParam);
 		sendEventToW(&ev, NULL);

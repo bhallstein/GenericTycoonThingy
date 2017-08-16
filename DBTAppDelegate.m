@@ -77,6 +77,11 @@ Event::key_code charToKeycode(unsigned int c) {
 			ev.setType(Event::LEFTCLICK);
 			ev.x = (int) p.x, ev.y = (int) p.y;
 		}
+		else if (event_type == @"mousedown") {
+			NSPoint p = [[new_events objectForKey:event_type] pointValue];
+			ev.setType(Event::LEFTMOUSEDOWN);
+			ev.x = (int) p.x, ev.y = (int) p.y;
+		}
 		else if (event_type == @"rightmouseup") {
 			NSPoint p = [[new_events objectForKey:event_type] pointValue];
 			ev.setType(Event::RIGHTCLICK);

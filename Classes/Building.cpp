@@ -9,6 +9,9 @@
 std::map<std::string, struct buildingInfo> Building::buildingTypes;
 std::string Building::defaultColour;
 std::string Building::defaultHoverColour;
+bool Building::initialized = false;
+
+int *Building::ind_array = (int*) malloc(sizeof(int*) * 150);
 
 Building::Building(ResponderMap *_rm, NavMap *_nm, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *_level) :
 	MappedObj(_rm, false), navmap(_nm), type(_type), level(_level), clicked(false), time_hovered(0)
@@ -39,7 +42,7 @@ void Building::receiveEvent(Event *ev) {
 }
 
 void Building::update() {
-	int indices[furnishings.size()], nFound ;
+	int nFound;
 	// Queue dispatch
 	for (std::vector<Unit*>::iterator it = Q.begin(); it < Q.end(); ) {
 		Unit *u = *it, *s;
@@ -49,12 +52,12 @@ void Building::update() {
 			Furnishing *f = furnishings[i];
 			if (f->readyForInteraction("havehaircut"))
 				if (staffBindings.find(f) != staffBindings.end())
-					s = staffBindings[f], indices[nFound++] = i;
+					s = staffBindings[f], Building::ind_array[nFound++] = i;
 		}
 		if (nFound == 0)
 			it++;
 		else {
-			Furnishing *f = furnishings[indices[W::randUpTo(nFound)]];
+			Furnishing *f = furnishings[Building::ind_array[W::randUpTo(nFound)]];
 			level->createBehaviour("havehaircut")->init(level, u, s, f);
 			it = Q.erase(it);
 		}
@@ -84,6 +87,20 @@ void Building::addToQueue(Unit *u) {
 }
 void Building::addFurnishing(Furnishing *f) {
 	furnishings.push_back(f);
+	// If there is a free staff, bind it
+	for (int i=0, n = staff.size(); i < n; i++) {
+		Unit *u = staff[i];
+		bool isBound = false;
+		for (std::map<Furnishing*, Unit*>::iterator it = staffBindings.begin(); it != staffBindings.end(); it++)
+			if (it->second == u) {
+				isBound = true;
+				break;
+			}
+		if (!isBound) {
+			staffBindings[f] = u;
+			break;
+		}
+	}
 }
 void Building::removeFurnishing(Furnishing *f) {
 	for (std::vector<Furnishing *>::iterator it = furnishings.begin(); it != furnishings.end(); it++)
@@ -95,15 +112,19 @@ void Building::removeFurnishing(Furnishing *f) {
 void Building::addStaff(Unit *s) {
 	std::cout << "adding staff to building... ";
 	staff.push_back(s);
-	// Add to an unstaffed furnishing
+	// Add to unstaffed furnishing, if any
 	for (int i=0, n = furnishings.size(); i < n; i++) {
 		Furnishing *f = furnishings[i];
-		if (f->requiresStaff(s->type.c_str()) && staffBindings.find(f) == staffBindings.end())
+		if (f->requiresStaff(s->type.c_str()) && staffBindings.find(f) == staffBindings.end()) {
 			staffBindings[f] = s;
+			break;
+		}
 	}
 }
 
 bool Building::initialize(W *_W) {
+	if (Building::initialized) return true;
+		
 	W::log("  Building::initialize() called...");
 	LuaHelper mrLua(_W);
 	
@@ -146,15 +167,15 @@ bool Building::initialize(W *_W) {
 		bInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Building::defaultHoverColour;
 		lua_pop(L, 1);							// S: -1 buildingtype; -2 key; -3 buildingTypes
 
-		if (!mrLua.pushSubtable("allowedFurnishing")) {
-			char s[100]; sprintf(s, "In buildings.lua, couldn't find allowedFurnishing for '%s' type", bType);
+		if (!mrLua.pushSubtable("allowedFurnishings")) {
+			char s[100]; sprintf(s, "In buildings.lua, couldn't find allowedFurnishings for '%s' type", bType);
 			W::log(s);
 			return false;
 		}
-		std::string s = "    "; s += bType; s += ": allowedFurnishing: ";
+		std::string s = "    "; s += bType; s += ": allowedFurnishings: ";
 		int n = 0;
-		lua_pushnil(L);							// S: -1 nil; -2 allowedFurnishing; -3 buildingtype; ...
-		while (lua_next(L, -2)) {				// S: -1 value; -2 key; -3 allowedFurnishing
+		lua_pushnil(L);							// S: -1 nil; -2 allowedFurnishings; -3 buildingtype; ...
+		while (lua_next(L, -2)) {				// S: -1 value; -2 key; -3 allowedFurnishings
 			if (!lua_isstring(L, -1)) {
 				lua_pop(L, 1);
 				continue;
@@ -162,8 +183,8 @@ bool Building::initialize(W *_W) {
 			bInfo->allowedFurnishings.push_back(lua_tostring(L, -1));
 			s += bInfo->allowedFurnishings.back(); s += ", ";
 			n++;
-			lua_pop(L, 1);						// S: -1 key; -2 allowedFurnishing; -3 buildingtype; ...
-		}										// S: -1 allowedFurnishing; -2 buildingtype; ...
+			lua_pop(L, 1);						// S: -1 key; -2 allowedFurnishings; -3 buildingtype; ...
+		}										// S: -1 allowedFurnishings; -2 buildingtype; ...
 		lua_pop(L, 1);							// S: -1 buildingtype; -2 key; -3 buildingTypes
 		if (n > 0) 
 			s.erase(s.size() - 2);
@@ -171,6 +192,7 @@ bool Building::initialize(W *_W) {
 		
 		lua_pop(L, 1);							// S: -1 key; -2 buildingTypes
 	}
-	
+
+	Building::initialized = true;
 	return true;
 }

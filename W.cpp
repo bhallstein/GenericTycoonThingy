@@ -100,19 +100,22 @@ __colour W::stringToColour(const char *s) {
 	c.alpha = streq(s, "black") ? 0.5 : 1;
 	return c;
 }
-void W::drawRect(float _x, float _y, float _width, float _height, const char *colname) {
+void W::drawRect(float _x, float _y, float _width, float _height, const char *colname, float rot) {
 	__colour col = stringToColour(colname);
 	glColor4f(col.red, col.green, col.blue, col.alpha);
-
+	
 	float x = _x, y = _y;
 	if (current_drawn_view != NULL)
 		x += current_drawn_view->x, y += current_drawn_view->y;
 	
+	glLoadIdentity();
+	glTranslatef(x + _width/2, y + _height/2, 0);
+	glRotatef(rot, 0, 0, 1);
 	glBegin(GL_QUADS);
-		glVertex2f(x, y);
-		glVertex2f(x + _width, y);
-		glVertex2f(x + _width, y + _height);
-		glVertex2f(x, y + _height);
+		glVertex2f(-_width/2, -_height/2);
+		glVertex2f(_width/2, -_height/2);
+		glVertex2f(_width/2, _height/2);
+		glVertex2f(-_width/2, _height/2);
 	glEnd();
 }
 

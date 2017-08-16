@@ -58,6 +58,10 @@ public:
 		}
 	}
 	
+	void setCorner(int _x, int _y) {
+		corner_x = _x, corner_y = _y;
+	}
+	
 	// Properties
 	int x, y, width, height;
 	

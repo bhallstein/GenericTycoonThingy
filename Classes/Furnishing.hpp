@@ -52,6 +52,7 @@ public:
 	void release();
 	
 	static bool initialize(W *);	// Populate our static furnishingTypes map from furnishing.lua
+	static bool initialized;
 
 protected:
 	std::string *f_colour;

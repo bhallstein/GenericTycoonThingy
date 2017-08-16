@@ -39,7 +39,7 @@ public:
 	void startDrawing();
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
-	void drawRect(float _x, float _y, float _width, float _height, const char *colour);
+	void drawRect(float _x, float _y, float _width, float _height, const char *colour, float rot = 0);
 	__colour stringToColour(const char *);
 
 	// Event shizzle

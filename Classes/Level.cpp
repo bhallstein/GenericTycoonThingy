@@ -22,7 +22,7 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	buildLevel(levelpath);
 	
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
-	uibarview = new UIBarView(theW, aniston);
+	uibarview = new UIBarView(theW, aniston, &responderMap);
 	responderMap.addResponder(uibarview);
 	uibarview->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
 	uibarview->subscribe("open hiring ui view", new Callback(&Level::openHiringView, this));
@@ -370,7 +370,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	if (furnishingPurchasingView != NULL) return;
 	currentlyEditedBuilding = b;
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 47, 47, 140, 220);
-	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, b->b_allowedFurnishings);
+	furnishingPurchasingView = new FurnishingPurchasingUIView(theW, aniston, &responderMap, b->b_allowedFurnishings);
 	responderMap.addResponder(furnishingPurchasingView);
 	
 	furnishingPurchasingView->subscribe("close", new Callback(&Level::closeFurnishingPurchasingView, this));
@@ -385,8 +385,8 @@ void Level::closeFurnishingPurchasingView() {
 }
 void Level::openHiringView() {
 	if (hiringUIView != NULL) return;
-	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PFIXED, 10, 90, 140, 200);
-	hiringUIView = new HiringUIView(theW, aniston);
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 10, 320, 140, 200);
+	hiringUIView = new HiringUIView(theW, aniston, &responderMap);
 	responderMap.addResponder(hiringUIView);
 	
 	// Subscriptions
@@ -412,6 +412,7 @@ bool Level::chargePlayer(int _amount) {
 void Level::decreaseMoney(int _amount) {
 	money -= _amount;
 }
+
 
 #include "Button.hpp"
 
@@ -447,7 +448,7 @@ void LevelView::drawMappedObj(MappedObj *mo) {
 	const char *col = mo->col();
 	for (int i=0; i < mo->groundplan.size(); i++) {
 		intcoord c = mo->groundplan[i];
-		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, col);
+		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, col, mo->rotation);
 	}
 }
 
@@ -489,7 +490,7 @@ void LevelView::scroll(Direction::Enum dir) {
 }
 
 
-UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
+UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
 {
 	buttons.push_back(new Button(10, 10, 20, 20, "open hiring ui view"));
 }
@@ -503,8 +504,8 @@ void UIBarView::draw() {
 }
 
 
-FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston &_aniston, std::vector<std::string> *_furnishingTypes) :
-	UIView(_theW, _aniston), furnishingTypes(_furnishingTypes)
+FurnishingPurchasingUIView::FurnishingPurchasingUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, std::vector<std::string> *_furnishingTypes) :
+	UIView(_theW, _aniston, _rm, ALLOW_DRAG), furnishingTypes(_furnishingTypes)
 {
 	buttons.push_back(new Button(7, 7, 12, 12, "close"));
 	// Add buttons for creating furnishing
@@ -525,7 +526,7 @@ void FurnishingPurchasingUIView::draw() {
 	}
 }
 
-HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
+HiringUIView::HiringUIView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm) : UIView(_theW, _aniston, _rm, ALLOW_DRAG)
 {
 	buttons.push_back(new Button(7, 7, 12, 12, "close"));
 	buttons.push_back(new Button(7, 30, 20, 20, "hire staff"));

@@ -73,10 +73,7 @@ void SeekHaircutBehaviour::_update() {
 }
 
 void HaveHaircutBehaviour::init(Level *_l, Unit *_u, Unit *_s, Furnishing *_f) {
-	level = _l;
-	unit = _u;
-	staff = _s;
-	chair = _f;
+	level = _l, unit = _u, staff = _s, chair = _f;
 	typestring = "havehaircut";
 	// Check chair is capable of this interaction
 	if (!chair->capableOfInteraction(typestring.c_str())) {
@@ -96,10 +93,13 @@ void HaveHaircutBehaviour::_update() {
 	}
 	else if (stage == 1) {	// Run animations
 		if (unit->arrived && staff->arrived)
-			chair->release(), stage++;
+			unit->runAnimation(), staff->runAnimation(), stage++;
 	}
-	else if (stage == 2) {	// Release Unit
-		level->createBehaviour("despawn")->init(unit);
-		destroyed = true;
+	else if (stage == 2) {	// Release things
+		if (unit->animation_finished && staff->animation_finished) {
+			level->createBehaviour("despawn")->init(unit);
+			chair->release();
+			destroyed = true;
+		}
 	}
 }

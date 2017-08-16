@@ -34,6 +34,7 @@ public:
 	std::vector<intcoord> groundplan;
 	bool destroyed;
 	bool hover;
+	float rotation;
 	
 	ResponderMap *rm;
 	bool placeableMode;

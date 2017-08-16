@@ -16,18 +16,26 @@
 #include "types.hpp"
 #include "View.hpp"
 
+#define ALLOW_DRAG true
+#define DISALLOW_DRAG false
+
 class Button;
 class Callback;
+class ResponderMap;
 
 class UIView : public View {
 public:
-	UIView(W *, JenniferAniston &);
+	UIView(W *, JenniferAniston &, ResponderMap *, bool _allowDrag);
 	~UIView();
 	
 	void processMouseEvent(Event *);
 	void subscribe(const char *, Callback *);
 	
 protected:
+	ResponderMap *rm;
+	bool allowDrag, dragloop;
+	intcoord drag_initial;
+	
 	std::vector<Button *> buttons;
 	std::map<std::string, Callback *> subscriptions;
 };

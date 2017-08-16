@@ -52,6 +52,7 @@ public:
 	void addStaff(Unit *);
 	
 	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua
+	static bool initialized;
 	
 protected:
 	// Properties
@@ -69,6 +70,8 @@ protected:
 	static std::map<std::string, struct buildingInfo> buildingTypes;	// e.g. "pieshop" => struct buildingInfo { }
 	static std::string defaultColour;
 	static std::string defaultHoverColour;
+	
+	static int *ind_array;
 };
 
 #endif
