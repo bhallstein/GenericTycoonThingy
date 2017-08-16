@@ -9,10 +9,6 @@ MapLoc::~MapLoc() {
 	// Destructor
 }
 
-void MapLoc::dispatchEvent(Event *ev) {
-	for (std::list<EventResponder*>::iterator i = responderList.begin(); i != responderList.end(); i++)
-		(*i)->receiveEvent(ev);
-}
 void MapLoc::addNeighbour(MapLoc *neighbour) {
 	neighbours.remove(neighbour);	 // This may perhaps not be necessary.
 	neighbours.push_back(neighbour);
@@ -55,10 +51,6 @@ GameMap::GameMap(int _w, int _h) {
 }
 GameMap::~GameMap() {
 	maplocs.clear();
-}
-
-void GameMap::dispatchEvent(Event *ev) {
-	maplocs[w*ev->y + ev->x].dispatchEvent(ev);
 }
 
 void GameMap::makePassable(int atX, int atY) {

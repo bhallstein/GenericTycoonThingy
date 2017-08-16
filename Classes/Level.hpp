@@ -33,7 +33,7 @@ class LevelView : public View {
 public:
 	
 	// Methods
-	LevelView(sf::RenderWindow *, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
+	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
 	void draw(std::vector<Building*> buildings, std::vector<Placeable*> placeables, std::vector<Unit*> units);
 	void acceptEvent(Event *);
 	
@@ -70,7 +70,7 @@ protected:
 	EventHandler *eventHandler;
 	
 	GameMap *gamemap;
-	LevelView levelview;
+	LevelView *levelview;
 	View uiview;
 	
 

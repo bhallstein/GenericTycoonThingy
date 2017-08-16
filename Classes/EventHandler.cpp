@@ -9,10 +9,8 @@ EventHandler::~EventHandler() {
 
 
 void EventHandler::subscribe(View *v) {
-	unsubscribe(v);							// At some point a more sophisticated subscripion system is called for,
-	subscribed_views.push_back(v);			// where arbitrary objects may subscribe to *particular* events.
-											// (This would be handy for key presses – mouse events will pretty
-											// much always be sent via the memory map the appropriate view.)
+	unsubscribe(v);			
+	subscribed_views.push_back(v);
 	std::cout << "View " << v << " subscribed to receive mouse events" << std::endl;
 }
 void EventHandler::unsubscribe(View *v) {

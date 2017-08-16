@@ -34,7 +34,6 @@ public:
 	~MapLoc();
 	
 	// Methods
-	void dispatchEvent(Event *ev);
 	void addNeighbour(MapLoc *neighbour);
 	void removeNeighbour(MapLoc *neighbour);
 	
@@ -50,8 +49,6 @@ public:
 	
 protected:
 	
-	std::list<EventResponder*> responderList;
-	
 };
 
 
@@ -65,7 +62,6 @@ public:
 	int w, h;
 	
 	// Methods
-	void dispatchEvent(Event *);
 	void makeImpassable(int atX, int atY);
 	void makePassable(int atX, int atY);
 	void addImpassableObject(EventResponder *resp);

@@ -1,11 +1,8 @@
 #include "Level.hpp"
 
-Level::Level(std::string fileName, sf::RenderWindow *_window, EventHandler *_eventHandler) : window(_window), eventHandler(_eventHandler), 	levelview(_window, 0, 0, 0, 80), uiview(_window, 0, -80, 0, 0)
-{
-	// Give levelview responderMap powers.
-	levelview.createEventResponderMap();
-	eventHandler->subscribe(&levelview);
-	
+Level::Level(std::string fileName, sf::RenderWindow *_window, EventHandler *_eventHandler) :
+	window(_window), eventHandler(_eventHandler), uiview(_window, 10, 10, 0, -80, 0, 0)
+{	
 	// Build level
 	std::cout << "calling buildLevel" << std::endl;
 	buildLevel(readLevel(fileName));
@@ -20,6 +17,7 @@ Level::~Level()
 	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++)
 		delete (*i);
 	delete gamemap;
+	delete levelview;
 }
 
 Unit* Level::createUnit() {
@@ -31,14 +29,14 @@ Unit* Level::createUnit() {
 Building* Level::createBuilding(int atX, int atY) {
 	Building *b = new Building(gamemap, eventHandler, atX, atY);
 	buildings.push_back(b);
-	levelview.addResponder(b);
+	levelview->addResponder(b);
 	eventHandler->subscribe(b, K_L);
 	std::cout << "added building " << b << "(now " << buildings.size() << ")" << std::endl;
 	return b;
 }
 void Level::createPlaceable() {
-	Placeable *p = new Placeable(gamemap, &levelview);
-	if (!levelview.requestPrivilegedEventResponderStatus(p)) {
+	Placeable *p = new Placeable(gamemap, levelview);
+	if (!levelview->requestPrivilegedEventResponderStatus(p)) {
 		delete p;
 		return;
 	}
@@ -49,7 +47,7 @@ void Level::createPlaceable() {
 
 void Level::draw()
 {
-	levelview.draw(buildings, placeables, units);
+	levelview->draw(buildings, placeables, units);
 	uiview.draw();
 	//if (framecount == 1200) framecount = 0;
 	//if (50 == framecount++) this->createUnit();	// Create a new unit every 20 seconds
@@ -65,36 +63,32 @@ void Level::buildLevel(ptree levelFile)
 {
 	w = levelFile.get<int>("level.<xmlattr>.width");
 	h = levelFile.get<int>("level.<xmlattr>.height");
+	std::cout << "level dimensions: " << w << " x " << h << std::endl;
 	
+	// Create map
 	gamemap = new GameMap(w, h);
-	
-	std::cout << "level width: " << w << std::endl;
-	std::cout << "level height: " << h << std::endl;
 
-	std::cout << "creating buildings" << std::endl;
+	// Create levelview
+	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
+	levelview->createEventResponderMap();					// Make levelview respond to mouse events
+	eventHandler->subscribe(levelview);						// 
+
 	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
 	{
 		if(obj.first == "building")
 			createBuilding(obj.second.get<int>("x",0), obj.second.get<int>("y",0));
 	}
-	std::cout << "built level from filey" << std::endl;
 }
 
 
-LevelView::LevelView(sf::RenderWindow *_window, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
-	View(_window, _l_offset, _t_offset, _r_offset, _b_offset)
+LevelView::LevelView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
+	View(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
 {
-	responder_block_height = 16;
-	responder_block_width = 16;
+	
 }
 
-void LevelView::acceptEvent(Event *ev) {	
-	if (privileged_event_responder != NULL) {
-		privileged_event_responder->receiveEvent(ev);
-		return;
-	}
-	
-	std::list<EventResponder*> *resps = &responderMap[ev->y * responderMap_w + ev->x];
+void LevelView::acceptEvent(Event *ev) {
+	std::list<EventResponder*> *resps = &responderMap[ev->y * blocks_w + ev->x];
 	for (std::list<EventResponder*>::iterator i = resps->begin(); i != resps->end(); i++)
 		(*i)->receiveEvent(ev);
 }
@@ -102,9 +96,10 @@ void LevelView::acceptEvent(Event *ev) {
 void LevelView::draw(std::vector<Building*> buildings, std::vector<Placeable*> placeables, std::vector<Unit*> units) {
 
 	// This is obviously a horrendous way to get info into the view, but the separation of View is nonetheless a structural
-	// improvement. The sane way to do would be to pass the game map, of course, which we should do at some point.
+	// improvement. The sane way to do it might be to pass the game map.
 
-	int block_width = responder_block_width, block_height = responder_block_height;
+	float block_width  = (r_pos - l_pos) / blocks_w;
+	float block_height = (b_pos - t_pos) / blocks_h;
 
 	// Draw buildings
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++) {

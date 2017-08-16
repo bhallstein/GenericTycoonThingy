@@ -41,7 +41,6 @@ void Placeable::receiveEvent(Event *ev) {
 			// so it (or the drawing class) can respond accordingly (a highlighted drawing state, for instance.).
 		}
 		else if (ev->type == LEFTCLICK) {
-			std::cout << "placeable " << this << " was clicked" << std::endl;
 			clicked = !clicked;
 		}
 	}
