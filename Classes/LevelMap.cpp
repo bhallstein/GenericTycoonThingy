@@ -1,16 +1,27 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ================
+ *  LevelMap.cpp
+ * ================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "LevelMap.hpp"
 #include "LevelView.hpp"
 #include "TLO.hpp"
 #include "LuaObj.h"
 #include "SpawnPoint.hpp"
 
-
 LevelMap::LevelMap(LevelState *_ls, LevelView *_lv) :
 	levelState(_ls),
 	levelView(_lv),
 	loaded(false)
 {
-	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&LevelMap::keyEvent, this));
+	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelMap::keyEvent, this));
 }
 LevelMap::~LevelMap()
 {

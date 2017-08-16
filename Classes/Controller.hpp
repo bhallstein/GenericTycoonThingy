@@ -1,7 +1,19 @@
 /*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  Controller.hpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
  * Controller.hpp
  *
- * A Controller issues tasks to  Units and Furnishings for its own devious/ant
+ * A Controller issues tasks to  Units and Furnishings for its own devious
  * aims & purposes
  *
  */

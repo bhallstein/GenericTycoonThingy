@@ -1,18 +1,21 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  LevelView.cpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "LevelView.hpp"
 #include "Unit.hpp"
 
-/* LevelView-specific event types */
-
-namespace W { namespace EventType {
-	T LV_LEFTMOUSEDOWN  = W::Event::registerType();
-	T LV_RIGHTMOUSEDOWN = W::Event::registerType();
-	T LV_LEFTMOUSEUP    = W::Event::registerType();
-	T LV_RIGHTMOUSEUP   = W::Event::registerType();
-	T LV_MOUSEMOVE      = W::Event::registerType();
-} }
-
-
-/* LevelView implementation */
+/********************************/
+/*** LevelView implementation ***/
+/********************************/
 
 LevelView::LevelView() :
 	View(new W::Positioner(
@@ -28,36 +31,25 @@ LevelView::LevelView() :
 	
 	// Screenedge scrolling
 	W::Callback scrCb(&LevelView::scrollEvent, this);
-	W::Messenger::subscribeToEventType(W::EventType::ScreenEdgeLeft,   scrCb);
-	W::Messenger::subscribeToEventType(W::EventType::ScreenEdgeRight,  scrCb);
-	W::Messenger::subscribeToEventType(W::EventType::ScreenEdgeTop,    scrCb);
-	W::Messenger::subscribeToEventType(W::EventType::ScreenEdgeBottom, scrCb);
+	W::Messenger::subscribe(W::EventType::ScreenEdgeLeft,   scrCb);
+	W::Messenger::subscribe(W::EventType::ScreenEdgeRight,  scrCb);
+	W::Messenger::subscribe(W::EventType::ScreenEdgeTop,    scrCb);
+	W::Messenger::subscribe(W::EventType::ScreenEdgeBottom, scrCb);
 }
 LevelView::~LevelView()
 {
-	// bye level view
-	W::Messenger::unsubscribeFromEventType(W::EventType::ScreenEdgeLeft,   this);
-	W::Messenger::unsubscribeFromEventType(W::EventType::ScreenEdgeRight,  this);
-	W::Messenger::unsubscribeFromEventType(W::EventType::ScreenEdgeTop,    this);
-	W::Messenger::unsubscribeFromEventType(W::EventType::ScreenEdgeBottom, this);
+	W::Messenger::unsubscribe(W::EventType::ScreenEdgeLeft,   this);
+	W::Messenger::unsubscribe(W::EventType::ScreenEdgeRight,  this);
+	W::Messenger::unsubscribe(W::EventType::ScreenEdgeTop,    this);
+	W::Messenger::unsubscribe(W::EventType::ScreenEdgeBottom, this);
 }
 
-void LevelView::processMouseEvent(W::Event *ev) {
-	// Convert event from pixel to grid coordinates
-	ev->pos -= _offset;
+void LevelView::updatePosition(const W::size &winsize) {
+	bgRect->setSz(rct.sz);
+}
+
+void LevelView::convertEventCoords(W::Event *ev) {
 	ev->pos = convertPixelToGridCoords(ev->pos);
-	
-	// Resubmit converted event with LEVEL_X type
-	using namespace W::EventType;
-	switch (ev->type) {
-		case LMouseDown : ev->type = LV_LEFTMOUSEDOWN;  break;
-		case RMouseDown : ev->type = LV_RIGHTMOUSEDOWN; break;
-		case LMouseUp   : ev->type = LV_LEFTMOUSEUP;    break;
-		case RMouseUp   : ev->type = LV_RIGHTMOUSEUP;   break;
-		case MouseMove  : ev->type = LV_MOUSEMOVE;      break;
-	}
-//	if (ev->type == LV_LEFTMOUSEUP) std::cout << ev->pos.xyStr() << "\n";
-	W::Messenger::dispatchPositionalEvent(ev);
 }
 W::EventPropagation::T LevelView::scrollEvent(W::Event *ev) {
 	using namespace W::EventType;
@@ -81,6 +73,8 @@ void LevelView::scroll(int x, int y) {
 	int max_offset_y = rct.sz.height - level_height * gridsize;
 	if (_offset.x < max_offset_x) _offset.x = max_offset_x;
 	if (_offset.y < max_offset_y) _offset.y = max_offset_y;
+	
+	bgRect->setPos(W::position(-_offset.x, -_offset.y));
 }
 
 W::position LevelView::convertGridToPixelCoords(const W::position &_p) {
@@ -104,13 +98,10 @@ W::position LevelView::convertPixelToGridCoords(const W::position &_p) {
 	);
 }
 
-void LevelView::updatePosition(const W::size &winsize) {
-	bgRect->setPos(rct.pos);
-	bgRect->setSz(rct.sz);
-}
 
-
-/* GTTHelpView implementation */
+/**********************************/
+/*** GTTHelpView implementation ***/
+/**********************************/
 
 GTTHelpView::GTTHelpView() : W::UIView("UIViews/GTTHelpView.lua")
 {

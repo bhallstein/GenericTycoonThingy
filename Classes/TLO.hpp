@@ -1,5 +1,17 @@
 /*
- * TLO.hpp - for useful top-level-object related functionality
+ * Generic Tycoon Thingy
+ *
+ * ===========
+ *  TLO.hpp
+ * ===========
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
+ * TLO.hpp - contains useful top-level-object related functionality
  *
  */
 

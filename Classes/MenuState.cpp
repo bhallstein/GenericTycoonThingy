@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  MenuState.cpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "MenuState.hpp"
 #include "LevelState.hpp"
 #include "MrKlangy.hpp"
@@ -11,7 +23,7 @@ MenuState::MenuState() : W::GameState(W::GS_OPAQUE)
 	addView(clicktobeginview);
 	
 	// Key subscriptions
-	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&MenuState::keyEvent, this));
+	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&MenuState::keyEvent, this));
 	W::Messenger::subscribeToUIEvent("LevelStartBtn", W::EventType::ButtonClick, W::Callback(&MenuState::uiEvent, this));
 	
 //	MrKlangy::playBGM("menu.xm");
@@ -42,7 +54,7 @@ W::EventPropagation::T MenuState::keyEvent(W::Event *ev) {
 	return W::EventPropagation::ShouldContinue;
 }
 W::EventPropagation::T MenuState::uiEvent(W::Event *ev) {
-	startLevel("level1");
+	startLevel("a save game");
 	return W::EventPropagation::ShouldContinue;
 }
 

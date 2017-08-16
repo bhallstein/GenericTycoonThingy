@@ -1,5 +1,17 @@
 /*
- * Types.hpp – useful declarations 'n junk
+ * Generic Tycoon Thingy
+ *
+ * =============
+ *  types.hpp
+ * =============
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
+ * Types.hpp – useful declarations & junk
  *
  */
 

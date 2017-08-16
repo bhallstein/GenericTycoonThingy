@@ -1,10 +1,23 @@
 /*
- * MenuState.hpp - a menu state
+ * Generic Tycoon Thingy
  *
- * Instantiates a ClickToBeginView, which is a UIView containing a single button
- * and a MenuBackgroundView, which has flashy colours.
+ * =================
+ *  MenuState.hpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
  */
 
+/*
+ * MenuState.hpp - a primitive menu state
+ * 
+ * Instantiates a ClickToBeginView, which is a UIView containing a single button
+ * and a MenuBackgroundView, which has flashy colours.
+ *
+ */ 
+ 
 #ifndef MENUSTATE_H
 #define MENUSTATE_H
 

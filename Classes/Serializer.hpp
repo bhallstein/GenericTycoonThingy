@@ -1,4 +1,16 @@
 /*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  Serializer.hpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
  * Serializer.hpp
  *
  * - A Serializer is a templated class created to wrap properties of a Serializable or one of its subclasses.

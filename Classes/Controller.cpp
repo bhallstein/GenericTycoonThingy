@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  Controller.cpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Controller.hpp"
 #include "Unit.hpp"
 #include "UIDManager.hpp"

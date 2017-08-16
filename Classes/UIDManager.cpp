@@ -1,10 +1,21 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  UIDManager.cpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "UIDManager.hpp"
 #include "TLO.hpp"
 
 TLO* UID::get() {
 	return UIDManager::getTLO(*this);
 }
-
 
 unsigned int UIDManager::currentID = 1;
 std::map<UID,UID> UIDManager::translationMap;

@@ -1,5 +1,12 @@
 /*
- * LevelMap.hpp
+ * Generic Tycoon Thingy
+ *
+ * ================
+ *  LevelMap.hpp
+ * ================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
  *
  */
 

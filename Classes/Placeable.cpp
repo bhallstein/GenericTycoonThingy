@@ -1,10 +1,22 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  Placeable.cpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Placeable.hpp"
 #include "PlaceableManager.hpp"
 #include "LevelState.hpp"
 #include "LevelView.hpp"
 
-Placeable::Placeable(PlaceableManager *_mngr) :
-	mngr(_mngr)
+Placeable::Placeable(PlaceableManager *_mngr, LevelView *_lv) :
+	mngr(_mngr), levelView(_lv)
 {
 	// hai placeable
 }
@@ -17,15 +29,15 @@ W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
 	W::position p = ev->pos;
 	p.a = p.b = 0;
-	if (ev->type == LV_MOUSEMOVE) {
+	if (ev->type == MouseMove) {
 		pos = p;
 		mngr->placementLoopUpdate();
 	}
-	else if (ev->type == LV_LEFTMOUSEUP) {
+	else if (ev->type == LMouseUp) {
 		if (mngr->attemptToPlace(p))
 			deactivate();
 	}
-	else if (ev->type == LV_RIGHTMOUSEUP) {
+	else if (ev->type == RMouseUp) {
 		deactivate();
 		mngr->cancel();
 	}
@@ -37,19 +49,19 @@ W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
 bool Placeable::activate() {
 	using namespace W::EventType;
 	W::Callback cb(&Placeable::mouseEvent, this);
-	bool success = W::Messenger::requestPrivilegedResponderStatusForEventType(LV_MOUSEMOVE, cb)
-		&& W::Messenger::requestPrivilegedResponderStatusForEventType(LV_LEFTMOUSEDOWN, cb)
-		&& W::Messenger::requestPrivilegedResponderStatusForEventType(LV_LEFTMOUSEUP, cb)
-		&& W::Messenger::requestPrivilegedResponderStatusForEventType(LV_RIGHTMOUSEDOWN, cb)
-		&& W::Messenger::requestPrivilegedResponderStatusForEventType(LV_RIGHTMOUSEUP, cb);
+	bool success = W::Messenger::requestPrivilegedEventResponderStatus(levelView, MouseMove, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, LMouseDown, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, LMouseUp, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, RMouseDown, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, RMouseUp, cb);
 	if (!success) deactivate();
 	return success;
 }
 void Placeable::deactivate() {
 	using namespace W::EventType;
-	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LV_MOUSEMOVE, this);
-	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LV_LEFTMOUSEDOWN, this);
-	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LV_LEFTMOUSEUP, this);
-	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LV_RIGHTMOUSEDOWN, this);
-	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LV_RIGHTMOUSEUP, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, MouseMove, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, LMouseDown, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, LMouseUp, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, RMouseDown, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, RMouseUp, this);
 }

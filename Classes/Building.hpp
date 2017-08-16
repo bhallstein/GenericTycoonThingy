@@ -1,4 +1,16 @@
 /*
+ * Generic Tycoon Thingy
+ *
+ * ================
+ *  Building.hpp
+ * ================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
  * Building.hpp
  * 
  * Buildings are slightly different from the other TLOs. They aren’t really

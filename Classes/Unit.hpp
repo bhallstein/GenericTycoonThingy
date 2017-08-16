@@ -1,5 +1,12 @@
-/* 
- * Unit.hpp
+/*
+ * Generic Tycoon Thingy
+ *
+ * ============
+ *  Unit.hpp
+ * ============
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
  *
  */
 

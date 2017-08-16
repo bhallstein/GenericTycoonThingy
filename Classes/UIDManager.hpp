@@ -1,7 +1,19 @@
 /*
- * UIDManager.hpp - static class allowing TLOs to refer to each other by UID
+ * Generic Tycoon Thingy
  *
- * 
+ * ==================
+ *  UIDManager.hpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
+ * UIDManager.hpp
+ *
+ * Static class allowing TLOs to refer to each other by UID
  *
  */
 

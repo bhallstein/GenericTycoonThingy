@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ===============
+ *  MrPaths.hpp
+ * ===============
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #ifndef MrPaths_H
 #define MrPaths_H
 

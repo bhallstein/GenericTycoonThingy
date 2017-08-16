@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ====================
+ *  Serializable.cpp
+ * ====================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Serializable.hpp"
 #include "Serializer.hpp"
 

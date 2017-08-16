@@ -1,6 +1,13 @@
 /*
- * SpawnPoint.hpp - a spawn point
- * 
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  SpawnPoint.hpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
  */
 
 #ifndef SPAWNPOINT_H

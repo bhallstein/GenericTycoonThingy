@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ================
+ *  MrKlangy.cpp
+ * ================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 

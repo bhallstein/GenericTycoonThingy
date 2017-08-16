@@ -1,5 +1,17 @@
 /*
- * Placeable.hpp - sort of an abstract placement manager for MappedObj
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  Placeable.hpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
+/*
+ * Placeable.hpp - sort of an abstract placement manager for TLOs
  *
  */
 
@@ -12,16 +24,18 @@
 #include "W.h"
 
 class PlaceableManager;
+class LevelView;
 
 class Placeable {
 public:
-	Placeable(PlaceableManager *);
+	Placeable(PlaceableManager *, LevelView *);
 	~Placeable();
 	bool activate();
 	void deactivate();
 	W::EventPropagation::T mouseEvent(W::Event *);
 	PlaceableManager *mngr;
 	W::position pos;
+	LevelView *levelView;
 };
 
 #endif

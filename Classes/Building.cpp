@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  Buliding.cpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Building.hpp"
 #include "LevelState.hpp"
 #include "LevelView.hpp"
@@ -33,7 +45,7 @@ Building::Building(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_n
 	rct.setPos(_pos);
 //	bInfo = &Building::buildingTypes[type];	// Save ptr to properties for this building type
 	
-	W::Messenger::subscribeToEventType(W::EventType::LV_LEFTMOUSEDOWN, W::Callback(&Building::mouseEvent, this));
+	W::Messenger::subscribeInView(levelView, W::EventType::LMouseDown, W::Callback(&Building::mouseEvent, this), &rct);
 	
 	if (!navmap->isPassableUnder(rct))
 		throw W::Exception("Navmap was not passable under Building plan.");
@@ -43,11 +55,13 @@ Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
 	navmap->unisolate(rct);		// NOTE: W::NavMap::unisolate() is not yet functional
-	W::Messenger::unsubscribeFromMouseEvents(this);
+	W::Messenger::unsubscribeInView(levelView, W::EventType::LMouseDown, this);
 }
 
 W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
-	if (ev->type == W::EventType::LV_LEFTMOUSEDOWN) {
+	using namespace W::EventType;
+	if (ev->type == LMouseDown) {
+		std::cout << "Building " << this << " lmousedown\n";
 //		level->openFurnishingPurchasingView(this);
 	}
 	return W::EventPropagation::ShouldContinue;

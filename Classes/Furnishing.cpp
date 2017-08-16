@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  Furnishing.cpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Furnishing.hpp"
 #include "Building.hpp"
 #include "Unit.hpp"
@@ -49,18 +61,18 @@ Furnishing::Furnishing(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap
 	drawnFurnishing = new DrawnFurnishing(levelView);
 	drawnFurnishing->setPosn(rct.pos);
 	
-	W::Messenger::subscribeToPositionalEventType(W::EventType::LV_LEFTMOUSEUP, W::Callback(&Furnishing::mouseEvent, this), &rct);
-	std::cout << "lv left mouse up: " << W::EventType::LV_LEFTMOUSEUP << "\n";
+	W::Messenger::subscribeInView(levelView, W::EventType::LMouseUp, W::Callback(&Furnishing::mouseEvent, this), &rct);
 }
 Furnishing::~Furnishing()
 {
 	std::cout << "furnishing destruct" << std::endl;
 	using namespace W::EventType;
-	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEDOWN,  this);
-	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEUP,    this);
-	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
-	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
-	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
+	W::Messenger::unsubscribeInView(levelView, LMouseUp, this);
+//	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEDOWN,  this);
+//	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEUP,    this);
+//	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
+//	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
+//	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
 	navmap->makePassable(rct);
 	delete drawnFurnishing;
 }
@@ -91,8 +103,8 @@ void Furnishing::_setUp() {
 W::EventPropagation::T Furnishing::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
 	
-	if (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
-	else if (ev->type == LV_LEFTMOUSEUP)
+	if (ev->type == MouseMove) { /* hover = true; */ }
+	else if (ev->type == LMouseUp)
 		std::cout << "furnishing " << uid.id << " detected left mouse up" << std::endl;
 	
 	return W::EventPropagation::ShouldStop;

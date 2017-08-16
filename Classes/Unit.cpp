@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ============
+ *  Unit.cpp
+ * ============
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "Unit.hpp"
 #include "Building.hpp"
 #include "LevelState.hpp"
@@ -51,11 +63,11 @@ Unit::~Unit()
 {
 	std::cout << "unit " << this << " destruct" << std::endl;
 	using namespace W::EventType;
-	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEDOWN,  this);
-	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEUP,    this);
-	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
-	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
-	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
+//	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEDOWN,  this);
+//	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEUP,    this);
+//	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
+//	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
+//	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
 	delete drawnUnit;
 }
 void Unit::_setUp() {
@@ -86,11 +98,11 @@ W::EventPropagation::T Unit::mouseEvent(W::Event *ev) {
 	W::EventPropagation::T v = W::EventPropagation::ShouldStop;
 
 	if (mode == UnitMode::ANIMATING) return v;
-	if      (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
-	else if (ev->type == LV_LEFTMOUSEDOWN) printDebugInfo();
-	else if (ev->type == LV_RIGHTMOUSEDOWN) {
-		if (typeInfo->isStaff) pickUp();
-	}
+//	if      (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
+//	else if (ev->type == LV_LEFTMOUSEDOWN) printDebugInfo();
+//	else if (ev->type == LV_RIGHTMOUSEDOWN) {
+//		if (typeInfo->isStaff) pickUp();
+//	}
 	
 	return v;
 }

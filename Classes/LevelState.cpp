@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  LevelState.cpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
+ */
+
 #include "LevelState.hpp"
 #include "LevelView.hpp"
 #include "LevelMap.hpp"
@@ -31,7 +43,7 @@ LevelState::LevelState() :
 	
 //	MrKlangy::playBGM("level.mod");
 	
-	W::Messenger::subscribeToEventType(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
+	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
 }
 LevelState::~LevelState()
 {

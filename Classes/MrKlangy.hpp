@@ -1,5 +1,12 @@
 /*
- * MrKlangy.hpp - your helpful audio assistant
+ * Generic Tycoon Thingy
+ *
+ * ================
+ *  MrKlangy.hpp
+ * ================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
  *
  */
 

@@ -1,5 +1,12 @@
 /*
- * LevelView.hpp
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  LevelView.hpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
  *
  */
 
@@ -11,18 +18,14 @@
 #include "Unit.hpp"
 #include "Furnishing.hpp"
 
-// LevelView-specific event types
-namespace W { namespace EventType {
-	extern T LV_LEFTMOUSEDOWN, LV_LEFTMOUSEUP, LV_RIGHTMOUSEDOWN, LV_RIGHTMOUSEUP, LV_MOUSEMOVE;
-} }
-
-
 class LevelView : public W::View {
 public:
 	LevelView();
 	~LevelView();
 	
-	void processMouseEvent(W::Event *);
+	void updatePosition(const W::size &);
+	
+	void convertEventCoords(W::Event *);
 	W::EventPropagation::T scrollEvent(W::Event *);
 	
 	void setLevelSize(const W::size &sz) {
@@ -35,8 +38,6 @@ public:
 	W::size     convertPixelToGridCoords(const W::size &);
 	
 protected:
-	void updatePosition(const W::size &winsize);
-	
 	W::DRect *bgRect;
 	
 	int gridsize;

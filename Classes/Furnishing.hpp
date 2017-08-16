@@ -1,6 +1,13 @@
 /*
- * Furnishing.hpp
- * 
+ * Generic Tycoon Thingy
+ *
+ * ==================
+ *  Furnishing.hpp
+ * ==================
+ *
+ * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * All rights reserved
+ *
  */
 
 #ifndef FURNITURE_H
