@@ -17,12 +17,10 @@
 #include <vector>
 
 #include "types.h"
-#include "MappedObj.hpp"
 #include "MisterHeapy.hpp"
 
 using std::cout;
 using std::endl;
-
 
 class NavNode
 {
@@ -51,6 +49,7 @@ protected:
 };
 
 
+class MappedObj;
 class Building;
 
 class NavMap

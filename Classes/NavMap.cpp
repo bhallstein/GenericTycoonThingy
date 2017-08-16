@@ -1,7 +1,4 @@
 #include "NavMap.hpp"
-#include "Building.hpp"
-
-/****   NavNode implementation   ****/
 
 NavNode::NavNode() {
 	passable = true;
@@ -32,14 +29,14 @@ void NavNode::setComparand(float _min_dist) {
 }
 
 
-/****   NavMap implementation   ****/
+#include "MappedObj.hpp"
+#include "Building.hpp"
 
 NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h) {
 	w = _w, h = _h;
 	int n = w * h;
 	nodes.resize(n);
 
-	int i, j, x, y;
 	NavNode *node;
 	for (int j=0; j < h; j++) {
 		for (int i=0; i < w; i++) {
@@ -47,11 +44,10 @@ NavMap::NavMap(int _w, int _h) : open_nodes(_w * _h) {
 			node->x = i;						// NavNodes should know their coordinates
 			node->y = j;						//
 			
-			for (y = j-1; y <= j+1; y++)		// Setup refs to neighbouring nodes
-				for (x = i-1; x <= i+1; x++)
+			for (int y = j-1; y <= j+1; y++)		// Setup refs to neighbouring nodes
+				for (int x = i-1; x <= i+1; x++)
 					if (x == i && y == j) ;							// self is not a neighbour
 					else if (x < 0 || x >= w || y < 0 || y >= h) ;	// check map boundaries
-					//else if (!nodes[y*w + x].passable) ;			// exclude impassable neighbours (actually don't: all passable at this point!)
 					else node->addNeighbour(&nodes[y*w + x]);
 		}
 	}
@@ -172,7 +168,7 @@ void NavMap::addBuilding(Building *b) {
 	// for each edgey node
 	for (int i=0; i < edgey_nodes.size(); i++) {
 		NavNode *X = edgey_nodes[i];
-		std::vector<NavNode *> *neighbours = &X->neighbours;
+		//std::vector<NavNode *> *neighbours = &X->neighbours;
 		// if any two nodes on adjacent sides are not neighbours of x, sever the connection between them
 		NavNode *n1, *n2;
 		if (X->y > 0 && X->x < w - 1) {			// check above and right nodes

@@ -1,11 +1,11 @@
 #include "SettingsManager.hpp"
 
-SettingsManager::SettingsManager(char* argv[])
+SettingsManager::SettingsManager(/*char* argv[]*/)
 {
-	init(argv);
+	init();
 }
 
-void SettingsManager::init(char* argv[])
+void SettingsManager::init(/*char* argv[]*/)
 {
 	//fixed path to local settings file
 	std::string fileName = "Data/settings.xml";

@@ -1,29 +1,35 @@
 #include "Unit.hpp"
 #include "NavMap.hpp"
-#include "View.hpp"
 
-Unit::Unit(NavMap *_navmap, View *_view, int _x, int _y) :
-	MappedObj(_x, _y), navmap(_navmap), view(_view), destroyed(false), dest_x(_x), dest_y(_y), state(S_IDLE), hover(false)
+Unit::Unit(NavMap *_navmap, int _x, int _y) :
+	MappedObj(_x, _y),
+	navmap(_navmap),
+	destroyed(false),
+	dest_x(_x),
+	dest_y(_y),
+	state(S_IDLE),
+	hover(false)
 {
 	intcoord p[] = { {0,0}, {-1,-1} };
 	setGroundPlan(p);
 	
 	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 }
-Unit::~Unit() {
+Unit::~Unit()
+{
 	std::cout << "unit destruct" << std::endl;
 }
 
 void Unit::receiveEvent(Event *ev) {
-	if (ev->type == MOUSEMOVE)
+	if (ev->type == Event::MOUSEMOVE)
 		hover = true;
 }
 
-char Unit::col() {
-	if (hover) { hover = false; return 'l'; }
-	else if (state == S_IDLE) return 'b';
-	else if (state == S_TRAVELING) return 'w';
-	else return 'r';
+colour_name Unit::col() {
+	if (hover) { hover = false; return BLUE; }
+	else if (state == S_IDLE) return BLACK;
+	else if (state == S_TRAVELING) return WHITE;
+	else return RED;
 }
 
 void Unit::update() {
@@ -93,10 +99,8 @@ void Unit::incrementLocation() {
 	if (reached_next) {
 		// If on point of entering next loc, check is passable
 		if (route[0]->passable) {
-			view->removeResponder(this);
 			x = next_x, y = next_y;
 			a = b = 0;
-			view->addResponder(this);
 			nextInRoute();
 		}
 		// If access denied, go back to the previous square. Waiting & recalculation will ensue upon arrival.

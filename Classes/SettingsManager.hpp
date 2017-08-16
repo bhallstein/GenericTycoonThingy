@@ -13,18 +13,15 @@
 #define SETTINGSMANAGER_H
 
 #include <string>
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/xml_parser.hpp>
-//#include <boost/foreach.hpp>
 
 #include "Setting.hpp"
 
 class SettingsManager
 {
 public:
-	SettingsManager(char* argv[]);
+	SettingsManager(/*char* argv[]*/);
 	// Methods
-	void init(char* argv[]); //initialise SM - this includes loading settings or defaults as appropriate
+	void init(/*char* argv[]*/); //initialise SM - this includes loading settings or defaults as appropriate
 	void save(std::string fileName); // Save external files (XML and Binary)
 	//void detect(); 					// Run detection routines for flagged settings
 
@@ -54,7 +51,5 @@ public:
 	}
 
 };
-
-
 
 #endif

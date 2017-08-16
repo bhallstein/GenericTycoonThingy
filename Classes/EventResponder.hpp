@@ -6,9 +6,6 @@
 #ifndef EVENTRESPONDER_H
 #define EVENTRESPONDER_H
 
-#include <SFML/Window.hpp>
-
-#include "types.h"
 #include "Event.hpp"
 
 class EventResponder
@@ -18,8 +15,8 @@ public:
 	~EventResponder() { };
 
 	virtual void receiveEvent(Event *) = 0;
-
-protected:
+	
+	int x, y, width, height;		// For ERs that need to handle mouse events
 	
 };
 

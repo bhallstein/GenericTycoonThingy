@@ -1,6 +1,9 @@
 #include "Placeable.hpp"
+#include "NavMap.hpp"
+#include "ResponderMap.hpp"
 
-Placeable::Placeable(NavMap *_navmap, View *_view) : MappedObj(0, 0), navmap(_navmap), view(_view), clicked(false), destroyed(false), mode(PLACEMENT)
+Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM) :
+	MappedObj(-100, -100), navmap(_navmap), levelResponderMap(_levelRM), clicked(false), destroyed(false), mode(PLACEMENT)
 {
 	intcoord p[] = {
 		{0,0}, {1,0},
@@ -15,31 +18,31 @@ Placeable::~Placeable()
 
 void Placeable::receiveEvent(Event *ev) {
 	if (mode == PLACEMENT) {
-		if (ev->type == MOUSEMOVE) {
+		if (ev->type == Event::MOUSEMOVE) {
 			x = ev->x, y = ev->y;
 		}
-		else if (ev->type == LEFTCLICK) {
+		else if (ev->type == Event::LEFTCLICK) {
 			for (int i=0, n = ground_plan.size(); i < n; i++) {
 				intcoord c = ground_plan[i];
 				if (!navmap->isPassableAt(c.x + x, c.y + y))
 					return;							// Check if area is passable
 			}
 			mode = PLACED;
-			view->relinquishPrivilegedEventResponderStatus(this);
-			view->addResponder(this);
+			levelResponderMap->relinquishPrivilegedEventResponderStatus(this);
+			levelResponderMap->addMappedObj(this);
 			navmap->addImpassableObject(this);
 		}
-		else if (ev->type == RIGHTCLICK) {
-			view->relinquishPrivilegedEventResponderStatus(this);
+		else if (ev->type == Event::RIGHTCLICK) {
+			levelResponderMap->relinquishPrivilegedEventResponderStatus(this);
 			destroyed = true;
 		}
 	}
 	else if (mode == PLACED) {
-		if (ev->type == LEFTCLICK)
+		if (ev->type == Event::LEFTCLICK)
 			clicked = !clicked;
 	}
 }
 
-char Placeable::col() {
-	return (mode == PLACEMENT ? 'w' : clicked ? 'r' : 'b');
+colour_name Placeable::col() {
+	return (mode == PLACEMENT ? WHITE : clicked ? RED : BLUE);
 }

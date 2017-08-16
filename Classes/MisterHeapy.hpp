@@ -43,14 +43,13 @@
  *         - that the first element pushed or fast_pushed after instantiating or resetting() IS THE FIRST in said
  *           contiguous area of memory
  *         - obviously enough, that your elements do not move in memory after you have added pointers to them to the heap
+ *
  */
 
 #ifndef MISTERHEAPY_H
 #define MISTERHEAPY_H
 
 #include <iostream>
-#include <queue>
-#include <algorithm>
 
 #include "types.h"
 

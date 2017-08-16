@@ -1,15 +1,22 @@
 #include "Menu.hpp"
+#include "Game.hpp"
 #include "Level.hpp"
+#include "Button.hpp"
 
-Menu::Menu(Game *_game, sf::RenderWindow *_window) : GameState(_game, _window)
+Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW), buttonMap(_theW->width(), _theW->height())
 {
-	menuview = new MenuView(window, 16, 16, 0, 0, 0, 0);
-	eventHandler.subscribe(menuview);
+	JenniferAniston aniston(theW, TOP_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 1);
+	menuview = new MenuView(_theW, aniston, &buttonMap, &buttons);
+	responderMap.addResponder(menuview);
 	
-	// Add buttons, add them to menuview
-	Button *b = new Button(this, 3, 3);			// For menu customization, could set various this-stuffery from xml shiz.
-	buttons.push_back(b);						// 
-	menuview->addResponder(b);					//
+	// Add buttons
+	startlevel_btn = new Button(this, 100, 200, 240, 135);
+	buttonMap.addResponder(startlevel_btn);
+	buttons.push_back(startlevel_btn);
+	
+	// Key subscriptions
+	responderMap.subscribeToKey(this, Event::K_Q);
+	responderMap.subscribeToKey(this, Event::K_ESC);
 }
 Menu::~Menu()
 {
@@ -17,7 +24,7 @@ Menu::~Menu()
 	Button *b;
 	for (int i=0, n = buttons.size(); i < n; i++) {
 		b = buttons[i];
-		menuview->removeResponder(b);
+		buttonMap.removeResponder(b);
 		delete b;
 	}
 	buttons.clear();
@@ -33,54 +40,54 @@ void Menu::resume(Returny *returny) {
 	if (returny->type == Returny::killer_returny)
 		game->stateFinished(this, Returny(Returny::killer_returny));
 }
-void Menu::handleEvent(Event *ev) {
-	// Handle things like ESC, UP, DOWN, ENTER...
-	if (ev->type == KEYPRESS) {
-		if (ev->key == K_ESC)
-			game->stateFinished(this, Returny(Returny::empty_returny));
-	}
-}
 void Menu::update() {
 
 }
 void Menu::draw() {
-	menuview->draw(&buttons);
+	menuview->_draw();
+}
+
+void Menu::setResolution(int _w, int _h) {
+	GameState::setResolution(_w, _h);
+	buttonMap.setSize(_w, _h);
+	menuview->updatePosition();
+}
+
+void Menu::receiveEvent(Event *ev) {
+	if (ev->type == Event::KEYPRESS) {
+		if (ev->key == Event::K_Q)
+			game->stateFinished(this, Returny(Returny::killer_returny));
+		if (ev->key == Event::K_ESC)
+			game->stateFinished(this, Returny(Returny::empty_returny));
+	}
+}
+
+void Menu::buttonClick(Button *btn) {
+	if (btn == startlevel_btn)
+		startLevel("Data/level1.xml");
 }
 
 void Menu::startLevel(std::string path) {
-	level = new Level(game, window, path);		// Urgently need error handling here (exception in Level constr?)
+	std::cout << "starting level " << path << std::endl;
+	std::string p = path;
+	level = new Level(game, theW, p);		// Need error handling here (e.g. for exception in Level constructor?)
 	game->pushState(level);
 }
 
 
-Button::Button(Menu *_menu, int _x, int _y) : MappedObj(_x, _y), menu(_menu)
-{
-	intcoord p[] = {
-		{0,0}, {1,0}, {2,0},
-		{0,1}, {1,1}, {2,1}, {-1,-1}
-	};
-	setGroundPlan(p);
-}
-Button::~Button() {
-	std::cout << "Button destruct" << std::endl;
-}
-void Button::receiveEvent(Event *ev) {
-	if (ev->type == MOUSEMOVE)
-		hover = true;
-	else if (ev->type == LEFTCLICK)
-		menu->startLevel("Data/level1.xml");
-}
-char Button::col() {
-	if (hover) { hover = false; return 'r'; }
-	else return 'b';
-}
+#include "../W.hpp"
 
-MenuView::MenuView(sf::RenderWindow *_win, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :
-	View(_win, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
+MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_buttonMap, std::vector<Button*> *_buttons)
+: View(_theW, _aniston), buttonMap(_buttonMap), buttons(_buttons)
 {
 	
 }
-void MenuView::draw(std::vector<Button*> *buttons) {
-	for (int i=0, n = buttons->size(); i < n; i++)
-		drawMappedObj((*buttons)[i]);
+void MenuView::draw() {
+	for (int i=0, n = buttons->size(); i < n; i++) {
+		Button *b = (*buttons)[i];
+		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	}
+}
+void MenuView::processMouseEvent(Event *ev) {
+	buttonMap->dispatchEvent(ev);
 }
