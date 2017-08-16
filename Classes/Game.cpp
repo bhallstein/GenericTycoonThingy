@@ -31,8 +31,8 @@ void Game::Run()
 	LevelMap levelmap(default_map_columns, default_map_rows, pixel_width, pixel_height);
 	
 	bool should_quit = false;
-	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, and imlement the 
-															// receiveEvent(sf::Event *ev) method
+	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
+															// the receiveEvent(sf::Event *ev) method
 	sf::Event ev;
     
 	while (DBTWindow.IsOpened() && !should_quit)
@@ -47,11 +47,9 @@ void Game::Run()
 	
 			// If there is privileged event responder: send events to it
 			if (privileged_event_responder != NULL) {
-				// Send to P.E.R.
 				// The game loop can't always know what the P.E.R. should do with the event
 				// 	– it depends on what the P.E.R. is up to. We merely send the event on.
 				EventResponder *resp = (EventResponder*) privileged_event_responder;
-				//cout << "sending event to Privileged Responder... ";
 				resp->receiveEvent(&ev, &privileged_event_responder);
 			}
 			else {
@@ -68,13 +66,14 @@ void Game::Run()
 						privileged_event_responder = (EventResponder*) b;	// not sure if cast to EvResp needed here
 
 						std::cout << "adding building to memory map... ";
-						// add to memory map
 					}
 				}
 				// Mouse
 				else if (ev.Type == sf::Event::MouseMoved) 
 				{
 					// Send to relevant things, use memory mapping
+					// get maploc for mouse location
+					// send event to each’s receiveEvent() method
 				}
 			}
         }

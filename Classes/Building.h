@@ -15,6 +15,8 @@
 
 #include "EventResponder.h"
 
+#define NO_PREV_POSITION -27831
+
 
 class Building : EventResponder
 {
@@ -25,7 +27,7 @@ public:
 	/* Instance methods */
 	void handleMouseMove(int x, int y);
  	void setPositionFromMouse(int x, int y);
-	void setPos(sf::Vector2i);
+	void getBounds(int *x1, int *y1, int *x2, int *y2);
 
 	void draw(sf::RenderWindow &wind);
 	
@@ -33,14 +35,17 @@ public:
 	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);
 
 	/* Instance varables */
+	sf::Vector2i pos;
+	sf::Vector2i size_in_blocks;
+
 	bool destroyed;
+	bool position_updated;
+	sf::Vector2i prev_position;
 
 protected:
 	enum mode_types { PLACEMENT, PLACED } mode;
-	sf::Vector2i pos;
 	sf::Vector2i block_size;		// pixel size of blocks that make up the map
-	sf::Vector2i size_in_blocks;	// w/h of building, in map blocks
-
+	
 };
 
 #endif

@@ -6,15 +6,22 @@ Building::Building(sf::Vector2i _block_size)
 	size_in_blocks.x = 6;
 	size_in_blocks.y = 4;
 	block_size = _block_size;
+
+	// Builing state relevant to the LevelMap.
 	destroyed = false;
+	position_updated = false;
+	prev_position.x = prev_position.y = NO_PREV_POSITION;
+	
 }
 Building::~Building()
 {
 	// Destroy things
 }
 
-void Building::setPositionFromMouse(int x, int y)
-{
+void Building::setPositionFromMouse(int x, int y) {
+	prev_position.x = pos.x;
+	prev_position.y = pos.y;
+	
 	int remainder_x = x % block_size.x;
 	int remainder_y = y % block_size.y;
 
@@ -23,13 +30,18 @@ void Building::setPositionFromMouse(int x, int y)
 	
 	pos.x = topleftcorner_x - remainder_x;
 	pos.y = topleftcorner_y - remainder_y;
+	
+	position_updated = true;
 }
 
-void Building::setPos(sf::Vector2i _pos) {
-	pos = _pos;
+void Building::getBounds(int *x1, int *y1, int *x2, int *y2) {
+	*x1 = pos.x;
+	*y1 = pos.y;
+	*x2 = pos.x + size_in_blocks.x * block_size.x;
+	*y2 = pos.y + size_in_blocks.y * block_size.y;
 }
 
-void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {		// how to unhook from PER status? pass pointer to it?
+void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {
 	if (mode == PLACEMENT) {
 		if (ev->Type == sf::Event::MouseMoved) {
 			this->setPositionFromMouse(ev->MouseMove.X, ev->MouseMove.Y);
@@ -76,9 +88,8 @@ void Building::draw(sf::RenderWindow &w)
   A building generates its own internal mapping region, also – i.e. they define a free movement zone,
   and form a node in the pathfinding system’s nodelist.
   
-  
-  Buildings are like other things in the game, like units, obstacles, implements, furniture in
-  some key respects – each object must have a sprite, and the code for managing the display of that sprite
-  (or returning it for display by some more powerful, parent drawing class.)
+  Buildings are like other things in the game (units, obstacles, implements, furniture...) in
+  some key respects – for example, each has a sprite, and managed the display of that sprite
+  (or returns it for display by some more powerful parent class.)
 
 #endif

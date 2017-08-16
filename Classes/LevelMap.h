@@ -36,17 +36,16 @@ public:
 	LevelMap(int _rows, int _columns, int _width, int _height);
 	~LevelMap();
 
-	// Properties
-	int columns, rows;
-	vector<Building> buildings;
-
-	// Getters
-	int numberOfBuildings();
-
 	// Functions
 	void draw(sf::RenderWindow& window);
 	Building *createBuilding();
-	void moveBuilding(Building *b, int x1, int y1, int x2, int y2);	// If setting initial location, use a negative value for x1 or y1
+
+	//void memmap_addObject(DrawnObject *object);
+	//void memmap_removeObject(DrawnObject *object);
+
+	// Properties
+	int columns, rows;
+	vector<Building> buildings;
 
 protected:
 	// Memory mapped list of things at each integer location

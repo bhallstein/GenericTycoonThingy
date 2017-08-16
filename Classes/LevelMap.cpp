@@ -37,10 +37,7 @@ LevelMap::LevelMap(int _columns, int _rows, int _width, int _height)
 LevelMap::~LevelMap()
 {
 	// Destructor
-}
-
-int LevelMap::numberOfBuildings() {
-	return buildings.size();
+	maplocs.clear();
 }
 
 Building* LevelMap::createBuilding()
@@ -48,48 +45,41 @@ Building* LevelMap::createBuilding()
 	Building b(block_size);
 	buildings.push_back(b);
 	std::cout << "created building: " << buildings.size() << std::endl;
-	return &buildings.back();
+
+	Building *new_building = &buildings.back();
+
+	return new_building;
 }
 
-void LevelMap::moveBuilding(Building *b, int x1, int y1, int x2, int y2)
-{
-	//// Remove from current maploc
-	//if (x1 >= 0 and y1 >= 0)
-	//	(*maplocs[y1 * rows + x1]).removeBuilding(b);
-	//	
-	//// Add to new maploc
-	//(*maplocs[y2 * rows + x2]).addBuilding(b);
-}
-
+//void LevelMap::memmap_addObject(DrawnObject *object) {
+//	// Add to memory map
+//}
+//void LevelMap::memmap_removeObject(DrawnObject *object) {
+//	// Remove from memory map
+//	// Should a drawn object always implement a prev_position, with the option of NO_PREV_POSITION?
+//	// This way, can remove it from memory map without passing x1, y1, x2, y2
+//	// Yes, then.
+//}
 
 void LevelMap::draw(sf::RenderWindow &window)
 {
 	// Draw buildings
 	for (vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++) {
-		if ((*i).destroyed)
+		if ((*i).destroyed) {
+			// Remove from memory map
+			// this->memmap_removeObject(buildings[i]);
 			buildings.erase(i--);
+		}
+		//else if ((*i).position_updated) {
+		//	// Move in memory map
+		//	this->memmap_removeObject(buildings[i]);
+		//	this->memmap_addObject(buildings[i]);
+		//	(*i).position_updated = false;
+		//	//int x1, y1, x2, y2;
+		//	//new_building->getBounds(&x1, &y1, &x2, &y2);
+		//	//this->memmap_addObject(new_building, x1, y1, x2, y2);
+		//}
 		else
 			(*i).draw(window);
 	}
 }
-
-
-
-
-#ifdef dont_compile_this_pls_its_not_actually_code
-
-  Process for adding a building:
-  	- create building object
-  		- initialize in mode 'placement':
-  			- responds to all mouse events, and blocks other things from responding to them (captures? them) *
-  			- on hover, if valid placement, color => green, otherwise red
-  			- on click, if valid placement, building changes to mode to 'placed'
-  
-  * The concept of privileged event responders is required: some things must interrupt the usual mapping of events
-    to objects via the map, and be the sole recipient of such events.
-
-	This can be achieved if, when the game loop elicits the creation of a new building, it receives back a reference
-	to the building created. The game loop has a privileged_mouse_event_responder, and, before sending events
-	down the usual channels, test this, and if it is set, instead sends the mouse events only to that privileged responder.
-
-#endif
