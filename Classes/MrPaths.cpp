@@ -2,7 +2,7 @@
 
 #ifdef __APPLE__
 	#include <Cocoa/Cocoa.h>
-#elif defined WIN32 || WIN64
+#elif defined _WIN32 || _WIN64
 	#include "shlobj.h"
 #endif
 
