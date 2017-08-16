@@ -26,7 +26,7 @@ class Building : public MappedObj {
 public:
 	Building(int _x, int _y, const char *type);
 	~Building();
-
+	
 	// Properties
 	std::string type;
 	bool destroyed;
@@ -36,8 +36,8 @@ public:
 	void receiveEvent(Event *);		// Handle mouse events
 	void update() { }
 	colour col();
-
-	static bool initialize(W *);	// Populate buildingTypes map from buildings.lua.
+	
+	static bool initialize(W *);	// Populate our static buildingTypes map from buildings.lua.
 	
 protected:
 	// Properties

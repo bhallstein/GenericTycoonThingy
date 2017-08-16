@@ -90,6 +90,7 @@ bool Building::initialize(W *_W) {
 		lua_pop(L, 2);								// Stack: -1 key; -2 table
 	}
 	
+	_W->log("...initialization succeeded.");
 	return true;
 }
 

@@ -13,16 +13,27 @@
 #include "Classes/Event.hpp"
 #include "Classes/View.hpp"
 
+std::string W::logfilePath;
+std::ofstream W::logfile;
+
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
 	this->initializePaths();
-	logfile.open(logfilePath.c_str());
+	W::logfile.open(logfilePath.c_str());
+#ifdef __APPLE__
+	// Tail log file in a Terminal window
+	system("echo \"#!/bin/bash\" > ~/Desktop/tail_cmd");
+	system("echo \"tail -f ~/Desktop/DBTlog.txt\" >> ~/Desktop/tail_cmd");
+	system("chmod a+x ~/Desktop/tail_cmd; open -a Terminal ~/Desktop/tail_cmd");
+#endif
 	std::string s = "W: settingsPath: "; s.append(settingsPath);
 	std::string t = "W: resourcesPath: "; t.append(resourcesPath);
-	log(s.c_str()); log(t.c_str());
-	log("");
+	log(s.c_str()); log(t.c_str()); log("");
 }
 W::~W() {
 	log("W destruct");
+#ifdef __APPLE__
+	system("mv ~/Desktop/tail_cmd ~/.Trash/");
+#endif
 	logfile.close();
 }
 
@@ -104,8 +115,8 @@ void W::initializePaths() {
 	// Log path
 	char path[MAX_PATH] = "";
 	[NSHomeDirectory() getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
-	logfilePath = path;
-	logfilePath.append("/Desktop/DBTlog.txt");
+	W::logfilePath = path;
+	W::logfilePath.append("/Desktop/DBTlog.txt");
 	
 	// Settings path
 	settingsPath = path;
@@ -119,8 +130,8 @@ void W::initializePaths() {
 	// Log path
 	char path[MAX_PATH] = "";
 	SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, path);
-	logfilePath = path;
-	logfilePath.append("/DBTlog.txt");
+	W::logfilePath = path;
+	W::logfilePath.append("/DBTlog.txt");
 	
 	// Settings path
 	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);

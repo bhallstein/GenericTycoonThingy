@@ -49,11 +49,18 @@ void Level::buildLevel(std::string levelname) {
 
 	// Initialize Building class
 	if (!Building::initialize(theW))
-		throw MsgException("Could not read building info.");
+		throw MsgException("Couldn't read building info.");
 	
 	// Set level width and height
-	w = mrLua.getvalue<int>("width");
-	h = mrLua.getvalue<int>("height");
+	try {
+		w = mrLua.getvalue<int>("width");
+		h = mrLua.getvalue<int>("height");
+	}
+	catch (MsgException &exc) {
+		std::string s = "Couldn't get level's dimensions: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
+	}
 	
 	// Create map
 	navmap = new NavMap(w, h);
@@ -65,46 +72,64 @@ void Level::buildLevel(std::string levelname) {
 	responderMap.addResponder(levelview);
 	
 	// Get allowed buildings
-	mrLua.pushtable("allowedBuildings");
-	lua_pushnil(L);									// S: -1 nil; -2 table
-	while (lua_next(L, -2) != 0) {					// S: -1 val; -2 key; -3 table
-		if (!lua_isstring(L, -1)) continue;
-		allowedBuildings.push_back(lua_tostring(L, -1));
-		std::string s = "allowedBuildings: added "; s.append(lua_tostring(L, -1));
-		theW->log(s.c_str());
-		lua_pop(L, 1);								// S: -1 key; -2 table
+	try {
+		mrLua.pushtable("allowedBuildings");
+		lua_pushnil(L);									// S: -1 nil; -2 table
+		while (lua_next(L, -2) != 0) {					// S: -1 val; -2 key; -3 table
+			if (!lua_isstring(L, -1)) continue;
+			allowedBuildings.push_back(lua_tostring(L, -1));
+			std::string s = "allowedBuildings: added "; s.append(lua_tostring(L, -1));
+			theW->log(s.c_str());
+			lua_pop(L, 1);								// S: -1 key; -2 table
+		}
+		lua_settop(L, 0);	// S: empty
+	} catch (MsgException &exc) {
+		std::string s = "Error getting list of allowed buildings for level: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
 	}
-	lua_settop(L, 0);	// S: empty
 	
 	// Populate level with buildings
-	mrLua.pushtable("buildings");
-	lua_pushnil(L);						// S: -1 nil; -2 table
-	while (lua_next(L, -2) != 0) {		// S: -1 val; -2 key; -3 table
-		if (lua_type(L, -1) != LUA_TTABLE)
-			continue;
-		
-		// Get Building position & type
-		int x = mrLua.getfield<int>("x");
-		int y = mrLua.getfield<int>("y");
-		const char *bType = mrLua.getfield<const char *>("type");
-		
-		createBuilding(x, y, bType);
-		
-		lua_pop(L, 1);					// S: -1 key; -2 table
+	try {
+		mrLua.pushtable("buildings");
+		lua_pushnil(L);						// S: -1 nil; -2 table
+		while (lua_next(L, -2) != 0) {		// S: -1 val; -2 key; -3 table
+			if (lua_type(L, -1) != LUA_TTABLE)
+				continue;
+			
+			// Get Building position & type
+			int bX = mrLua.getfield<int>("x");
+			int bY = mrLua.getfield<int>("y");
+			const char *bType = mrLua.getfield<const char *>("type");
+			
+			createBuilding(bX, bY, bType);
+			
+			lua_pop(L, 1);					// S: -1 key; -2 table
+		}
+		lua_settop(L, 0);	// S: empty
+	} catch (MsgException &exc) {
+		std::string s = "Couldn't create buildings: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
 	}
-	lua_settop(L, 0);	// S: empty
 	
 	// Add spawn points
-	mrLua.pushtable("spawnPoints");
-	lua_pushnil(L);						// S: -1 nil; -2 table
-	while (lua_next(L,1) != 0) {		// S: -1 val; -2 key; -3 table
-		spawnPoints.push_back(new SpawnPoint(
-			mrLua.getfield<int>("x"),
-			mrLua.getfield<int>("y"),
-			mrLua.getfield<std::string>("name"),
-			mrLua.getfield<int>("rate")
-		));
-		lua_pop(L, 1);					// S: -1 key; -2 table
+	try {
+		mrLua.pushtable("spawnPoints");
+		lua_pushnil(L);						// S: -1 nil; -2 table
+		while (lua_next(L,1) != 0) {		// S: -1 val; -2 key; -3 table
+			spawnPoints.push_back(new SpawnPoint(
+				mrLua.getfield<int>("x"),
+				mrLua.getfield<int>("y"),
+				mrLua.getfield<std::string>("name"),
+				mrLua.getfield<int>("rate")
+			));
+			lua_pop(L, 1);					// S: -1 key; -2 table
+		}
+	} catch (MsgException &exc) {
+		std::string s = "Couldn't add spawn points: ";
+		s.append(exc.msg);
+		throw MsgException(s.c_str());
 	}
 }
 
@@ -168,13 +193,12 @@ Staff* Level::createStaff() {
 	int atX, atY; // co-ords required by unit's ctor
 	//find the asylum (spawn building) amongst our buildings
 	//note: this method only reliably works while we only have 1 asylum per level
-	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
 		if ((*i)->type == "asylum") {
 			atX = (*i)->x;
 			atY = (*i)->y;
-			i = buildings.end();
+			break;
 		}
-		else i++;
 
 	Staff* s = new Staff(navmap, atX, atY); //create the Staff with the found co-ords
 	units.push_back(s); //add the staff to the level's unit list

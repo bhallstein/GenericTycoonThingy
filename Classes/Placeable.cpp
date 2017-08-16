@@ -25,7 +25,7 @@ void Placeable::receiveEvent(Event *ev) {
 			for (int i=0, n = ground_plan.size(); i < n; i++) {
 				intcoord c = ground_plan[i];
 				if (!navmap->isPassableAt(c.x + x, c.y + y))
-					return;							// Check if area is passable
+					return;
 			}
 			mode = PLACED;
 			levelResponderMap->relinquishPrivilegedEventResponderStatus(this);

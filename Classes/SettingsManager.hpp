@@ -58,13 +58,18 @@ public:
 
 	// loadSettings is implemented in the header because it's important
 	// This way if we add a setting we only have to come to the header to add both it AND its defaults AND its luaRead
-	void loadSettings()
+	bool loadSettings()
 	{		
 		mrLua->pushtable("settings");
-		screenWidth.value = mrLua->getSubfield<int>("ScreenWidth","value");
-		screenHeight.value = mrLua->getSubfield<int>("ScreenHeight","value");
-		fullscreen.value = mrLua->getSubfield<bool>("FullScreen","value");
-		framerateLimit.value = mrLua->getSubfield<int>("FramerateLimit","value");
+		try {
+			screenWidth.value = mrLua->getSubfield<int>("ScreenWidth","value");
+			screenHeight.value = mrLua->getSubfield<int>("ScreenHeight","value");
+			fullscreen.value = mrLua->getSubfield<bool>("FullScreen","value");
+			framerateLimit.value = mrLua->getSubfield<int>("FramerateLimit","value");
+		} catch (MsgException &exc) {
+			return false;
+		}
+		return true;
 	}
 };
 

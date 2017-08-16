@@ -13,13 +13,13 @@ bool LuaHelper::loadFile(const char *filename)
 {
 	bool loadingSuccess = !luaL_loadfile(LuaInstance, filename);
 	if (!loadingSuccess) {
-		std::string s = "LuaHelper: could not load file '"; s.append(filename); s.append("'");
-		theW->log(s.c_str());
-		s = "error was: '"; s.append(to<const char *>(-1)); s.append("'");
+		std::string s = "LuaHelper: could not load file '"; s.append(filename); s.append("'; error was: ");
+		std::string t; to<std::string>(-1, t);
+		s.append(t);
 		theW->log(s.c_str());
 		return false;
 	}
-	// Set the Lua path to our Resources folder
+	// Add our Resources folder to the Lua path
 	lua_getglobal(LuaInstance, "package");
 	lua_getfield(LuaInstance, -1, "path");
 	std::string path = lua_tostring(LuaInstance, -1);	// Grab path string from top of stack
@@ -31,9 +31,9 @@ bool LuaHelper::loadFile(const char *filename)
 	
 	bool callingSuccess = !lua_pcall(LuaInstance, 0, 0, 0);
 	if (!callingSuccess) {
-		std::string s = "LuaHelper: could not execute file '"; s.append(filename); s.append("'");
-		theW->log(s.c_str());
-		s = "error was: '"; s.append(to<const char *>(-1)); s.append("'");
+		std::string s = "LuaHelper: could not execute file '"; s.append(filename); s.append("'; error was: ");
+		std::string t; to<std::string>(-1, t);
+		s.append(t);
 		theW->log(s.c_str());
 		return false;
 	}

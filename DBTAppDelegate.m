@@ -57,7 +57,10 @@ Event::key_code charToKeycode(unsigned int c) {
 }
 
 -(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-	if (quit) return NSTerminateNow;
+	if (quit) {
+		delete (W*) theW;
+		return NSTerminateNow;
+	}
 	[self sendQuitEvent];
 	return NSTerminateCancel;
 }

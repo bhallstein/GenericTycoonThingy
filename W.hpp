@@ -49,7 +49,7 @@ public:
 
 	// Stringy output
 	void warning(const char *msg, const char *title = "Warning");
-	void log(const char *);
+	static void log(const char *);
 
 	//void* getView();
 	int width();
@@ -58,8 +58,8 @@ public:
 	// Properties
 	std::string settingsPath;
 	std::string resourcesPath;
-	std::string logfilePath;
-	std::ofstream logfile;
+	static std::string logfilePath;
+	static std::ofstream logfile;
 	
 protected:
 	// Methods
