@@ -293,7 +293,7 @@ void Level::receiveEvent(Event *ev) {
 	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(Direction::DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q)        game->stateFinished(this, Returny(Returny::killer_returny));
-		else if (ev->key == Event::K_ESC) { theW->playSound("Battle control terminated.wav"); game->stateFinished(this, Returny(Returny::empty_returny)); }
+		else if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
 		else if (ev->key == Event::K_H)   openHelpView();
 	}
 	else if (ev->type == Event::BUTTONCLICK) {

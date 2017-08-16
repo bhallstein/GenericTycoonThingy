@@ -19,7 +19,8 @@ class W;
 class Level;
 class Button;
 
-class MenuView;
+class MenuBackgroundView;
+class ClickToBeginView;
 
 class Menu : public GameState, public EventResponder {
 public:
@@ -41,22 +42,34 @@ public:
 	
 protected:
 	// Properties
-	MenuView *menuview;
+	MenuBackgroundView *menubackgroundview;
+	ClickToBeginView *clicktobeginview;
 	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
 	
 };
 
 
-#include "UIView.hpp"
+#include "View.hpp"
+
+class ClickToBeginView : public View {
+public:
+	ClickToBeginView(W *, JenniferAniston &, Menu *);
+	~ClickToBeginView();
+	void draw();
+	void processMouseEvent(Event *);
+private:
+	bool mr_hov;
+	Menu *menu;
+};
+
 
 struct colour_square;
 
-class MenuView : public UIView {
+class MenuBackgroundView : public View {
 public:
-	MenuView(W *, JenniferAniston &, ResponderMap *, Menu *);
-	~MenuView();
+	MenuBackgroundView(W *, JenniferAniston &);
+	~MenuBackgroundView();
 	void draw();
-	void processMouseEvent(Event *);
 private:
 	int *colour_squares;
 	__colour *colour_cycle_array;
@@ -83,7 +96,6 @@ private:
 	
 	float alpha;
 	bool mrandom_prerandomised;
-	bool mr_hov;
 	Menu *menu;
 	int *mtransbars_heights;
 };

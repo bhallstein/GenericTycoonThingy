@@ -7,8 +7,11 @@
 Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 {
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	menuview = new MenuView(_theW, aniston, &responderMap, this);
-	responderMap.addResponder(menuview);
+	menubackgroundview = new MenuBackgroundView(theW, aniston);
+	
+	JenniferAniston aniston2(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
+	clicktobeginview = new ClickToBeginView(theW, aniston2, this);
+	responderMap.addResponder(clicktobeginview);
 	
 //	menuview->subscribeToButtons(new Callback(&Menu::receiveEvent, this));
 	
@@ -20,7 +23,7 @@ Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 }
 Menu::~Menu()
 {	
-	delete menuview;
+	delete menubackgroundview;
 }
 
 void Menu::pause() {
@@ -36,12 +39,13 @@ void Menu::update() {
 
 }
 void Menu::draw() {
-	menuview->_draw();
+	menubackgroundview->_draw();
+	clicktobeginview->_draw();
 }
 
 void Menu::setResolution(int _w, int _h) {
 	GameState::setResolution(_w, _h);
-	menuview->updatePosition();
+	menubackgroundview->updatePosition();
 }
 
 void Menu::receiveEvent(Event *ev) {
@@ -73,9 +77,37 @@ void Menu::startLevel(std::string path) {
 
 
 #include "../W.hpp"
+
+ClickToBeginView::ClickToBeginView(W *_theW, JenniferAniston &_aniston, Menu *_menu) :
+	View(_theW, _aniston), menu(_menu)
+{
+	mr_hov = false;
+}
+void ClickToBeginView::draw() {
+	// Main
+	if (mr_hov) theW->drawRect(160, 224, 480, 100, "red", 0, 0.7), mr_hov = false;
+	else theW->drawRect(160, 224, 480, 100, "black", 0, 0.2);
+	//	for (int i=0, n = buttons.size(); i < n; i++) {
+	//		Button *b = buttons[i];
+	//		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	//	}
+	theW->drawText(186, 254, "black", (char *) "Welcome to Generic Tycoon Thingy");
+	theW->drawText(308, 284, "white", (char *) "Click to begin");
+}
+void ClickToBeginView::processMouseEvent(Event *ev) {
+	if (ev->type == Event::MOUSEMOVE) {
+		if (ev->x >= 160 && ev->x < 160 + 480 && ev->y >= 224 && ev->y < 224 + 100)
+			mr_hov = true;
+	}
+	else if (ev->type == Event::LEFTCLICK)
+		if (mr_hov)
+			menu->startLevel("level1.lua");
+}
+
+
 #include <cmath>
 
-MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, Menu *_menu) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG), menu(_menu)
+MenuBackgroundView::MenuBackgroundView(W *_theW, JenniferAniston &_aniston) : View(_theW, _aniston)
 {	
 	colour_cycle_length = 60;
 	colour_cycle_array = (__colour*) malloc(sizeof(__colour) * colour_cycle_length);
@@ -94,15 +126,14 @@ MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, Menu 
 	mode = MNONE;
 	mrandom_prerandomised = false;
 	mtransbars_heights = (int*) malloc(sizeof(int) * 40);
-	mr_hov = false;
 }
-MenuView::~MenuView() {
+MenuBackgroundView::~MenuBackgroundView() {
 	free(colour_squares);
 	free(colour_cycle_array);
 	free(mtransbars_heights);
 }
 
-void MenuView::draw() {
+void MenuBackgroundView::draw() {
 	// Swirly colours
 	
 	if (alpha < 0.8) alpha += 0.005;
@@ -156,27 +187,8 @@ void MenuView::draw() {
 		int _x = i%40 * width/40, _y = i/40 * height/30;
 		theW->drawRect(_x, _y, width/40, height/30, &colour_cycle_array[colour_squares[i]], false, alpha);
 	}
-	
-	// Main
-	if (mr_hov) theW->drawRect(160, 224, 480, 100, "red", 0, 0.7), mr_hov = false;
-	else theW->drawRect(160, 224, 480, 100, "black", 0, 0.2);
-//	for (int i=0, n = buttons.size(); i < n; i++) {
-//		Button *b = buttons[i];
-//		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
-//	}
-	theW->drawText(186, 254, "black", (char *) "Welcome to Generic Tycoon Thingy");
-	theW->drawText(308, 284, "white", (char *) "Click to begin");
 }
-void MenuView::processMouseEvent(Event *ev) {
-	if (ev->type == Event::MOUSEMOVE) {
-		if (ev->x >= 160 && ev->x < 160 + 480 && ev->y >= 224 && ev->y < 224 + 100)
-			mr_hov = true;
-	}
-	else if (ev->type == Event::LEFTCLICK)
-		if (mr_hov)
-			menu->startLevel("level1.lua");
-}
-void MenuView::switchMode() {
+void MenuBackgroundView::switchMode() {
 	framecount = 0;
 	if (mode == MTRANSCIRC || mode == MTRANSWIPE || mode == MTRANSBARS)
 		mode = MRANDOM;
