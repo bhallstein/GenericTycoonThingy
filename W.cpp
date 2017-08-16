@@ -143,9 +143,9 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 	// work out total width & hence position
 	int tw = 0, c;
 	for (int i=0; (c = text[i]); i++)
-		if (c == 'I' | c == 'i' || c == '1' || c == ':' || c == '!' || c == '.') tw += char_width - 4;
-		else if (c == 'L' || c == 'l')                   tw += char_width - 2;
-		else                                             tw += char_width;
+		if (c == 'I' | c == 'i' || c == '1' || c == ':' || c == '!' || c == '.' || c == '\'') tw += char_width - 4;
+		else if (c == 'L' || c == 'l') tw += char_width - 2;
+		else tw += char_width;
 	if (rAlign) x -= tw;
 	
 	for (int i=0; text[i] != '\0'; i++) {
@@ -426,9 +426,14 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 				drawRect(x+2, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
+			case '\'' : {
+				drawRect(x+2, y, 2, 2, colname, 0, 1);
+				drawRect(x+3, y-2, 2, 2, colname, 0, 1);
+				break;
+			}
 			default: break;
 		}
-		if (c == 'I' | c == 'i' || c == '1' || c == ':') x += char_width - 4;
+		if (c == 'I' | c == 'i' || c == '1' || c == ':' || c == '!' || c == '.' || c == '\'') x += char_width - 4;
 		else if (c == 'L' || c == 'l')                   x += char_width - 2;
 		else                                             x += char_width;
 	}

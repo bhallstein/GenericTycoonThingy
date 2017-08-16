@@ -307,8 +307,13 @@ void Level::receiveEvent(Event *ev) {
 	else if (ev->type == Event::SCREENEDGE_BOTTOM) levelview->scroll(Direction::DOWNWARD);
 	else if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q)        game->stateFinished(this, Returny(Returny::killer_returny));
-		else if (ev->key == Event::K_ESC) game->stateFinished(this, Returny(Returny::empty_returny));
 		else if (ev->key == Event::K_H)   openHelpView();
+		else if (ev->key == Event::K_ESC) {
+			if (helpView != NULL) closeHelpView();
+			else if (furnishingPurchasingView != NULL) closeFurnishingPurchasingView();
+			else if (hiringUIView != NULL) closeHiringView();
+			else game->stateFinished(this, Returny(Returny::empty_returny));
+		}
 	}
 	else if (ev->type == Event::BUTTONCLICK) {
 		if (ev->payload == "open hiring ui view")                      openHiringView();
@@ -471,7 +476,7 @@ void Level::closeHiringView() {
 void Level::openHelpView() {
 	if (helpView != NULL) return;
 	pause();
-	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 140, 77, 520, 400);
+	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PFIXED, 140, 77, 520, 350);
 	helpView = new GTTHelpView(theW, aniston, &responderMap, &timeRemaining, &moneyLimit);
 	responderMap.addResponder(helpView);
 	helpView->subscribeToButtons(new Callback(&Level::receiveEvent, this));
@@ -674,8 +679,8 @@ void GTTHelpView::draw() {
 	
 	theW->drawRect(10, 234, 500, 1, "white", 0, 0.3);
 
-	theW->drawText(10, 274, "white", (char*)"Esc: quit to main menu");
-	theW->drawText(10, 294, "white", (char*)"Q: quit completely");
-	theW->drawText(10, 314, "white", (char*)"H: help");
+	theW->drawText(14, 264, "white", (char*)"Esc: quit to main menu");
+	theW->drawText(14, 284, "white", (char*)"Q: quit completely");
+	theW->drawText(14, 304, "white", (char*)"H: help");
 }
 
