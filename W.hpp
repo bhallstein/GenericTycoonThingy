@@ -6,6 +6,7 @@
 #ifndef THEW_H
 #define THEW_H
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -48,6 +49,7 @@ public:
 
 	// Stringy output
 	void warning(const char *msg, const char *title = "Warning");
+	void log(const char *);
 
 	//void* getView();
 	int width();
@@ -56,6 +58,8 @@ public:
 	// Properties
 	std::string settingsPath;
 	std::string resourcesPath;
+	std::string logfilePath;
+	std::ofstream logfile;
 	
 protected:
 	// Methods
@@ -68,7 +72,6 @@ protected:
 	View *current_drawn_view;
 
 	std::vector<Event> events;
-
 };
 
 #endif

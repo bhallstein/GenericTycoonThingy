@@ -20,8 +20,6 @@ struct NativeObjs {
 WindowManager::WindowManager() : mode(WINDOWED) {
 	objs = new NativeObjs();
 	
-	a_lion_is_here = false;
-	
 	// Create OpenGL context
 	NSOpenGLPixelFormatAttribute attrs[] = { NSOpenGLPFADoubleBuffer, 0 };
 	NSOpenGLPixelFormat *pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
@@ -44,6 +42,10 @@ void WindowManager::createWindow() {
 											   styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
 												 backing:NSBackingStoreBuffered
 												   defer:NO];
+	NSWindowCollectionBehavior coll = [objs->window collectionBehavior];	// Enable lion fullscreenery
+	coll |= NSWindowCollectionBehaviorFullScreenPrimary;					// 
+	[objs->window setCollectionBehavior:coll];								//
+	
 	[objs->window center];
 	
 	NSRect viewRect = NSMakeRect(0, 0, frame.size.width, frame.size.height);
@@ -67,48 +69,19 @@ void WindowManager::closeWindow() {
 
 bool WindowManager::goWindowed() {
 	if (mode == WINDOWED) return true;
-	
-	if (a_lion_is_here) {
-		// Lion fullscreen shizzle
-	}
-	else {
-		closeWindow();
-		createWindow();
-	}
+	[objs->window toggleFullScreen:nil];
 	return true;
 }
 bool WindowManager::goFullscreen() {
 	if (mode == FULLSCREEN) return true;
-	
-	if (a_lion_is_here) {
-		// Lion fullscreen shizzle
-	}
-	else {
-		// Snow leopard fullscreen shizzle
-		closeWindow();
-		
-		NSRect mainDisplayRect = [[NSScreen mainScreen] frame];			// Create fullscreen window
-		objs->window = [[NSWindow alloc] initWithContentRect:mainDisplayRect
-												   styleMask:NSBorderlessWindowMask
-													 backing:NSBackingStoreBuffered
-													   defer:NO];
-		[objs->window setLevel:NSMainMenuWindowLevel+1];
-		[objs->window setOpaque:YES];
-		[objs->window setHidesOnDeactivate:YES];
-		
-		NSRect viewRect = NSMakeRect(0.0, 0.0, mainDisplayRect.size.width, mainDisplayRect.size.height);
-		objs->view = [[MyView alloc] initWithFrame:viewRect];
-		[objs->window setContentView:objs->view];	// Add view to window
-		
-		[objs->context setView:objs->view];			// Set view as context’s drawable object
-		
-		objs->windowDelegate = [[MyWindowDelegate alloc] init];	// Create delegate to handle window close
-		[objs->window setDelegate:objs->windowDelegate];
-		
-		[objs->window makeKeyAndOrderFront:NSApp];
-		[objs->window makeFirstResponder:objs->view];
-	}
+	[objs->window toggleFullScreen:nil]; 
 	return true;
+}
+void WindowManager::wentWindowed() {
+	mode = WINDOWED;
+}
+void WindowManager::wentFullscreen() {
+	mode = FULLSCREEN;
 }
 
 void WindowManager::setTitle(const char *t) {
@@ -137,6 +110,9 @@ void WindowManager::clearEvents() {
 }
 void* WindowManager::getView() {
 	return objs->view;
+}
+void* WindowManager::getWindow() {
+	return objs->window;
 }
 void WindowManager::frameChanged() {
 	[objs->context update];
@@ -167,17 +143,17 @@ WindowManager::WindowManager(WNDPROC wndProc) : mode(WINDOWED) {
 	WNDCLASSEX wc;	// Before creating a window, you have to register a class for it
 
 	wc.cbSize = sizeof(wc);
-    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;	// Force redraw on resize; has own device context
-    wc.lpfnWndProc = wndProc;
-    wc.cbClsExtra = 0;			// No extra class memory 
-    wc.cbWndExtra = 0;			// No extra window memory 
+	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;	// Force redraw on resize; has own device context
+	wc.lpfnWndProc = wndProc;
+	wc.cbClsExtra = 0;			// No extra class memory 
+	wc.cbWndExtra = 0;			// No extra window memory 
 	wc.hInstance = this->appInstance;
-    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = NULL;		// GetStockObject(WHITE_BRUSH) ?
-    wc.lpszMenuName = NULL;			// Menu resource name... "MainMenu" ?
-    wc.lpszClassName = "DBTWindow";	// Window class name
-    wc.hIconSm = (HICON) LoadImage(wc.hInstance, MAKEINTRESOURCE(5), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = NULL;		// GetStockObject(WHITE_BRUSH) ?
+	wc.lpszMenuName = NULL;			// Menu resource name... "MainMenu" ?
+	wc.lpszClassName = "DBTWindow";	// Window class name
+	wc.hIconSm = (HICON) LoadImage(wc.hInstance, MAKEINTRESOURCE(5), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 
 	if (!RegisterClassEx(&wc))
 		throw MsgException("Failed to register window class.");

@@ -25,8 +25,8 @@ public:
 	// Methods
 	void createWindow();
 	void closeWindow();
-	bool goWindowed();
-	bool goFullscreen();
+	bool goWindowed();		void wentWindowed();
+	bool goFullscreen();	void wentFullscreen();
 	void setTitle(const char *q);
 	
 	void enableDrawing();
@@ -38,6 +38,7 @@ public:
 	void* getEvents();
 	void clearEvents();
 	void* getView();
+	void* getWindow();
 	void frameChanged();
 	void setBackBufferSize(int _w, int _h);
 	
@@ -45,7 +46,6 @@ protected:
 	// Properties
 	struct NativeObjs *objs;
 	enum mode_types { WINDOWED, FULLSCREEN } mode;
-	bool a_lion_is_here;
 	
 };
 

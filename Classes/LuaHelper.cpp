@@ -16,8 +16,8 @@ bool LuaHelper::loadFile(std::string &fileName)
 int LuaHelper::pushtable(const char *key)
 {
 	lua_getglobal(LuaInstance, key); //push the table to the stack
-	int success;
-	if (success = lua_isnil(LuaInstance,-1))
+	int success = lua_isnil(LuaInstance,-1);
+	if (success)
 		lua_pop(LuaInstance,1);
 	return success;
 }

@@ -6,7 +6,12 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define NO_PREV_POSITION -27139
+#include <string>
+
+#ifndef MAX_PATH
+#define MAX_PATH 200
+#endif
+
 #define INFINITAH 9999999
 
 // Game stages
@@ -40,6 +45,7 @@ public:
 	MsgException(const char *s) {
 		msg = s;
 	}
+	~MsgException() throw() { }
 	virtual const char* what() {
 		return "Message exception";
 	}

@@ -1,6 +1,6 @@
 #include "W.hpp"
 
-#ifdef _APPLE__
+#ifdef __APPLE__
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
 #import "MyView.h"
@@ -15,9 +15,11 @@
 
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
 	this->initializePaths();
+	logfile.open(logfilePath.c_str());
 }
 W::~W() {
 	std::cout << "w destroy" << std::endl;
+	logfile.close();
 }
 
 bool W::goWindowed() {
@@ -98,21 +100,30 @@ void W::clearEvents() {
 	events.clear();
 }
 
-//FILE* W::filePointerToResource(std::string s) {
-//	int len = 180; char path[len];
-//	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
-//	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
-//	return fopen(path, "r");
-//}
 void W::initializePaths() {
 #ifdef __APPLE__
-	int len = 200; char path[len];
-	NSString *_path = [NSString stringWithFormat:@"%@/%s", [[NSBundle mainBundle] resourcePath], s.c_str()];
-	[_path getCString:path maxLength:len encoding:NSUTF8StringEncoding];
-	return path;
-#elif defined _WIN32 || _WIN64
-	// Settings path
+	// Log path
 	char path[MAX_PATH] = "";
+	[NSHomeDirectory() getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
+	logfilePath = path;
+	logfilePath.append("/Desktop/DBTlog.txt");
+	
+	// Settings path
+	settingsPath = path;
+	settingsPath.append("/Library/Application Support/Demon Barber Tycoon");
+	
+	// Resources path
+	[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
+	resourcesPath = path;
+	resourcesPath.append("/");
+#elif defined _WIN32 || _WIN64
+	// Log path
+	char path[MAX_PATH] = "";
+	SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, path);
+	logfilePath = path;
+	logfilePath.append("/DBTlog.txt");
+	
+	// Settings path
 	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
 	settingsPath = path;
 	settingsPath.append("/Demon Barber Tycoon/");
@@ -126,7 +137,10 @@ void W::initializePaths() {
 }
 bool W::isValidDir(const char *dir) {
 #ifdef __APPLE__
-	// ...
+	BOOL isdir;
+	[[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithCString:dir encoding:NSUTF8StringEncoding]
+										 isDirectory:&isdir];
+	return isdir;
 #elif defined _WIN32 || _WIN64
 	DWORD dw = GetFileAttributes(dir);
 	return dw != INVALID_FILE_ATTRIBUTES && (dw & FILE_ATTRIBUTE_DIRECTORY);
@@ -134,7 +148,10 @@ bool W::isValidDir(const char *dir) {
 }
 bool W::createDir(const char *dir) {
 #ifdef __APPLE__
-	// ...
+	return [[NSFileManager defaultManager] createDirectoryAtPath:[NSString stringWithCString:dir encoding:NSUTF8StringEncoding]
+									 withIntermediateDirectories:YES
+													  attributes:nil
+														   error:nil];
 #elif defined _WIN32 || _WIN64
 	return CreateDirectory(dir, NULL);
 #endif
@@ -142,10 +159,19 @@ bool W::createDir(const char *dir) {
 
 void W::warning(const char *msg, const char *title) {
 #ifdef __APPLE__
-	// ...
+	NSBeginAlertSheet(
+		[NSString stringWithCString:title encoding:NSUTF8StringEncoding],
+		@"OK",
+		nil, nil, (NSWindow*)winManager->getWindow(), nil, NULL, NULL, NULL,
+		[NSString stringWithCString:msg encoding:NSUTF8StringEncoding]
+	);
 #elif defined _WIN32 || _WIN64
 	MessageBox(NULL, msg, title, MB_OK | MB_ICONEXCLAMATION);
 #endif
+}
+
+void W::log(const char *txt) {
+	logfile << txt << std::endl;
 }
 
 int W::width() {

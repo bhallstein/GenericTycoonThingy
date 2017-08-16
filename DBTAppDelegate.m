@@ -37,12 +37,18 @@ Event::key_code charToKeycode(unsigned int c) {
 	theW = new W((WindowManager*)winManager);
 	game = new Game((W*)theW);
 	
-	NSLog(@"Setting up frame change notification");
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(frameChange:)
 												 name:NSViewGlobalFrameDidChangeNotification
 											   object:(MyView*)((WindowManager*)winManager)->getView()];
-	NSLog(@"Scheduling timer");
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(wentFullscreen:)
+												 name:NSWindowDidEnterFullScreenNotification
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(wentWindowed:)
+												 name:NSWindowDidExitFullScreenNotification
+											   object:nil];
 	timer = [NSTimer scheduledTimerWithTimeInterval:1./40.
 											 target:self
 										   selector:@selector(runGameLoop:)
@@ -141,8 +147,14 @@ Event::key_code charToKeycode(unsigned int c) {
 	}
 }
 
--(void)frameChange:(NSNotificationCenter*)notification {
+-(void)frameChange:(NSNotification*)notification {
 	((WindowManager*)winManager)->frameChanged();
+}
+-(void)wentFullscreen:(NSNotification*)notification {
+	((WindowManager*)winManager)->wentFullscreen();
+}
+-(void)wentWindowed:(NSNotification*)notification {
+	((WindowManager*)winManager)->wentWindowed();
 }
 
 -(void)dealloc {

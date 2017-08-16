@@ -10,11 +10,14 @@ Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 	settings = new SettingsManager(theW);
 	
 	if (settings->fullscreen.value)
-		theW->goFullscreen();
+		system("say fullscreen");
 	else
-		theW->goWindowed();
+		system("say not fullscreen");
+	//if (settings->fullscreen.value)
+	//	theW->goFullscreen();
+	//else
+	theW->goWindowed();
 	
-	std::cout << "changing window title" << std::endl;
 	theW->setWindowTitle(game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon");
 	
 	prev_w = theW->width(), prev_h = theW->height();
@@ -24,7 +27,7 @@ Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 
 Game::~Game()
 {
-	
+	delete settings;
 }
 
 void Game::sendEvents(std::vector<Event> *events) {

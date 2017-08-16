@@ -37,9 +37,8 @@ public:
 
 	template <class sth>
 	bool get(std::string &tablename, sth &val) {
-		sth = mrLua->getSubfield<sth>(tablename.c_str(), "Value");
-		return true;
-		// How does mr lua cope with & report an error in getsubfield?
+		val = mrLua->getSubfield<sth>(tablename.c_str(), "Value");
+		return true; // How does mr lua cope with an error in getsubfield?
 	}
 	
 	// Methods
