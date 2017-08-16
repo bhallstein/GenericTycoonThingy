@@ -17,7 +17,7 @@ void Button::receiveEvent(Event *ev) {
 	else if (ev->type == Event::LEFTCLICK)
 		receiver->buttonClick(this);
 }
-colour Button::col() {
-	if (hover) { hover = false; return _RED_; }
-	return colour(_BLACK_);
+const char * Button::col() {
+	if (hover) { hover = false; return "red"; }
+	return "black";
 }

@@ -38,32 +38,6 @@ typedef struct door {
 	direction orientation;
 } door;
 
-enum utility_colours { _BLACK_, _WHITE_, _RED_, _GREEN_, _BLUE_, _YELLOW_, _PURPLE_ };
-typedef struct colour {
-	colour() { };
-	colour(utility_colours c) {
-		if (c == _BLACK_) red = green = blue = 0, alpha = 0.5;
-		else if (c == _WHITE_)  red = green = blue = alpha = 1;
-		else if (c == _RED_)    red = 1, green = blue = 0, alpha = 1;
-		else if (c == _GREEN_)  red = 0, green = 1, blue = 0, alpha = 1;
-		else if (c == _BLUE_)   red = green = 0, blue = 1, alpha = 1;
-		else if (c == _YELLOW_) red = green = 1, blue = 0, alpha = 1;
-		else if (c == _PURPLE_) red = 0.47, green = 0, blue = 0.78, alpha = 1;
-	}
-	colour(std::string s) {
-		if (s == "black") red = green = blue = 0, alpha = 0.5;
-		else if (s == "white")  red = green = blue = alpha = 1;
-		else if (s == "red")    red = 1, green = blue = 0, alpha = 1;
-		else if (s == "green")  red = 0, green = 1, blue = 0, alpha = 1;
-		else if (s == "blue")   red = green = 0, blue = 1, alpha = 1;
-		else if (s == "yellow") red = green = 1, blue = 0, alpha = 1;
-		else if (s == "purple") red = 0.47, green = 0, blue = 0.78, alpha = 1;
-		colname = s;
-	}
-	float red, green, blue, alpha;
-	std::string colname;
-} colour;
-
 class MsgException : public std::exception {
 public:
 	MsgException(const char *s) {

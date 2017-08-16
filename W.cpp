@@ -85,7 +85,21 @@ void W::setUpDrawingForView(View *v) {
 	current_drawn_view = v;
 	glScissor(v->x, height() - v->y - v->height, v->width, v->height);
 }
-void W::drawRect(float _x, float _y, float _width, float _height, colour col) {
+__colour W::stringToColour(std::string &s) {
+	__colour c;
+	if (s == "black")		c.red = 0,    c.green = 0,    c.blue = 0;
+	else if (s == "white")  c.red = 1,    c.green = 1,    c.blue = 1;
+	else if (s == "red")    c.red = 1,    c.green = 0,    c.blue = 0;
+	else if (s == "green")  c.red = 0,    c.green = 1,    c.blue = 0;
+	else if (s == "blue")   c.red = 0,    c.green = 0,    c.blue = 1;
+	else if (s == "yellow") c.red = 1,    c.green = 1,    c.blue = 0;
+	else if (s == "purple") c.red = 0.47, c.green = 0,    c.blue = 0.78;
+	c.alpha = s == "black" ? 0.5 : 1;
+	return c;
+}
+void W::drawRect(float _x, float _y, float _width, float _height, const char *colname) {
+	std::string s(colname);
+	__colour col = stringToColour(s);
 	glColor4f(col.red, col.green, col.blue, col.alpha);
 
 	float x = _x, y = _y;

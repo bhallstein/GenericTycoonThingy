@@ -7,27 +7,35 @@
 #define UNIT_H
 
 #include <iostream>
+#include <map>
 
 #include "types.hpp"
 #include "MappedObj.hpp"
+#include "../W.hpp"
 
 class NavMap;
 class NavNode;
 
-class Unit : public MappedObj
-{
+struct unitInfo {
+	std::string col, hoverCol, colWhenMoving;
+};
+
+class Unit : public MappedObj {
 public:
-	Unit(NavMap *, int _x, int _y);
+	Unit(NavMap *, int _x, int _y, const char *type);
 	~Unit();
-
-	// Methods
-	void receiveEvent(Event *);	// Override to handle events
-	colour col();
-	void update();
-
+	
 	// Properties
-	int dest_x, dest_y;
+	std::string type;
 	bool destroyed;
+	int dest_x, dest_y;
+	
+	// Methods
+	void receiveEvent(Event *);
+	const char * col();
+	void update();
+	
+	static bool initialize(W *); 	// Populate static unitTypes from units.lua
 	
 protected:
 	// Methods
@@ -36,14 +44,22 @@ protected:
 	void setToTraveling();
 	void setToWaiting();
 	void incrementLocation();
-
+	
 	// Properties
 	enum state_types { S_IDLE, S_TRAVELING, S_WAITING } state;
 	int frames_waited;
 	NavMap *navmap;
 	std::vector<NavNode *> route;
 	bool hover;
-
+	std::string u_colour;
+	std::string u_hoverColour;
+	std::string u_colourWhenMoving;
+	
+	// Static members
+	static std::map<std::string, struct unitInfo> unitTypes;	// e.g. "civilian" => struct unitInfo { }
+	static std::string defaultColour;
+	static std::string defaultHoverColour;
+	static std::string defaultColourWhenMoving;
 };
 
 #endif

@@ -16,6 +16,10 @@
 class View;
 class Event;
 
+typedef struct __colour {
+	float red, green, blue, alpha;
+} __colour;
+
 class W {
 public:
 	W(WindowManager *);
@@ -34,7 +38,8 @@ public:
 	void startDrawing();
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
-	void drawRect(float _x, float _y, float _width, float _height, colour);
+	void drawRect(float _x, float _y, float _width, float _height, const char *colour);
+	__colour stringToColour(std::string &s);
 
 	// Event shizzle
 	void addEvent(Event &);

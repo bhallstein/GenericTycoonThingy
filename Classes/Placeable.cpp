@@ -43,6 +43,6 @@ void Placeable::receiveEvent(Event *ev) {
 	}
 }
 
-colour Placeable::col() {
-	return (mode == PLACEMENT ? _WHITE_ : clicked ? _RED_ : _BLUE_);
+const char * Placeable::col() {
+	return (mode == PLACEMENT ? "white" : clicked ? "red" : "blue");
 }
