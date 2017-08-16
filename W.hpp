@@ -16,6 +16,7 @@
 #include "irrKlang.h"
 
 #define MR_CURRENCY '$'
+#define TYCOON_NAME "Generic Tycoon Thingy"
 
 class View;
 class Event;

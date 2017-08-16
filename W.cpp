@@ -24,7 +24,6 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	time_t timey;
 	time(&timey);
 	twister.seed(timey);
-	bgm = 0;
 	
 	this->initializePaths();
 	W::logfile.open(logfilePath.c_str());
@@ -34,12 +33,12 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	log(s.c_str());
 	
 	sound_engine = irrklang::createIrrKlangDevice();
+	bgm = 0;
 }
 W::~W() {
 	log("W destruct");
 	logfile.close();
-	bgm->drop();
-	bgm = 0;
+	if (bgm) bgm->drop();
 	sound_engine->drop();
 }
 
@@ -444,7 +443,9 @@ void W::initializePaths() {
 	
 	// Settings path
 	settingsPath = path;
-	settingsPath.append("/Library/Application Support/Demon Barber Tycoon/");
+	settingsPath.append("/Library/Application Support/");
+	settingsPath.append(TYCOON_NAME);
+	settingsPath.append("/");
 	
 	// Lua path
 	[[[NSBundle mainBundle] resourcePath] getCString:path maxLength:MAX_PATH encoding:NSUTF8StringEncoding];
@@ -463,18 +464,20 @@ void W::initializePaths() {
 	// Settings path
 	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
 	settingsPath = path;
-	settingsPath.append("/Demon Barber Tycoon/");
+	settingsPath.append("/");
+	settingsPath.append(TYCOON_NAME);
+	settingsPath.append("/");
 	
-	// Lua path
+	// Get general path to resources
 	GetModuleFileName(0, path, sizeof(path) - 1);
 	std::string resourcesPath = path;
 	resourcesPath = resourcesPath.substr(0, resourcesPath.rfind("\\"));
-
-#ifdef _DEBUG //debug builds adjust to VS folder structure; Release builds use /Data/ or /Lua/ relative to the .exe
-	resourcesPath.append("/../Demon Barber Tycoon");
+#ifdef _DEBUG // debug builds adjust to VS folder structure; Release builds use /Data/ or /Lua/ relative to the .exe
+	resourcesPath.append("/../Demon Barber Tycoon/");
 #endif
-
-	luaPath = resourcesPath + "/Lua/";
+	
+	// Lua path
+	luaPath = resourcesPath + "Lua/";
 	
 	// Data path
 	dataPath = resourcesPath + "/Data/";
