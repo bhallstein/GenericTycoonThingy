@@ -129,7 +129,8 @@ Furnishing* LevelMap::createFurnishing(bool placeableMode, const std::string &ty
 		f->uid = UIDManager::getNewUID();
 		UIDManager::registerTLO(f);
 		furnishings.push_back(f);
-		W::log << "Furnishing " << f->uid.id << " created and initialized at " << f->rct.pos.xyStr() << std::endl;
+		W::log << "Furnishing " << f->uid.id << " created and initialized "
+			<< (placeableMode ? " in placeable mode" : std::string("at ") + f->rct.pos.xyStr()) << std::endl;
 	}
 	else {
 		delete f;
@@ -162,7 +163,8 @@ Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W:
 		u->uid = UIDManager::getNewUID();
 		UIDManager::registerTLO(u);
 		units.push_back(u);
-		W::log << "Unit " << u->uid.id << " created and initialized at " << u->rct.pos.xyStr() << std::endl;
+		W::log << "Unit " << u->uid.id << " created and initialized "
+			<< (placeableMode ? "in placeable mode" : std::string("at ") + u->rct.pos.xyStr()) << std::endl;
 	}
 	else {
 		W::log << "Unit " << u->uid.id << " created then failed to initialize" << std::endl;
@@ -194,7 +196,8 @@ SpawnPoint* LevelMap::createSpawnPoint(bool placeableMode, const W::position &po
 		sp->uid = UIDManager::getNewUID();
 		UIDManager::registerTLO(sp);
 		spawnPoints.push_back(sp);
-		W::log << "SpawnPoint " << sp->uid.id << " created and initialized at " << sp->rct.pos.xyStr() << std::endl;
+		W::log << "SpawnPoint " << sp->uid.id << " created and initialized "
+			<< (placeableMode ? "in placeable mode" : std::string("at ") + sp->rct.pos.xyStr()) << std::endl;
 	}
 	else {
 		delete sp;
