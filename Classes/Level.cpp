@@ -215,19 +215,14 @@ Staff* Level::createStaff()
 		if ((*i)->type == "Asylum") {
 			atX = (*i)->x;
 			atY = (*i)->y;
+			i = buildings.end();
 		}
 		else i++;
 
-	try{
-		Staff* s = new Staff(navmap,atX,atY); //create the Staff with the found co-ords
-		units.push_back(s); //add the staff to the level's unit list
-		levelResponderMap->addMappedObj(s);
-		return s;
-	}
-	catch(...)
-	{
-		throw;
-	}
+	Staff* s = new Staff(navmap,atX,atY); //create the Staff with the found co-ords
+	units.push_back(s); //add the staff to the level's unit list
+	levelResponderMap->addMappedObj(s);
+	return s;
 }
 Building* Level::createBuilding(int atX, int atY) {
 	Building *b = new Building(atX, atY);

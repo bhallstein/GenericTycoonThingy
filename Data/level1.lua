@@ -29,6 +29,11 @@ buildings = {
 		x = 37,
 		y = 18,
 	},
+	{
+		["type"] = asylum(),
+		x = 20,
+		y = 5,
+	},
 }
 spawnPoints = {
 	{

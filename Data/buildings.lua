@@ -76,3 +76,20 @@ function derelict()
 	return building
 
 end
+
+function asylum()
+	building = {}
+	
+	building.type = "Asylum"
+	
+	--colours
+	building.colour = {
+		r = 120,
+		g = 0,
+		b = 200,
+		a = 255,
+	}
+	
+	return building
+
+end
