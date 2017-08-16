@@ -460,7 +460,7 @@ void W::initializePaths() {
 	luaPath = resourcesPath + "Lua/";
 	
 	// Data path
-	dataPath = resoursPath + "Data/";
+	dataPath = resourcesPath + "Data/";
 #endif
 }
 bool W::isValidDir(const char *dir) {
