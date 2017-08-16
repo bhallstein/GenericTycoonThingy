@@ -4,7 +4,7 @@
 
 LevelScore::LevelScore(W::Window *_win, bool _victory) : win(_win), victory(_victory)
 {
-	scoreview = new ScoreView(win, &eh, victory);
+	scoreview = new ScoreView(win, victory);
 	addView(scoreview);
 	scoreview->subscribeToButtons(new W::Callback(&LevelScore::recEv, this));
 	
@@ -12,7 +12,7 @@ LevelScore::LevelScore(W::Window *_win, bool _victory) : win(_win), victory(_vic
 	MrKlangy::playBGM(victory ? "win.ogg" : "lose-b.ogg", false);
 
 	// Key subscriptions
-	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&LevelScore::recEv, this));
+	W::Messenger::subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&LevelScore::recEv, this));
 }
 LevelScore::~LevelScore()
 {
@@ -52,11 +52,10 @@ void LevelScore::replayLevel() {
 }
 
 
-ScoreView::ScoreView(W::Window *_win, W::EventHandler *_eh, bool _victory) :
+ScoreView::ScoreView(W::Window *_win, bool _victory) :
 	UIView(
 		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 1),
-		_win,
-		_eh
+		_win
 	),
 	victory(_victory)
 {

@@ -41,7 +41,7 @@ protected:
 
 class ClickToBeginView : public W::UIView {
 public:
-	ClickToBeginView(W::Window *, W::EventHandler *, Menu *);
+	ClickToBeginView(W::Window *, Menu *);
 	void draw();
 	void processMouseEvent(W::Event *);
 private:

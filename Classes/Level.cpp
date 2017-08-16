@@ -27,19 +27,19 @@ Level::Level(W::Window *_win, std::string levelpath) : win(_win)
 
 	buildLevel(levelpath);
 	
-	uibarview = new UIBarView(win, &eh, &money);
+	uibarview = new UIBarView(win, &money);
 	addView(uibarview);
 	uibarview->subscribeToButtons(new W::Callback(&Level::buttonEvent, this));
 	
 	// Subscribe to screenedge events
 	W::Callback c(&Level::scrollEvent, this);
-	eh.subscribeToEventType(W::EventType::SCREENEDGE_LEFT, c);
-	eh.subscribeToEventType(W::EventType::SCREENEDGE_RIGHT, c);
-	eh.subscribeToEventType(W::EventType::SCREENEDGE_TOP, c);
-	eh.subscribeToEventType(W::EventType::SCREENEDGE_BOTTOM, c);
+	W::Messenger::subscribeToEventType(W::EventType::SCREENEDGE_LEFT, c);
+	W::Messenger::subscribeToEventType(W::EventType::SCREENEDGE_RIGHT, c);
+	W::Messenger::subscribeToEventType(W::EventType::SCREENEDGE_TOP, c);
+	W::Messenger::subscribeToEventType(W::EventType::SCREENEDGE_BOTTOM, c);
 	
 	// Key subscriptions
-	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Level::keyEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Level::keyEvent, this));
 	
 	// Time
 	framecount = 0;
@@ -121,7 +121,7 @@ void Level::buildLevel(std::string levelname) {
 	navmap = new W::NavMap(w, h);
 	
 	// Create levelview
-	levelview = new LevelView(win, &eh, &buildings, &furnishings, &units, &staff, w, h, &timeRemaining, navmap);
+	levelview = new LevelView(win, &buildings, &furnishings, &units, &staff, w, h, &timeRemaining, navmap);
 	addView(levelview);
 	
 	// Get allowed buildings
@@ -270,7 +270,7 @@ void Level::update() {
 		W::position p;
 		spawnPoints[0]->getCoords(&p);
 		Unit *u = createUnit(p.x, p.y, "customer");
-		addBehaviour(new CustomerBehaviour(&eh, u, this));
+		addBehaviour(new CustomerBehaviour(u, this));
 	}
 //	float some_coefficient = 0.2;
 //	float spawnRate = realtimetime / timeLimit * some_coefficient;
@@ -343,27 +343,31 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 	Unit *u;
 	std::vector<Unit*> *vctr;
 	bool initsuccess;
-	if (Unit::infoForType(type)->isStaff) {
-		u = new Unit(&eh, navmap, type, this, true);
+	bool isStaff = Unit::infoForType(type)->isStaff;
+	if (isStaff) {
+		u = new Unit(navmap, type, this, true);
 		vctr = &staff;
 		initsuccess = u->init(-100, -100);
 	}
 	else {
-		u = new Unit(&eh, navmap, type, this, false);
+		u = new Unit(navmap, type, this, false);
 		vctr = &units;
 		initsuccess = u->init(atX, atY);
 	}
 	
 	if (initsuccess) {
 		vctr->push_back(u);
-		printf("added unit %p of type \"%s\" (now %ld)\n", u, type, vctr->size());
+		printf(
+			"added %sunit %p of type \"%s\" (now %ld)\n",
+			isStaff ? "staff " : "", u, type, vctr->size()
+		);
 		return u;
 	}
 	// TODO: deallocate on init failure?
 	return NULL;
 }
 Building* Level::createBuilding(W::position &pos, const char *type, std::vector<W::rect> *plan) {
-	Building *b = new Building(&eh, navmap, type, plan, pos, this);
+	Building *b = new Building(navmap, type, plan, pos, this);
 	buildings.push_back(b);
 	printf("added building %p of type '%s' (now %ld)\n", b, type, buildings.size());
 	return b;
@@ -372,11 +376,11 @@ Furnishing* Level::createFurnishing(const char *type, bool placeableMode, int at
 	Furnishing *f;
 	std::vector<Furnishing*> *vctr;
 	if (strstarts(type, "door")) {
-		f = new Door(&eh, navmap, type, this, placeableMode);
+		f = new Door(navmap, type, this, placeableMode);
 		vctr = &doors;
 	}
 	else {
-		f = new Furnishing(&eh, navmap, type, this, currentlyEditedBuilding, placeableMode);
+		f = new Furnishing(navmap, type, this, currentlyEditedBuilding, placeableMode);
 		vctr = &furnishings;
 	}
 	
@@ -404,7 +408,7 @@ void Level::purchaseFurnishing(const char *type) {
 void Level::hireStaff(const char *type) { 
 	if(Unit::infoForType(type)->hireCost <= money) {
 		Unit *u = createUnit(0, 0, type);
-		addBehaviour(new ShopKeeperBehaviour(&eh, u, this));
+		addBehaviour(new ShopKeeperBehaviour(u, this));
 	}
 	else
 		std::cout << "not enough money to hire a " << type << std::endl;
@@ -468,7 +472,7 @@ void Level::openFurnishingPurchasingView(Building *b) {
 	if (b == currentlyEditedBuilding) return;
 	closeFurnishingPurchasingView();
 	currentlyEditedBuilding = b;
-	furnishingPurchasingView = new FurnishingPurchasingUIView(win, &eh, &b->bInfo->allowedFurnishings);
+	furnishingPurchasingView = new FurnishingPurchasingUIView(win, &b->bInfo->allowedFurnishings);
 	addView(furnishingPurchasingView);
 	furnishingPurchasingView->subscribeToButtons(new W::Callback(&Level::buttonEvent, this));
 }
@@ -480,7 +484,7 @@ void Level::closeFurnishingPurchasingView() {
 }
 void Level::openHiringView() {
 	if (hiringUIView != NULL) return;
-	hiringUIView = new HiringUIView(win, &eh);
+	hiringUIView = new HiringUIView(win);
 	addView(hiringUIView);
 	hiringUIView->subscribeToButtons(new W::Callback(&Level::buttonEvent, this));
 }
@@ -492,7 +496,7 @@ void Level::closeHiringView() {
 void Level::openHelpView() {
 	if (helpView != NULL) return;
 	pause();
-	helpView = new GTTHelpView(win, &eh, &timeRemaining, &moneyLimit);
+	helpView = new GTTHelpView(win, &timeRemaining, &moneyLimit);
 	addView(helpView);
 	helpView->subscribeToButtons(new W::Callback(&Level::buttonEvent, this));
 }
@@ -519,7 +523,7 @@ void Level::decreaseMoney(int _amount) {
 
 
 LevelView::LevelView(
-	W::Window *_win, W::EventHandler *_eh,
+	W::Window *_win,
 	std::vector<Building*> *_buildings, std::vector<Furnishing*> *_furnishings, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 	int _level_width, int _level_height,
 	int *_time_remaining,
@@ -529,7 +533,7 @@ LevelView::LevelView(
 		 new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 1),
 		_win
 	),
-	eh(_eh), buildings(_buildings), furnishings(_furnishings), units(_units), staff(_staff),
+	buildings(_buildings), furnishings(_furnishings), units(_units), staff(_staff),
 	level_width(_level_width), level_height(_level_height),
 	scroll_x(0), scroll_y(0), time_remaining(_time_remaining), nm(_nm)
 {
@@ -619,7 +623,7 @@ void LevelView::processMouseEvent(W::Event *ev) {
 	}
 //	if (ev->type == LEVEL_LEFTMOUSEDOWN)
 //		printf("lmousedown at %d,%d\n", ev->pos.x, ev->pos.y);
-	eh->dispatchEvent(ev);
+	W::Messenger::dispatchEvent(ev);
 }
 
 void LevelView::scroll(Direction::T dir) {
@@ -640,11 +644,10 @@ void LevelView::scroll(Direction::T dir) {
 }
 
 
-UIBarView::UIBarView(W::Window *_win, W::EventHandler *_eh, int *_econ) :
+UIBarView::UIBarView(W::Window *_win, int *_econ) :
 	UIView(
 		new W::Positioner(W::BOTTOM_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 0.1),
-		_win,
-		_eh
+		_win
 	),
 	economy(_econ)
 {
@@ -666,11 +669,10 @@ void UIBarView::draw() {
 }
 
 
-FurnishingPurchasingUIView::FurnishingPurchasingUIView(W::Window *_win, W::EventHandler *_eh, std::vector<std::string> *_furnishingTypes) :
+FurnishingPurchasingUIView::FurnishingPurchasingUIView(W::Window *_win, std::vector<std::string> *_furnishingTypes) :
 	UIView(
 		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PFIXED, 47, 47, 140, 220),
 		_win,
-		_eh,
 		W::ALLOW_DRAG
 	),
 	furnishingTypes(_furnishingTypes)
@@ -705,11 +707,10 @@ void FurnishingPurchasingUIView::draw() {
 	}
 }
 
-HiringUIView::HiringUIView(W::Window *_win, W::EventHandler *_eh) :
+HiringUIView::HiringUIView(W::Window *_win) :
 	UIView(
 		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PFIXED, 10, 320, 140, 200),
 		_win,
-		_eh,
 		W::ALLOW_DRAG
 	)
 {
@@ -738,11 +739,10 @@ void HiringUIView::draw() {
 	}
 }
 
-GTTHelpView::GTTHelpView(W::Window *_win, W::EventHandler *_eh, int *_time_remaining, int *_monetary_target) :
+GTTHelpView::GTTHelpView(W::Window *_win, int *_time_remaining, int *_monetary_target) :
 	UIView(
 		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PFIXED, 140, 77, 520, 350),
 		_win,
-		_eh,
 		W::ALLOW_DRAG
 	),
 	time_remaining(_time_remaining), monetary_target(_monetary_target)

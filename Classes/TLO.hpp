@@ -12,7 +12,7 @@
 
 class TLO : public W::MappedObj {
 public:
-	TLO(W::EventHandler *);
+	TLO();
 	~TLO();
 	
 	//virtual void update() { }		// Default implementations of these fns are provided so that

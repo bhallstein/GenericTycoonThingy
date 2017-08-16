@@ -26,7 +26,7 @@ struct furnishingInfo {
 
 class Furnishing : public PlaceableManager, public BehaviourParticipant {
 public:
-	Furnishing(W::EventHandler *, W::NavMap *, const char *_type, Level *, Building *, bool _placeableMode);
+	Furnishing(W::NavMap *, const char *_type, Level *, Building *, bool _placeableMode);
 	~Furnishing();
 	
 	// Properties
@@ -69,7 +69,7 @@ protected:
 
 class Door : public Furnishing {
 public:
-	Door(W::EventHandler *, W::NavMap *, const char *_type, Level *, bool _placeableMode);
+	Door(W::NavMap *, const char *_type, Level *, bool _placeableMode);
 	~Door();
 	
 	bool canPlace(int _x, int _y);

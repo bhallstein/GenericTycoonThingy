@@ -10,13 +10,11 @@ struct MrKlangy::init {
 		bgm = NULL;
 		
 		irrklang::ISoundDeviceList* deviceList = irrklang::createSoundDeviceList();
-		if (!deviceList->getDeviceCount())
-			device_available = false;
-		else {
-			device_available = true;
-			sound_engine = irrklang::createIrrKlangDevice();
-		}
+		device_available = deviceList->getDeviceCount();
 		deviceList->drop();
+		
+		if (device_available)
+			sound_engine = irrklang::createIrrKlangDevice();
 	}
 };
 
@@ -30,7 +28,6 @@ void MrKlangy::playBGM(const char *soundfile, bool loop) {
 	bgm = sound_engine->play2D((MrPaths::dataPath + soundfile).c_str(), loop, false, true);
 }
 void MrKlangy::stopBGM() {
-	if (!device_available) return;
 	if (bgm) {
 		bgm->stop();
 		bgm->drop();

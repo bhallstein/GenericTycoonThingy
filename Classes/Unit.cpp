@@ -14,8 +14,8 @@ W::Colour Unit::defaultColour;
 W::Colour Unit::defaultHoverColour;
 bool Unit::initialized = false;
 
-Unit::Unit(W::EventHandler *_eh, W::NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
-	PlaceableManager(_eh, _placeableMode), navmap(_navmap), type(_type), level(_level),
+Unit::Unit(W::NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
+	PlaceableManager(_placeableMode), navmap(_navmap), type(_type), level(_level),
 	mode(IDLE), hired(false), skBehaviour(NULL)
 {
 	plan.resize(1);
@@ -35,11 +35,12 @@ Unit::~Unit()
 {
 	std::cout << "unit destruct" << std::endl;
 	using namespace W::EventType;
-	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
-	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
-	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
-	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
-	eh->unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
+	if (skBehaviour) skBehaviour->destroy();
 }
 
 bool Unit::canPlace(int _x, int _y) {
@@ -53,11 +54,11 @@ void Unit::finalizePlacement() {
 	}
 	
 	using namespace W::EventType;
-	eh->subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Unit::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Unit::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Unit::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Unit::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Unit::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Unit::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Unit::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Unit::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Unit::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Unit::receiveEvent, this));
 
 	prev_pos = pos;
 }
@@ -132,11 +133,11 @@ void Unit::pickUp() {
 	if (skBehaviour) skBehaviour->unitWasPickedUp();
 	
 	using namespace W::EventType;
-	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
-	eh->unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
-	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
-	eh->unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
-	eh->unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_LEFTMOUSEDOWN,  this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_LEFTMOUSEUP,    this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_RIGHTMOUSEDOWN, this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_RIGHTMOUSEUP,   this);
+	W::Messenger::unsubscribeFromEventType(LEVEL_MOUSEMOVE,      this);
 	
 	PlaceableManager::pickUp();
 }

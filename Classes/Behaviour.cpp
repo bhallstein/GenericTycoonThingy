@@ -16,8 +16,7 @@
 bool Behaviour::lua_initialized = false;
 LuaHelper *Behaviour::mrLua = new LuaHelper();
 
-Behaviour::Behaviour(W::EventHandler *_eh) :
-	TLO(_eh),
+Behaviour::Behaviour() :
 	stage(0), waiting(false)
 {
 	// hai bhvr
@@ -46,8 +45,7 @@ bool Behaviour::initialize() {
 /* SuperBehaviour : Behaviour */
 /******************************/
 
-SuperBehaviour::SuperBehaviour(W::EventHandler *_eh) :
-	Behaviour(_eh),
+SuperBehaviour::SuperBehaviour() :
 	yield_behaviour(NULL), suspended(false)
 {
 	// it r bird? it r plain? no, it r suprbhvr.
@@ -88,8 +86,7 @@ void SuperBehaviour::unsuspend() {
 /* DispatchingBehaviour : Behaviour */
 /************************************/
 
-DispatchingBehaviour::DispatchingBehaviour(W::EventHandler *_eh) :
-	SuperBehaviour(_eh),
+DispatchingBehaviour::DispatchingBehaviour() :
 	sb(NULL), available(true)
 {
 	// hai dispatchy
@@ -101,8 +98,7 @@ bool DispatchingBehaviour::isAvailable() { return available; }
 /* CustomerBehaviour : SuperBehaviour */
 /**************************************/
 
-CustomerBehaviour::CustomerBehaviour(W::EventHandler *_eh, Unit *_u, Level *_l) :
-	SuperBehaviour(_eh),
+CustomerBehaviour::CustomerBehaviour(Unit *_u, Level *_l) :
 	customer(_u), level(_l)
 {
 	printf("CustomerBehaviour %p created on unit %p\n", this, customer);
@@ -122,7 +118,7 @@ void CustomerBehaviour::_superupdate() {
 		else {
 			W::position dest;
 			destination_building->getQueuePoint(dest);
-			yield(new RouteBehaviour(eh, customer, dest));
+			yield(new RouteBehaviour(customer, dest));
 		}
 	}
 	else if (stage == 1) {
@@ -154,7 +150,7 @@ void CustomerBehaviour::_superupdate() {
 		destination_building->customerLeaving();
 		W::position dest;
 		customer->getDespawnPoint(dest);
-		yield(new RouteBehaviour(eh, customer, dest));
+		yield(new RouteBehaviour(customer, dest));
 	}
 	else if (stage == 6) {
 		// Despawn
@@ -172,12 +168,15 @@ void CustomerBehaviour::buildingAccessGranted() {
 /* ShopKeeperBehaviour : DispatchingBehaviour */
 /**********************************************/
 
-ShopKeeperBehaviour::ShopKeeperBehaviour(W::EventHandler *_eh, Unit *_sk, Level *_level) :
-	DispatchingBehaviour(_eh),
+ShopKeeperBehaviour::ShopKeeperBehaviour(Unit *_sk, Level *_level) :
 	sk(_sk), contextBuilding(NULL), level(_level)
 {
 	printf("ShopKeeperBehaviour %p created on unit %p\n", this, sk);
 	sk->skBehaviour = this;
+}
+ShopKeeperBehaviour::~ShopKeeperBehaviour()
+{
+	printf("ShopKeeperBehaviour %p destruct\n", this);
 }
 void ShopKeeperBehaviour::_superupdate() {
 	if (stage == 0) {
@@ -196,7 +195,7 @@ void ShopKeeperBehaviour::_superupdate() {
 	
 	/**** Customer dispatch ****/
 	else if (stage == 300) {
-		yield(new PurchaseBehaviour(eh, customer, sk, furnishing, level));
+		yield(new PurchaseBehaviour(customer, sk, furnishing, level));
 	}
 	else if (stage == 301) {
 		finishedDispatch();
@@ -247,8 +246,8 @@ void ShopKeeperBehaviour::unitWasPutDown() {
 /* RouteBehaviour : Behaviour */
 /******************************/
 
-RouteBehaviour::RouteBehaviour(W::EventHandler *_eh, Unit *_u, W::position &_dest) :
-	Behaviour(_eh), unit(_u), dest(_dest)
+RouteBehaviour::RouteBehaviour(Unit *_u, W::position &_dest) :
+	unit(_u), dest(_dest)
 {
 	printf("RouteBehaviour %p created on unit %p\n", this, unit);
 	unit->capture();
@@ -313,8 +312,7 @@ void RouteBehaviour::_update() {
 /* PurchaseBehaviour : DispatchingBehaviour */
 /********************************************/
 
-PurchaseBehaviour::PurchaseBehaviour(W::EventHandler *_eh, Unit *_cust, Unit *_staff, Furnishing *_f, Level *_level) :
-	Behaviour(_eh),
+PurchaseBehaviour::PurchaseBehaviour(Unit *_cust, Unit *_staff, Furnishing *_f, Level *_level) :
 	customer(_cust), staff(_staff), furnishing(_f), level(_level)
 {
 	printf("PurchaseBehaviour %p created on customer %p, shopkeeper %p and furnishing %p\n", this, customer, staff, furnishing);

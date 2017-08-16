@@ -2,8 +2,8 @@
 #include "PlaceableManager.hpp"
 #include "Level.hpp"
 
-Placeable::Placeable(PlaceableManager *_mngr, W::EventHandler *_eh) :
-	mngr(_mngr), eh(_eh)
+Placeable::Placeable(PlaceableManager *_mngr) :
+	mngr(_mngr)
 {
 	plan.resize(1);
 	W::rect *r = &plan[0];
@@ -31,14 +31,14 @@ void Placeable::receiveEvent(W::Event *ev) {
 
 bool Placeable::activate() {
 	using namespace W::EventType;
-	eh->requestPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE,      W::Callback(&Placeable::receiveEvent, this));
-	eh->requestPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Placeable::receiveEvent, this));
-	eh->requestPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Placeable::receiveEvent, this));
+	W::Messenger::requestPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE,      W::Callback(&Placeable::receiveEvent, this));
+	W::Messenger::requestPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Placeable::receiveEvent, this));
+	W::Messenger::requestPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Placeable::receiveEvent, this));
 	return true;
 }
 void Placeable::deactivate() {
 	using namespace W::EventType;
-	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE, this);
-	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN, this);
-	eh->relinquishPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, this);
+	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LEVEL_MOUSEMOVE, this);
+	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LEVEL_LEFTMOUSEDOWN, this);
+	W::Messenger::relinquishPrivilegedResponderStatusForEventType(LEVEL_RIGHTMOUSEDOWN, this);
 }

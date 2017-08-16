@@ -38,7 +38,7 @@ protected:
 
 class ScoreView : public W::UIView {
 public:
-	ScoreView(W::Window *_win, W::EventHandler *_eh, bool _victory);
+	ScoreView(W::Window *_win, bool _victory);
 	void draw();
 	bool victory;
 };

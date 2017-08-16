@@ -31,7 +31,7 @@ namespace W { namespace EventType {
 
 class Unit : public PlaceableManager, public BehaviourParticipant {
 public:
-	Unit(W::EventHandler *, W::NavMap *, const char *_type, Level *, bool _placeableMode);
+	Unit(W::NavMap *, const char *_type, Level *, bool _placeableMode);
 	~Unit();
 	
 	// Properties

@@ -16,7 +16,7 @@ class Placeable;
 
 class PlaceableManager : public TLO {
 public:
-	PlaceableManager(W::EventHandler *, bool _placeableMode);
+	PlaceableManager( bool _placeableMode);
 	~PlaceableManager();
 	bool init(int _x, int _y);
 	

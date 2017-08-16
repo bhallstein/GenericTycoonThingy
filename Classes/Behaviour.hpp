@@ -24,7 +24,7 @@ class LuaHelper;
 
 class Behaviour : public TLO {
 public:
-	Behaviour(W::EventHandler *);
+	Behaviour();
 	virtual ~Behaviour();
 	void update() {
 		// This waiting routine is provided so that subclasses can simply
@@ -61,7 +61,7 @@ protected:
 
 class SuperBehaviour /* to the rescue */ : public Behaviour {
 public:
-	SuperBehaviour(W::EventHandler *);
+	SuperBehaviour();
 	virtual ~SuperBehaviour();
 	void _update();
 	virtual void _superupdate() = 0;	// Implementation for SBs goes in this override
@@ -93,7 +93,7 @@ protected:
 
 class CustomerBehaviour : public SuperBehaviour {
 public:
-	CustomerBehaviour(W::EventHandler *, Unit *, Level *);
+	CustomerBehaviour(Unit *, Level *);
 	~CustomerBehaviour();
 	void _superupdate();
 	
@@ -112,7 +112,7 @@ protected:
 
 class RouteBehaviour : public Behaviour {
 public:
-	RouteBehaviour(W::EventHandler *, Unit *, W::position &_dest);
+	RouteBehaviour(Unit *, W::position &_dest);
 	~RouteBehaviour();
 	void _update();
 private:
@@ -127,7 +127,7 @@ private:
 
 class DispatchingBehaviour : public SuperBehaviour {
 public:
-	DispatchingBehaviour(W::EventHandler *);
+	DispatchingBehaviour();
 	virtual bool dispatchUnit(Unit *, SuperBehaviour *) { return false; }
 	virtual bool dispatchUnit(Unit *, Furnishing *, SuperBehaviour *) { return false; }
 	virtual void finishedDispatch() = 0;	// When DB has finished performing task, should unsuspend its calling SB
@@ -140,7 +140,8 @@ protected:
 
 class ShopKeeperBehaviour : public DispatchingBehaviour {
 public:
-	ShopKeeperBehaviour(W::EventHandler *, Unit *, Level *);
+	ShopKeeperBehaviour(Unit *, Level *);
+	~ShopKeeperBehaviour();
 	void _superupdate();
 	bool dispatchUnit(Unit *, Furnishing *, SuperBehaviour *);
 	void finishedDispatch();
@@ -160,7 +161,7 @@ protected:
 
 class PurchaseBehaviour : public Behaviour {
 public:
-	PurchaseBehaviour(W::EventHandler *, Unit *_customer, Unit *_staff, Furnishing *, Level *);
+	PurchaseBehaviour(Unit *_customer, Unit *_staff, Furnishing *, Level *);
 	void _update();
 private:
 	Unit *customer;

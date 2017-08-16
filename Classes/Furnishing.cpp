@@ -11,8 +11,8 @@ W::Colour Furnishing::defaultColour;
 W::Colour Furnishing::defaultHoverColour;
 bool Furnishing::initialized = false;
 
-Furnishing::Furnishing(W::EventHandler *_eh, W::NavMap *_navmap, const char *_type, Level *_level, Building *_context, bool _placeableMode) :
-	PlaceableManager(_eh, _placeableMode), navmap(_navmap), type(_type), level(_level), contextBuilding(_context),
+Furnishing::Furnishing(W::NavMap *_navmap, const char *_type, Level *_level, Building *_context, bool _placeableMode) :
+	PlaceableManager(_placeableMode), navmap(_navmap), type(_type), level(_level), contextBuilding(_context),
 	animationFinished(false), purchased(false)
 {
 	// Set properties for this Furnishing type
@@ -64,11 +64,11 @@ void Furnishing::finalizePlacement() {
 		purchased = true;
 	}
 	using namespace W::EventType;
-	eh->subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Furnishing::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Furnishing::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Furnishing::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Furnishing::receiveEvent, this));
-	eh->subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Furnishing::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_LEFTMOUSEDOWN,  W::Callback(&Furnishing::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_LEFTMOUSEUP,    W::Callback(&Furnishing::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_RIGHTMOUSEDOWN, W::Callback(&Furnishing::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_RIGHTMOUSEUP,   W::Callback(&Furnishing::receiveEvent, this));
+	W::Messenger::subscribeToEventType(LEVEL_MOUSEMOVE,      W::Callback(&Furnishing::receiveEvent, this));
 }
 
 W::Colour& Furnishing::col() {
@@ -244,10 +244,10 @@ int Furnishing::costForType(const char *_type) {
 }
 
 
-Door::Door(W::EventHandler *_eh, W::NavMap *_nm, const char *_type, Level *_level, bool _placeableMode) :
-	Furnishing(_eh, _nm, _type, _level, NULL, _placeableMode)
+Door::Door(W::NavMap *_nm, const char *_type, Level *_level, bool _placeableMode) :
+	Furnishing(_nm, _type, _level, NULL, _placeableMode)
 {
-	
+	// ello
 }
 Door::~Door()
 {

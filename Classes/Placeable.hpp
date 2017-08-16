@@ -15,13 +15,12 @@ class PlaceableManager;
 
 class Placeable : public W::MappedObj {
 public:
-	Placeable(PlaceableManager *, W::EventHandler *);
+	Placeable(PlaceableManager *);
 	~Placeable();
 	bool activate();
 	void deactivate();
 	void receiveEvent(W::Event *ev);
 	PlaceableManager *mngr;
-	W::EventHandler *eh;
 };
 
 #endif

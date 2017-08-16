@@ -30,7 +30,7 @@ struct buildingInfo {
 
 class Building : public TLO {
 public:
-	Building(W::EventHandler *, W::NavMap *, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *);
+	Building(W::NavMap *, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *);
 	~Building();
 	
 	// Properties

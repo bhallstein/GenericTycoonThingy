@@ -1,12 +1,12 @@
 #include "PlaceableManager.hpp"
 #include "Placeable.hpp"
 
-PlaceableManager::PlaceableManager(W::EventHandler *_eh, bool _placeableMode) :
-	TLO(_eh), placeableMode(_placeableMode), placeable(NULL)
+PlaceableManager::PlaceableManager(bool _placeableMode) :
+	placeableMode(_placeableMode), placeable(NULL)
 {
 	pos.x = pos.y = 0;
 	rotation = 0;
-	placeable = new Placeable(this, eh);
+	placeable = new Placeable(this);
 }
 PlaceableManager::~PlaceableManager()
 {

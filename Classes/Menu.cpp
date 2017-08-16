@@ -7,12 +7,12 @@ Menu::Menu(W::Window *_win) : W::GameState(W::GS_OPAQUE), win(_win)
 	menubackgroundview = new MenuBackgroundView(win);
 	addView(menubackgroundview);
 	
-	clicktobeginview = new ClickToBeginView(win, &eh, this);
+	clicktobeginview = new ClickToBeginView(win, this);
 //	clicktobeginview->subscribeToButtons(new W::Callback...)
 	addView(clicktobeginview);
 	
 	// Key subscriptions
-	eh.subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Menu::receiveEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::KEYPRESS, W::Callback(&Menu::receiveEvent, this));
 
 	MrKlangy::playBGM("menu.xm");
 }
@@ -62,10 +62,10 @@ void Menu::startLevel(std::string path) {
 }
 
 
-ClickToBeginView::ClickToBeginView(W::Window *_win, W::EventHandler *_eh, Menu *_menu) :
+ClickToBeginView::ClickToBeginView(W::Window *_win, Menu *_menu) :
 	W::UIView(
 		new W::Positioner(W::TOP_LEFT, W::PFIXED, W::PPROPORTIONAL, 0, 0, 1, 1),
-		_win, _eh
+		_win
 	),
 	menu(_menu)
 {

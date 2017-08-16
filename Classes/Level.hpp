@@ -133,7 +133,7 @@ class LevelView : public W::View {
 public:
 	// Methods
 	LevelView(
-		W::Window *, W::EventHandler *,
+		W::Window *,
 		std::vector<Building*> *, std::vector<Furnishing*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 		int _level_width, int _level_height,
 		int *_time_remaining,
@@ -163,14 +163,13 @@ public:
 	std::vector<Unit*>       *units;
 	std::vector<Unit*>       *staff;
 	
-	W::EventHandler *eh;
 	W::NavMap *nm;
 };
 
 
 class UIBarView : public W::UIView {
 public:
-	UIBarView(W::Window *, W::EventHandler *, int *_econ);
+	UIBarView(W::Window *, int *_econ);
 	void draw();
 private:
 	int *economy;
@@ -178,7 +177,7 @@ private:
 
 class FurnishingPurchasingUIView : public W::UIView {
 public:
-	FurnishingPurchasingUIView(W::Window *, W::EventHandler *, std::vector<std::string> *_furnishingTypes);
+	FurnishingPurchasingUIView(W::Window *, std::vector<std::string> *_furnishingTypes);
 	void draw();
 protected:
 	std::vector<std::string> *furnishingTypes;
@@ -186,13 +185,13 @@ protected:
 
 class HiringUIView : public W::UIView {
 public:
-	HiringUIView(W::Window *, W::EventHandler *);
+	HiringUIView(W::Window *);
 	void draw();
 };
 
 class GTTHelpView : public W::UIView {
 public:
-	GTTHelpView(W::Window *, W::EventHandler *, int *_time_remaining, int *_monetary_target);
+	GTTHelpView(W::Window *, int *_time_remaining, int *_monetary_target);
 	void draw();
 private:
 	int *time_remaining;

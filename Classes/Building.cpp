@@ -14,8 +14,7 @@ bool Building::initialized = false;
 
 std::vector<std::map<Furnishing*, Unit*>::iterator> Building::_ind_array;
 
-Building::Building(W::EventHandler *_eh, W::NavMap *_nm, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *_level) :
-	TLO(_eh),
+Building::Building(W::NavMap *_nm, const char *_type, std::vector<W::rect> *_plan, W::position &_pos, Level *_level) :
 	navmap(_nm), type(_type), level(_level),
 	clicked(false), time_hovered(0), hover(false), customerCount(0)
 {
@@ -23,7 +22,7 @@ Building::Building(W::EventHandler *_eh, W::NavMap *_nm, const char *_type, std:
 	plan = *_plan;
 	bInfo = &Building::buildingTypes[type];	// Save ptr to properties for this building type
 	
-	eh->subscribeToEventType(W::EventType::LEVEL_LEFTMOUSEDOWN, W::Callback(&Building::receiveEvent, this));
+	W::Messenger::subscribeToEventType(W::EventType::LEVEL_LEFTMOUSEDOWN, W::Callback(&Building::receiveEvent, this));
 	
 	if (!navmap->isPassableUnder(this))
 		throw W::Exception("Navmap was not passable under Building plan.");
@@ -33,7 +32,7 @@ Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
 	navmap->unisolate(this);	// NOTE: W::NavMap::unisolate() is not yet functional
-	eh->unsubscribeFromMouseEvents(this);
+	W::Messenger::unsubscribeFromMouseEvents(this);
 }
 
 void Building::receiveEvent(W::Event *ev) {
