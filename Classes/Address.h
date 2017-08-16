@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ADDRESS_H
+#define ADDRESS_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,3 +36,5 @@ protected:
 private:
 	
 };
+
+#endif
