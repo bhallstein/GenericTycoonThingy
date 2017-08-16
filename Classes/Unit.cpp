@@ -15,10 +15,7 @@ Unit::Unit(NavMap *_navmap, int _x, int _y) :
 	
 	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 }
-Unit::~Unit()
-{
-	std::cout << "unit destruct" << std::endl;
-}
+Unit::~Unit() { }
 
 void Unit::receiveEvent(Event *ev) {
 	if (ev->type == Event::MOUSEMOVE)

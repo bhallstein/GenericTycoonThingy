@@ -6,7 +6,9 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-class Unit : public Unit
+#include "Unit.hpp"
+
+class Client : public Unit
 {
 public:
 	

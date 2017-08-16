@@ -5,6 +5,7 @@
 #include "Building.hpp"
 #include "Placeable.hpp"
 #include "Unit.hpp"
+#include "Staff.hpp"
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
@@ -204,8 +205,29 @@ Unit* Level::createUnit(int atX, int atY) {
 	Unit *u = new Unit(navmap, atX, atY);
 	units.push_back(u);
 	levelResponderMap->addMappedObj(u);
-	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
+}
+Staff* Level::createStaff()
+{
+	int atX, atY; //co-ords required by unit's ctor
+	//find the asylum (spawn building) amongst our buildings //note: this method only reliably works while we only have 1 asylum per level
+	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
+		if ((*i)->type == "Asylum") {
+			atX = (*i)->x;
+			atY = (*i)->y;
+		}
+		else i++;
+
+	try{
+		Staff* s = new Staff(navmap,atX,atY); //create the Staff with the found co-ords
+		units.push_back(s); //add the staff to the level's unit list
+		levelResponderMap->addMappedObj(s);
+		return s;
+	}
+	catch(...)
+	{
+		throw;
+	}
 }
 Building* Level::createBuilding(int atX, int atY) {
 	Building *b = new Building(atX, atY);
@@ -329,6 +351,10 @@ UIBarView::UIBarView(W *_theW, JenniferAniston &aniston, Level *_level) :
 	createplaceable_btn = new Button(this, 10, 10, 20, 20);
 	buttonMap.addResponder(createplaceable_btn);
 	buttons.push_back(createplaceable_btn);
+
+	createstaff_btn = new Button(this, 40, 10, 20, 20);
+	buttonMap.addResponder(createstaff_btn);
+	buttons.push_back(createstaff_btn);
 }
 
 UIBarView::~UIBarView()
@@ -339,6 +365,8 @@ UIBarView::~UIBarView()
 void UIBarView::buttonClick(Button *btn) {
 	if (btn == createplaceable_btn)
 		level->createPlaceable();
+	if (btn == createstaff_btn)
+		level->createStaff();
 }
 
 void UIBarView::processMouseEvent(Event *ev) {

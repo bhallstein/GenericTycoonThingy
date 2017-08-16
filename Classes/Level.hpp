@@ -25,6 +25,7 @@ class NavMap;
 class Building;
 class Placeable;
 class Unit;
+class Staff;
 
 class LevelView;
 class UIBarView;
@@ -52,6 +53,7 @@ public:
 	
 	// Top-level-object stuff
 	Unit* createUnit(int atX, int atY);
+	Staff* createStaff();
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
@@ -128,6 +130,7 @@ public:
 	// Properties
 	Level *level;
 	Button *createplaceable_btn;
+	Button *createstaff_btn;
 	std::vector<Button *> buttons;
 	ResponderMap buttonMap;
 };
