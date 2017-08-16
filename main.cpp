@@ -1,11 +1,85 @@
+/*
+ * main.cpp – main game loop thinger
+ *
+ */
+
+#include <iostream>
+#include <string>
 #include <map>
-#include "game.h"
-#include <SFML\Graphics.hpp>
+#include <vector>
 
-using namespace sf;
-using namespace std;
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
-// O hai everyone
+/* Game classes */
+// #include "Classes/Address.h"
+// #include "Classes/Builder.h"
+// #include "Classes/Building.h"
+// #include "Classes/Game.h"
+// #include "Classes/Level.h"
+// #include "Classes/SettingsManager.h"
+// #include "Classes/Structure.h"
+// #include "Classes/Tutorial.h"
+
+// using namespace std;
+using std::cin;
+using std::cout;
+using std::ifstream;
+using std::ofstream;
+
+using std::string;
+using std::vector;
+using std::map;
+
+
+int main(int argc, char *argv[], char *envp[])
+{
+	// Configuration: paths
+	string path_settings = "Data/Settings.xml";
+	// etc.
+
+	/* Window setup */
+
+	// Set defaults (manually for now)
+	int w_width = 800, w_height = 600;
+	string w_name = "Demon Barber Tycoon";
+	
+	// Get settings from file and if success & values valid, replace defaults.
+	//...
+	
+	sf::RenderWindow DBT_Window(sf::VideoMode(w_width, w_height), w_name, sf::Style::Close);
+
+	
+	// Arrays for units, buildings
+	
+	
+
+    while (DBT_Window.IsOpened())
+    {
+        sf::Event ev;
+        while (DBT_Window.PollEvent(ev)) 
+		{
+            // Close window : exit
+            if (ev.Type == sf::Event::Closed)
+	   		DBT_Window.Close();
+	
+			// Mouseovers: pass to underlying objects
+			// Current affairs will need to overrule: say you are dragging a member of staff across the map.
+			// How to do this unclear atm.
+			if (ev.Type == sf::Event::)
+        }
+    
+        DBT_Window.Clear(sf::Color::Black);
+    
+	    //window.Draw(sprite);
+    
+        // Update the window
+        DBT_Window.Display();
+    }
+}
+
+
 
 map<string,string> paraMap(int argc, char *argv[], char *envp[]) //consider validating the map's contents too - and removing invalid pairs (no need to error unnecessarily; just ignore)
 {
@@ -57,96 +131,3 @@ map<string,string> paraMap(int argc, char *argv[], char *envp[]) //consider vali
 
 	return theMap;
 }
-
-int main(int argc, char *argv[], char *envp[])
-{
-	/*int error = 0; // used to return an error code, or 0 for no error
-
-	map<string,string> argMap;
-	argMap = paraMap(argc,argv,envp);
-
-	//iterate through the map, outputting params!
-	for(map<string,string>::iterator iter = argMap.begin(); iter != argMap.end(); iter++)
-	{
-		cout << iter->first << " = " << iter->second << endl; //output key = value
-	}
-
-	cin.get();
-
-	cout << "-----------Welcome to Demon Barber Tycoon!------------\n\n\n";
-	cout << "Starting new game. Select 'Help' for instructions.\n\n";
-	
-	Game dbt;
-	dbt.Run();
-
-	return error;*/
-//SFML STUFF
-	// Create the main window
-    RenderWindow window(VideoMode(800, 600), "SFML window");
-
-	// Load a sprite to display
-     Texture texture;
-     texture.LoadFromFile("cute_image.png");
-     Sprite sprite(texture);
-
-	// Start the game loop
-     while (window.IsOpened())
-     {
-         // Process events
-         Event event;
-         while (window.PollEvent(event))
-         {
-             // Close window : exit
-             if (event.Type == Event::Closed)
-                 window.Close();
-         }
- 
-         // Clear screen
-         window.Clear(Color(100,149,237));
-
-		 window.Draw(sprite);
- 
-         // Update the window
-         window.Display();
-     }
-}
-
-
-
-/*
-//SFML STUFF
-#include <SFML\Graphics.hpp>
-
-using namespace sf;
-
-int main()
-{
-	// Create the main window
-    RenderWindow window(VideoMode(800, 600), "SFML window");
-
-	// Load a sprite to display
-     Texture texture;
-     texture.LoadFromFile("cute_image.png");
-     Sprite sprite(texture);
-
-	// Start the game loop
-     while (window.IsOpened())
-     {
-         // Process events
-         Event event;
-         while (window.PollEvent(event))
-         {
-             // Close window : exit
-             if (event.Type == Event::Closed)
-                 window.Close();
-         }
- 
-         // Clear screen
-         window.Clear(Color(100,149,237));
-
-		 window.Draw(sprite);
- 
-         // Update the window
-         window.Display();
-     }
-}*/
