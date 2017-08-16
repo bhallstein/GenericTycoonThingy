@@ -21,8 +21,6 @@ class Game
 public:
 	Game(W *);
 	~Game();
-
-	// Methods
 	
 	// Events/Update/Drawing
 	void sendEvents(std::vector<Event> *);
@@ -46,7 +44,6 @@ protected:
 	int prev_w, prev_h;
 	
 	bool finishedIntro;
-	
 };
 
 #endif

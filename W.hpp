@@ -12,6 +12,7 @@
 
 #include "Classes/types.hpp"
 #include "WindowManager.hpp"
+#include "mtrand.h"
 
 class View;
 class Event;
@@ -50,7 +51,7 @@ public:
 	void initializePaths();
 	bool isValidDir(const char *);
 	bool createDir(const char *);
-
+	
 	// Stringy output
 	void warning(const char *msg, const char *title = "Warning");
 	static void log(const char *);
@@ -65,6 +66,9 @@ public:
 	static std::string logfilePath;
 	static std::ofstream logfile;
 	
+	// Mersenne Twister
+	static unsigned int randUpTo(int);
+	
 protected:
 	// Methods
 	//void setBackBufferSize(int _x, int _y);
@@ -76,6 +80,8 @@ protected:
 	View *current_drawn_view;
 
 	std::vector<Event> events;
+	
+	static MTRand_int32 twister;
 };
 
 #endif

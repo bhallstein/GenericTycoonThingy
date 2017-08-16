@@ -2,16 +2,14 @@
 
 defaultColour = "black"
 defaultHoverColour = "blue"
-defaultColourWhenMoving = "white"
 
 unitTypes = {
 	civilian = {
 		
 	},
 	staff = {
-		colour = "yellow",
+		colour = "green",
 		hoverColour = "red",
-		colourWhenMoving = "green",
 		hireCost = 10
 	}
 }

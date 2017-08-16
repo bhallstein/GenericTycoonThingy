@@ -13,10 +13,16 @@
 #include "Classes/Event.hpp"
 #include "Classes/View.hpp"
 
+MTRand_int32 W::twister;
+
 std::string W::logfilePath;
 std::ofstream W::logfile;
 
 W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting_up(true) {
+	time_t timey;
+	time(&timey);
+	twister.seed(timey);
+	
 	this->initializePaths();
 	W::logfile.open(logfilePath.c_str());
 #ifdef __APPLE__
@@ -181,6 +187,10 @@ bool W::createDir(const char *dir) {
 #elif defined _WIN32 || _WIN64
 	return CreateDirectory(dir, NULL);
 #endif
+}
+
+unsigned int W::randUpTo(int x) {
+	return twister()%x;
 }
 
 void W::warning(const char *msg, const char *title) {

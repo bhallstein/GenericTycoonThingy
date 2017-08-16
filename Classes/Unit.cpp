@@ -1,25 +1,23 @@
 #include "Unit.hpp"
 #include "NavMap.hpp"
 #include "LuaHelper.hpp"
+#include "Building.hpp"
+#include "Level.hpp"
 
 std::map<std::string, struct unitInfo> Unit::unitTypes;
 std::string Unit::defaultColour;
 std::string Unit::defaultHoverColour;
-std::string Unit::defaultColourWhenMoving;
 
-Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type) :
-	MappedObj(_rm, false), navmap(_navmap), type(_type),
-	state(S_IDLE), hover(false)
+Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level) :
+	MappedObj(_rm, false), navmap(_navmap), type(_type), level(_level),
+	hover(false), stage(0)
 {
 	intcoord c = {0,0};
 	groundplan.push_back(c);
 	
-	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
-	
 	// Get properties for this unit type
-	u_colour           = &Unit::unitTypes[type].col;
-	u_hoverColour      = &Unit::unitTypes[type].hoverCol;
-	u_colourWhenMoving = &Unit::unitTypes[type].colWhenMoving;
+	u_colour      = &Unit::unitTypes[type].col;
+	u_hoverColour = &Unit::unitTypes[type].hoverCol;
 }
 Unit::~Unit() { }
 
@@ -34,132 +32,196 @@ void Unit::receiveEvent(Event *ev) {
 
 const char * Unit::col() {
 	if (hover) { hover = false; return u_hoverColour->c_str(); }
-	else if (state == S_IDLE) return u_colour->c_str();
-	else if (state == S_TRAVELING) return u_colourWhenMoving->c_str();
-	else return "red";
+	return u_colour->c_str();
+}
+
+void Unit::addIntention(Intention::Enum _intention) {
+	intentions.push_back(_intention);
 }
 
 void Unit::update() {
 	if (hover) return;
-	
-	bool at_dest = (x == dest_x && y == dest_y);
-	
-	if (state == S_IDLE) {
-		if (!at_dest)
-			setToTraveling();
+	Intention::Enum curIntention = intentions.empty() ? Intention::NONE : intentions[0];
+	if (curIntention == Intention::HAIRCUT)       intentionUpdate_Haircut();
+	else if (curIntention == Intention::PIE)      intentionUpdate_Pie();
+	else if (curIntention == Intention::DESTRUCT) intentionUpdate_Destruct();
+}
+
+void Unit::intentionUpdate_Haircut() {
+	if (stage == -1) {		// Waiting
+		if (++frames_waited >= 60) stage++;
+	}
+	else if (stage == 0) {	// Route to barber shop
+		dest_building = level->randomBuildingWithType("barber");
+		if (dest_building == NULL)
+			frames_waited = 0, stage = -1;
+		else {
+			dest_building->getEntryPoint(&dest_x, &dest_y);
+			if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+				stage++;
+			else
+				frames_waited = 0, stage = -1;
+		}
+	}
+	else if (stage == 1) {	// Move to destination
+		if (atDest()) stage++;
+		else if (!incrementLocation()) stage = 0;
+	}
+	else if (stage == 2) {	// Entry negotiation
+		dest_building->getQueuePoint(&dest_x, &dest_y);
+		stage += 2;
+	}
+	else if (stage == 3) {	// Waiting
+		if (++frames_waited >= 60) stage++;
+	}
+	else if (stage == 4) {	// Route to queue point
+		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+			stage++;
 		else
-			if(++frames_waited == 120)
-				frames_waited = 0, seekHinterland();
+			frames_waited = 0, stage = 3;
 	}
-	else if (state == S_WAITING) {
-		frames_waited++;
-		if (frames_waited == 60)
-			frames_waited = 0, setToTraveling();
+	else if (stage == 5) {	// Move to queue point
+		if (atDest()) frames_waited = 0, stage++;
+		else if (!incrementLocation()) stage = 4;
 	}
-	else if (at_dest) {
-		if(inHinterland()) destroyed = true;
-		setToIdle();
+	else if (stage == 6) {	// Queue
+		if (++frames_waited == 60) nextIntention();
 	}
-	else if (state == S_TRAVELING) {
-		if (route.empty())
-			setToTraveling();
+}
+void Unit::intentionUpdate_Pie() {
+	if (stage == -1) {		// Waiting
+		if (++frames_waited >= 60) stage++;
 	}
-
-	if (state != S_TRAVELING) return;	
-
-	incrementLocation();
-}
-
-void Unit::seekHinterland()
-{
-	//randomise whether we head to the sides or top/bottom
-	switch(rand()%4 + 1)
-	{
-	case 1: //head left
-		dest_x = 0, dest_y = rand()%navmap->h;
-		break;
-	case 2: //head right
-		dest_x = navmap->w-1, dest_y = rand()%navmap->h;
-		break;
-	case 3: //head up
-		dest_y = 0, dest_x = rand()%navmap->w;
-		break;
-	case 4: //head down
-		dest_y = navmap->h-1, dest_x = rand()%navmap->w;
-		break;
+	else if (stage == 0) {	// Route to barber shop
+		dest_building = level->randomBuildingWithType("pieshop");
+		if (dest_building == NULL)
+			frames_waited = 0, stage = -1;
+		else {
+			dest_building->getEntryPoint(&dest_x, &dest_y);
+			if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+				stage++;
+			else
+				frames_waited = 0, stage = -1;
+		}
 	}
-
-	//now we've set our new Hinterlandsy destination - go there!
-	setToTraveling();
+	else if (stage == 1) {	// Move to destination
+		if (atDest()) stage++;
+		else if (!incrementLocation()) stage = 0;
+	}
+	else if (stage == 2) {	// Entry negotiation
+		dest_building->getQueuePoint(&dest_x, &dest_y);
+		stage += 2;
+	}
+	else if (stage == 3) {	// Waiting
+		if (++frames_waited >= 60) stage++;
+	}
+	else if (stage == 4) {	// Route to queue point
+		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+			stage++;
+		else
+			frames_waited = 0, stage = 3;
+	}
+	else if (stage == 5) {	// Move to queue point
+		if (atDest()) frames_waited = 0, stage++;
+		else if (!incrementLocation()) stage = 4;
+	}
+	else if (stage == 6) {	// Queue
+		if (++frames_waited == 60) nextIntention();
+	}
+}
+void Unit::intentionUpdate_Destruct() {
+	if (stage == -1) {		// Waiting
+		if (++frames_waited == 60) stage++;
+	}
+	else if (stage == 0) {	// Find route to despawn loc
+		switch(W::randUpTo(4))
+		{
+			case 0: //head left
+				dest_x = 0, dest_y = W::randUpTo(navmap->h);
+				break;
+			case 1: //head right
+				dest_x = navmap->w-1, dest_y = W::randUpTo(navmap->h);
+				break;
+			case 2: //head up
+				dest_y = 0, dest_x = W::randUpTo(navmap->w);
+				break;
+			case 3: //head down
+				dest_y = navmap->h-1, dest_x = W::randUpTo(navmap->w);
+				break;
+		}
+		if (navmap->getRoute(x, y, dest_x, dest_y, &route))
+			stage++;
+		else
+			frames_waited = 0, stage = -1;
+	}
+	else if (stage == 1) {	// Move to despawn loc
+		if (atDest()) stage++;
+		else if (!incrementLocation()) stage = 0;
+	}
+	else if (stage == 2) {	// Despawn
+		destroyed = true;
+	}
+}
+void Unit::nextIntention() {
+	stage = 0;
+	if (!intentions.empty()) intentions.erase(intentions.begin());
 }
 
-bool Unit::inHinterland()
-{
-	return (x <= HINTERLAND_WIDTH ||
-			x >= navmap->w-HINTERLAND_WIDTH || 
-			y <= HINTERLAND_WIDTH || 
-			y >= navmap->h-HINTERLAND_WIDTH);
-}
 
-void Unit::nextInRoute() {
-	route.erase(route.begin());
-}
-void Unit::setToIdle() {
-	frames_waited = 0; //bodged in here because a) current Hinterlands implementation and b) why not? it doesn't need retaining cross-state
-	route.clear();
-	state = S_IDLE;
-}
-void Unit::setToTraveling() {
-	if (navmap->getRoute(x, y, dest_x, dest_y, &route))
-		route.erase(route.begin()), state = S_TRAVELING;
-	else
-		setToWaiting();
-}
-void Unit::setToWaiting() {
-	frames_waited = 0;
-	state = S_WAITING;
-}
-void Unit::incrementLocation() {
-	// Increment a & b toward next in route
+bool Unit::incrementLocation() {
+	if (atDest()) return true;
+	
 	float step = 0.05;
 	float a_diff = 0, b_diff = 0;
-
-	int next_x = route[0]->x, next_y = route[0]->y;
-	bool diagonal = (x != next_x && y != next_y);
+	bool diagonal = x != prev_x && y != prev_y;
 	
-	if (x < next_x)      a_diff = step;
-	else if (x > next_x) a_diff = -step;
-	if (y < next_y)      b_diff = step;
-	else if (y > next_y) b_diff = -step;
-
-	if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
-
-	a += a_diff, b += b_diff;
-	
-	// Check if we’ve reached the next loc. This happens:
-	//   - for diagonals, when a^2 + b^2 = 2
-	//   - for linears, when |a| = 1 or |b| = 1
-	bool reached_next = ((diagonal && a*a + b*b >= 2) || (!diagonal && (a*a >= 1 || b*b >= 1)));
+	// Check if we've reached the next loc. This happens
+	//  - for linears, when |a| < step or |b| < step
+	//  - for diagonals, when a^2 + b^2 < 2 * step^2
+	float t = a != 0 ? a : b;
+	bool reached_next = (diagonal && a*a + b*b < 2*step*step) || (!diagonal && t*t < step*step);
 	if (reached_next) {
-		// If on point of entering next loc, check is passable
-		if (route[0]->passable) {
-			x = next_x, y = next_y;
-			a = b = 0;
-			nextInRoute();
-		}
-		// If access denied, go back to the previous square. Waiting & recalculation will ensue upon arrival.
+		if (route.empty())
+			a = b = 0;			// Arrived!
 		else {
-			route.clear();
-			route.push_back( navmap->nodeAt(x, y) );
-			x = next_x, y = next_y;
-			a = b = 0;
+			// Get next in route
+			int c = route[0]->x, d = route[0]->y;
+			if (navmap->isPassableAt(c, d)) {
+				prev_x = x, prev_y = y;
+				x = c, y = d;
+				a = prev_x == x ? 0 : prev_x < x ? -1 : 1;
+				b = prev_y == y ? 0 : prev_y < y ? -1 : 1;
+				route.erase(route.begin());
+			}
+			else {
+				route.clear();
+				return false;
+			}
 		}
 	}
+	else {
+		// Decrement a & b toward current loc
+		if (x > prev_x)      a_diff = step;
+		else if (x < prev_x) a_diff = -step;
+		if (y > prev_y)      b_diff = step;
+		else if (y < prev_y) b_diff = -step;
+		if (diagonal) a_diff *= 0.71, b_diff *= 0.71;	// For diagonal traveling, normalise the motion vector by dividing by √2
+		a += a_diff, b += b_diff;
+	}
+	return true;
+}
+inline bool Unit::atDest() {
+	return dest_x == x && dest_y == y && a == 0 && b == 0;
+}
+inline bool Unit::inHinterland() {
+	return (
+		x < HINTERLAND_WIDTH || x >= navmap->w-HINTERLAND_WIDTH || 
+		y < HINTERLAND_WIDTH || y >= navmap->h-HINTERLAND_WIDTH
+	);
 }
 
 bool Unit::initialize(W *_W) {
 	W::log("Unit::initialize() called...");
-	
 	LuaHelper mrLua(_W);
 	
 	std::string path = _W->resourcesPath;
@@ -174,7 +236,6 @@ bool Unit::initialize(W *_W) {
 		// Set Unit defaults
 		Unit::defaultColour           = mrLua.getvalue<const char *>("defaultColour");
 		Unit::defaultHoverColour      = mrLua.getvalue<const char *>("defaultHoverColour");
-		Unit::defaultColourWhenMoving = mrLua.getvalue<const char *>("defaultColourWhenMoving");
 	} catch (MsgException &exc) {
 		std::string s = "In units.lua, could not get defaults. Error: "; s.append(exc.msg);
 		W::log(s.c_str());
@@ -200,10 +261,6 @@ bool Unit::initialize(W *_W) {
 		
 		lua_getfield(L, -1, "hoverColour");			// S: -1 colour; -2 subtable; -3 key; -4 table
 		uInfo->hoverCol = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultHoverColour;
-		lua_pop(L, 1);
-		
-		lua_getfield(L, -1, "colourWhenMoving");	// S: -1 colour; 2 subtable; -3 key; -4 table
-		uInfo->colWhenMoving = lua_isstring(L, -1) ? lua_tostring(L, -1) : Unit::defaultColourWhenMoving;
 		lua_pop(L, 1);
 
 		lua_getfield(L, -1, "hireCost");	// S: -1 colour; 2 subtable; -3 key; -4 table

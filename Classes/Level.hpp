@@ -63,6 +63,8 @@ public:
 	void destroyThings();
 	void destroyAllThings();
 	
+	Building* randomBuildingWithType(const char *);
+	
 	// View stuff
 	void openFurniturePurchasingView(Building *);
 	void closeFurniturePurchasingView();
@@ -79,8 +81,8 @@ public:
 	int columns, rows;
 	std::vector<Building*>   buildings;
 	std::vector<Furniture*>  furniture;
-	std::vector<Unit*>		 units;
-	std::vector<Unit*>		 staff;
+	std::vector<Unit*>       units;
+	std::vector<Unit*>       staff;
 	std::vector<SpawnPoint*> spawnPoints;
 	
 protected:
@@ -128,10 +130,10 @@ public:
 	int scroll_x, scroll_y;
 	ResponderMap *levelResponderMap;
 
-	std::vector<Building*>	*buildings;
-	std::vector<Furniture*>	*furniture;
-	std::vector<Unit*>		*units;
-	std::vector<Unit*>		*staff;
+	std::vector<Building*>  *buildings;
+	std::vector<Furniture*> *furniture;
+	std::vector<Unit*>      *units;
+	std::vector<Unit*>      *staff;
 };
 
 
