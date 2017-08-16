@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "Menu.hpp"
 
 Game::Game(sf::RenderWindow *_window, SettingsManager* _settings) : should_quit(false)
 {

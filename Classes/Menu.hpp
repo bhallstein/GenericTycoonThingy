@@ -18,11 +18,12 @@
 #include "GameState.hpp"
 #include "View.hpp"
 #include "MappedObj.hpp"
-#include "Level.hpp"
+
 
 
 class MenuView;
 class Button;
+class Level;
 
 class Menu : public GameState
 {

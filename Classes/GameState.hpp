@@ -16,9 +16,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include "Game.hpp"
 #include "EventHandler.hpp"
 
+
+class Game;
 
 class GameState
 {

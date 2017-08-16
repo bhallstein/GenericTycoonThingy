@@ -1,4 +1,5 @@
 #include "Menu.hpp"
+#include "Level.hpp"
 
 Menu::Menu(Game *_game, sf::RenderWindow *_window) : GameState(_game, _window)
 {

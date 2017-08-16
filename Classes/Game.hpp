@@ -15,6 +15,7 @@
 #include "types.h"
 #include "Event.hpp"
 #include "SettingsManager.hpp"
+#include "Menu.hpp"
 
 // Forward Declarations
 class GameState;

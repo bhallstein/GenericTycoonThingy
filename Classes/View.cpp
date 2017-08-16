@@ -54,15 +54,20 @@ void View::relinquishPrivilegedEventResponderStatus(EventResponder *resp) {
 		privileged_event_responder = NULL;
 }
 
-void View::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall, float x_offset, float y_offset) {
+void View::drawRect(sf::Color colour, int _x, int _y, int _w, int _h, float x_offset, float y_offset) {
+	// Calculate block dimensions from current size of view
 	float block_width  = (r_pos - l_pos) / grid_w;
 	float block_height = (b_pos - t_pos) / grid_h;
-	int atX = l_pos + (block_x + x_offset) * block_width;
-	int atY = t_pos + (block_y + y_offset) * block_height;
-	int width = blocks_wide * block_width;
-	int height = blocks_tall * block_height;
-	if (atX + width >= r_pos)  width = r_pos - atX;
-	if (atY + height >= b_pos) height = b_pos - atY;
+	// Calculate resulting rect position & dimensions
+	int atX = l_pos + (_x + x_offset) * block_width;
+	int atY = t_pos + (_y + y_offset) * block_height;
+	int width  = _w * block_width;
+	int height = _h * block_height;
+	// Don't bother drawing things outside the view
+	if (atX > r_pos || atY > b_pos || atX + width < l_pos || atY + height < t_pos)
+		return;
+	if (atX + width > r_pos)  width  = r_pos - atX;
+	if (atY + height > b_pos) height = b_pos - atY;
 	window->Draw(
 		sf::Shape::Rectangle(atX, atY, width, height, colour)
 	);
@@ -197,14 +202,17 @@ void ScrollingView::convertEventToBlockCoordinates(Event *ev) {
 	if (scroll_y < 0) scroll_y = 0;
 	else if (scroll_y >= max_scroll_y) scroll_y = max_scroll_y;
 }
-void ScrollingView::drawRect(sf::Color colour, int block_x, int block_y, int blocks_wide, int blocks_tall, float a_offset, float b_offset) {
-	int atX = (a_offset + block_x) * block_pixel_width - scroll_x;
-	int atY = (b_offset + block_y) * block_pixel_height - scroll_y;
-	int width = blocks_wide * block_pixel_width;
-	int height = blocks_tall * block_pixel_height;
-	if (atX >= r_pos || atY >= b_pos) return;
-	if (atX + width >= r_pos)  width = r_pos - atX;
-	if (atY + height >= b_pos) height = b_pos - atY;
+void ScrollingView::drawRect(sf::Color colour, int _x, int _y, int _w, int _h, float a_offset, float b_offset) {
+	// Calculate position & dimensions of rect
+	int atX = (a_offset + _x) * block_pixel_width - scroll_x;
+	int atY = (b_offset + _y) * block_pixel_height - scroll_y;
+	int width  = _w * block_pixel_width;
+	int height = _h * block_pixel_height;
+	// Don't bother drawing things outside the view
+	if (atX > r_pos || atY > b_pos || atX + width < l_pos || atY + height < t_pos)
+		return;
+	if (atX + width > r_pos)  width  = r_pos - atX;
+	if (atY + height > b_pos) height = b_pos - atY;
 	window->Draw(
 		sf::Shape::Rectangle(atX, atY, width, height, colour)
 	);

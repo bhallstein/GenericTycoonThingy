@@ -16,6 +16,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <set>
 
 #include "types.h"
 #include "MappedObj.hpp"
@@ -34,14 +35,15 @@ public:
 	// Methods
 	void addNeighbour(NavNode *neighbour);
 	void removeNeighbour(NavNode *neighbour);
+	bool hasNeighbour(NavNode *n);
 	
-	bool operator< (NavNode*);		// For ordering in MisterHeapy
+	bool operator< (NavNode *);		// For ordering in MisterHeapy
 	void setComparand(float);		// For updating by MisterHeapy
 	
 	// Properties
 	int x, y;
 	bool passable;
-	std::list<NavNode*> neighbours;		// Pointers to passable neighbour nodes. For pathfinding.
+	std::vector<NavNode *> neighbours;		// Pointers to passable neighbour nodes. For pathfinding.
 	float min_dist;
 
 	NavNode *route_prev;
@@ -50,6 +52,8 @@ protected:
 	
 };
 
+
+class Building;
 
 class NavMap
 {
@@ -63,6 +67,8 @@ public:
 	// Methods
 	void addImpassableObject(MappedObj *);
 	void removeImpassableObject(MappedObj *);
+	void addBuilding(Building *);
+	void removeBuilding(Building *);
 	bool isPassableAt(int atX, int atY);
 	NavNode* nodeAt(int atX, int atY);
 	

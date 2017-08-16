@@ -79,7 +79,8 @@ Building* Level::createBuilding(int atX, int atY) {
 	Building *b = new Building(atX, atY);
 	buildings.push_back(b);
 	levelview->addResponder(b);
-	navmap->addImpassableObject(b);
+	navmap->addBuilding(b);
+	//navmap->addImpassableObject(b);
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }

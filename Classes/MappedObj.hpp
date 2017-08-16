@@ -24,7 +24,7 @@ public:
 	// Properties
 	int x, y;							// Coordinates of top left corner
 	float a, b;							// Floating pt offset from integer location (default 0)
-	std::vector<intcoord> ground_plan;	// List of blocks (relative to to top left corner) taken up by the object
+	std::vector<intcoord> ground_plan;	// Blocks (relative to to top left corner) taken up by the object
 
 protected:
 	// Methods

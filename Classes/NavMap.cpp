@@ -1,4 +1,5 @@
 #include "NavMap.hpp"
+#include "Building.hpp"
 
 /****   NavNode implementation   ****/
 
@@ -9,12 +10,19 @@ NavNode::~NavNode() {
 	// Destructor
 }
 
-void NavNode::addNeighbour(NavNode *neighbour) {
-	neighbours.remove(neighbour);	 // This may perhaps not be necessary.
-	neighbours.push_back(neighbour);
+void NavNode::addNeighbour(NavNode *n) {
+	neighbours.push_back(n);
 }
-void NavNode::removeNeighbour(NavNode *neighbour) {
-	neighbours.remove(neighbour);
+void NavNode::removeNeighbour(NavNode *n) {
+	for (std::vector<NavNode*>::iterator it = neighbours.begin(); it != neighbours.end(); )
+		if (*it == n) it = neighbours.erase(it);
+		else it++;
+}
+bool NavNode::hasNeighbour(NavNode *n) {
+	for (int i=0; i < neighbours.size(); i++)
+		if (neighbours[i] == n)
+			return true;
+	return false;
 }
 bool NavNode::operator< (NavNode *m) {
 	return min_dist > m->min_dist;		// Heap orders larger items first by default. We want the opposite.
@@ -125,6 +133,75 @@ void NavMap::removeImpassableObject(MappedObj *obj) {
 		makePassable(c.x, c.y);
 	}
 }
+void NavMap::addBuilding(Building *b) {
+	std::vector<NavNode *> edgey_nodes;
+	std::vector<intcoord> *plan = &b->ground_plan;
+	int bx = b->x, by = b->y;
+	
+	// for each node X in ground plan
+	for (int i=0; i < plan->size(); i++) {
+		intcoord c = (*plan)[i];
+		NavNode *X = nodeAt(c.x + bx, c.y + by);
+		
+		// for each of neighbour of X, Y
+		std::vector<NavNode *> *neighbours = &X->neighbours;
+		for (std::vector<NavNode *>::iterator it=neighbours->begin(); it != neighbours->end(); ) {
+			NavNode *Y = *it;
+			bool Y_is_part_of_building = false;
+			for (int j=0; j < plan->size(); j++) {
+				c = (*plan)[j];
+				if (nodeAt(c.x + bx, c.y + by) == Y) {
+					Y_is_part_of_building = true;
+					break;
+				}
+			}
+			if (Y_is_part_of_building)
+				it++;
+			else {
+				// if Y is not part of the building, sever links to X and add both to edgey nodes
+				Y->removeNeighbour(X);
+				it = neighbours->erase(it);
+				edgey_nodes.push_back(X);
+				edgey_nodes.push_back(Y);
+			}
+		}
+	}
+	
+	// for each edgey node
+	for (int i=0; i < edgey_nodes.size(); i++) {
+		NavNode *X = edgey_nodes[i];
+		std::vector<NavNode *> *neighbours = &X->neighbours;
+		// if any two nodes on adjacent sides are not neighbours of x, sever the connection between them
+		NavNode *n1, *n2;
+		if (X->y > 0 && X->x < w - 1) {			// check above and right nodes
+			n1 = nodeAt(X->x, X->y - 1);
+			n2 = nodeAt(X->x + 1, X->y);
+			if (!X->hasNeighbour(n1) && !X->hasNeighbour(n2))
+				n1->removeNeighbour(n2), n2->removeNeighbour(n1);
+		}
+		if (X->x < w - 1 && X->y < h - 1) {		// check right and below nodes
+			n1 = nodeAt(X->x + 1, X->y);
+			n2 = nodeAt(X->x, X->y + 1);
+			if (!X->hasNeighbour(n1) && !X->hasNeighbour(n2))
+				n1->removeNeighbour(n2), n2->removeNeighbour(n1);
+		}
+		if (X->y < h - 1 && X->x > 0) {			// check below and left nodes
+			n1 = nodeAt(X->x, X->y + 1);
+			n2 = nodeAt(X->x - 1, X->y);
+			if (!X->hasNeighbour(n1) && !X->hasNeighbour(n2))
+				n1->removeNeighbour(n2), n2->removeNeighbour(n1);
+		}
+		if (X->x > 0 && X->y > 0) {				// check left and above nodes
+			n1 = nodeAt(X->x - 1, X->y);
+			n2 = nodeAt(X->x, X->y - 1);
+			if (!X->hasNeighbour(n1) && !X->hasNeighbour(n2))
+				n1->removeNeighbour(n2), n2->removeNeighbour(n1);
+		}
+	}
+}
+void NavMap::removeBuilding(Building *b) {
+	
+}
 bool NavMap::isPassableAt(int atX, int atY) {
 	return nodes[atY*w + atX].passable;
 }
@@ -174,14 +251,14 @@ bool NavMap::getRoute(int fromX, int fromY, int toX, int toY, std::vector<NavNod
 		
 		// Recalc neighbours’ min_dists
 		//cout << "recalculate neighbours’ min_dists:" << endl;
-		for (std::list<NavNode*>::iterator i = X->neighbours.begin(); i != X->neighbours.end(); i++) {
-			neighbour = (*i);
+		for (std::vector<NavNode*>::iterator it = X->neighbours.begin(); it != X->neighbours.end(); it++) {
+			neighbour = (*it);
 			dist_via_X = X->min_dist + ((neighbour->x == X->x || neighbour->y == X->y) ? 1 : 1.41421356);
 			//cout << " " << neighbour->x << "," << neighbour->y << ": " << dist_via_X << " vs " << neighbour->min_dist;
 			if (dist_via_X < neighbour->min_dist) {
 				open_nodes.update(neighbour, dist_via_X);
 				neighbour->route_prev = X;	
-			}			
+			}
 			//cout << " (" << neighbour->min_dist << ")" << endl;
 		}
 	}

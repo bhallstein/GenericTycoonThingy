@@ -96,7 +96,7 @@ public:
 	
 protected:
 	// Methods
-	void drawRect(sf::Color, int atX, int atY, int width, int height, float x_offset = 0, float y_offset = 0);
+	void drawRect(sf::Color, int _x, int _y, int _w, int _h, float x_offset = 0, float y_offset = 0);
 	void convertEventToBlockCoordinates(Event *ev);
 	
 	// Properties
