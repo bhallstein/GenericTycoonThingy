@@ -15,7 +15,7 @@ bool LuaHelper::loadFile(const char *filename)
 	if (!loadingSuccess) {
 		std::string s = "LuaHelper: could not load file '", t; s.append(filename); s.append("'; error was: ");
 		to<std::string>(-1, t); s.append(t);
-		theW->log(s.c_str());
+		W::log(s.c_str());
 		return false;
 	}
 	// Add our Resources folder to the Lua path
@@ -32,7 +32,7 @@ bool LuaHelper::loadFile(const char *filename)
 	if (!callingSuccess) {
 		std::string s = "LuaHelper: could not execute file '", t; s.append(filename); s.append("'; error was: ");
 		to<std::string>(-1, t); s.append(t);
-		theW->log(s.c_str());
+		W::log(s.c_str());
 		return false;
 	}
 	return true;

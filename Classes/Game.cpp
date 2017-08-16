@@ -2,7 +2,6 @@
 #include "../W.hpp"
 #include "SettingsManager.hpp"
 #include "Menu.hpp"
-#include <ctime>
 
 Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 {

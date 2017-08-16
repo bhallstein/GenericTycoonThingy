@@ -15,6 +15,7 @@
 #include "GameState.hpp"
 #include "EventResponder.hpp"
 #include "SpawnPoint.hpp"
+#include "Behaviour.hpp"
 
 class Game;
 class W;
@@ -22,13 +23,12 @@ class ResponderMap;
 class Button;
 class NavMap;
 class Building;
-class Furniture;
+class Furnishing;
 class Unit;
-class Placeable;
 
 class LevelView;
 class UIBarView;
-class FurniturePurchasingUIView;
+class FurnishingPurchasingUIView;
 class HiringUIView;
 
 class Level : public GameState, public EventResponder {
@@ -53,9 +53,10 @@ public:
 	void setResolution(int _w, int _h);
 	
 	// TLO stuff
-	Unit*     createUnit(int atX, int atY, const char *type);
-	Building* createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
-	void      createFurniture(const char *type);
+	Unit*       createUnit(int atX, int atY, const char *type);
+	Building*   createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
+	Furnishing* createFurnishing(const char *type);
+	Behaviour*  createBehaviour(const char *type);
 	void createBarbersChair();
 	void createSofa();
 	void createStaffUnit();
@@ -64,15 +65,16 @@ public:
 	void destroyAllThings();
 	
 	Building* randomBuildingWithType(const char *);
+	Building* buildingAtLocation(int x, int y);
 	
 	// View stuff
-	void openFurniturePurchasingView(Building *);
-	void closeFurniturePurchasingView();
+	void openFurnishingPurchasingView(Building *);
+	void closeFurnishingPurchasingView();
 	Building *currentlyEditedBuilding;
 	void openHiringView();
 	void closeHiringView();
 
-	//Money
+	// Money
 	void payPlayer(int);
 	bool chargePlayer(int);		//returns false if player can't be charged (i.e. not enough positive balance to complete transaction)
 	void decreaseMoney(int);	//as chargePlayer() but without the checks, since some actions may decrease even if Player has negative balance (e.g. monthly expenditure)
@@ -80,9 +82,10 @@ public:
 	// Properties
 	int columns, rows;
 	std::vector<Building*>   buildings;
-	std::vector<Furniture*>  furniture;
+	std::vector<Furnishing*> furnishings;
 	std::vector<Unit*>       units;
 	std::vector<Unit*>       staff;
+	std::vector<Behaviour*>  behaviours;
 	std::vector<SpawnPoint*> spawnPoints;
 	
 protected:
@@ -96,7 +99,7 @@ protected:
 	ResponderMap *levelResponderMap;
 	LevelView *levelview;
 	UIBarView *uibarview;
-	FurniturePurchasingUIView *furniturePurchasingView;
+	FurnishingPurchasingUIView *furnishingPurchasingView;
 	HiringUIView *hiringUIView;
 	
 	int money;
@@ -116,13 +119,13 @@ public:
 	LevelView(
 		W *, JenniferAniston &,
 		ResponderMap *_levelRM,
-		std::vector<Building*> *, std::vector<Furniture*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
+		std::vector<Building*> *, std::vector<Furnishing*> *, std::vector<Unit*> *_units, std::vector<Unit*> *_staff,
 		int _level_width, int _level_height
 	);
 	void draw();
 	void drawMappedObj(MappedObj *obj);	// Utility fn for drawing objects
 	void processMouseEvent(Event *);
-	void scroll(direction);
+	void scroll(Direction::Enum);
 	
 	// Properties
 	int gridsize;
@@ -130,10 +133,10 @@ public:
 	int scroll_x, scroll_y;
 	ResponderMap *levelResponderMap;
 
-	std::vector<Building*>  *buildings;
-	std::vector<Furniture*> *furniture;
-	std::vector<Unit*>      *units;
-	std::vector<Unit*>      *staff;
+	std::vector<Building*>   *buildings;
+	std::vector<Furnishing*> *furnishings;
+	std::vector<Unit*>       *units;
+	std::vector<Unit*>       *staff;
 };
 
 
@@ -145,12 +148,12 @@ public:
 	void draw();
 };
 
-class FurniturePurchasingUIView : public UIView {
+class FurnishingPurchasingUIView : public UIView {
 public:
-	FurniturePurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_furnitureTypes);
+	FurnishingPurchasingUIView(W *, JenniferAniston &, std::vector<std::string> *_furnishingTypes);
 	void draw();
 protected:
-	std::vector<std::string> *furnitureTypes;
+	std::vector<std::string> *furnishingTypes;
 };
 
 class HiringUIView : public UIView {

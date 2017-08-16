@@ -7,16 +7,19 @@ buildingTypes = {
 	barber = {
 		colour = "red",
 		hoverColour = "black",
-		allowedFurniture = { "barberschair", "sofa" }
+		allowedFurnishing = { "barberschair", "sofa" }
 	},
 	pieshop = {
-		colour = "yellow"
+		colour = "yellow",
+		allowedFurnishing = { "piecounter" }
 	},
 	home = {
-		colour = "black"
+		colour = "black",
+		allowedFurnishing = {  }
 	},
 	asylum = {
-		colour = "purple"
+		colour = "purple",
+		allowedFurnishing = {  }
 	}
 }
 
