@@ -4,6 +4,10 @@ Building::Building() {
 	// initialize building
 	// see LevelMap.cpp for part of this process
 }
+Building::~Building()
+{
+	//deconstructor
+}
 
 
 

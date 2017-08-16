@@ -9,7 +9,8 @@
 class Building
 {
 public:
-
+	Building();
+	~Building();
 protected:
 
 };

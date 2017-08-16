@@ -9,7 +9,6 @@ Game::Game()
 	// Set defaults (manually for now)
 	int w_width = 800, w_height = 600;
 	std::string w_name = "Demon Barber Tycoon";
-	system("oh hello");
 	
 	// Get settings from file and if success & values valid, replace defaults.
 	// ...

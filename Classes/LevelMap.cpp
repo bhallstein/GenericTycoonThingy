@@ -5,19 +5,23 @@ LevelMap::LevelMap(int w, int h)
 	Rows = h;
 	Columns = w;
 }
+LevelMap::~LevelMap()
+{
+	//deconstructor
+}
 
-int numberOfBuildings() {
+int LevelMap::numberOfBuildings()
+{
 	return Buildings.size();
 }
 
-void Draw(sf::RenderWindow &window)
+void LevelMap::Draw(sf::RenderWindow &window)
 {
 	// Draw background
-	window.Clear(sf::Color::white);
+	window.Clear(sf::Color::White);
 	
 	// Draw buildings
-	vector<int>::iterator i;
-	for (i = Buildings.begin(); i < Buildings.end(); i++)
+	for (vector<Building>::iterator i = Buildings.begin(); i < Buildings.end(); i++)
 		; // draw building
 }
 

@@ -6,10 +6,12 @@
 #define LEVELMAP_H
 
 #include <vector>
-#include "Building.h" 
+#include "Building.h"
 
 using namespace std;
 
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 class LevelMap
 {
