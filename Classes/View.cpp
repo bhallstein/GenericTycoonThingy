@@ -9,7 +9,9 @@ View::View(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offse
 	l_offset(_l_offset), t_offset(_t_offset), r_offset(_r_offset), b_offset(_b_offset),
 	blocks_w(_blocks_w), blocks_h(_blocks_h)
 {
-	ready_for_event_response = false;
+	// Set up for event response
+	responderMap.resize(blocks_w * blocks_h);
+	privileged_event_responder = NULL;
 	
 	// Set edges from window size and offsets
 	int win_w = window->GetWidth(), win_h = window->GetHeight();
@@ -23,14 +25,7 @@ View::~View() {
 	std::cout << "view destruct" << std::endl;
 }
 
-void View::createEventResponderMap() {
-	if (ready_for_event_response) return;
-	responderMap.resize(blocks_w * blocks_h);
-	privileged_event_responder = NULL;
-	ready_for_event_response = true;
-}
 void View::addResponder(MappedObj *obj) {
-	if (!ready_for_event_response) return;		// This is really the sort of place one should throw an exception
 	int x = obj->x, y = obj->y;
 	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
 		intcoord c = obj->ground_plan[i];
@@ -41,7 +36,6 @@ void View::addResponder(MappedObj *obj) {
 	}
 }
 void View::removeResponder(MappedObj *obj) {
-	if (!ready_for_event_response) return;
 	int x = obj->x, y = obj->y;
 	for (int i=0, n = obj->ground_plan.size(); i < n; i++) {
 		intcoord c = obj->ground_plan[i];
@@ -51,7 +45,6 @@ void View::removeResponder(MappedObj *obj) {
 	}
 }
 bool View::requestPrivilegedEventResponderStatus(EventResponder *resp) {
-	if (!ready_for_event_response) return false;
 	if (privileged_event_responder != NULL) return false;
 	privileged_event_responder = resp;
 	return true;
@@ -104,8 +97,6 @@ void View::draw() {
 }
 
 void View::_dispatchMouseEvent(Event *ev) {
-	if (!ready_for_event_response) return;
-
 	ev->convertCoords((r_pos - l_pos)/blocks_w, (b_pos - t_pos)/blocks_h);
 	if (ev->x < 0 || ev->x >= blocks_w || ev->y < 0 || ev->y >= blocks_h)
 		return;
@@ -117,9 +108,7 @@ void View::_dispatchMouseEvent(Event *ev) {
 
 	dispatchMouseEvent(ev);
 }
-void View::dispatchMouseEvent(Event *ev) {
-	if (!ready_for_event_response) return;
-	
+void View::dispatchMouseEvent(Event *ev) {	
 	// Get unit whose centre is closest to mouse. Search this & adjacent blocks.
 	std::list<MappedObj *> *objs;
 	std::list<MappedObj *>::iterator it;
@@ -175,8 +164,6 @@ ScrollingView::~ScrollingView() {
 }
 
 void ScrollingView::_dispatchMouseEvent(Event *ev) {
-	if (!ready_for_event_response) return;
-	
 	if (ev->x < 0 || ev->y < 0 || ev->x >= r_pos - l_pos || ev->y >= b_pos - t_pos)
 		return;
 	

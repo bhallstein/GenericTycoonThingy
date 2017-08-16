@@ -4,7 +4,6 @@ Level::Level(Game *_game, sf::RenderWindow *_window, std::string levelpath) :
 	GameState(_game, _window), framecount(0)
 {	
 	uiview = new View(_window, 16, 3, 0, -80, 0, 0);
-	uiview->createEventResponderMap();
 	eventHandler.subscribe(uiview);
 	
 	buildLevel(readLevel(levelpath));
@@ -31,8 +30,7 @@ void Level::buildLevel(ptree levelFile)
 	
 	// Create levelview
 	levelview = new LevelView(window, w, h, 0, 0, 0, 80);
-	levelview->createEventResponderMap();					// Make levelview respond to mouse events
-	eventHandler.subscribe(levelview);						// 
+	eventHandler.subscribe(levelview);
 
 	BOOST_FOREACH(ptree::value_type &obj, levelFile.get_child("level"))
 	{

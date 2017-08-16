@@ -4,31 +4,33 @@
  * Subclass this to create your own views.
  *
  * Internal coordinates
- *  - takes (blocks_w, blocks_h) params: these allow you to specify a drawing/eventresponse grid
- *  - the purpose of this is simple eventreponse and drawing
- *  - you are not limited to aligning your drawing to this grid, since you also have access to the pixel properties
- *    of the view (l_pos, t_pos, r_pos & b_pos) and events’ floating point offset coords (a & b).
+ *  - It’s very convenient to divide a View into a grid of blocks.
+ *  - This simplifies both drawing and eventresponse.
+ *
+ * Offsets from the window edge
+ *  - A View’s position within the window is specified using offsets from the edges
+ *  - For instance, if you set the left_offset parameter to 50, the left edge of the view will be 50 pixels from the left edge of the window
+ *  - Or if you set left_offset to -50, the left edge of the view will be 50 pixels from the *right* edge of the window
  *
  * Constructor takes:
- *  - a ptr to the window
- *  - two ints: how many blocks to subdivide the view into, vertically & horizontally
+ *  - a pointer to the window
+ *  - two ints: how many "blocks" to subdivide the view into, vertically & horizontally
  *  - four ints: the offsets from the window’s edges of each of the View’s sides.
- *      - a positive offset of 50 for the left side would set the views’s left edge 50 pixels from the left edge of the window.
- *      - a negative offset of -50 for the left side would set the views’s left edge 50 pixels from the *right* edge of the window.
  * 
- * Drawing functions:
- *  - Currently provides drawRect(colour, x, y, width, height)
+ * Drawing:
+ *  - To implement your subclass’s drawing behaviour, override draw()
+ *  - From inside draw(), you can use View’s convenience drawing function(s):
+ *  	- drawRect(colour, x, y, width, height)
+ * 			- (takes block coordinates)
+ *  - You’re not limited to drawing in the block coordinate system, though. You can also draw directly to the window using pixel values.
  *
  * Event Response functions
  *  - Can be subscribed to an EventHandler, which will pass it mouse events.
- *  - Conversion to block coordinates is automatic. For higher precision, Event has floats ::a and ::b.
- *  - The rationale for this is that for coordinate conversion of events, the pixel width and height of map blocks are required, and
- *    Views are the only thing which should worry about this
+ *  - Can use View::addResponder() & removeResponder() to objects for mouse events
  * 
  * To prepare your View for event response:
- *  - Instantiate your View ("myview") with attention to the blocks-wide and -tall parameters
- *  - call `myview.createEventResponderMap()`
- *  - add myview to an EventHandler: `eventHandler.subscribe(&myview);`
+ *  - Create the instance
+ *  - Subscribe it to an EventHandler: `eh.subscribe(&myview);`
  * 
  */
 
@@ -60,7 +62,6 @@ public:
 	virtual void _dispatchMouseEvent(Event *);	// EventHandler calls this, allowing View & subclasses to do some
 												// shit before calling dispatchMouseEvent function
 	
-	void createEventResponderMap(); 		// Create structures necessary for event response
 	void addResponder(MappedObj *);
 	void removeResponder(MappedObj *);
 	
@@ -79,7 +80,6 @@ protected:
 	// Properties
 	sf::RenderWindow *window;
 	
-	bool ready_for_event_response;
 	int blocks_w, blocks_h;
 	std::vector<std::list<MappedObj *> > responderMap;
 	EventResponder *privileged_event_responder;

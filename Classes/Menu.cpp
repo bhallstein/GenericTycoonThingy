@@ -3,7 +3,6 @@
 Menu::Menu(Game *_game, sf::RenderWindow *_window) : GameState(_game, _window)
 {
 	menuview = new MenuView(window, 16, 16, 0, 0, 0, 0);
-	menuview->createEventResponderMap();
 	eventHandler.subscribe(menuview);
 	
 	// Add buttons, add them to menuview
