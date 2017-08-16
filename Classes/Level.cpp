@@ -233,6 +233,12 @@ void Level::pause() {
 void Level::resume(Returny *returny) {
 	if (returny->type == Returny::killer_returny)
 		game->stateFinished(this, Returny(Returny::killer_returny));
+	else if (returny->type == Returny::payload_returny) {
+		if (returny->payload == "exit to menu")
+			game->stateFinished(this, Returny(Returny::empty_returny));
+		else if (returny->payload == "replay")
+			game->stateFinished(this, *returny);
+	}
 }
 void Level::update() {
 	realtimetime += realtimetimer->getMicroseconds() / 1000000.;

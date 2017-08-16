@@ -50,13 +50,25 @@ void LevelScore::receiveEvent(Event *ev) {
 	if (ev->type == Event::KEYPRESS) {
 		if (ev->key == Event::K_Q)
 			game->stateFinished(this, Returny(Returny::killer_returny));
-		if (ev->key == Event::K_ESC)
-			game->stateFinished(this, Returny(Returny::empty_returny));
+		if (ev->key == Event::K_ESC) {
+			exitToMenu();
+		}
 	}
 	else if (ev->type == Event::BUTTONCLICK) {
-		if (ev->payload == "start level 1")
-			startLevel("level1.lua");
+		if (ev->payload == "exit to menu") exitToMenu();
+		else if (ev->payload == "replay") replayLevel();
 	}
+}
+
+void LevelScore::exitToMenu() {
+	Returny ret = Returny(Returny::payload_returny);
+	ret.payload = "exit to menu";
+	game->stateFinished(this, ret);
+}
+void LevelScore::replayLevel() {
+	Returny ret = Returny(Returny::payload_returny);
+	ret.payload = "replay";
+	game->stateFinished(this, ret);
 }
 
 void LevelScore::startLevel(std::string path) {
@@ -78,16 +90,19 @@ void LevelScore::startLevel(std::string path) {
 
 ScoreView::ScoreView(W *_theW, JenniferAniston &_aniston, ResponderMap *_rm, bool _victory) : UIView(_theW, _aniston, _rm, DISALLOW_DRAG)
 {
-	//buttons.push_back(new Button(280, 160, 240, 110, "start level 1"));
+	buttons.push_back(new Button(240, 155, 120, 80, "replay"));
+	buttons.push_back(new Button(440, 155, 120, 80, "exit to menu"));
 	victory = _victory;
 }
 void ScoreView::draw() {
-	/*for (int i=0, n = buttons.size(); i < n; i++) {
+	for (int i=0, n = buttons.size(); i < n; i++) {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
-	}*/
+	}
+	theW->drawText(260, 250, "black", (char*)"replay");
+	theW->drawText(474, 250, "black", (char*)"menu");
 	if(victory)
-		theW->drawText(180, 180, "green", (char*)"YOU WIN!");
+		theW->drawText(340, 88, "white", (char*)"YOU WIN!");
 	else
-		theW->drawText(180, 180, "red", (char*)"YOU LOSE!");
+		theW->drawText(346, 88, "white", (char*)"YOU LOSE!");
 }
