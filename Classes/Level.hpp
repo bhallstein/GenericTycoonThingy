@@ -24,6 +24,7 @@
 #include "EventHandler.hpp"
 #include "GameState.hpp"
 #include "Game.hpp"
+#include "SpawnPoint.hpp"
 
 class LevelView;
 
@@ -57,10 +58,12 @@ public:
 	std::vector<Building*> buildings;
 	std::vector<Placeable*> placeables;
 	std::vector<Unit*> units;
-	
+	std::vector<SpawnPoint*> spawnPoints;
+
 protected:
 	// Methods
 	void buildLevel(std::string filename);
+	std::map<std::string,Building*> availableBuildings;
 	
 	// Properties
 	int w, h; 					// Blocks wide/tall.

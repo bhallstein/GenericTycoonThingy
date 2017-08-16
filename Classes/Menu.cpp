@@ -70,9 +70,9 @@ void Button::receiveEvent(Event *ev) {
 	else if (ev->type == LEFTCLICK)
 		menu->startLevel("Data/level1.lua");
 }
-char Button::col() {
-	if (hover) { hover = false; return 'r'; }
-	else return 'b';
+sf::Color Button::col() {
+	if (hover) { hover = false; return sf::Color(255,0,0,255); }
+	else return sf::Color(0,0,0,255);
 }
 
 MenuView::MenuView(sf::RenderWindow *_win, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset) :

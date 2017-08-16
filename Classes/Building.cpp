@@ -17,6 +17,10 @@ Building::Building(int _x, int _y) : MappedObj(_x, _y), clicked(false), destroye
 	doors.push_back(d[0]);
 	doors.push_back(d[1]);
 }
+Building::Building() : MappedObj(-1,-1), clicked(false), destroyed(false)
+{
+	//i'm a template building!
+}
 Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
@@ -29,21 +33,6 @@ void Building::receiveEvent(Event *ev) {
 		std::cout << "Building " << this << " received L!" << std::endl;
 }
 
-char Building::col() {
-	char defaultCol;
-	switch(type)
-	{
-	case HOME:
-		defaultCol = 'w';
-		break;
-	case BARBER:
-		defaultCol = 'r';
-		break;
-	case PIESHOP:
-		defaultCol = 'y';
-		break;
-	default:
-		defaultCol = 'b';
-	}
-	return (clicked ? 'l' : defaultCol);
+sf::Color Building::col() {
+	return (clicked ? sf::Color(0,255,0,255) : defaultCol);
 }

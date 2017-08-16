@@ -8,6 +8,9 @@
 
 #include <vector>
 
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+
 #include "types.h"
 #include "EventResponder.hpp"
 
@@ -19,7 +22,7 @@ public:
 	~MappedObj() { }
 	
 	// Methods
-	virtual char col() = 0;				// Temporary: override to return colour the object should be drawn
+	virtual sf::Color col() = 0;				// Temporary: override to return colour the object should be drawn
 	
 	// Properties
 	int x, y;							// Coordinates of top left corner

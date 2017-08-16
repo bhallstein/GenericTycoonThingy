@@ -33,7 +33,7 @@ void Level::buildLevel(std::string levelFile)
 		w = mrLua.getvalue<int>("width");
 		h = mrLua.getvalue<int>("height");
 
-		std::cout << "level dimensions: " << w << " x " << h << std::endl;
+		//std::cout << "level dimensions: " << w << " x " << h << std::endl;
 
 		// Create map
 		navmap = new NavMap(w, h);
@@ -42,11 +42,39 @@ void Level::buildLevel(std::string levelFile)
 		levelview = new LevelView(window, w, h, 0, 0, 0, 80);
 		eventHandler.subscribe(levelview);
 
+		//building templates
+		mrLua.pushtable("availableBuildings");
+
+		lua_pushnil(mrLua.LuaInstance);
+		while(lua_next(mrLua.LuaInstance,1) != 0)
+		{
+			Building* ab = new Building();
+			
+			ab->type = mrLua.getfield<std::string>("type");
+			ab->defaultCol = sf::Color(
+				mrLua.getSubfield<int>("colour","r"),
+				mrLua.getSubfield<int>("colour","g"),
+				mrLua.getSubfield<int>("colour","b"),
+				mrLua.getSubfield<int>("colour","a"));
+			//add other template properties here
+			mrLua.stackdump(mrLua.LuaInstance);
+
+			//add this template
+			availableBuildings[ab->type] = ab;
+
+			//pop the table, leaving the key ready for next iteration
+			lua_pop(mrLua.LuaInstance, 1);
+		}
+
+		//empty the stack for safety?
+		lua_settop(mrLua.LuaInstance,0);
+		mrLua.stackdump(mrLua.LuaInstance);
+
 		//buildings
 		mrLua.pushtable("buildings");
 
 		lua_pushnil(mrLua.LuaInstance); //start at the start
-		while (lua_next(mrLua.LuaInstance,1) != 0) //"buildings" table is at index 1 in the stack
+		while(lua_next(mrLua.LuaInstance,1) != 0) //"buildings" table is at index 1 in the stack
 		{
 			int x,y; //temp. since we need these to even construct building!
 
@@ -57,21 +85,49 @@ void Level::buildLevel(std::string levelFile)
 			Building* b = createBuilding(x, y);
 
 			//type
-			switch(mrLua.getfield<int>("type")) //get the value returned from the top
+			Building* ab; //don't like this here as we only use it for string'd types below
+			lua_getfield(mrLua.LuaInstance,-1,"type"); //push the type table to the stack
+			switch(lua_type(mrLua.LuaInstance,-1))
 			{
-				case 1:
-					b->type = HOME;
+				case LUA_TSTRING:
+					//look up properties from the named template class
+					ab = availableBuildings[lua_tostring(mrLua.LuaInstance,-1)];
+
+					//set properties from the template
+					b->type = ab->type;
+					b->defaultCol = ab->defaultCol;
+
+					//we should rewrite this so b = ab; then override properties with building specific stuff?
 					break;
-				case 2:
-					b->type = BARBER;
+				case LUA_TTABLE:
+					//set properties as returned from lua
+					b->type = mrLua.getfield<std::string>("type");
+					b->defaultCol = sf::Color(
+						mrLua.getSubfield<int>("colour","r"),
+						mrLua.getSubfield<int>("colour","g"),
+						mrLua.getSubfield<int>("colour","b"),
+						mrLua.getSubfield<int>("colour","a"));
 					break;
-				case 3:
-					b->type = PIESHOP;
-					break;
-				default:
-					b->type = DERELICT;
-					break;
+					
 			}
+			//pop the type table
+			lua_pop(mrLua.LuaInstance, 1);
+			
+			//any other properties that aren't templated here
+
+			//pop the table, leaving the key ready for next iteration
+			lua_pop(mrLua.LuaInstance, 1);
+		}
+
+		//empty the stack
+		lua_settop(mrLua.LuaInstance,0);
+
+		//Spawn Points!
+		mrLua.pushtable("spawnPoints");
+		lua_pushnil(mrLua.LuaInstance); //start at the start
+		while (lua_next(mrLua.LuaInstance,1) != 0) //spawnpointicles
+		{
+			spawnPoints.push_back(new SpawnPoint(&mrLua));
 
 			//pop the table, leaving the key ready for next iteration
 			lua_pop(mrLua.LuaInstance, 1);
@@ -108,7 +164,7 @@ Unit* Level::createUnit(int atX, int atY) {
 	Unit *u = new Unit(navmap, levelview, atX, atY);
 	units.push_back(u);
 	levelview->addResponder(u);
-	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
+	//std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
@@ -116,7 +172,7 @@ Building* Level::createBuilding(int atX, int atY) {
 	buildings.push_back(b);
 	levelview->addResponder(b);
 	navmap->addBuilding(b);
-	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
+	//std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
 void Level::createPlaceable() {
@@ -126,7 +182,7 @@ void Level::createPlaceable() {
 		return;
 	}
 	placeables.push_back(p);
-	std::cout << "added placeable " << p << " (now " << placeables.size() << ")" << std::endl;
+	//std::cout << "added placeable " << p << " (now " << placeables.size() << ")" << std::endl;
 	return;
 }
 void Level::destroyThings() {
@@ -162,9 +218,13 @@ void Level::destroyAllThings() {
 }
 
 void Level::updateObjects() {
-	if (framecount == 90) framecount = 0;
-	if (10 == framecount++) createUnit(rand()%w, rand()%h);	// Create a new unit every so often
-	
+	for(int i=0;i <spawnPoints.size();i++)
+	{
+		std::vector<int> spawnLoc = spawnPoints[i]->Spawn();
+		if(spawnLoc.size() > 1) //does it have both co-ords?
+			createUnit(spawnLoc[0],spawnLoc[1]);
+	}
+
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();
 }

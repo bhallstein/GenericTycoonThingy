@@ -22,7 +22,7 @@ public:
 
 	// Methods
 	void receiveEvent(Event *ev);
-	char col();
+	sf::Color col();
 
 	// Properties
 	bool destroyed;

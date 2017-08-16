@@ -60,7 +60,7 @@ public:
 	
 	// Methods
 	void receiveEvent(Event *);
-	char col();
+	sf::Color col();
 	
 protected:
 	bool hover;

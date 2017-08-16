@@ -19,11 +19,11 @@ void Unit::receiveEvent(Event *ev) {
 		hover = true;
 }
 
-char Unit::col() {
-	if (hover) { hover = false; return 'l'; }
-	else if (state == S_IDLE) return 'b';
-	else if (state == S_TRAVELING) return 'w';
-	else return 'r';
+sf::Color Unit::col() {
+	if (hover) { hover = false; return sf::Color(0,0,255,255); }
+	else if (state == S_IDLE) return sf::Color(0,0,0,255);
+	else if (state == S_TRAVELING) return sf::Color(255,255,255,255);
+	else return sf::Color(255,0,0,255);
 }
 
 void Unit::update() {

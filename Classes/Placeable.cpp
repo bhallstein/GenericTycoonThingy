@@ -40,6 +40,6 @@ void Placeable::receiveEvent(Event *ev) {
 	}
 }
 
-char Placeable::col() {
-	return (mode == PLACEMENT ? 'w' : clicked ? 'r' : 'b');
+sf::Color Placeable::col() {
+	return (mode == PLACEMENT ? sf::Color(255,255,255,255) : clicked ? sf::Color(255,0,0,255) : sf::Color(0,0,0,255));
 }

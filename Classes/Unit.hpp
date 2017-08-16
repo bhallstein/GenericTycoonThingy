@@ -1,5 +1,5 @@
 /* 
- * Unit.h
+ * Unit.hpp
  *
  */
 
@@ -28,7 +28,7 @@ public:
 
 	// Methods
 	void receiveEvent(Event *);	// Override to handle events
-	char col();
+	sf::Color col();
 	void update();
 
 	// Properties
