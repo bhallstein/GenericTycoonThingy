@@ -28,21 +28,20 @@ public:
 
 	// Methods
 	void run();
-
+	
 	void cleanStates();
 	void changeState(GameState *);
 	void pushState(GameState *);
 	void popState();
-
-         
+	
 	// Events/Update/Drawing - passed to active State
-	void handleEvents(Event,sf::Event); 
+	void handleEvents();
 	void update();
 	void draw();
-
+	
 	bool running() { return is_running; }
 	void quit();
-
+	
 	SettingsManager* settings;
 
 protected:

@@ -43,21 +43,26 @@ void Game::cleanStates()
 }
 
 //Events/Update/Draw - usually passed to active State
-void Game::handleEvents(Event event,sf::Event sf_event)
+void Game::handleEvents()
 {
-	event.loadFromMousePos(sf::Mouse::GetPosition(*window));					
+	Event event;
+	sf::Event sf_event;
+	
+	event.loadFromMousePos(sf::Mouse::GetPosition(*window));
 	if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
-		eventHandler.dispatchEvent(&event);										
+		eventHandler.dispatchEvent(&event);
 		
 	while (window->PollEvent(sf_event)) {
 		event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
-			
+		
+		if (event.type == MOUSEMOVE) ;			// Ignore actual mouse moves
+		
 		// Close window : exit
 		if (event.type == CLOSED || event.key == K_Q)
 			quit();
 		
 		else
-			states.back()->handleEvents(this, &event);	// Pass to active state
+			states.back()->handleEvents(this, &event);	// Pass keys to active state
 	}
 }
 
@@ -122,13 +127,10 @@ void Game::run()
 	// Switch to Level state
 	changeState(Level::instance());
 
-	sf::Event sf_event;
-	Event event;
-
 	while (running())
     {
 		// Events
-		handleEvents(event,sf_event);
+		handleEvents();
 		
 		// Updates
 		update();

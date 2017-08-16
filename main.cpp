@@ -20,6 +20,6 @@ int main(int argc, char *argv[], char *envp[])
 	sf::RenderWindow dbt_window;
 
 	// Start game
-	Game g(&dbt_window,&dbt_settings);
+	Game g(&dbt_window, &dbt_settings);
 	g.run();
 }

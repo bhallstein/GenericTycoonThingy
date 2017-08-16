@@ -37,7 +37,7 @@ public:
 	void removeNeighbour(NavNode *neighbour);
 	
 	bool operator< (NavNode*);		// For ordering in MisterHeapy
-	void setComparator(float);      // For updating by MisterHeapy
+	void setComparand(float);		// For updating by MisterHeapy
 	
 	// Properties
 	int x, y;
@@ -71,7 +71,7 @@ public:
 
 protected:
 	// Properties
-	std::vector<NavNode> maplocs;		// A w*h-sized array of NavNodes
+	std::vector<NavNode> nodes;		// A w*h-sized array of NavNodes
 	MisterHeapy<NavNode*, float> open_nodes;
 	
 	// Methods

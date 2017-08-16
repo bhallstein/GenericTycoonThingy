@@ -39,9 +39,8 @@ void Level::handleEvents(Game* g,Event* event)
 		if (event->key == K_P)
 			createPlaceable();
 	}
-			
+	
 	// Mouse events sent via eventhandler
-	if (event->type == MOUSEMOVE) ;				// Ignore actual mouse moves
 	eventHandler->dispatchEvent(event);
 }
 
@@ -101,8 +100,8 @@ void Level::destroyAllThings() {
 }
 
 void Level::updateObjects() {
-	if (framecount == 300) framecount = 0;
-	if (50 == framecount++) createUnit(0, 0);	// Create a new unit every 5 seconds
+	if (framecount == 180) framecount = 0;
+	if (10 == framecount++) createUnit(0, 0);	// Create a new unit every so often
 	
 	for (int i=0; i < units.size(); i++)
 		units[i]->update();
