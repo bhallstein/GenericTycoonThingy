@@ -26,18 +26,16 @@ public:
 	void removeCustomer(std::string customer);
 
 	std::map<std::string,int[2]> Customers;//to store both the types and the rate at which they will spawn. 2nd element in array is the counter.
-
+	
 	//properties
 	bool isSpawning;
 	int x, y;
 	std::string name;
 	int rate; //global rate right now; no unit typing
 	int rateCounter; //temp!
-
+	
 protected:
-
-//properties
-
+	
 };
 
 #endif

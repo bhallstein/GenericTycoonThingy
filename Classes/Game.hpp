@@ -8,36 +8,33 @@
 
 #include <vector>
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
 #include "types.h"
-#include "Event.hpp"
-#include "SettingsManager.hpp"
-#include "Menu.hpp"
-#include "GameState.hpp"
+#include "Returny.hpp"
 
+class W;
+class GameState;
+class Event;
+class SettingsManager;
 
 class Game
 {
 public:
-	Game(sf::RenderWindow *, SettingsManager *);
+	Game(W *);
 	~Game();
 
 	// Methods
-	void run();
 	
+	// Events/Update/Drawing
+	void sendEvents(std::vector<Event> *);
+	bool update();
+	void draw();
+	
+	// State methods
 	void pushState(GameState *);
 	void popState();
 	void stateFinished(GameState *, Returny);
 	
-	// Events/Update/Drawing - passed to active State
-	void sendEvents();
-	void update();
-	void draw();
-	
-	SettingsManager* settings;
+	SettingsManager *settings;
 
 protected:
 	// Properties
@@ -45,7 +42,10 @@ protected:
 	bool resume;
 	Returny returny;
 	
-	sf::RenderWindow *window;
+	W *theW;
+	int prev_w, prev_h;
+	
+	bool finishedIntro;
 	
 };
 

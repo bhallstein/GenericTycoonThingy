@@ -10,19 +10,19 @@
 
 #include "types.h"
 #include "MappedObj.hpp"
-#include "NavMap.hpp"
-#include "View.hpp"
 
+class NavMap;
+class ResponderMap;
 
-class Placeable : public MappedObj
-{
+class Placeable : public MappedObj {
 public:
-	Placeable(NavMap *, View *);
+	Placeable(NavMap *, ResponderMap *);
 	~Placeable();
 
 	// Methods
 	void receiveEvent(Event *ev);
-	sf::Color col();
+	void update() { }
+	colour col();
 
 	// Properties
 	bool destroyed;
@@ -32,7 +32,7 @@ protected:
 	enum mode_types { PLACEMENT, PLACED } mode;
 	bool clicked;
 	NavMap *navmap;
-	View *view;
+	ResponderMap *levelResponderMap;
 	
 };
 

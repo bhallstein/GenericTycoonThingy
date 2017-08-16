@@ -19,7 +19,6 @@ std::vector<int> SpawnPoint::Spawn()
 	{
 		thereturnofthespawn.push_back(x);
 		thereturnofthespawn.push_back(y);
-
 		rateCounter = 0; //reset :)
 	}
 

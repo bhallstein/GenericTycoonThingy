@@ -1,19 +1,21 @@
-/* LuaHelper.hpp
- * contains C++ functions to make Lua interaction more elegant
+/* 
+ * LuaHelper.hpp - C++ functions to make Lua interaction more elegant
  *
  */
+
 #ifndef LUAHELPER_H
 #define LUAHELPER_H
 
-#include <Lua.hpp>
 #include <string>
+
+#include <Lua.hpp>
 
 class LuaHelper {
 public:
 	LuaHelper();
 	~LuaHelper();
 
-	int loadFile(std::string fileName);
+	bool loadFile(std::string &fileName);
 
 //lua helper function templates
 	int pushtable(const char *key);
