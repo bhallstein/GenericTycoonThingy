@@ -141,9 +141,6 @@ void Level::resume(Returny *returny) {
 		game->stateFinished(this, Returny(Returny::killer_returny));
 }
 void Level::update() {
-	if (framecount == 60) framecount = 0;
-	if (framecount++ == 10) createUnit(rand()%w, rand()%h);		// Create a new unit every so often
-	
 	intcoord c;
 	for(int i=0; i < spawnPoints.size(); i++)
 		if (spawnPoints[i]->spawn(&c))

@@ -10,6 +10,9 @@ bool SpawnPoint::spawn(intcoord *c)
 {
 	bool spawn_alert = rate == ++rateCounter;
 	if (spawn_alert)
+	{
 		c->x = x, c->y = y;
+		rateCounter = 0; //reset rateCounter as we hit it
+	}
 	return spawn_alert;
 }
