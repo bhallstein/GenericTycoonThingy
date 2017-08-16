@@ -49,8 +49,6 @@ void Level::buildLevel(std::string levelname)
 	// Set level width and height
 	w = mrLua.getvalue<int>("width");
 	h = mrLua.getvalue<int>("height");
-	//char s[100];
-	//sprintf(s, "Level dimensions: %d x %d", w, h);
 	
 	// Create map
 	navmap = new NavMap(w, h);
