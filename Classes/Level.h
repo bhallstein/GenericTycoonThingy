@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LEVEL_H
+#define LEVEL_H
+
 #include "Builder.h"
 
 class Level
@@ -12,3 +14,5 @@ private:
 
 
 };
+
+#endif

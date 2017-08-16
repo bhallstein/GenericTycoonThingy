@@ -2,6 +2,8 @@
  * LevelMap.h - Defines the map data, including buildings and units, for a level
  *
  */
+#ifndef LEVELMAP_H
+#define LEVELMAP_H
 
 #include <vector>
 #include "Building.h" 
@@ -28,3 +30,5 @@ public:
 private:
 
 };
+
+#endif

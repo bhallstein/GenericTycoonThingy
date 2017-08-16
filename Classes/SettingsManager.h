@@ -3,6 +3,9 @@
  *
  */
 
+#ifndef SETTINGSMANAGER_H
+#define SETTINGSMANAGER_H
+
 /*using namespace std;
 
 enum SettingType //Available Setting Types
@@ -49,3 +52,5 @@ public:
 	
 	//map<string,string> paraMap(); //this is the original paraMap function at this time.
 };*/
+
+#endif

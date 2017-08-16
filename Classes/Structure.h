@@ -1,4 +1,6 @@
-#pragma once
+#ifndef STRUCTURE_H
+#define STRUCTURE_H
+
 #include "Address.h"
 
 class Structure
@@ -35,3 +37,5 @@ protected:
 
 	std::string m_Type;
 };
+
+#endif
