@@ -48,7 +48,7 @@ public:
 	Building *createBuilding();
 	void moveBuilding(Building *b, int x1, int y1, int x2, int y2);	// If setting initial location, use a negative value for x1 or y1
 
-private:
+protected:
 	// Memory mapped list of things at each integer location
 	vector<MapLocation*> maplocs;
 

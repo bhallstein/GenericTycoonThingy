@@ -1,20 +1,5 @@
 #include "Building.h"
 
-/*********************************
- * EventResponder implementation *
- *********************************/
-
-EventResponder::EventResponder() { }
-EventResponder::~EventResponder() { }
-
-void EventResponder::receiveEvent(sf::Event *ev, EventResponder **p_e_r) { }
-
-
-
-/*********************************
- *    Building implementation    *
- *********************************/
-
 Building::Building(sf::Vector2i _block_size)
 {
 	mode = PLACEMENT;
@@ -68,16 +53,9 @@ void Building::receiveEvent(sf::Event *ev, EventResponder **p_e_r) {		// how to 
 
 void Building::draw(sf::RenderWindow &w)
 {
-	//if (mode == PLACEMENT) {
-	//	sf::Vector2i m_pos = sf::Mouse::GetPosition(w);
-	//	pos = nearestBlock(m_pos.x, m_pos.y);
-	//}
-	
-	//std::cout << "Draw - building pos: " << pos.x << "," << pos.y << std::endl;
-	
 	w.Draw(
 		sf::Shape::Rectangle(
-			pos.x, pos.y, size_in_blocks.x * block_size.x, size_in_blocks.y * block_size.y,
+			pos.x, pos.y, (int) size_in_blocks.x * block_size.x, (int) size_in_blocks.y * block_size.y,
 			(mode == PLACEMENT) ? sf::Color::White : sf::Color::Black
 		)
 	);

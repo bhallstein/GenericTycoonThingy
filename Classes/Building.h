@@ -1,5 +1,6 @@
 /*
  * Building.h
+ * - a building
  *
  */
 
@@ -12,25 +13,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include "EventResponder.h"
 
-/* EventResponder
-   - an abstract class, for subclassing, to allow various objects to handle events.
-   - implement the subclass’s specific event behaviour by overriding receiveEvent(). */
-
-class EventResponder
-{
-public:
-	EventResponder();
-	~EventResponder();
-	
-	virtual void receiveEvent(sf::Event *ev, EventResponder **p_e_r);
-
-protected:
-	
-};
-
-/* Building
-   - a building */
 
 class Building : EventResponder
 {

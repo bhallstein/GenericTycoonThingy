@@ -16,6 +16,7 @@ Game::Game()
 	// ...
 	
  	DBTWindow.Create(sf::VideoMode(pixel_width, pixel_height), w_name, sf::Style::Close);
+	DBTWindow.SetFramerateLimit(60);
 }
 
 Game::~Game()

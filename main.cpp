@@ -6,7 +6,7 @@
 // #include <iostream>
 #include <string>
 // #include <map>
-// #include <vector>
+ #include <vector>
 
 #include "Classes/Game.h"
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[], char *envp[])
 	// Configuration: paths
 	std::string path_settings = "Data/Settings.xml";
 	// etc.
-	
+
 	// Start game
 	Game g;
 	g.Run();

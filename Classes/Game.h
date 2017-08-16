@@ -22,7 +22,7 @@ public:
 	// Instance methods
 	void Run();
 
-private:
+protected:
 	sf::RenderWindow DBTWindow;
 	int pixel_width, pixel_height;
 	
