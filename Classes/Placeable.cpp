@@ -12,11 +12,13 @@ std::string Placeable::defaultColourWhilePlacing;
 Placeable::Placeable(NavMap *_navmap, ResponderMap *_levelRM, const char *_type) :
 	MappedObj(-100, -100), navmap(_navmap), levelResponderMap(_levelRM), type(_type), clicked(false), destroyed(false), mode(PLACEMENT)
 {
-	intcoord p[] = {
-		{0,0}, {1,0},
-		{0,1}, {1,1},	{-1,-1}
-	};
-	setGroundPlan(p);
+	std::vector<intcoord> p;
+	intcoord c = {0,0}, d = {1,0}, e = {0,1}, f = {1,1};
+	p.push_back(c);
+	p.push_back(d);
+	p.push_back(e);
+	p.push_back(f);
+	setGroundPlan(&p);
 	
 	// Set properties for this Placeable type
 	p_colour             = placeableTypes[_type].col;

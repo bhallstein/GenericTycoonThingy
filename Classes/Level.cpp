@@ -92,24 +92,62 @@ void Level::buildLevel(std::string levelname) {
 	
 	// Populate level with buildings
 	try {
-		mrLua.pushtable("buildings");
-		lua_pushnil(L);						// S: -1 nil; -2 table
-		while (lua_next(L, -2) != 0) {		// S: -1 val; -2 key; -3 table
-			if (lua_type(L, -1) != LUA_TTABLE)
+		mrLua.pushtable("buildings");		// S: buildings
+		lua_pushnil(L);						// S: -1 nil; -2 buildings
+		while (lua_next(L, -2) != 0) {		// S: -1 building; -2 key; -3 buildings
+			if (lua_type(L, -1) != LUA_TTABLE) {
+				lua_pop(L, 1);
 				continue;
-			
-			// Get Building position & type
+			}
+			// Set position & type
 			int bX = mrLua.getfield<int>("x");
 			int bY = mrLua.getfield<int>("y");
 			const char *bType = mrLua.getfield<const char *>("type");
 			
-			createBuilding(bX, bY, bType);
+			// Set ground plan
+			std::vector<intcoord> gp;
+			if (!mrLua.pushSubtable("groundplan")) throw MsgException("Could not find groundplan table.");
+			lua_pushnil(L);									// S: -1 nil; -2 groundplan; -4 building; -5 key; -6 buildings
+			for (int i=0; lua_next(L, -2); i++) {			// S: -1 coords; -2 key; -3 groundplan; ...
+				if (!lua_istable(L, -1)) {
+					lua_pop(L, 1);
+					continue;
+				}
+				intcoord c = { mrLua.getfield<int>(1), mrLua.getfield<int>(2) };
+				gp.push_back(c);
+				lua_pop(L, 1);								// S: -1 key; -2 groundplan; -3 building; -4 key; -5 buildings
+			}												// S: -1 groundplan; -2 building; -3 key; -4 buildings
+			lua_pop(L, 1);									// S: -1 building; -2 key; -3 building
 			
-			lua_pop(L, 1);					// S: -1 key; -2 table
+			// Set doors (optional... !)
+			std::vector<door> doors;
+			if (mrLua.pushSubtable("doors")) {				// S: -1 doors; -2 building; -3 key; -4 buildings
+				door d;
+				lua_pushnil(L);								// S: -1 nil; -2 doors; ...
+				while (lua_next(L, -2)) {					// S: -1 door; -2 key; -3 doors; ...
+					if (!lua_istable(L, -1)) {
+						lua_pop(L, 1);
+						continue;
+					}
+					d.coord.x = mrLua.getfield<int>(1);
+					d.coord.y = mrLua.getfield<int>(2);
+					std::cout << "d: " << d.coord.x << "," << d.coord.y << std::endl;
+					const char *dir = mrLua.getfield<const char *>(3);
+					if (strcmp(dir, "upward") == 0)         d.orientation = UPWARD;
+					else if (strcmp(dir, "downward") == 0)  d.orientation = DOWNWARD;
+					else if (strcmp(dir, "leftward") == 0)  d.orientation = LEFTWARD;
+					else if (strcmp(dir, "rightward") == 0) d.orientation = RIGHTWARD;
+					doors.push_back(d);
+					lua_pop(L, 1);							// S: -1 key; -2 doors; -3 building; -4 key; -5 buildings
+				}											// S: -1 doors; -2 building; -3 key; -4 buildings
+			}
+			lua_pop(L, 2);									// S: -1 key; buildings
+			
+			Building *b = createBuilding(bX, bY, bType, &gp, &doors);
 		}
-		lua_settop(L, 0);	// S: empty
+		lua_settop(L, 0);	// S: ~
 	} catch (MsgException &exc) {
-		std::string s = "Couldn't create buildings: ";
+		std::string s = "Couldn't load buildings: ";
 		s.append(exc.msg);
 		throw MsgException(s.c_str());
 	}
@@ -182,7 +220,7 @@ void Level::handleCloseEvent() {
 
 Unit* Level::createUnit(int atX, int atY, const char *type) {
 	std::vector<Unit*> *vctr = &units;
-	if (!strcmp(type, "staff")) {
+	if (strcmp(type, "staff") == 0) {
 		// Find the asylum (spawn building) amongst our buildings
 		// Note: this method will use the first asylum it finds
 		for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); i++)
@@ -199,8 +237,8 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 	std::cout << "added unit " << u << " of type '" << type << "' (now " << vctr->size() << ")" << std::endl;
 	return u;
 }
-Building* Level::createBuilding(int atX, int atY, const char *type) {
-	Building *b = new Building(atX, atY, type);
+Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors) {
+	Building *b = new Building(atX, atY, type, groundplan, doors);
 	buildings.push_back(b);
 	levelResponderMap->addMappedObj(b);
 	responderMap.subscribeToKey(b, Event::K_L);

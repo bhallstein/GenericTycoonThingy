@@ -7,23 +7,11 @@ std::map<std::string, struct buildingInfo> Building::buildingTypes;
 std::string Building::defaultColour;
 std::string Building::defaultHoverColour;
 
-Building::Building(int _x, int _y, const char *_type) : MappedObj(_x, _y), type(_type), clicked(false), destroyed(false), time_hovered(0)
-{
-	intcoord p[] = {
-		{0,0}, {1,0}, {2,0}, {3,0}, {4,0}, {5,0},
-		{0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1},
-		{0,2}, {1,2}, {2,2}, {3,2}, {4,2}, {5,2},
-		{0,3}, {1,3}, {2,3}, {3,3}, {4,3}, {5,3},
-		              {2,4}, {3,4},					{-1,-1}
-	};
-	setGroundPlan(p);
-	door d1 = {2,4, DOWNWARD};
-	door d2 = {3,4, DOWNWARD};
-	door d3 = {0,1, LEFTWARD};		// Side door! Why not.
-	doors.push_back(d1);
-	doors.push_back(d2);
-	doors.push_back(d3);
-	
+Building::Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors) :
+	MappedObj(_x, _y), type(_type), clicked(false), destroyed(false), time_hovered(0)
+{	
+	setGroundPlan(_groundplan);
+	doors = *_doors;
 	// Get properties for this building type
 	b_colour = Building::buildingTypes[type].col;
 	b_hoverColour = Building::buildingTypes[type].hoverCol;

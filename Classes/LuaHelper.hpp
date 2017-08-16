@@ -27,13 +27,14 @@ public:
 
 	template <typename T> T getfield(const char *table, const char *key);
 	template <typename T> T getfield(const char *key);
+	template <typename T> T getfield(int numerical_key);
 	template <typename T> T getSubfield(const char *table, const char *key);
 	template <typename T> T getvalue(const char *key);
 	
 	template <typename T> bool to(int index, T&);
 	
-	lua_State *LuaInstance; //instance of the Lua Interpreter
-	std::string stackdump(lua_State *l);
+	lua_State *LuaInstance;
+	std::string stackdump();
 	
 	W *theW;
 };
@@ -56,12 +57,23 @@ inline T LuaHelper::getfield(const char *table, const char *key) //can return in
 //get a basic field from a lua table, assuming table is at index -1
 template <typename T>
 inline T LuaHelper::getfield(const char *key) //can return int,double,string,char[],bool
-{
+{										// S: -1 table
 	T val;
 	lua_pushstring(LuaInstance, key);	// S: -1 key; -2 table
 	lua_gettable(LuaInstance, -2);		// S: -1 value; -2 table
 	bool success = to<T>(-1, val);
-	lua_pop(LuaInstance, 1);			// S: ~
+	lua_pop(LuaInstance, 1);			// S: -1 table
+	if (!success) throw MsgException("Unexpected Lua type encountered.");
+	return val;
+}
+template <typename T>
+inline T LuaHelper::getfield(int numerical_key)
+{										// S: -1 table
+	T val;
+	lua_pushnumber(LuaInstance, numerical_key);
+	lua_gettable(LuaInstance, -2);		// S: -1 value; -2 table
+	bool success = to<T>(-1, val);
+	lua_pop(LuaInstance, 1);			// S: -1 table;
 	if (!success) throw MsgException("Unexpected Lua type encountered.");
 	return val;
 }

@@ -23,7 +23,7 @@ struct buildingInfo {
 
 class Building : public MappedObj {
 public:
-	Building(int _x, int _y, const char *type);
+	Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors);
 	~Building();
 	
 	// Properties

@@ -17,8 +17,10 @@ Unit::Unit(NavMap *_navmap, int _x, int _y, const char *_type) :
 	state(S_IDLE),
 	hover(false)
 {
-	intcoord p[] = { {0,0}, {-1,-1} };
-	setGroundPlan(p);
+	intcoord c = {0,0};
+	std::vector<intcoord> p;
+	p.push_back(c);
+	setGroundPlan(&p);
 	
 	dest_x = rand()%navmap->w, dest_y = rand()%navmap->h;	// Generate random destination
 	
