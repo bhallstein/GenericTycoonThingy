@@ -3,6 +3,11 @@
  *
  */
 
+#ifndef GAME_H
+#define GAME_H
+
+#include "LevelMap.h"
+
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -23,3 +28,5 @@ private:
 	sf::RenderWindow DBTWindow;
 	
 };
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BUILDER_H
+#define BUILDER_H
+
 #include "Address.h"
 #include "Structure.h"
 
@@ -47,3 +49,5 @@ public:
 private:
 	
 };
+
+#endif
