@@ -7,6 +7,7 @@
 #define TYPES_H
 
 #define NO_PREV_POSITION -27139
+#define INFINITAH 9999999
 
 // Coordinates
 
