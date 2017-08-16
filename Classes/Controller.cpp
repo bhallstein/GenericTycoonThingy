@@ -16,11 +16,10 @@ Controller::Controller(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap
 }
 Controller::~Controller()
 {
-	UIDManager::unregisterTLO(this);
+	// Bye now
 }
-void Controller::setUp() {
-	if (!deserialized) uid = UIDManager::getNewUID();
-	UIDManager::registerTLO(this);
+void Controller::_setUp() {
+	
 }
 
 bool Controller::dispatchUnit(Unit *u) {

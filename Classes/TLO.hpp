@@ -1,14 +1,5 @@
 /*
- * TLO.hpp
- *
- * For useful top-level-object related functionality
- *
- * About auto-serialization
- *  - subclass creates a serialization_descriptor, which contains Serializers which can read/write
- *    the subclass's properties to/from lua
- *  - this initilization can be done in the existing static initialize() method
- *  - subclass supplies descriptor to TLO via the getSD() virtual method
- *  - TLO can then use the descriptor to serialize & deserialize objects
+ * TLO.hpp - for useful top-level-object related functionality
  *
  */
 
@@ -38,22 +29,29 @@ public:
 	{
 		// hai tlo
 	}
-	virtual ~TLO() { }
+	virtual ~TLO()
+	{
+		UIDManager::unregisterTLO(this);
+	}
 	
 	void setType(const std::string &_type) { type = _type; }
-	virtual void setUp() = 0;
+	void setUp() {
+		if (!deserialized) uid = UIDManager::getNewUID();
+		UIDManager::registerTLO(this);
+		_setUp();
+	}
+	virtual void _setUp() = 0;
 	virtual void update() = 0;
 	
 	bool destroyed;
 	void destroy() { destroyed = true; }
 	
-	static bool initialize() {
+	static void initialize() {
 		TLO::sd["uid"] = makeSerializer(&TLO::uid);
 		TLO::sd["rct"] = makeSerializer(&TLO::rct);
 		TLO::sd["type"] = makeSerializer(&TLO::type);
 		TLO::sd["destroyed"] = makeSerializer(&TLO::destroyed);
 			// Should `destroyed` ever be serialized as true?!
-		return true;
 	}
 	
 	UID uid;

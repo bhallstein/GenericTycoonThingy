@@ -1,42 +1,5 @@
 /*
- * PlaceableManager.hpp
- *
- * Implementing placeability is done by overriding PM's virtual methods, as follows:
- *
- * 1. We enter the placement loop
- *     - This may be at construct time, or when pickUp() is called.
- *     - placementLoopStarted() is called
- *			- update the drawn object to its placement loop drawing state
- * 2. The Placeable is moved around
- *		- placementLoopUpdate() is called
- *			- update the drawn object's position
- *			- do not update the subclass's own position, only the drawn object’s, as the new
- *			  position is not yet established
- * 3a Placement is attempted in a new location
- *		- canPlace(pos) is called
- *			- return whether the object can be placed at the given location
- *		- if canPlace returned true
- *			- the object’s new position is set
- * 3b Placement is cancelled
- * 4. The placement loop ends
- *		- if cancelled, placementLoopCancelled() called
- *			- may want to set the object to destroyed, or put it back where it was
- *		- otherwise, placementLoopSucceeded() called
- *			- set the drawn object's properties from the object's new position
- *			  and put it back in its non-placement loop drawing state
- *
- * Init
- *
- * A P.M. must be inited after being construct and set up. This is because the behaviour
- * of the subclass’s canPlace() etc. methods may depend on type info that is not available
- * at construct time.
- *
- * A P.M. can be created either in placeableMode or not: if the former, init()
- * tries to activate the placeable; if the latter, it tries to place the object
- * at the supplied position.
- *
- * In both cases init may fail: if the placeable couldn't become PER, or if
- * the subclass's canPlace() fn returned false.
+ * PlaceableManager.hpp - base class providing placeability
  *
  */
 

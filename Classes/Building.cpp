@@ -58,7 +58,7 @@ bool Building::initialize() {
 		
 	// 1. Get furnishingTypeInfo LuaObj
 	
-	std::string path = MrPaths::resourcesPath + "Lua/buildings.lua";
+	std::string path = MrPaths::resourcesPath + "Data/Object info/buildings.lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
 		W::log << "Could not read buildings.lua" << std::endl;

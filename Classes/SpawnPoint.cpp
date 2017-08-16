@@ -7,12 +7,10 @@ SpawnPoint::SpawnPoint(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap
 }
 SpawnPoint::~SpawnPoint()
 {
-	UIDManager::unregisterTLO(this);
+	// bai spawny
 }
-void SpawnPoint::setUp() {
-	if (!deserialized)
-		uid = UIDManager::getNewUID();
-	UIDManager::registerTLO(this);
+void SpawnPoint::_setUp() {
+	
 }
 void SpawnPoint::placementLoopStarted() {
 	// Update drawn representation properties

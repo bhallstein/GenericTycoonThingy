@@ -31,7 +31,7 @@ class Unit : public PlaceableManager {
 public:
 	Unit(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Unit();
-	void setUp();
+	void _setUp();
 		// When a unit is constructed, we may not yet know its type, which is therefore
 		// initially set to NO_TYPE.
 		// The unit must then be "set up".

@@ -91,7 +91,7 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	// Game entity class initialization
 	// - loads type info
 	// - creates serialization descriptors
-	if (!TLO::initialize())        { W::log << "Couldn't initialize TLO class"        << std::endl; return false; }
+	TLO::initialize();
 	if (!Building::initialize())   { W::log << "Couldn't initialize Building class"   << std::endl; return false; }
 	if (!Unit::initialize())       { W::log << "Couldn't initialize Unit class"       << std::endl; return false; }
 	if (!Furnishing::initialize()) { W::log << "Couldn't initialize Furnishing class" << std::endl; return false; }
@@ -99,7 +99,7 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	CustomerController::initialize();
 	
 	// Load level lua file
-	string path = MrPaths::resourcesPath + string("Levels/") + levelName + ".lua";
+	string path = MrPaths::resourcesPath + string("Data/Levels/") + levelName + ".lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
 		W::log << "Couldn't load file '" << path << "'" << std::endl;

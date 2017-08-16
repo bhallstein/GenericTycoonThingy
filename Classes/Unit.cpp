@@ -56,10 +56,9 @@ Unit::~Unit()
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
 	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
-	UIDManager::unregisterTLO(this);
 	delete drawnUnit;
 }
-void Unit::setUp() {
+void Unit::_setUp() {
 	if (type == NO_TYPE)
 		throw W::Exception("setUp() called on Unit with type NO_TYPE. Call setType() or deserialize first.");
 	
@@ -74,10 +73,8 @@ void Unit::setUp() {
 	
 	// Perform set-up for units constructed programmatically
 	if (!deserialized) {
-		uid = UIDManager::getNewUID();
+		// ...
 	}
-	
-	UIDManager::registerTLO(this);
 	
 	// Set up state of DrawnUnit
 	// e.g. du.setSpriteSet()...
@@ -254,7 +251,7 @@ bool Unit::initialize() {
 	if (Unit::initialized) return true;
 
 	/* 1. Get LuaObj & save unitTypeInfo map */
-	std::string path = MrPaths::resourcesPath + "Lua/units.lua";
+	std::string path = MrPaths::resourcesPath + "Data/Object info/units.lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
 		W::log << "Could not read units.lua" << std::endl;

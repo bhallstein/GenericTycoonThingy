@@ -24,7 +24,7 @@ class Furnishing : public PlaceableManager {
 public:
 	Furnishing(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Furnishing();
-	void setUp();
+	void _setUp();
 		// See note in Unit.hpp on creation & setup
 	
 	// Event callbacks

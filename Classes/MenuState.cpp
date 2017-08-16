@@ -61,7 +61,7 @@ void MenuState::startLevel(const std::string &levelName) {
 
 
 ClickToBeginView::ClickToBeginView(MenuState *_ms) :
-	W::UIView(MrPaths::resourcesPath + "UIViews/Menu_ClickToBeginView.lua"),
+	W::UIView(MrPaths::resourcesPath + "Data/UIViews/Menu_ClickToBeginView.lua"),
 	menuState(_ms)
 {
 	t1 = new W::DrawnText(this, W::position(186,30), "Welcome to Generic Tycoon Thingy", W::Colour::Black);

@@ -22,13 +22,13 @@ struct MrKlangy::init {
 
 void MrKlangy::playSound(const char *filename) {
 	if (!device_available || disableSounds) return;
-	std::string path = MrPaths::resourcesPath + std::string("Data/") + filename;
+	std::string path = MrPaths::resourcesPath + std::string("Data/Audio/") + filename;
 	sound_engine->play2D(path.c_str(), false);
 }
 void MrKlangy::playBGM(const char *filename, bool loop) {
 	if (!device_available || disableSounds) return;
 	stopBGM();
-	std::string path = MrPaths::resourcesPath + std::string("Data/") + filename;
+	std::string path = MrPaths::resourcesPath + std::string("Data/Audio/") + filename;
 	bgm = sound_engine->play2D(path.c_str(), loop, false, true);
 }
 void MrKlangy::stopBGM() {

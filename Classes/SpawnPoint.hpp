@@ -20,7 +20,7 @@ class SpawnPoint : public PlaceableManager {
 public:
 	SpawnPoint(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~SpawnPoint();
-	void setUp();
+	void _setUp();
 	void update() { }
 	
 protected:

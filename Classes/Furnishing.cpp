@@ -62,11 +62,10 @@ Furnishing::~Furnishing()
 	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
 	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
 	navmap->makePassable(rct);
-	UIDManager::unregisterTLO(this);
 	delete drawnFurnishing;
 }
 
-void Furnishing::setUp() {
+void Furnishing::_setUp() {
 	using std::string;
 	
 	if (type == NO_TYPE)
@@ -82,9 +81,8 @@ void Furnishing::setUp() {
 	
 	// Perform set-up for furnishings constructed programmatically
 	if (!deserialized) {
-		uid = UIDManager::getNewUID();
+		// ...
 	}
-	UIDManager::registerTLO(this);
 	
 	// Set up state of DrawnFurnishing
 	// ...
@@ -112,7 +110,7 @@ bool Furnishing::initialize() {
 	
 	// 1. Get furnishingTypeInfo LuaObj
 	
-	std::string path = MrPaths::resourcesPath + "Lua/furnishings.lua";
+	std::string path = MrPaths::resourcesPath + "Data/Object info/furnishings.lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
 		W::log << "Could not read furnishings.lua" << std::endl;

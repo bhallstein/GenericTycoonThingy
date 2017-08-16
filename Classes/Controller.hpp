@@ -24,7 +24,7 @@ class Controller : public TLO {
 public:
 	Controller(LevelState *, LevelMap *, LevelView *, W::NavMap *);
 	virtual ~Controller();
-	void setUp();
+	void _setUp();
 	
 	bool dispatchUnit(Unit *);
 		// If canDispatchUnitType( ) returns true, calls _dispatchUnit().
