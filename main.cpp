@@ -5,7 +5,7 @@
 using namespace sf;
 using namespace std;
 
-// Hai everyones
+// O hai everyone
 
 map<string,string> paraMap(int argc, char *argv[], char *envp[]) //consider validating the map's contents too - and removing invalid pairs (no need to error unnecessarily; just ignore)
 {
