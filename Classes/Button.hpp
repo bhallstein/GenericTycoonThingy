@@ -9,27 +9,25 @@
 #include <iostream>
 
 #include "types.hpp"
-#include "EventResponder.hpp"
 
-class Menu;
-class ButtonReceiver;
-
-class Button : public EventResponder
-{
+class Button {
 public:
-	Button(ButtonReceiver *, int _x, int _y, int _width, int _height);
+	Button(int _x, int _y, int _w, int _h, const char *_action);
 	~Button();
 
 	// Methods
-	void receiveEvent(Event *);
+	void setHover();
 	void update() { }
 	const char * col();
+	
+	// Properties
+	std::string action;
+	int x, y, width, height;
 
 protected:
 	// Properties
-	ButtonReceiver *receiver;
 	bool hover;
-
+	
 };
 
 #endif

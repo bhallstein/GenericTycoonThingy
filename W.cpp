@@ -21,9 +21,9 @@ W::W(WindowManager *_winManager) : winManager(_winManager), opengl_needs_setting
 	W::logfile.open(logfilePath.c_str());
 #ifdef __APPLE__
 	// Tail log file in a Terminal window
-//	system("echo \"#!/bin/bash\" > ~/Desktop/tail_cmd");
-//	system("echo \"tail -f ~/Desktop/DBTlog.txt\" >> ~/Desktop/tail_cmd");
-//	system("chmod a+x ~/Desktop/tail_cmd; open -a Terminal ~/Desktop/tail_cmd");
+	system("echo \"#!/bin/bash\" > ~/Desktop/tail_cmd");
+	system("echo \"tail -f ~/Desktop/DBTlog.txt\" >> ~/Desktop/tail_cmd");
+	system("chmod a+x ~/Desktop/tail_cmd; open -a Terminal ~/Desktop/tail_cmd");
 #endif
 	std::string s = "W: settingsPath: "; s.append(settingsPath);
 	std::string t = "W: resourcesPath: "; t.append(resourcesPath);

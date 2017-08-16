@@ -53,6 +53,8 @@ public:
 	Unit*     createUnit(int atX, int atY, const char *type);
 	Building* createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors);
 	void      createPlaceable(const char *type);
+	void createBarbersChair();
+	void createStaffUnit();
 	
 	void destroyThings();
 	void destroyAllThings();
@@ -115,25 +117,18 @@ public:
 };
 
 
-#include "ButtonReceiver.hpp"
+#include "UIView.hpp"
 
-class UIBarView : public View, public ButtonReceiver {
+class UIBarView : public UIView {
 public:
-	UIBarView(W *, JenniferAniston &, Level *);
-	~UIBarView();
-	
-	// Methods
-	void buttonClick(Button *);
+	UIBarView(W *, JenniferAniston &);
 	void draw();
-	void updatePosition();
-	void processMouseEvent(Event *);
-	
-	// Properties
-	Level *level;
-	Button *createplaceable_btn;
-	Button *createstaff_btn;
-	std::vector<Button *> buttons;
-	ResponderMap buttonMap;
+};
+
+class FurniturePurchasingUIView : public UIView {
+public:
+	FurniturePurchasingUIView(W *, JenniferAniston &);
+	void draw();
 };
 
 #endif

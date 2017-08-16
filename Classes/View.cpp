@@ -1,11 +1,13 @@
 #include "View.hpp"
 #include "Event.hpp"
 
-View::View(W *_theW, JenniferAniston &_jenniferAniston) : theW(_theW), jenniferAniston(_jenniferAniston) {
+View::View(W *_theW, JenniferAniston &_aniston) : theW(_theW), jenniferAniston(_aniston)
+{
 	updatePosition();
 }
 
-View::~View() {
+View::~View()
+{
 	std::cout << "view destruct" << std::endl;
 }
 

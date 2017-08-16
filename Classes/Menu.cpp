@@ -2,33 +2,22 @@
 #include "Game.hpp"
 #include "Level.hpp"
 #include "Button.hpp"
+#include "Callback.hpp"
 
-Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW), buttonMap(_theW->width(), _theW->height())
+Menu::Menu(Game *_game, W *_theW) : GameState(_game, _theW)
 {
 	JenniferAniston aniston(theW, TOP_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 1);
-	menuview = new MenuView(_theW, aniston, &buttonMap, &buttons);
+	menuview = new MenuView(_theW, aniston);
 	responderMap.addResponder(menuview);
 	
-	// Add buttons
-	startlevel_btn = new Button(this, 100, 200, 240, 135);
-	buttonMap.addResponder(startlevel_btn);
-	buttons.push_back(startlevel_btn);
+	menuview->subscribe("start level", new Callback(&Menu::startLevelOne, this));
 	
 	// Key subscriptions
 	responderMap.subscribeToKey(this, Event::K_Q);
 	responderMap.subscribeToKey(this, Event::K_ESC);
 }
 Menu::~Menu()
-{
-	// Remove buttons form view
-	Button *b;
-	for (int i=0, n = buttons.size(); i < n; i++) {
-		b = buttons[i];
-		buttonMap.removeResponder(b);
-		delete b;
-	}
-	buttons.clear();
-	
+{	
 	delete menuview;
 }
 
@@ -49,7 +38,6 @@ void Menu::draw() {
 
 void Menu::setResolution(int _w, int _h) {
 	GameState::setResolution(_w, _h);
-	buttonMap.setSize(_w, _h);
 	menuview->updatePosition();
 }
 
@@ -60,11 +48,6 @@ void Menu::receiveEvent(Event *ev) {
 		if (ev->key == Event::K_ESC)
 			game->stateFinished(this, Returny(Returny::empty_returny));
 	}
-}
-
-void Menu::buttonClick(Button *btn) {
-	if (btn == startlevel_btn)
-		startLevel("level1.lua");
 }
 
 void Menu::startLevel(std::string path) {
@@ -80,21 +63,20 @@ void Menu::startLevel(std::string path) {
 		theW->warning(msg.c_str());
 	}
 }
+void Menu::startLevelOne() {
+	startLevel("level1.lua");
+}
 
 
 #include "../W.hpp"
 
-MenuView::MenuView(W *_theW, JenniferAniston &_aniston, ResponderMap *_buttonMap, std::vector<Button*> *_buttons)
-: View(_theW, _aniston), buttonMap(_buttonMap), buttons(_buttons)
+MenuView::MenuView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
 {
-	
+	buttons.push_back(new Button(100, 200, 240, 135, "start level"));
 }
 void MenuView::draw() {
-	for (int i=0, n = buttons->size(); i < n; i++) {
-		Button *b = (*buttons)[i];
+	for (int i=0, n = buttons.size(); i < n; i++) {
+		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
-}
-void MenuView::processMouseEvent(Event *ev) {
-	buttonMap->dispatchEvent(ev);
 }

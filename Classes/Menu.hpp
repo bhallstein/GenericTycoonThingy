@@ -13,7 +13,6 @@
 
 #include "GameState.hpp"
 #include "EventResponder.hpp"
-#include "ButtonReceiver.hpp"
 
 class Game;
 class W;
@@ -22,7 +21,7 @@ class Button;
 
 class MenuView;
 
-class Menu : public GameState, public EventResponder, public ButtonReceiver {
+class Menu : public GameState, public EventResponder {
 public:
 	Menu(Game *, W *);
 	~Menu();
@@ -36,32 +35,24 @@ public:
 	void setResolution(int _w, int _h);
 	
 	void receiveEvent(Event *);
-	void buttonClick(Button *);
 	
 	void startLevel(std::string path);
+	void startLevelOne();
 	
 protected:
 	// Properties
 	MenuView *menuview;
-	std::vector<Button*> buttons;
-	Button *startlevel_btn;
-	
-	Level *level;				// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
-	ResponderMap buttonMap;		// Is there a need for a View subclass which manages a RM?
+	Level *level;		// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
 	
 };
 
 
-#include "View.hpp"
+#include "UIView.hpp"
 
-class MenuView : public View {
+class MenuView : public UIView {
 public:
-	MenuView(W *, JenniferAniston &, ResponderMap *_buttonMap, std::vector<Button*> *);
+	MenuView(W *, JenniferAniston &);
 	void draw();
-	void processMouseEvent(Event *);
-	
-	ResponderMap *buttonMap;
-	std::vector<Button *> *buttons;
 };
 
 #endif

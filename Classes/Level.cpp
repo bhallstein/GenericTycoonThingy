@@ -6,6 +6,7 @@
 #include "Placeable.hpp"
 #include "Unit.hpp"
 #include "LuaHelper.hpp"
+#include "Callback.hpp"
 
 Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _theW) {
 	framecount = 0;
@@ -13,8 +14,10 @@ Level::Level(Game *_game, W *_theW, std::string levelpath) : GameState(_game, _t
 	buildLevel(levelpath);
 	
 	JenniferAniston aniston(theW, BOTTOM_LEFT, PFIXED, PPROPORTIONAL, 0, 0, 1, 0.1);
-	uibarview = new UIBarView(theW, aniston, this);
+	uibarview = new UIBarView(theW, aniston);
 	responderMap.addResponder(uibarview);
+	uibarview->subscribe("create barberschair", new Callback(&Level::createBarbersChair, this));
+	uibarview->subscribe("add staff unit", new Callback(&Level::createStaffUnit, this));
 	
 	// Subscribe to screenedge events
 	responderMap.subscribeToEventType(this, Event::SCREENEDGE_LEFT);
@@ -248,7 +251,7 @@ Unit* Level::createUnit(int atX, int atY, const char *type) {
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<intcoord> *groundplan, std::vector<door> *doors) {
-	Building *b = new Building(atX, atY, type, groundplan, doors);
+	Building *b = new Building(atX, atY, type, groundplan, doors, this);
 	buildings.push_back(b);
 	levelResponderMap->addMappedObj(b);
 	responderMap.subscribeToKey(b, Event::K_L);
@@ -265,6 +268,12 @@ void Level::createPlaceable(const char *type) {
 	placeables.push_back(p);
 	std::cout << "added placeable " << p << " (now " << placeables.size() << ")" << std::endl;
 	return;
+}
+void Level::createBarbersChair() {
+	createPlaceable("barberschair");
+}
+void Level::createStaffUnit() {
+	createUnit(0, 0, "staff");
 }
 void Level::destroyThings() {
 	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); )
@@ -375,30 +384,10 @@ void LevelView::scroll(direction dir) {
 }
 
 
-UIBarView::UIBarView(W *_theW, JenniferAniston &aniston, Level *_level) :
-	View(_theW, aniston), buttonMap(width, height), level(_level)
+UIBarView::UIBarView(W *_theW, JenniferAniston &_aniston) : UIView(_theW, _aniston)
 {
-	createplaceable_btn = new Button(this, 10, 10, 20, 20);
-	buttonMap.addResponder(createplaceable_btn);
-	buttons.push_back(createplaceable_btn);
-
-	createstaff_btn = new Button(this, 40, 10, 20, 20);
-	buttonMap.addResponder(createstaff_btn);
-	buttons.push_back(createstaff_btn);
-}
-
-UIBarView::~UIBarView()
-{
-	
-}
-
-void UIBarView::buttonClick(Button *btn) {
-	if (btn == createplaceable_btn) level->createPlaceable("barberschair");
-	if (btn == createstaff_btn)     level->createUnit(0, 0, "staff");
-}
-
-void UIBarView::processMouseEvent(Event *ev) {
-	buttonMap.dispatchEvent(ev);
+	buttons.push_back(new Button(10, 10, 20, 20, "create barberschair"));
+	buttons.push_back(new Button(40, 10, 20, 20, "add staff unit"));
 }
 
 void UIBarView::draw() {
@@ -409,7 +398,13 @@ void UIBarView::draw() {
 	}
 }
 
-void UIBarView::updatePosition() {
-	View::updatePosition();
-	buttonMap.setSize(width, height);
+
+FurniturePurchasingUIView::FurniturePurchasingUIView(W *_theW, JenniferAniston &aniston) :
+	UIView(_theW, aniston)
+{
+	// Add buttons...
+}
+
+void FurniturePurchasingUIView::draw() {
+	theW->drawRect(x, y, width, height, "black");
 }

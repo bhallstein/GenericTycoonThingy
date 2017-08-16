@@ -14,6 +14,7 @@
 #include "MappedObj.hpp"
 
 class W;
+class Level;
 class LuaHelper;
 
 struct buildingInfo {
@@ -23,7 +24,7 @@ struct buildingInfo {
 
 class Building : public MappedObj {
 public:
-	Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors);
+	Building(int _x, int _y, const char *_type, std::vector<intcoord> *_groundplan, std::vector<door> *_doors, Level *);
 	~Building();
 	
 	// Properties
@@ -42,6 +43,7 @@ protected:
 	// Properties
 	bool clicked;
 	int time_hovered;
+	Level *level;
 	std::string *b_colour;
 	std::string *b_hoverColour;
 	std::vector<std::string> *b_allowedPlaceables;
