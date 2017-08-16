@@ -16,9 +16,8 @@
 #include "Event.hpp"
 #include "SettingsManager.hpp"
 #include "Menu.hpp"
+#include "GameState.hpp"
 
-// Forward Declarations
-class GameState;
 
 class Game
 {
@@ -31,21 +30,20 @@ public:
 	
 	void pushState(GameState *);
 	void popState();
-	void popAllStates();
+	void stateFinished(GameState *, Returny);
 	
 	// Events/Update/Drawing - passed to active State
 	void sendEvents();
 	void update();
 	void draw();
 	
-	void quit();
-	
 	SettingsManager* settings;
 
 protected:
 	// Properties
 	std::vector<GameState *> states;
-	bool should_quit;
+	bool resume;
+	Returny returny;
 	
 	sf::RenderWindow *window;
 	

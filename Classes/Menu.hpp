@@ -34,7 +34,7 @@ public:
 	// Methods
 	void reset();
 	void pause();
-	void resume();
+	void resume(Returny *);
 	void handleEvent(Event *);
 	void update();
 	void draw();

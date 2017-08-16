@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-Game::Game(sf::RenderWindow *_window, SettingsManager* _settings) : should_quit(false)
+Game::Game(sf::RenderWindow *_window, SettingsManager* _settings) : resume(false)
 {
 	//point our settings property to the SettingsManager instance
 	settings = _settings;
@@ -32,8 +32,7 @@ Game::~Game()
 	
 }
 
-void Game::sendEvents()
-{
+void Game::sendEvents() {
 	Event event;
 	sf::Event sf_event;
 	
@@ -43,16 +42,9 @@ void Game::sendEvents()
 		states.back()->_handleEvent(&event);
 		
 	while (window->PollEvent(sf_event)) {
-		event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
-		
-		if (event.type == MOUSEMOVE) ;			// Ignore sfml mouse moves
-		
-		// Close window : exit
-		else if (event.type == CLOSED || event.key == K_Q)
-			quit();
-		
-		else
-			states.back()->_handleEvent(&event);	// Send keys to active state
+		event.loadFromSFEvent(&sf_event);			// Convert sfml event to our own type
+		if (event.type == MOUSEMOVE) continue;		// Ignore sfml mouse moves
+		states.back()->_handleEvent(&event);		// Send keys to active state
 	}
 }
 void Game::update()
@@ -91,18 +83,13 @@ void Game::pushState(GameState *st)
 
 void Game::popState()
 {
-	// Clean up current state
-	if ( !states.empty() ) {
-		states.back()->reset();
-		states.pop_back();
-	}
-
-	// Resume previous state
-	if (!states.empty())
-		states.back()->resume();
+	states.pop_back();
+	if (!states.empty()) states.back()->resume(&returny);
 }
-void Game::popAllStates() {
-	while (!states.empty()) popState();
+void Game::stateFinished(GameState *state, Returny _returny) {
+	if (states.back() != state)	return;				// Throw exception
+	resume = true;
+	returny = _returny;
 }
 
 void Game::run()
@@ -114,16 +101,17 @@ void Game::run()
 	   these might include a splash, video, and so on. i.e. it will need to run through a list:
 	   if (something remains in the list), push it; otherwise, quit. */
 	
-	while (!states.empty() && !should_quit)
+	while (!states.empty())
     {
+		if (resume) {
+			resume = false;					// popState() resumes previous state: it may call stateFinished(),
+			popState();						// setting resume to TRUE
+			if (states.empty() || resume)
+				continue;
+		}
 		sendEvents();
 		update();
 		draw();
     }
 
-	popAllStates();
-}
-
-void Game::quit() {
-	should_quit = true;
 }

@@ -8,9 +8,12 @@ Level::Level(Game *_game, sf::RenderWindow *_window, std::string levelpath) :
 	
 	buildLevel(readLevel(levelpath));
 }
-
 Level::~Level() {
-	
+	std::cout << "level reset" << std::endl;
+	destroyAllThings();
+	delete navmap;
+	delete levelview;
+	delete uiview;
 }
 
 ptree Level::readLevel(std::string fileName) //This read may be replaced by more centralised serialisation later
@@ -39,19 +42,11 @@ void Level::buildLevel(ptree levelFile)
 	}
 }
 
-
-void Level::reset()
-{
-	std::cout << "level reset" << std::endl;
-	destroyAllThings();
-	delete navmap;
-	delete levelview;
-	delete uiview;
-}
-
-//To be done later ;)
 void Level::pause() { }
-void Level::resume() { }
+void Level::resume(Returny *returny) {
+	if (returny->type == Returny::killer_returny)
+		game->stateFinished(this, Returny(Returny::killer_returny));
+}
 
 void Level::update()
 {
@@ -62,7 +57,11 @@ void Level::update()
 void Level::handleEvent(Event* event)
 {
 	// Keys
-	if (event->type == KEYPRESS) { 
+	if (event->type == KEYPRESS) {
+		if (event->key == K_Q)
+			game->stateFinished(this, Returny(Returny::killer_returny));
+		if (event->key == K_ESC)
+			game->stateFinished(this, Returny(Returny::empty_returny));
 		if (event->key == K_P)
 			createPlaceable();
 	}

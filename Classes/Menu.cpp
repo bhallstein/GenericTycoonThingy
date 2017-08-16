@@ -25,17 +25,20 @@ Menu::~Menu()
 	delete menuview;
 }
 
-void Menu::reset() {
-	
-}
 void Menu::pause() {
 	
 }
-void Menu::resume() {
-	
+void Menu::resume(Returny *returny) {
+	delete level;
+	if (returny->type == Returny::killer_returny)
+		game->stateFinished(this, Returny(Returny::killer_returny));
 }
 void Menu::handleEvent(Event *ev) {
 	// Handle things like ESC, UP, DOWN, ENTER...
+	if (ev->type == KEYPRESS) {
+		if (ev->key == K_ESC)
+			game->stateFinished(this, Returny(Returny::empty_returny));
+	}
 }
 void Menu::update() {
 

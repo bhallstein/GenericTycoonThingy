@@ -20,6 +20,7 @@
 
 
 class Game;
+class Returny;
 
 class GameState
 {
@@ -28,9 +29,8 @@ public:
 	~GameState() { }
 	
 	// State-related virtual methods – subclasses must override
-	virtual void reset() = 0;
 	virtual void pause() = 0;
-	virtual void resume() = 0;
+	virtual void resume(Returny *) = 0;
 	virtual void handleEvent(Event *) = 0;
 	virtual void update() = 0;
 	virtual void draw() = 0;
@@ -50,6 +50,25 @@ protected:
 	Game *game;
 	sf::RenderWindow *window;
 	EventHandler eventHandler;
+	
+};
+
+
+class Returny {
+public:
+	enum returny_type { empty_returny, payload_returny, killer_returny };
+	enum returny_code {
+		no_action
+	};
+
+	Returny(returny_type _type = empty_returny, returny_code _code = no_action, std::string _payload = "") :
+		type(_type), code(_code), payload(_payload) {
+	
+	}
+
+ 	returny_type type;
+	returny_code code;
+	std::string payload;
 	
 };
 
