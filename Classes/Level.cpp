@@ -4,22 +4,31 @@ Level::Level(int _w, int _h, GameMap *_gamemap)
 {
 	w = _w, h = _h;
 	gamemap = _gamemap;
+	framecount = 0;
 }
 Level::~Level()
 {
-	// Destructor
+	// Buildings & units are allocated on the heap with `new` – so must be manually `delete`d.
 	for (std::vector<Building*>::iterator i = buildings.begin(); i != buildings.end(); i++)
-		delete (*i);	// Buildings are allocated on heap with `new` – so must be manually `delete`d.
+		delete (*i);	
+	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++)
+		delete (*i);
 }
 
 Building* Level::createBuilding()
 {
-	std::cout << "adding new building, currently: " << buildings.size() << "... ";
+	std::cout << "adding new building (currently " << buildings.size() << ")... ";
 	buildings.push_back( new Building(gamemap) );
-	std::cout << "done. now: " << buildings.size() << std::endl;
+	std::cout << "now: " << buildings.size() << std::endl;
 	return buildings.back();
 }
 
+Unit* Level::createUnit() {
+	std::cout << "adding new unit (currently " << units.size() << ")... ";
+	units.push_back( new Unit(gamemap) );
+	std::cout << "now: " << units.size() << std::endl;
+	return units.back();
+}
 
 void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 {
@@ -38,6 +47,16 @@ void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 			);
 		}
 	}
+	for (std::vector<Unit*>::iterator i = units.begin(); i != units.end(); i++) {
+		window.Draw(
+			sf::Shape::Rectangle(
+				(*i)->x * block_width, (*i)->y * block_height, (*i)->w * block_width, (*i)->h * block_height,
+				(*i)->col() == 'r' ? sf::Color::Red : (*i)->col() == 'b' ? sf::Color::Black : sf::Color::White
+			)
+		);
+	}
+	if (framecount == 1800) framecount = 0;
+	if (300 == framecount++) this->createUnit();	// Create a new unit every 30 seconds
 }
 
 

@@ -14,20 +14,17 @@
 #include "GameMap.hpp"
 
 
-class Building : EventResponder
+class Building : public EventResponder
 {
 public:
 	Building(GameMap *);
 	~Building();
 
 	// Methods
-	void receiveEvent(Event *ev, EventResponder **p_e_r);		// Override receive event method
+	void receiveEvent(Event *ev, EventResponder **p_e_r);	// Override to handle events
 	char col();		// Temporary coloration-signifier thingum
 
 	// Properties
-	int x, y;		// Integer block coordinates
-	int w, h;		//
-
 	bool destroyed;
 
 protected:

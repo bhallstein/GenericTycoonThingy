@@ -29,12 +29,19 @@ public:
 	~MapLoc();
 	
 	// Methods
+	void dispatchEvent(Event *ev, EventResponder **p_e_r);
 	void addResponder(EventResponder *x);
 	void removeResponder(EventResponder *x);
-	void dispatchEvent(Event *ev, EventResponder **p_e_r);
+	void addNeighbour(MapLoc *neighbour);
+	void removeNeighbour(MapLoc *neighbour);
+	
+	// Properties
+	int x, y;
+	bool passable;
 	
 protected:
 	std::list<EventResponder*> responderList;
+	std::list<MapLoc*> neighbours;		// Pointers to passable neighbour nodes. Used for pathfinding.
 	
 };
 
@@ -49,10 +56,15 @@ public:
 	int w, h;
 	
 	// Methods
-	void setDimensions(int _w, int _h);
-	void addObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
-	void removeObject(EventResponder *object, int atX, int atY, int obj_w = 1, int obj_h = 1);
+	void setDimensions(int _w, int _h);	// This should be called immediately after the constructor.
+	void addResponder(EventResponder *resp);
+	void removeResponder(EventResponder *resp);
 	void dispatchEvent(Event *, EventResponder **p_e_r);
+	void makeImpassable(int atX, int atY);
+	void makePassable(int atX, int atY);
+	void addImpassableObject(EventResponder *resp);
+	void removeImpassableObject(EventResponder *resp);
+	bool isPassableAt(int atX, int atY);
 
 protected:
 	// Properties

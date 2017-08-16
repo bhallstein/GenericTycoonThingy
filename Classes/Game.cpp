@@ -75,8 +75,7 @@ void Game::Run()
 					}
 				}
 				// Mouse
-				else if (event.type == MOUSEMOVE || event.type == LEFTCLICK)
-				{
+				else if (event.type == MOUSEMOVE || event.type == LEFTCLICK) {
 					// Send to relevant thing(s), use memory mapping
 					gamemap.dispatchEvent(&event, &privileged_event_responder);
 				}

@@ -18,11 +18,16 @@ class EventResponder
 public:
 	EventResponder();
 	~EventResponder();
-	
+
+	// Methods
 	virtual void receiveEvent(Event *ev, EventResponder **p_e_r);
+	
+	// Properties
+	int x, y;		// Integer block coordinates
+	int w, h;		//
 
 protected:
-
+	
 };
 
 #endif

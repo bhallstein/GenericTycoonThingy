@@ -16,6 +16,7 @@
 #include "GameMap.hpp"
 #include "EventResponder.hpp"
 #include "Building.hpp"
+#include "Unit.hpp"
 
 
 class Level
@@ -27,15 +28,17 @@ public:
 	// Functions
 	void draw(sf::RenderWindow& window, int block_width, int block_height);
 	Building *createBuilding();
+	Unit *createUnit();
 
 	// Properties
 	int columns, rows;
 	std::vector<Building*> buildings;
+	std::vector<Unit*> units;
 
 protected:
 	int w, h; 					// Blocks wide/tall.
 	GameMap *gamemap;
-	
+	int framecount;
 };
 
 #endif

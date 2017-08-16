@@ -15,7 +15,8 @@ Building::Building(GameMap *map)
 Building::~Building()
 {
 	// Remove from memory map
-	gamemap->removeObject(this, x, y, w, h);
+	gamemap->removeResponder(this);
+	gamemap->removeImpassableObject(this);
 }
 
 void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
@@ -24,7 +25,12 @@ void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
 			this->setPosition(ev->x, ev->y);
 		}
 		else if (ev->type == LEFTCLICK) {
+			for (int j=y; j < y + h; j++)
+				for (int i=x; i < x + w; i++)
+					if (!gamemap->isPassableAt(i, j))
+						return;							// Check if area is passable
 			mode = PLACED;
+			gamemap->addImpassableObject(this);
 			*p_e_r = NULL;
 		}
 		else if (ev->type == RIGHTCLICK) {
@@ -40,14 +46,14 @@ void Building::receiveEvent(Event *ev, EventResponder **p_e_r) {
 			clicked = !clicked;
 		}
 	}
-	// std::cout << "Buildingb pos: " << x << "," << y << std::endl;
+	// std::cout << "Building pos: " << x << "," << y << std::endl;
 }
 
 void Building::setPosition(int _x, int _y) {
 	if (x == _x && y == _y) return;
-	gamemap->removeObject(this, x, y, w, h);
+	gamemap->removeResponder(this);
 	x = _x, y = _y;
-	gamemap->addObject(this, x, y, w, h);
+	gamemap->addResponder(this);
 }
 
 char Building::col() {

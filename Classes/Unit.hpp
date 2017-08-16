@@ -13,23 +13,29 @@
 #include <SFML/Window.hpp>
 
 #include "EventResponder.hpp"
+#include "GameMap.hpp"
 
- 
-class Unit : EventResponder
+
+class Unit : public EventResponder
 {
 public:
-	Unit();
+	Unit(GameMap *map);
 	~Unit();
 
-	/* Methods */
+	// Methods
+	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);	// Override to handle events
+	char col();
 
-	// Override receive event method
-	void receiveEvent(sf::Event *ev, EventResponder **p_e_r);
-
+	// Properties
+	int a, b;		// Floating point offset from block
+	
+	std::string state;
 
 protected:
 
-
+	// Properties
+	GameMap *gamemap;
+	
 };
 
 #endif
