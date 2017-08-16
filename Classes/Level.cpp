@@ -1,127 +1,165 @@
 #include "Level.hpp"
+#include "Game.hpp"
+#include "ResponderMap.hpp"
+#include "NavMap.hpp"
+#include "Building.hpp"
+#include "Placeable.hpp"
+#include "Unit.hpp"
 
-Level::Level(Game *_game, sf::RenderWindow *_window, std::string levelpath) :
-	GameState(_game, _window), framecount(0)
-{	
-	uiview = new View(_window, 16, 3, 0, -80, 0, 0);
-	eventHandler.subscribe(uiview);
-	
+Level::Level(Game *_game, W *_theW, std::string levelpath) :
+	GameState(_game, _theW)
+{
+	framecount = 0;
+
 	buildLevel(levelpath);
+	
+	JenniferAniston aniston(theW, BOTTOM_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 0.1);
+	uibarview = new UIBarView(theW, aniston, this);
+	responderMap.addResponder(uibarview);
+	
+	// Subscribe to screenedge events
+	responderMap.subscribeToEventType(this, Event::SCREENEDGE_LEFT);
+	responderMap.subscribeToEventType(this, Event::SCREENEDGE_RIGHT);
+	responderMap.subscribeToEventType(this, Event::SCREENEDGE_TOP);
+	responderMap.subscribeToEventType(this, Event::SCREENEDGE_BOTTOM);
+	
+	// Key subscriptions
+	responderMap.subscribeToKey(this, Event::K_Q);
+	responderMap.subscribeToKey(this, Event::K_P);
 }
 Level::~Level() {
-	std::cout << "level reset" << std::endl;
+	std::cout << "level destruct" << std::endl;
 	destroyAllThings();
 	delete navmap;
 	delete levelview;
-	delete uiview;
+	delete uibarview;
 }
 
-void Level::buildLevel(std::string levelFile)
+void Level::buildLevel(std::string fileName)
 {
+	std::cout << "path before: " << fileName << std::endl;
+	fileName = theW->pathForResource(fileName);
+	std::cout << "path after: " << fileName << std::endl;
 	LuaHelper mrLua;
-
-	if (mrLua.loadFile(levelFile))
+	
+	if (mrLua.loadFile(fileName))
 	{
+		//some kind of error!
 		std::cout << mrLua.to<std::string>(-1);
 		std::cin.get();
-		//some kind of error!
 		//throw 1;
+		return;
 	}
-	else
-	{
-		//level width and height
-		w = mrLua.getvalue<int>("width");
-		h = mrLua.getvalue<int>("height");
-
-		std::cout << "level dimensions: " << w << " x " << h << std::endl;
-
-		// Create map
-		navmap = new NavMap(w, h);
 	
-		// Create levelview
-		levelview = new LevelView(window, w, h, 0, 0, 0, 80);
-		eventHandler.subscribe(levelview);
-
-		//buildings
-		mrLua.pushtable("buildings");
-
-		lua_pushnil(mrLua.LuaInstance); //start at the start
-		while (lua_next(mrLua.LuaInstance,1) != 0) //"buildings" table is at index 1 in the stack
+	// Set level width and height
+	w = mrLua.getvalue<int>("width");
+	h = mrLua.getvalue<int>("height");
+	std::cout << "level dimensions: " << w << " x " << h << std::endl;
+	
+	// Create map
+	navmap = new NavMap(w, h);
+	levelResponderMap = new ResponderMap(w, h);
+	
+	// Create levelview
+	JenniferAniston aniston(theW, TOP_LEFT, FIXED, PROPORTIONAL, 0, 0, 1, 1);
+	levelview = new LevelView(theW, aniston, levelResponderMap, &buildings, &placeables, &units, w, h);
+	responderMap.addResponder(levelview);
+	
+	// Lua: add buildings
+	mrLua.pushtable("buildings");
+	
+	lua_pushnil(mrLua.LuaInstance);					// Start at the start
+	while (lua_next(mrLua.LuaInstance, 1) != 0)		// "buildings" table is at index 1 in the stack
+	{
+		int x = mrLua.getfield<int>("x");
+		int y = mrLua.getfield<int>("y");
+		
+		Building* b = createBuilding(x, y);
+		
+		switch(mrLua.getfield<int>("type")) // Get the value returned from the top
 		{
-			int x,y; //temp. since we need these to even construct building!
-
-			//x and y
-			x = mrLua.getfield<int>("x");
-			y = mrLua.getfield<int>("y");
-
-			Building* b = createBuilding(x, y);
-
-			//type
-			switch(mrLua.getfield<int>("type")) //get the value returned from the top
-			{
-				case 1:
-					b->type = HOME;
-					break;
-				case 2:
-					b->type = BARBER;
-					break;
-				case 3:
-					b->type = PIESHOP;
-					break;
-				default:
-					b->type = DERELICT;
-					break;
-			}
-
-			//pop the table, leaving the key ready for next iteration
-			lua_pop(mrLua.LuaInstance, 1);
+			case 1:
+				b->type = Building::HOME;
+				break;
+			case 2:
+				b->type = Building::BARBER;
+				break;
+			case 3:
+				b->type = Building::PIESHOP;
+				break;
+			default:
+				b->type = Building::DERELICT;
+				break;
 		}
+		
+		lua_pop(mrLua.LuaInstance, 1);	// Pop the table, leaving key ready for next iteration
 	}
 }
 
-void Level::pause() { }
+void Level::pause() {
+	// pausery
+}
 void Level::resume(Returny *returny) {
 	if (returny->type == Returny::killer_returny)
 		game->stateFinished(this, Returny(Returny::killer_returny));
 }
-
-void Level::update()
-{
-	updateObjects();
+void Level::update() {
+	if (framecount == 60) framecount = 0;
+	if (framecount++ == 10) createUnit(rand()%w, rand()%h);		// Create a new unit every so often
+	
+	for (int i=0; i < units.size(); i++)
+		units[i]->update();					// Call update() on all TLOs
+	
 	destroyThings();	// Removed destroyed objects.
 }
-
-void Level::handleEvent(Event* event)
-{
-	// Keys
-	if (event->type == KEYPRESS) {
-		if (event->key == K_Q)
+void Level::draw() {
+	levelview->_draw();
+	uibarview->_draw();
+}
+void Level::setResolution(int _w, int _h) {
+	GameState::setResolution(_w, _h);
+	levelview->updatePosition();
+	uibarview->updatePosition();
+}
+	
+void Level::receiveEvent(Event *ev) {
+	if (ev->type == Event::SCREENEDGE_LEFT)		levelview->scroll(LEFTWARD);
+	if (ev->type == Event::SCREENEDGE_RIGHT)	levelview->scroll(RIGHTWARD);
+	if (ev->type == Event::SCREENEDGE_TOP)		levelview->scroll(UPWARD);
+	if (ev->type == Event::SCREENEDGE_BOTTOM)	levelview->scroll(DOWNWARD);
+	if (ev->type == Event::KEYPRESS) {
+		if (ev->key == Event::K_Q)
 			game->stateFinished(this, Returny(Returny::killer_returny));
-		if (event->key == K_ESC)
+		if (ev->key == Event::K_ESC)
 			game->stateFinished(this, Returny(Returny::empty_returny));
-		if (event->key == K_P)
+		if (ev->key == Event::K_P)
 			createPlaceable();
 	}
 }
 
+void Level::handleCloseEvent() {
+	GameState::handleCloseEvent();		// i.e. just quit for now
+}
+
 Unit* Level::createUnit(int atX, int atY) {
-	Unit *u = new Unit(navmap, levelview, atX, atY);
+	Unit *u = new Unit(navmap, atX, atY);
 	units.push_back(u);
-	levelview->addResponder(u);
+	levelResponderMap->addMappedObj(u);
 	std::cout << "added unit " << u << " (now " << units.size() << ")" << std::endl;
 	return u;
 }
 Building* Level::createBuilding(int atX, int atY) {
 	Building *b = new Building(atX, atY);
 	buildings.push_back(b);
-	levelview->addResponder(b);
+	levelResponderMap->addMappedObj(b);
+	responderMap.subscribeToKey(b, Event::K_L);
 	navmap->addBuilding(b);
 	std::cout << "added building " << b << " (now " << buildings.size() << ")" << std::endl;
 	return b;
 }
 void Level::createPlaceable() {
-	Placeable *p = new Placeable(navmap, levelview);
-	if (!levelview->requestPrivilegedEventResponderStatus(p)) {
+	Placeable *p = new Placeable(navmap, levelResponderMap);
+	if (!levelResponderMap->requestPrivilegedEventResponderStatus(p)) {
 		delete p;
 		return;
 	}
@@ -132,7 +170,7 @@ void Level::createPlaceable() {
 void Level::destroyThings() {
 	for (std::vector<Placeable*>::iterator i = placeables.begin(); i < placeables.end(); )
 		if ((*i)->destroyed) {
-			levelview->removeResponder(*i);
+			levelResponderMap->removeMappedObj(*i);
 			navmap->removeImpassableObject(*i);
 			delete *i;
 			i = placeables.erase(i);
@@ -140,7 +178,8 @@ void Level::destroyThings() {
 		else i++;
 	for (std::vector<Building*>::iterator i = buildings.begin(); i < buildings.end(); )
 		if ((*i)->destroyed) {
-			levelview->removeResponder(*i);
+			levelResponderMap->removeMappedObj(*i);
+			responderMap.unsubscribeFromAllKeys(*i);
 			navmap->removeImpassableObject(*i);
 			delete *i;
 			i = buildings.erase(i);
@@ -148,7 +187,7 @@ void Level::destroyThings() {
 		else i++;
 	for (std::vector<Unit*>::iterator i = units.begin(); i < units.end(); )
 		if ((*i)->destroyed) {
-			levelview->removeResponder(*i);
+			levelResponderMap->removeMappedObj(*i);
 			delete *i;
 			i = units.erase(i);
 		}
@@ -161,33 +200,36 @@ void Level::destroyAllThings() {
 	destroyThings();
 }
 
-void Level::updateObjects() {
-	if (framecount == 90) framecount = 0;
-	if (10 == framecount++) createUnit(rand()%w, rand()%h);	// Create a new unit every so often
-	
-	for (int i=0; i < units.size(); i++)
-		units[i]->update();
-}
-void Level::draw()
+
+#include "Button.hpp"
+
+LevelView::LevelView(
+	W *_theW, JenniferAniston &_aniston,
+	ResponderMap *_levelRM, std::vector<Building*> *_buildings, std::vector<Placeable*> *_placeables, std::vector<Unit*> *_units,
+	int _level_width, int _level_height
+)
+: View(_theW, _aniston),
+  levelResponderMap(_levelRM), buildings(_buildings), placeables(_placeables), units(_units),
+  level_width(_level_width), level_height(_level_height),
+  scroll_x(0), scroll_y(0)
 {
-	levelview->draw(&buildings, &placeables, &units);
-	uiview->draw();
+	gridsize = 20;		// Pixel size of a level block
 }
 
-
-LevelView::LevelView(sf::RenderWindow *_window, int _blocks_w, int _blocks_h, int _l_offset = 0, int _t_offset = 0, int _r_offset = 0, int _b_offset = 0) :
-	ScrollingView(_window, _blocks_w, _blocks_h, _l_offset, _t_offset, _r_offset, _b_offset)
-{
-	// oh hai
-}
-
-void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> *placeables, std::vector<Unit*> *units) {
-
-	// This is obviously a horrendous way to get info into the view, but the separation of View is nonetheless a structural
-	// improvement. The sane way to do it might be to pass the game map.
+void LevelView::drawMappedObj(MappedObj *obj) {
+	// Calculate position, accounting for scroll
+	int atX = (obj->x + obj->a) * gridsize - scroll_x;
+	int atY = (obj->y + obj->b) * gridsize - scroll_y;
 	
+	for (int i=0; i < obj->ground_plan.size(); i++) {
+		intcoord c = obj->ground_plan[i];
+		theW->drawRect(atX + c.x*gridsize, atY + c.y*gridsize, gridsize, gridsize, obj->col());
+	}
+}
+
+void LevelView::draw() {
 	// Draw background
-	drawRect(sf::Color(0, 0, 0, 50), 0, 0, grid_w, grid_h);
+	theW->drawRect(0, 0, width, height, BLACK);
 
 	// Draw buildings
 	for (int i=0, n = buildings->size(); i < n; i++)
@@ -200,17 +242,67 @@ void LevelView::draw(std::vector<Building*> *buildings, std::vector<Placeable*> 
 		drawMappedObj((*units)[i]);
 }
 
+void LevelView::processMouseEvent(Event *ev) {
+	// Convert event from View coordinates to grid coordinates
+	ev->x += scroll_x;
+	ev->y += scroll_y;
+	ev->a = (float) (ev->x%gridsize) / (float) gridsize;
+	ev->b = (float) (ev->y%gridsize) / (float) gridsize;
+	ev->x = ev->x / gridsize;
+	ev->y = ev->y / gridsize;
+	
+	levelResponderMap->dispatchEvent(ev);
+}
 
-#ifdef here_is_a_small_note_about_drawing_and_coordinates_why_here_you_ask_ill_get_back_to_you_on_that_one
+void LevelView::scroll(direction dir) {
+	int scrolldist = 10;
+	
+	if (dir == UPWARD)			scroll_y -= scrolldist;
+	else if (dir == DOWNWARD)	scroll_y += scrolldist;
+	else if (dir == LEFTWARD)	scroll_x -= scrolldist;
+	else if (dir == RIGHTWARD)	scroll_x += scrolldist;
+	
+	if (scroll_x < 0) scroll_x = 0;
+	if (scroll_y < 0) scroll_y = 0;
+	
+	int max_scroll_x = level_width * gridsize - width;
+	int max_scroll_y = level_height * gridsize - height;
+	if (scroll_x >= max_scroll_x) scroll_x = max_scroll_x;
+	if (scroll_y >= max_scroll_y) scroll_y = max_scroll_y;
+}
 
-Two coordinate systems:
-	block coordinates: x, y
-	floating point coords  (offset from the block): a, b
 
-Display code:
-	x, y, a, b
+UIBarView::UIBarView(W *_theW, JenniferAniston &aniston, Level *_level) :
+	View(_theW, aniston), buttonMap(width, height), level(_level)
+{
+	createplaceable_btn = new Button(this, 10, 10, 20, 20);
+	buttonMap.addResponder(createplaceable_btn);
+	buttons.push_back(createplaceable_btn);
+}
 
-Route finding:
-	x, y
+UIBarView::~UIBarView()
+{
+	
+}
 
-#endif
+void UIBarView::buttonClick(Button *btn) {
+	if (btn == createplaceable_btn)
+		level->createPlaceable();
+}
+
+void UIBarView::processMouseEvent(Event *ev) {
+	buttonMap.dispatchEvent(ev);
+}
+
+void UIBarView::draw() {
+	theW->drawRect(0, 0, width, height, BLACK);
+	for (int i=0; i < buttons.size(); i++) {
+		Button *b = buttons[i];
+		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
+	}
+}
+
+void UIBarView::updatePosition() {
+	View::updatePosition();
+	buttonMap.setSize(width, height);
+}

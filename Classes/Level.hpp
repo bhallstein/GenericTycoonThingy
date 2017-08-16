@@ -2,6 +2,7 @@
  * Level.h - Controls a level, including all the objects therein
  *
  */
+
 #ifndef LEVEL_H
 #define LEVEL_H
 
@@ -10,45 +11,49 @@
 #include <list>
 #include <string>
 
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "LuaHelper.hpp"
 #include "types.h"
-#include "NavMap.hpp"
-#include "EventResponder.hpp"
-#include "Placeable.hpp"
-#include "Building.hpp"
-#include "Unit.hpp"
-#include "View.hpp"
-#include "EventHandler.hpp"
 #include "GameState.hpp"
-#include "Game.hpp"
+#include "EventResponder.hpp"
+
+class Game;
+class W;
+class ResponderMap;
+class Button;
+class NavMap;
+class Building;
+class Placeable;
+class Unit;
 
 class LevelView;
+class UIBarView;
 
-class Level : public GameState
-{
+class Level : public GameState, public EventResponder {
 public:
-	Level(Game *, sf::RenderWindow *, std::string path);
+	Level(Game *, W *, std::string path);
 	~Level();
 	
 	// Methods
 	
-	// GameState overrides
+	// GameState function implementations
 	void reset();
 	void pause();
 	void resume(Returny *);
-	void handleEvent(Event *);
 	void update();
 	void draw();
+	void setResolution();
+
+	void handleCloseEvent();		// Will need to prompt for save, probably
+	void receiveEvent(Event *);		// Level is also an eventresponder, so can itself subscribe directly to events
+	void buttonClick(Button *);
+	
+	void setResolution(int _w, int _h);
 	
 	// Top-level-object stuff
 	Unit* createUnit(int atX, int atY);
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
-	void updateObjects();
 	void destroyThings();
 	void destroyAllThings();
 	
@@ -66,21 +71,61 @@ protected:
 	int w, h; 					// Blocks wide/tall.
 	
 	NavMap *navmap;
+	ResponderMap *levelResponderMap;
 	LevelView *levelview;
-	View *uiview;
+	UIBarView *uibarview;
 	
 	int framecount;
-
+	
 };
 
 
-class LevelView : public ScrollingView
-{
+#include "View.hpp"
+#include "JenniferAniston.hpp"
+
+class LevelView : public View {
 public:
 	// Methods
-	LevelView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
-	void draw(std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *);
+	LevelView(
+		W *, JenniferAniston &,
+		ResponderMap *_levelRM, std::vector<Building*> *, std::vector<Placeable*> *, std::vector<Unit*> *,
+		int _level_width, int _level_height
+	);
+	void draw();
+	void drawMappedObj(MappedObj *obj);	// Utility fn for drawing objects
+	void processMouseEvent(Event *);
+	void scroll(direction);
 	
+	// Properties
+	int gridsize;
+	int level_width, level_height;		// how many blocks wide/tall the level is
+	int scroll_x, scroll_y;
+	ResponderMap *levelResponderMap;
+	std::vector<Building*> *buildings;
+	std::vector<Placeable*> *placeables;
+	std::vector<Unit*> *units;
+	
+};
+
+
+#include "ButtonReceiver.hpp"
+
+class UIBarView : public View, public ButtonReceiver {
+public:
+	UIBarView(W *, JenniferAniston &, Level *);
+	~UIBarView();
+	
+	// Methods
+	void buttonClick(Button *);
+	void draw();
+	void updatePosition();
+	void processMouseEvent(Event *);
+	
+	// Properties
+	Level *level;
+	Button *createplaceable_btn;
+	std::vector<Button *> buttons;
+	ResponderMap buttonMap;
 };
 
 #endif

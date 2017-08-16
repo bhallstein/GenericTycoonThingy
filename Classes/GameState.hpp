@@ -1,5 +1,5 @@
 /*
- * GameState.hpp - abstract base class for creating State objects
+ * GameState.hpp - base class for creating State objects
  *
  * Note on pseudo-singletons:
  *  - For classes you want to ensure have only one instance, can prevent this from happening by providing a static `instances` property.
@@ -13,63 +13,43 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include <list>
+#include <map>
+#include <iostream>
 
-#include "EventHandler.hpp"
-
+#include "Event.hpp"
+#include "ResponderMap.hpp"
 
 class Game;
+class W;
 class Returny;
+class EventResponder;
 
-class GameState
-{
+class GameState {
 public:
-	GameState(Game *_game, sf::RenderWindow *_win) : game(_game), window(_win), translucent(false) { }
-	~GameState() { }
+	GameState(Game *, W *);
+	~GameState();
 	
-	// State-related virtual methods – subclasses must override
+	// State-related virtual methods - subclasses must override
 	virtual void pause() = 0;
 	virtual void resume(Returny *) = 0;
-	virtual void handleEvent(Event *) = 0;
 	virtual void update() = 0;
 	virtual void draw() = 0;
 	
-	void _handleEvent(Event *ev) {			// Wrapper for handleEvent:
-		if (ev->type == KEYPRESS)			//   This is what gets called by Game, and passes mouse events to the eventhandler.
-			handleEvent(ev);				//   Thus, a GameState subclass’s handleEvent() override only need respond to key presses.
-		else
-			eventHandler.dispatchEvent(ev);
-	}
+	void handleEvent(Event *ev);		// Send the event on, via the gamestate's responderMap
+	virtual void handleCloseEvent();	// By default, initiates the killer returny tango: override to customise
+	
+	virtual void setResolution(int _w, int _h);		// By default, calls responderMap.setSize()
 	
 	// Properties
-	bool translucent;	// Whether to draw the previous state too. Set to true for in-game menus, popovers & so on.
-
+	bool translucent;	// If true, the previous state will be drawn too. For in-game menus etc. Default: false
+	
 protected:
 	// Properties
 	Game *game;
-	sf::RenderWindow *window;
-	EventHandler eventHandler;
+	W *theW;
 	
-};
-
-
-class Returny {
-public:
-	enum returny_type { empty_returny, payload_returny, killer_returny };
-	enum returny_code {
-		no_action
-	};
-
-	Returny(returny_type _type = empty_returny, returny_code _code = no_action, std::string _payload = "") :
-		type(_type), code(_code), payload(_payload) {
-	
-	}
-
- 	returny_type type;
-	returny_code code;
-	std::string payload;
-	
+	ResponderMap responderMap;
 };
 
 #endif

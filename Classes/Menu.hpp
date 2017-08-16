@@ -1,8 +1,8 @@
 /*
  * Menu.hpp - a menu class
  * 
- * This will be a base class for specific menus.
- * Am just implementing a single menu now, to work out what it will look like.
+ * This will presumably be a base class used for creating specific menus.
+ * Just implementing a single menu now, to find out what it might entail.
  *
  */
 
@@ -11,34 +11,32 @@
 
 #include <vector>
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-
 #include "GameState.hpp"
-#include "View.hpp"
-#include "MappedObj.hpp"
-#include "Level.hpp"
+#include "EventResponder.hpp"
+#include "ButtonReceiver.hpp"
 
-
+class Game;
+class W;
+class Level;
+class Button;
 
 class MenuView;
-class Button;
-class Level;
 
-class Menu : public GameState
-{
+class Menu : public GameState, public EventResponder, public ButtonReceiver {
 public:
-	Menu(Game *, sf::RenderWindow *);
+	Menu(Game *, W *);
 	~Menu();
 	
 	// Methods
 	void reset();
 	void pause();
 	void resume(Returny *);
-	void handleEvent(Event *);
 	void update();
 	void draw();
+	void setResolution(int _w, int _h);
+	
+	void receiveEvent(Event *);
+	void buttonClick(Button *);
 	
 	void startLevel(std::string path);
 	
@@ -46,35 +44,24 @@ protected:
 	// Properties
 	MenuView *menuview;
 	std::vector<Button*> buttons;
+	Button *startlevel_btn;
 	
-	Level *level;		// This or a future LevelLoadinator will clearly one day be specific to a subclass
-	
-};
-
-
-class Button : public MappedObj
-{
-public:
-	Button(Menu *, int _x, int _y);
-	~Button();
-	
-	// Methods
-	void receiveEvent(Event *);
-	char col();
-	
-protected:
-	bool hover;
-	Menu *menu;
+	Level *level;				// This (or a future LevelLoadinator) will clearly one day be specific to a subclass
+	ResponderMap buttonMap;		// Is there a need for a View subclass which manages a RM?
 	
 };
 
 
-class MenuView : public View
-{
+#include "View.hpp"
+
+class MenuView : public View {
 public:
-	MenuView(sf::RenderWindow *, int _blocks_w, int _blocks_h, int _l_offset, int _t_offset, int _r_offset, int _b_offset);
-	void draw(std::vector<Button*> *);
+	MenuView(W *, JenniferAniston &, ResponderMap *_buttonMap, std::vector<Button*> *);
+	void draw();
+	void processMouseEvent(Event *);
 	
+	ResponderMap *buttonMap;
+	std::vector<Button *> *buttons;
 };
 
 #endif
