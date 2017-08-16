@@ -1,7 +1,11 @@
-/*// setman.h - a header for the Settings Manager, which loads external settings and processes command line arguments/parameters
-#include <string>
-#include <map>
-#include <vector>
+/*
+ * SettingsManager.h - suggest we rename this to something like DataClasses and put ’em all here
+ *
+ */
+
+
+
+/*
 //#include "pugi/pugixml.hpp" //XML Parser ;)
 #include "SettingsManager.cpp"
 

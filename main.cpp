@@ -55,7 +55,9 @@ int main(int argc, char *argv[], char *envp[])
 	
 	
 
-    while (DBT_Window.IsOpened())
+	bool should_quit = false;
+    
+	while (DBT_Window.IsOpened() && !should_quit)
     {
         sf::Event ev;
         while (DBT_Window.PollEvent(ev)) 
@@ -67,7 +69,15 @@ int main(int argc, char *argv[], char *envp[])
 			// Mouseovers: pass to underlying objects
 			// Current affairs will need to overrule: say you are dragging a member of staff across the map.
 			// How to do this unclear atm.
-			if (ev.Type == sf::Event::)
+			
+			if (ev.Type == sf::Event::KeyPressed) {
+				sf::Keyboard::Key keycode = ev.Key.Code;
+				if (keycode == sf::Keyboard::Escape)
+					should_quit = true;
+				if (keycode == 'b')
+					; // activate barbershop building
+				
+			}
         }
     
         DBT_Window.Clear(sf::Color::Black);

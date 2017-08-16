@@ -1,4 +1,0 @@
-Structure 1st
-Structure 2nd
-Structure 3rd
-Structure 4th
