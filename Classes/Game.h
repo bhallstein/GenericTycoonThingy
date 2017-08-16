@@ -6,11 +6,14 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Level.h"
-
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+
+#include "Level.h"
+#include "Event.h"
+
+#include "types.h"
 
 
 class Game
@@ -24,8 +27,8 @@ public:
 
 protected:
 	sf::RenderWindow DBTWindow;
-	int pixel_width, pixel_height;
-	
+	int w, h; 				// Blocks wide/tall
+	int block_w, block_h;	// Pixels per block
 };
 
 #endif

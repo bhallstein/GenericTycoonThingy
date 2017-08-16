@@ -9,9 +9,9 @@
 #ifndef EVENTRESPONDER_H
 #define EVENTRESPONDER_H
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+
+#include "Event.h"
 
 class EventResponder
 {
@@ -19,7 +19,7 @@ public:
 	EventResponder();
 	~EventResponder();
 	
-	virtual void receiveEvent(sf::Event *ev, EventResponder **p_e_r);
+	virtual void receiveEvent(Event *ev, EventResponder **p_e_r);
 
 protected:
 	

@@ -9,13 +9,14 @@ Game::Game()
 	/* Window setup */
 
 	// Set defaults (manually for now)
-	pixel_width = 800, pixel_height = 600;
-	std::string w_name = "Demon Barber Tycoon";
+	w = 50; h = 40;
+	block_w = 16; block_h = 15;
+	std::string window_name = "Demon Barber Tycoon";
 	
 	// Get settings from file and if success & values valid, replace defaults.
 	// ...
 	
- 	DBTWindow.Create(sf::VideoMode(pixel_width, pixel_height), w_name, sf::Style::Close);
+ 	DBTWindow.Create(sf::VideoMode(w * block_w, h * block_h), window_name, sf::Style::Close);
 	DBTWindow.SetFramerateLimit(60);
 }
 
@@ -27,51 +28,53 @@ Game::~Game()
 void Game::Run()
 {
 	// Create Level
-	int default_map_columns = 100, default_map_rows = 100;
-	Level level(default_map_columns, default_map_rows, pixel_width, pixel_height);
+	Level level(w, h);
+	
+	int pixel_w = w * block_w;
+	int pixel_h = h * block_h;
 	
 	bool should_quit = false;
 	EventResponder *privileged_event_responder = NULL; 		// All P.E.R.s must be subclasses of EventResponder, & implement 
 															// the receiveEvent(sf::Event *ev, ER *p_e_r) method
-	sf::Event ev;
+	sf::Event sf_event;
+	Event event;
     
 	while (DBTWindow.IsOpened() && !should_quit)
     {
 		/* Events */
 
-        while (DBTWindow.PollEvent(ev)) 
+        while (DBTWindow.PollEvent(sf_event))
 		{
-            // Close window : exit
-            if (ev.Type == sf::Event::Closed)
+			// Convert sf event to our own type
+			event.loadFromSFEvent(&sf_event, block_w, block_h);
+			
+			// Close window : exit
+            if (event.type == CLOSED)
 	   			DBTWindow.Close();
-	
+			
 			// If there is privileged event responder: send events to it
 			if (privileged_event_responder != NULL) {
 				// The game loop can't always know what the P.E.R. should do with the event
 				// 	– it depends on what the P.E.R. is up to. We merely send the event on.
 				EventResponder *resp = (EventResponder*) privileged_event_responder;
-				resp->receiveEvent(&ev, &privileged_event_responder);
+				resp->receiveEvent(&event, &privileged_event_responder);
 			}
+			// Eventually, we'll send events either via the memory map, or to the game UI.
 			else {
 				// Keys
-				if (ev.Type == sf::Event::KeyPressed) {
-					sf::Keyboard::Key keycode = ev.Key.Code;
-				
-					if (keycode == sf::Keyboard::Escape || keycode == sf::Keyboard::Q) {
+				if (event.type == KEYPRESS) {
+					if (event.key == K_ESC || event.key == K_Q) {
 						should_quit = true;
 					}
-					else if (keycode == sf::Keyboard::B) {
+					else if (event.key == K_B) {
 						std::cout << "creating new building... ";
-						Building *b = level.createBuilding();
-						privileged_event_responder = (EventResponder*) b;	// not sure if cast to EvResp needed here
-
-						std::cout << "adding building to memory map... ";
+						privileged_event_responder = (EventResponder*) level.createBuilding();
 					}
 				}
 				// Mouse
-				else if (ev.Type == sf::Event::MouseMoved) 
+				else if (event.type == MOUSEMOVE) // or click! 
 				{
-					// Send to relevant things, use memory mapping
+					// Send to relevant thing(s), use memory mapping
 					// get maploc for mouse location
 					// send event to each’s receiveEvent() method
 				}
@@ -83,47 +86,11 @@ void Game::Run()
 		
 		DBTWindow.Clear(sf::Color(138,43,226));		// Electric Indigo
 
-		level.draw(DBTWindow);
+		level.draw(DBTWindow, block_w, block_h);
 
         // Update the window
         DBTWindow.Display();
     }
-	
-	// Builder bill;
-	// 	Level level1(bill); //eventually need level manager to load certain levels
-	// 	int error = 0;
-	// 	bool GameOver = false;
-	// 	do
-	// 	{
-	// 		bill.actionFalse();
-	// 		bill.setMoney(m_Money);
-	// 
-	// 		cout << "Day " << m_Days << endl;
-	// 		cout << "Money: " << m_Money << endl;
-	// 		cout << "Please Enter an action.\n";
-	// 		
-	// 		char Input[256];
-	// 		cin.getline ( Input, 256, '\n' );
-	// 
-	// 		if(Input != "")
-	// 		{
-	// 			GameOver = Action(Input, bill);	
-	// 		}
-	// 		else
-	// 		{
-	// 			cout << "No command has been entered - please enter an action.\n\n";
-	// 		}
-	// 		
-	// 			
-	// 		bool action = bill.returnAction();
-	// 		if(action)
-	// 		{
-	// 			m_Money = bill.getMoney();
-	// 			GatherIncome(bill);
-	// 			m_Days++;
-	// 		}
-	// 	}
-	// 	while(!GameOver);
 
 	return;	// return error
 }
@@ -216,15 +183,3 @@ void Game::Run()
 // 		}
 // 		return GameOver;
 // }
-// 
-// void Game::GatherIncome(Builder& bill)
-// {
-// 	Structure* moo = bill.m_pBuildFarLeft;
-// 	while (moo != 0)
-// 	{
-// 		m_Money += moo->GetIncome();
-// 		moo = moo->GetRight();
-// 	}
-// }
-
-

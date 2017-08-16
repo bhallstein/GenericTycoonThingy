@@ -14,10 +14,27 @@
 #define GAMEMAP_H
 
 // #include <iostream>
-// #include <vector>
+#include <list>
+#include <vector>
 // #include <list>
-// 
-// using namespace std;
+
+#include "EventResponder.h"
+
+
+class MapLoc
+{
+public:
+	MapLoc();
+	~MapLoc();
+	
+	// Methods
+	void addObject(EventResponder *x);
+	void removeObject(EventResponder *x);
+	
+protected:
+	std::list<EventResponder*> things;
+	
+};
 
 
 class GameMap
@@ -30,12 +47,13 @@ public:
 	int w, h;
 	
 	// Methods
-	//void memmap_addObject(DrawnObject *object);
-	//void memmap_removeObject(DrawnObject *object);
+	void addObject(EventResponder *object, int atX, int atY);
+	void removeObject(EventResponder *object, int atX, int atY);
 
 protected:
-	// Memory mapped list of things at each integer location
-	//vector<MapLocation*> maplocs;
+	
+	// Properties
+	std::vector<MapLoc> maplocs;	// A [w*h]-sized array of MapLocs
 	
 };
 

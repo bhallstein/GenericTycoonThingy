@@ -1,10 +1,9 @@
 #include "Level.h"
 
-Level::Level(int _columns, int _rows, int _width, int _height)
+Level::Level(int _w, int _h)
 {
-	rows = _rows, columns = _columns;
-	block_size.x = _width/_columns;
-	block_size.y = _height/_rows;
+	// Constructor
+	w = _w, h = _h;
 }
 Level::~Level()
 {
@@ -13,20 +12,52 @@ Level::~Level()
 
 Building* Level::createBuilding()
 {
-	Building b(block_size);
+	Building b;
 	buildings.push_back(b);
 	std::cout << "created building: " << buildings.size() << std::endl;
 	return &buildings.back();
 }
 
 
-void Level::draw(sf::RenderWindow &window)
+void Level::draw(sf::RenderWindow &window, int block_width, int block_height)
 {
 	// Draw buildings
-	for (vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++) {
+	for (std::vector<Building>::iterator i = buildings.begin(); i < buildings.end(); i++) {
 		if ((*i).destroyed)
 			buildings.erase(i--);
-		else
-			(*i).draw(window);
+		else {
+			window.Draw(
+				sf::Shape::Rectangle(
+					(*i).x * block_width, (*i).y * block_height, (*i).w * block_width, (*i).h * block_height,
+					(*i).col() == 'w' ? sf::Color::White : sf::Color::Black
+				)
+			);
+		}
 	}
 }
+
+
+#ifdef here_is_a_small_note_about_drawing_and_coordinates
+
+Two coordinate systems:
+	block coordinates: x, y
+	floating point coords  (offset from the block): a, b
+
+Level:
+	w, h	blocks wide/tall: intcoord
+Drawn Object:
+	x, y	block coordinate
+	[a, b	floating point coordinate within block: floatcoord]
+
+GameMap makes x,y coords available.
+Drawn Objects make x,y & a,b coord available.
+Level makes all objects currently in play available.
+
+Display code:
+	x, y, a, b
+
+Route finding:
+	x, y
+
+
+#endif
