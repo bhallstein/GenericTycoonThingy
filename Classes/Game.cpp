@@ -1,12 +1,12 @@
 #include "Game.hpp"
 #include "Level.hpp"
 
-Game::Game(sf::RenderWindow *_window)
+Game::Game(sf::RenderWindow *_window, SettingsManager* _settings)
 {
-	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file?)
+	//point our settings property to the SettingsManager instance
+	settings = _settings;
 
-	// Get game settings
-	settings.load(false);	// false = don't load defaults
+	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file?)
 	
 	// Window setup
 	window = _window;
@@ -22,10 +22,10 @@ Game::Game(sf::RenderWindow *_window)
 	 * 2. is probably better – it enables us to consolidate settings into the game code. And it is 
 	 * more flexible: the game should be able most excellent-like to switch graphics modes on the fly.
 	 */
-	int windowStyle = (settings.setMap["Windowed"].value == "1" ? sf::Style::Close : sf::Style::Fullscreen);
+	int windowStyle = (settings->Windowed.value ? sf::Style::Close : sf::Style::Fullscreen);
 	std::string window_name = game_stage == TUTORIAL_STAGE ? "Happy Hair Tycoon" : "Demon Barber Tycoon";
- 	window->Create(sf::VideoMode(800, 600), window_name, windowStyle);
-	window->SetFramerateLimit(60);
+ 	window->Create(sf::VideoMode(settings->Screen_Width.value, settings->Screen_Height.value), window_name, windowStyle);
+	window->SetFramerateLimit(settings->FramerateLimit.value);
 }
 
 Game::~Game()
@@ -135,7 +135,7 @@ void Game::Run()
 		
 		//Updates
 		Update();
-		
+
 		// Drawing
 		Draw();
     }

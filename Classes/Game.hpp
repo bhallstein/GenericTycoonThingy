@@ -13,17 +13,17 @@
 #include <SFML/Window.hpp>
 
 #include "types.h"
-
-#include "SettingsManager.hpp"
 #include "Event.hpp"
 #include "EventHandler.hpp"
+#include "SettingsManager.hpp"
 
+//Forward Declarations
 class GameState;
 
 class Game
 {
 public:
-	Game(sf::RenderWindow *);
+	Game(sf::RenderWindow *,SettingsManager *);
 	~Game();
 
 	// Methods
@@ -37,14 +37,14 @@ public:
 	void PopState();
 
 	//Events/Update/Draw - usually passed to active State
-	void HandleEvents(Event event,sf::Event sf_event); 
+	void HandleEvents(Event,sf::Event); 
 	void Update();
 	void Draw();
 
 	bool Running() { return is_running; }
 	void Quit() { is_running = false; }
 
-	SettingsManager settings;
+	SettingsManager* settings;
 
 protected:
 	bool is_running;

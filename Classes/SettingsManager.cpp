@@ -1,23 +1,38 @@
 #include "SettingsManager.hpp"
 
-SettingsManager::SettingsManager()
+SettingsManager::SettingsManager(char* argv[])
 {
+	init(argv);
+}
+
+void SettingsManager::init(char* argv[])
+{
+	//fixed path to local settings file
+	std::string fileName = "Data/settings.xml";
+
+	//is file good?
+	//YES - load from it
+
+	//NO - loadDefaults() and write a default file for next time ;)
+	loadDefaults();
+	save(fileName);
+
+	//populate valid arguments list?
+
+	//check command line arguments against the valid list (arguments should be an object so we can assess type; only as simply as whether or not it takes a second param)?
 
 }
 
-SettingsManager::~SettingsManager()
+void SettingsManager::save(std::string fileName)
 {
-
+	//Do this later
 }
 
-int SettingsManager::load(bool defaults)
-{
-	int error = 0;
-	std::string fileName;
+	
 
-	if(!defaults) fileName = "Data/settings.xml";
-	else fileName = "Data/defaultsettings.xml";
+	
 
+/* OLD XML VERSION
 	//First load the settings.xml, and populate settings objects from here
 	// Create an empty property tree object
     using boost::property_tree::ptree;
@@ -61,55 +76,7 @@ int SettingsManager::load(bool defaults)
 			setMap[x->key] = *x;
 
 			x->~Setting(); //destroy the setting?
-		}
-	}
-
-	return error;
-	
-	// Get the filename and store it in the m_fil variable.
-    // Note that we construct the path to the value by separating
-    // the individual keys with dots. If dots appear in the keys,
-    // a path type with a different separator can be used.
-    // If the debug.filename key is not found, an exception is thrown.
-    
-	//settingsFile = pt.get<std::string>("debug.filename");
-
-    // Get the debug level and store it in the m_level variable.
-    // This is another version of the get method: if the value is
-    // not found, the default value (specified by the second
-    // parameter) is returned instead. The type of the value
-    // extracted is determined by the type of the second parameter,
-    // so we can simply write get(...) instead of get<int>(...).
-    
-	//m_level = pt.get("debug.level", 0);
-
-    // Iterate over the debug.modules section and store all found
-    // modules in the m_modules set. The get_child() function
-    // returns a reference to the child at the specified path; if
-    // there is no such child, it throws. Property tree iterators
-    // are models of BidirectionalIterator.
-    
-	/*BOOST_FOREACH(ptree::value_type &v,
-            pt.get_child("debug.modules"))
-        m_modules.insert(v.second.data());*/
-
-
-	//populate valid arguments list
-
-	//check command line arguments against the valid list (arguments should be an object so we can assess type; only as simply as whether or not it takes a second param)
-}
-
-
-//Setting class
-Setting::Setting()
-{
-
-}
-
-Setting::~Setting()
-{
-
-}
+		}*/
 
 /*
 
