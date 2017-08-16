@@ -44,23 +44,14 @@ bool Building::initialize(W *_W) {
 	}
 	lua_State *L = mrLua.LuaInstance;
 	
-	// Set Building::defaultColour
-	lua_getglobal(L, "defaultColour");			// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		_W->log("In buildings.lua, could not find defaultColour");
-		return false;
+	try {
+		// Set Building defaults
+		Building::defaultColour      = mrLua.getvalue<const char *>("defaultColour");
+		Building::defaultHoverColour = mrLua.getvalue<const char *>("defaultHoverColour");
+	} catch (MsgException &exc) {
+		std::string s = "In buildings.lua, could not get defaults. Error: "; s.append(exc.msg);
+		W::log(s.c_str());
 	}
-	Building::defaultColour = lua_tostring(L, -1);
-	lua_pop(L, 1);								// S: ~
-	
-	// Set Building::defaultHoverColour
-	lua_getglobal(L, "defaultHoverColour");		// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		_W->log("In buildings.lua, could not find defaultHoverColour");
-		return false;
-	}
-	Building::defaultHoverColour = lua_tostring(L, -1);
-	lua_pop(L, 1);								// S: ~
 	
 	// Construct Building::buildingTypes map
 	if (!mrLua.pushtable("buildingTypes")) {

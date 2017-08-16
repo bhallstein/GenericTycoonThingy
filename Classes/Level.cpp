@@ -49,16 +49,15 @@ void Level::buildLevel(std::string levelname) {
 	lua_State *L = mrLua.LuaInstance;
 
 	// Initialize TLO classes
-	if (!Building::initialize(theW))	throw MsgException("Couldn't read building info.");
-	if (!Unit::initialize(theW))		throw MsgException("Couldn't read unit info.");
-	if (!Placeable::initialize(theW))	throw MsgException("Couldn't read placeable info.");
+	if (!Building::initialize(theW))  throw MsgException("Couldn't read building info.");
+	if (!Unit::initialize(theW))      throw MsgException("Couldn't read unit info.");
+	if (!Placeable::initialize(theW)) throw MsgException("Couldn't read placeable info.");
 	
 	// Set level width and height
 	try {
 		w = mrLua.getvalue<int>("width");
 		h = mrLua.getvalue<int>("height");
-	}
-	catch (MsgException &exc) {
+	} catch (MsgException &exc) {
 		std::string s = "Couldn't get level's dimensions: ";
 		s.append(exc.msg);
 		throw MsgException(s.c_str());
@@ -77,13 +76,21 @@ void Level::buildLevel(std::string levelname) {
 	try {
 		mrLua.pushtable("allowedBuildings");
 		lua_pushnil(L);									// S: -1 nil; -2 table
+		int n = 0;
+		std::string s = "allowedBuildings: ";
 		while (lua_next(L, -2) != 0) {					// S: -1 val; -2 key; -3 table
 			if (!lua_isstring(L, -1)) continue;
 			allowedBuildings.push_back(lua_tostring(L, -1));
-			std::string s = "allowedBuildings: added "; s.append(lua_tostring(L, -1));
-			theW->log(s.c_str());
+			s.append(lua_tostring(L, -1)); s.append(", ");
 			lua_pop(L, 1);								// S: -1 key; -2 table
+			n++;
 		}
+		if (n > 0) {
+			s.erase(s.size() - 2);
+			W::log(s.c_str());
+		}
+		else
+			W::log("No building types in allowedBuildings.");
 		lua_settop(L, 0);	// S: ~
 	} catch (MsgException &exc) {
 		std::string s = "Error getting list of allowed buildings for level: ";

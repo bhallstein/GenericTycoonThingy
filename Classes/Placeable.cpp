@@ -69,32 +69,15 @@ bool Placeable::initialize(W *_W) {
 	}
 	lua_State *L = mrLua.LuaInstance;
 	
-	// Set Placeable::defaultColour
-	lua_getglobal(L, "defaultColour");				// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In placeables.lua, could not find defaultColour");
-		return false;
+	try {
+		// Set Placeable defaults
+		Placeable::defaultColour             = mrLua.getvalue<const char *>("defaultColour");
+		Placeable::defaultHoverColour        = mrLua.getvalue<const char *>("defaultHoverColour");
+		Placeable::defaultColourWhilePlacing = mrLua.getvalue<const char *>("defaultColourWhilePlacing");
+	} catch (MsgException &exc) {
+		std::string s = "In placeables.lua, could not get defaults. Error: "; s.append(exc.msg);
+		W::log(s.c_str());
 	}
-	Placeable::defaultColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Placeable::defaultHoverColour
-	lua_getglobal(L, "defaultHoverColour");			// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In placeables.lua, could not find defaultHoverColour");
-		return false;
-	}
-	Placeable::defaultHoverColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Placeable::defaultColourWhilePlacing
-	lua_getglobal(L, "defaultColourWhilePlacing");			// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In placeables.lua, could not find defaultColourWhilePlacing");
-		return false;
-	}
-	Placeable::defaultColourWhilePlacing = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
 	
 	// Construct Placeable::placeableTypes map
 	if (!mrLua.pushtable("placeableTypes")) {

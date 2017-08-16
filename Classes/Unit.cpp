@@ -136,36 +136,19 @@ bool Unit::initialize(W *_W) {
 	}
 	lua_State *L = mrLua.LuaInstance;
 	
-	// Set Unit::defaultColour
-	lua_getglobal(L, "defaultColour");				// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultColour");
-		return false;
+	try {
+		// Set Unit defaults
+		Unit::defaultColour           = mrLua.getvalue<const char *>("defaultColour");
+		Unit::defaultHoverColour      = mrLua.getvalue<const char *>("defaultHoverColour");
+		Unit::defaultColourWhenMoving = mrLua.getvalue<const char *>("defaultColourWhenMoving");
+	} catch (MsgException &exc) {
+		std::string s = "In units.lua, could not get defaults. Error: "; s.append(exc.msg);
+		W::log(s.c_str());
 	}
-	Unit::defaultColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Unit::defaultHoverColour
-	lua_getglobal(L, "defaultHoverColour");			// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultHoverColour");
-		return false;
-	}
-	Unit::defaultHoverColour = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~
-	
-	// Set Unit::defaultColourWhenMoving
-	lua_getglobal(L, "defaultColourWhenMoving");	// S: -1 value
-	if (!lua_isstring(L, -1)) {
-		W::log("In units.lua, could not find defaultColourWhenMoving");
-		return false;
-	}
-	Unit::defaultColourWhenMoving = lua_tostring(L, -1);
-	lua_pop(L, 1);									// S: ~	
 	
 	// Construct Unit::unitTypes map
 	if (!mrLua.pushtable("unitTypes")) {
-		W::log("In units.lua, could not push the unitTypes table onto the stack");
+		W::log("In units.lua, could not get the unitTypes table.");
 		return false;
 	}
 	lua_pushnil(L);									// S: -1 nil; -2 table
