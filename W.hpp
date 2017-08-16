@@ -43,7 +43,8 @@ public:
 	void startDrawing();
 	void finishDrawing();
 	void setUpDrawingForView(View *);	// Called by View::_draw(), to prepare the current view
-	void drawRect(float x, float y, float _width, float _height, const char *colour, float rot = 0);
+	void drawRect(float x, float y, float _width, float _height, const char *colour, float rot = 0, float alpha = -1);
+	void drawRect(float x, float y, float w, float h, __colour *col, float rot = 0, float alpha = 1);
 	__colour stringToColour(const char *);
 	void drawText(float x, float y, const char *col, char *text, bool rAlign = false);
 	

@@ -49,10 +49,41 @@ protected:
 
 #include "UIView.hpp"
 
+struct colour_square;
+
 class MenuView : public UIView {
 public:
-	MenuView(W *, JenniferAniston &, ResponderMap *);
+	MenuView(W *, JenniferAniston &, ResponderMap *, Menu *);
+	~MenuView();
 	void draw();
+	void processMouseEvent(Event *);
+private:
+	int *colour_squares;
+	__colour *colour_cycle_array;
+	int      colour_cycle_length;
+	
+	int framecount;
+	
+	enum _modes {
+		MNONE, MRANDOM, MSTRIPESH, MSTRIPESREV, MFADE, /*MSTRIPESD,*/ MPULSE, MTURNY, MLAST
+	} mode;
+	void switchMode();
+	void switchToRandom();
+	void switchToStripes();
+	
+	void incrementColour(int *sq, int n = 1) {
+		*sq += n;
+		if (*sq >= colour_cycle_length) *sq -= colour_cycle_length;
+	}
+	void decrementColour(int *sq, int n = 1) {
+		*sq -= n;
+		if (*sq < 0) *sq += colour_cycle_length;
+	}
+	
+	float alpha;
+	bool mrandom_prerandomised;
+	bool mr_hov;
+	Menu *menu;
 };
 
 #endif

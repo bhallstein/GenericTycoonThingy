@@ -105,9 +105,25 @@ __colour W::stringToColour(const char *s) {
 	c.alpha = streq(s, "black") ? 0.5 : 1;
 	return c;
 }
-void W::drawRect(float x, float y, float w, float h, const char *colname, float rot) {
+void W::drawRect(float x, float y, float w, float h, const char *colname, float rot, float alpha) {
 	__colour col = stringToColour(colname);
-	glColor4f(col.red, col.green, col.blue, col.alpha);
+	glColor4f(col.red, col.green, col.blue, alpha == -1 ? col.alpha : alpha);
+	
+	if (current_drawn_view != NULL)
+		x += current_drawn_view->x, y += current_drawn_view->y;
+	
+	glLoadIdentity();
+	glTranslatef(x + w/2, y + h/2, 0);
+	glRotatef(rot, 0, 0, 1);
+	glBegin(GL_QUADS);
+		glVertex2f(-w/2, -h/2);
+		glVertex2f(w/2, -h/2);
+		glVertex2f(w/2, h/2);
+		glVertex2f(-w/2, h/2);
+	glEnd();
+}
+void W::drawRect(float x, float y, float w, float h, __colour *col, float rot, float alpha) {
+	glColor4f(col->red, col->green, col->blue, alpha);
 	
 	if (current_drawn_view != NULL)
 		x += current_drawn_view->x, y += current_drawn_view->y;
@@ -136,269 +152,269 @@ void W::drawText(float x, float y, const char *colname, char *text, bool rAlign)
 		char c = text[i];
 		switch(c) {
 			case 'A' : case 'a' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x, y+2, 2, 8, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
-				drawRect(x+8, y+2, 2, 8, colname);
+				drawRect(x, y, 10, 2, colname, 0, 1);
+				drawRect(x, y+2, 2, 8, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
+				drawRect(x+8, y+2, 2, 8, colname, 0, 1);
 				break;
 			}
 			case 'B' : case 'b' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
-				drawRect(x+8, y+2, 2, 8, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
+				drawRect(x+8, y+2, 2, 8, colname, 0, 1);
 				break;
 			}
 			case 'C' : case 'c' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 7, 2, colname);
-				drawRect(x+2, y+8, 7, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 7, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 7, 2, colname, 0, 1);
 				break;
 			}
 			case 'D': case 'd' : { 
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y+2, 2, 8, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y+2, 2, 8, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case 'E' : case 'e' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 7, 2, colname);
-				drawRect(x+2, y+4, 5, 2, colname);
-				drawRect(x+2, y+8, 7, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 7, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 5, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 7, 2, colname, 0, 1);
 				break;
 			}
 			case 'F' : case 'f' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 7, 2, colname);
-				drawRect(x+2, y+4, 5, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 7, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 5, 2, colname, 0, 1);
 				break;
 			}
 			case 'G' : case 'g' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 8, 2, colname);
-				drawRect(x+2, y+8, 8, 2, colname);
-				drawRect(x+8, y+4, 2, 4, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 8, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 8, 2, colname, 0, 1);
+				drawRect(x+8, y+4, 2, 4, colname, 0, 1);
 				break;
 			}
 			case 'H' : case 'h' : { 
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
 				break;
 			}
 			case '1' : {
-				drawRect(x, y, 2, 2, colname);
+				drawRect(x, y, 2, 2, colname, 0, 1);
 			}
 			case 'I' : case 'i' : {
-				drawRect(x+2, y, 2, 10, colname);
+				drawRect(x+2, y, 2, 10, colname, 0, 1);
 				break;
 			}
 			case 'J' : case 'j' : {
-				drawRect(x+6, y, 2, 10, colname);
-				drawRect(x, y+8, 6, 2, colname);
+				drawRect(x+6, y, 2, 10, colname, 0, 1);
+				drawRect(x, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case 'K' : case 'k' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y+4, 5, 2, colname);
-				drawRect(x+7, y, 2, 4, colname);
-				drawRect(x+7, y+6, 2, 4, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y+4, 5, 2, colname, 0, 1);
+				drawRect(x+7, y, 2, 4, colname, 0, 1);
+				drawRect(x+7, y+6, 2, 4, colname, 0, 1);
 				break;
 			}
 			case 'L' : case 'l' : {
-				drawRect(x+1, y, 2, 10, colname);
-				drawRect(x+3, y+8, 6, 2, colname);
+				drawRect(x+1, y, 2, 10, colname, 0, 1);
+				drawRect(x+3, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case 'M' : case 'm' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y+2, 2, 2, colname);
-				drawRect(x+4, y+4, 2, 2, colname);
-				drawRect(x+6, y+2, 2, 2, colname);
-				drawRect(x+8, y, 2, 10, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
 				break;
 			}
 			case 'N' : case 'n' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y+2, 2, 2, colname);
-				drawRect(x+4, y+4, 2, 2, colname);
-				drawRect(x+6, y+6, 2, 2, colname);
-				drawRect(x+8, y, 2, 10, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
 				break;
 			}
 			case '0' : {
-				drawRect(x+4, y+4, 2, 2, colname);
+				drawRect(x+4, y+4, 2, 2, colname, 0, 1);
 			}
 			case 'O' : case 'o' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case 'P' : case 'p' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
-				drawRect(x+8, y, 2, 6, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 6, colname, 0, 1);
 				break;
 			}
 			case 'Q' : case 'q' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
-				drawRect(x+6, y+10, 2, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
+				drawRect(x+6, y+10, 2, 2, colname, 0, 1);
 				break;
 			}
 			case 'R' : case 'r' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
-				drawRect(x+8, y, 2, 6, colname);
-				drawRect(x+6, y+6, 2, 2, colname);
-				drawRect(x+8, y+8, 2, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 6, colname, 0, 1);
+				drawRect(x+6, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+8, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
 			case 'S' : case 's' : case '5' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x, y+4, 10, 2, colname);
-				drawRect(x, y+8, 10, 2, colname);
-				drawRect(x, y+2, 2, 2, colname);
-				drawRect(x+8, y+6, 2, 2, colname);
+				drawRect(x, y, 10, 2, colname, 0, 1);
+				drawRect(x, y+4, 10, 2, colname, 0, 1);
+				drawRect(x, y+8, 10, 2, colname, 0, 1);
+				drawRect(x, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+8, y+6, 2, 2, colname, 0, 1);
 				break;
 			}
 			case 'T' : case 't' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x+4, y+2, 2, 8, colname);
+				drawRect(x, y, 10, 2, colname, 0, 1);
+				drawRect(x+4, y+2, 2, 8, colname, 0, 1);
 				break;
 			}
 			case 'U' : case 'u' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case 'V' : case 'v' : {
-				drawRect(x, y, 2, 6, colname);
-				drawRect(x+2, y+6, 2, 2, colname);
-				drawRect(x+4, y+8, 2, 2, colname);
-				drawRect(x+6, y+6, 2, 2, colname);
-				drawRect(x+8, y, 2, 6, colname);
+				drawRect(x, y, 2, 6, colname, 0, 1);
+				drawRect(x+2, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+8, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 6, colname, 0, 1);
 				break;
 			}
 			case 'W' : case 'w' : {
-				drawRect(x, y, 2, 8, colname);
-				drawRect(x+4, y, 2, 8, colname);
-				drawRect(x+8, y, 2, 8, colname);
-				drawRect(x+2, y+8, 2, 2, colname);
-				drawRect(x+6, y+8, 2, 2, colname);
+				drawRect(x, y, 2, 8, colname, 0, 1);
+				drawRect(x+4, y, 2, 8, colname, 0, 1);
+				drawRect(x+8, y, 2, 8, colname, 0, 1);
+				drawRect(x+2, y+8, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
 			case 'X' : case 'x' : {
-				drawRect(x, y, 2, 2, colname);
-				drawRect(x+2, y+2, 2, 2, colname);
-				drawRect(x+4, y+4, 2, 2, colname);
-				drawRect(x+6, y+6, 2, 2, colname);
-				drawRect(x+8, y+8, 2, 2, colname);
-				drawRect(x+8, y, 2, 2, colname);
-				drawRect(x+6, y+2, 2, 2, colname);
-				drawRect(x+2, y+6, 2, 2, colname);
-				drawRect(x, y+8, 2, 2, colname);
+				drawRect(x, y, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+8, y+8, 2, 2, colname, 0, 1);
+				drawRect(x+8, y, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+6, 2, 2, colname, 0, 1);
+				drawRect(x, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
 			case 'Y' : case 'y' : {
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x, y, 2, 2, colname);
-				drawRect(x+2, y+2, 2, 2, colname);
-				drawRect(x+4, y+4, 4, 2, colname);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x, y, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+4, 4, 2, colname, 0, 1);
 				break;
 			}
 			case 'Z' : case 'z' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x, y+8, 10, 2, colname);
-				drawRect(x+6, y+2, 2, 2, colname);
-				drawRect(x+4, y+4, 2, 2, colname);
-				drawRect(x+2, y+6, 2, 2, colname);
+				drawRect(x, y, 10, 2, colname, 0, 1);
+				drawRect(x, y+8, 10, 2, colname, 0, 1);
+				drawRect(x+6, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+6, 2, 2, colname, 0, 1);
 				break;
 			}
 			case '2' : {
-				drawRect(x, y, 2, 4, colname);
-				drawRect(x+2, y, 8, 2, colname);
-				drawRect(x+8, y+2, 2, 2, colname);
-				drawRect(x+2, y+4, 8, 2, colname);
-				drawRect(x, y+6, 2, 4, colname);
-				drawRect(x+2, y+8, 8, 2, colname);
+				drawRect(x, y, 2, 4, colname, 0, 1);
+				drawRect(x+2, y, 8, 2, colname, 0, 1);
+				drawRect(x+8, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 8, 2, colname, 0, 1);
+				drawRect(x, y+6, 2, 4, colname, 0, 1);
+				drawRect(x+2, y+8, 8, 2, colname, 0, 1);
 				break;
 			}
 			case '3' : {
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x, y, 8, 2, colname);
-				drawRect(x, y+8, 8, 2, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x, y, 8, 2, colname, 0, 1);
+				drawRect(x, y+8, 8, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
 				break;
 			}
 			case '4' : {
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x, y, 2, 4, colname);
-				drawRect(x, y+4, 8, 2, colname);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x, y, 2, 4, colname, 0, 1);
+				drawRect(x, y+4, 8, 2, colname, 0, 1);
 				break;
 			}
 			case '6' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+2, y, 8, 2, colname);
-				drawRect(x+2, y+4, 8, 2, colname);
-				drawRect(x+2, y+8, 8, 2, colname);
-				drawRect(x+8, y+6, 2, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 8, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 8, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 8, 2, colname, 0, 1);
+				drawRect(x+8, y+6, 2, 2, colname, 0, 1);
 				break;
 			}
 			case '7' : {
-				drawRect(x, y, 10, 2, colname);
-				drawRect(x+8, y+2, 2, 2, colname);
-				drawRect(x+6, y+4, 2, 2, colname);
-				drawRect(x+4, y+6, 2, 2, colname);
-				drawRect(x+2, y+8, 2, 2, colname);
+				drawRect(x, y, 10, 2, colname, 0, 1);
+				drawRect(x+8, y+2, 2, 2, colname, 0, 1);
+				drawRect(x+6, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+4, y+6, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
 			case '8' : {
-				drawRect(x, y, 2, 10, colname);
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x+2, y, 6, 2, colname);
-				drawRect(x+2, y+4, 6, 2, colname);
-				drawRect(x+2, y+8, 6, 2, colname);
+				drawRect(x, y, 2, 10, colname, 0, 1);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x+2, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+4, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 6, 2, colname, 0, 1);
 				break;
 			}
 			case '9' : {
-				drawRect(x+8, y, 2, 10, colname);
-				drawRect(x, y, 8, 2, colname);
-				drawRect(x, y+4, 8, 2, colname);
-				drawRect(x, y+2, 2, 2, colname);
-				drawRect(x, y+8, 8, 2, colname);
+				drawRect(x+8, y, 2, 10, colname, 0, 1);
+				drawRect(x, y, 8, 2, colname, 0, 1);
+				drawRect(x, y+4, 8, 2, colname, 0, 1);
+				drawRect(x, y+2, 2, 2, colname, 0, 1);
+				drawRect(x, y+8, 8, 2, colname, 0, 1);
 				break;
 			}
 //			case '$' : {
-//				drawRect(x, y, 10, 2, colname);
-//				drawRect(x, y+4, 10, 2, colname);
-//				drawRect(x, y+8, 10, 2, colname);
-//				drawRect(x, y+2, 2, 2, colname);
-//				drawRect(x+8, y+6, 2, 2, colname);
-//				drawRect(x+4, y-1, 2, 12, colname);
+//				drawRect(x, y, 10, 2, colname, 0, 1);
+//				drawRect(x, y+4, 10, 2, colname, 0, 1);
+//				drawRect(x, y+8, 10, 2, colname, 0, 1);
+//				drawRect(x, y+2, 2, 2, colname, 0, 1);
+//				drawRect(x+8, y+6, 2, 2, colname, 0, 1);
+//				drawRect(x+4, y-1, 2, 12, colname, 0, 1);
 //				break;
 //			}
 			case MR_CURRENCY /* £ */ : {
-				drawRect(x+4, y, 6, 2, colname);
-				drawRect(x+2, y+2, 2, 2, colname);
-				drawRect(x, y+4, 8, 2, colname);
-				drawRect(x+2, y+6, 2, 4, colname);
-				drawRect(x, y+8, 10, 2, colname);
+				drawRect(x+4, y, 6, 2, colname, 0, 1);
+				drawRect(x+2, y+2, 2, 2, colname, 0, 1);
+				drawRect(x, y+4, 8, 2, colname, 0, 1);
+				drawRect(x+2, y+6, 2, 4, colname, 0, 1);
+				drawRect(x, y+8, 10, 2, colname, 0, 1);
 				break;
 			}
 			case ':' : {
-				drawRect(x+2, y+4, 2, 2, colname);
-				drawRect(x+2, y+8, 2, 2, colname);
+				drawRect(x+2, y+4, 2, 2, colname, 0, 1);
+				drawRect(x+2, y+8, 2, 2, colname, 0, 1);
 				break;
 			}
 			default: break;

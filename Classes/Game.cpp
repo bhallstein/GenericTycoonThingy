@@ -5,7 +5,7 @@
 
 Game::Game(W *_theW) : theW(_theW), resume(false), finishedIntro(false)
 {
-	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file)
+//	int game_stage = DEMON_STAGE;	// Should be a setting or otherwise disk-saved (perhaps in its own file)
 	
 	settings = new SettingsManager(theW);
 	if (settings->fullscreen.value)	{ }	// The value of this somehow seems to be getting *randomly generated* at
