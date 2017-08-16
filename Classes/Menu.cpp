@@ -80,6 +80,6 @@ void MenuView::draw() {
 		Button *b = buttons[i];
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}
-	theW->drawText(186, 340, "black", "Welcome to Generic Tycoon Thingy");
-	theW->drawText(308, 380, "white", "Click to begin");
+	theW->drawText(186, 340, "black", (char *) "Welcome to Generic Tycoon Thingy");
+	theW->drawText(308, 380, "white", (char *) "Click to begin");
 }

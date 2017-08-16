@@ -28,7 +28,7 @@ struct furnishingInfo {
 
 class Furnishing : public MappedObj, public BehaviourParticipant {
 public:
-	Furnishing(ResponderMap *, NavMap *, const char *_type, Building *);
+	Furnishing(ResponderMap *, NavMap *, const char *_type, Level *, Building *);
 	~Furnishing();
 	
 	// Properties
@@ -49,8 +49,7 @@ public:
 	static bool initialize(W *);	// Populate our static furnishingTypes map from furnishing.lua
 	static bool initialized;
 
-	// UnitInfo gets
-	static int getFurnishingCost(std::string); //lookup a FurnishingInfo cost from furnishingTypes
+	static int costForType(const char *);
 protected:
 	std::string *f_colour;
 	std::string *f_hoverColour;
@@ -61,6 +60,9 @@ protected:
 	NavMap *navmap;
 	Building *contextBuilding;
 	int animFrames, animationDuration;
+
+	Level *level;
+	bool purchased;
 	
 	// Static members
 	static std::map<std::string, struct furnishingInfo> furnishingTypes;	// e.g. "barber's chair" => struct unitInfo { }

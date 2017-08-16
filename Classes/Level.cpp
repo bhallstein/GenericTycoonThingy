@@ -291,8 +291,8 @@ void Level::receiveEvent(Event *ev) {
 		if (ev->key == Event::K_S)   createFurnishing("sofa");
 	}
 	else if (ev->type == Event::BUTTONCLICK) {
-		if (ev->payload == "open hiring ui view") openHiringView();
-		else if (ev->payload == "close hiring ui view")               closeHiringView();
+		if (ev->payload == "open hiring ui view")                      openHiringView();
+		else if (ev->payload == "close hiring ui view")                closeHiringView();
 		else if (ev->payload == "close furnishing purchasing ui view") closeFurnishingPurchasingView();
 		else if (ev->payload == "hire staff") hireStaff("staff");
 		else if (ev->payload == "buy furnishing barberschair") purchaseFurnishing("barberschair");
@@ -338,7 +338,7 @@ Building* Level::createBuilding(int atX, int atY, const char *type, std::vector<
 	return NULL;
 }
 Furnishing* Level::createFurnishing(const char *type) {
-	Furnishing *f = new Furnishing(levelResponderMap, navmap, type, currentlyEditedBuilding);
+	Furnishing *f = new Furnishing(levelResponderMap, navmap, type, this, currentlyEditedBuilding);
 	if (f->init(-100, -100)) {
 		furnishings.push_back(f);
 		std::cout << "added furnishing " << f << " (now " << furnishings.size() << ")" << std::endl;
@@ -352,13 +352,13 @@ Behaviour* Level::createBehaviour(const char *_type) {
 	return bhvr;
 }
 void Level::purchaseFurnishing(const char *type) {
-	if (chargePlayer(Furnishing::getFurnishingCost(type)))
+	if (Furnishing::costForType(type) <= money)
 		createFurnishing(type);
 	else
 		std::cout << "not enough money to buy a " << type << std::endl;
 }
 void Level::hireStaff(const char *type) { 
-	if(chargePlayer(Unit::getUnitHireCost(type)))
+	if(Unit::hireCostForType(type) <= money)
 		createUnit(0, 0, type);
 	else
 		std::cout << "not enough money to hire a " << type << std::endl;

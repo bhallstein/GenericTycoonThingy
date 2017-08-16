@@ -4,15 +4,16 @@
 #include "Building.hpp"
 #include "NavMap.hpp"
 #include "Unit.hpp"
+#include "Level.hpp"
 
 std::map<std::string, struct furnishingInfo> Furnishing::furnishingTypes;
 std::string Furnishing::defaultColour;
 std::string Furnishing::defaultHoverColour;
 bool Furnishing::initialized = false;
 
-Furnishing::Furnishing(ResponderMap *_rm, NavMap *_navmap, const char *_type, Building *_context) :
-	MappedObj(_rm, true), navmap(_navmap), type(_type), contextBuilding(_context),
-	animationFinished(false)
+Furnishing::Furnishing(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, Building *_context) :
+	MappedObj(_rm, true), navmap(_navmap), type(_type), level(_level), contextBuilding(_context),
+	animationFinished(false), purchased(false)
 {
 	// Set properties for this Furnishing type
 	groundplan             = furnishingTypes[type].groundplan;
@@ -68,6 +69,10 @@ void Furnishing::finalizePlacement() {
 	navmap->addImpassableObject(this);
 	if (contextBuilding)
 		contextBuilding->addFurnishing(this);
+	if (!purchased) {
+		level->chargePlayer(Furnishing::costForType(type.c_str()));
+		purchased = true;
+	}
 }
 
 const char * Furnishing::col() {
@@ -227,6 +232,6 @@ bool Furnishing::initialize(W *_W) {
 	Furnishing::initialized = true;
 	return true;
 }
-int Furnishing::getFurnishingCost(std::string _furnishingKey) {
-	return furnishingTypes[_furnishingKey].cost;
+int Furnishing::costForType(const char *_type) {
+	return furnishingTypes[_type].cost;
 }

@@ -84,7 +84,7 @@ void ScoreView::draw() {
 		theW->drawRect(b->x, b->y, b->width, b->height, b->col());
 	}*/
 	if(victory)
-		theW->drawText(180, 180, "green", "YOU WIN!");
+		theW->drawText(180, 180, "green", (char*)"YOU WIN!");
 	else
-		theW->drawText(180, 180, "red", "YOU LOSE!");
+		theW->drawText(180, 180, "red", (char*)"YOU LOSE!");
 }

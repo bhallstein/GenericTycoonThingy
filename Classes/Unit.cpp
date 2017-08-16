@@ -12,7 +12,7 @@ bool Unit::initialized = false;
 
 Unit::Unit(ResponderMap *_rm, NavMap *_navmap, const char *_type, Level *_level, bool _placeableMode) :
 	MappedObj(_rm, _placeableMode), navmap(_navmap), type(_type), level(_level),
-	contextBuilding(NULL), hover(false), mode(IDLE)
+	contextBuilding(NULL), hover(false), mode(IDLE), hired(false)
 {
 	intcoord c = {0,0};
 	groundplan.push_back(c);
@@ -37,6 +37,10 @@ void Unit::finalizePlacement() {
 	if (placeableMode && u_isStaff) {
 		if (Building *b = level->buildingAtLocation(x, y))
 			b->addStaff(this), contextBuilding = b;
+		if (!hired) {
+			level->chargePlayer(Unit::hireCostForType(type.c_str()));
+			hired = true;
+		}
 	}
 	prev_x = x, prev_y = y;
 }
@@ -256,8 +260,8 @@ bool Unit::initialize(W *_W) {
 	Unit::initialized = true;
 	return true;
 }
-int Unit::getUnitHireCost(std::string _unitKey) {
-	return unitTypes[_unitKey].hireCost;
+int Unit::hireCostForType(const char *_type) {
+	return unitTypes[_type].hireCost;
 }
 
 void Unit::printDebugInfo() {

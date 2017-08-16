@@ -60,8 +60,8 @@ public:
 	
 	std::string nextBehaviour;
 
-	// UnitInfo gets
-	static int getUnitHireCost(std::string); //lookup a unitInfo hireCost from unitTypes
+	static int hireCostForType(const char *);
+
 protected:
 	enum Mode {
 		WAITING,	// Waiting always precedes voyaging?
@@ -88,6 +88,8 @@ protected:
 	std::vector<std::string>* getCompatibleBehaviours();
 	bool u_isStaff;
 	int u_hireCost;
+	
+	bool hired;
 	
 	NavMap *navmap;
 	std::vector<NavNode *> route;
