@@ -86,6 +86,11 @@ void View::_acceptEvent(Event *ev) {
 	if (ev->x < 0 || ev->x >= blocks_w || ev->y < 0 || ev->y >= blocks_h)
 		return;
 
+	if (privileged_event_responder != NULL) {
+		privileged_event_responder->receiveEvent(ev);
+		return;
+	}
+
 	acceptEvent(ev);
 }
 void View::acceptEvent(Event *ev) {

@@ -93,7 +93,7 @@ public:
 	
 protected:
 	
-	int block_size_x, block_size_y;		// Subclasses should override. Default is 16.
+	int block_size_x, block_size_y;		// Subclasses should override. Default is 20.
 	int scroll_x, scroll_y;
 	
 };
