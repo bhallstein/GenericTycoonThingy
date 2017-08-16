@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Level.hpp"
 
 Game::Game(sf::RenderWindow *_window)
 {
@@ -32,52 +33,114 @@ Game::~Game()
 	
 }
 
+void Game::Cleanup()
+{
+	// cleanup all the states
+	while ( !states.empty() ) {
+		states.back()->Cleanup();
+		states.pop_back();
+	}
+}
+
+//Events/Update/Draw - usually passed to active State
+void Game::HandleEvents(Event event,sf::Event sf_event)
+{
+	event.loadFromMousePos(sf::Mouse::GetPosition(*window));					
+	if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
+		eventHandler.dispatchEvent(&event);										
+		
+	while (window->PollEvent(sf_event)) {
+		event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
+			
+		// Close window : exit
+		if (event.type == CLOSED)
+		{
+			window->Close();
+			Quit();
+		}
+
+		//Let the active GameState handle anything else :)
+		states.back()->HandleEvents(this,&event);
+	}
+}
+
+void Game::Update()
+{
+	//let the current active state perform updates
+	states.back()->Update(this);
+}
+void Game::Draw()
+{
+	//Clear screen
+	window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
+
+	//let the current active state draw
+	states.back()->Draw(this);
+
+	//Display shizzle
+	window->Display();	// Refresh the window
+}
+
+void Game::ChangeState(GameState* state) 
+{
+	// cleanup the current state
+	if ( !states.empty() ) {
+		states.back()->Cleanup();
+		states.pop_back();
+	}
+
+	// store and init the new state
+	states.push_back(state);
+	states.back()->Init(window, &eventHandler);
+}
+
+void Game::PushState(GameState* state)
+{
+	// pause current state
+	if ( !states.empty() ) {
+		states.back()->Pause();
+	}
+
+	// store and init the new state
+	states.push_back(state);
+	states.back()->Init(window, &eventHandler);
+}
+
+void Game::PopState()
+{
+	// cleanup the current state
+	if ( !states.empty() ) {
+		states.back()->Cleanup();
+		states.pop_back();
+	}
+
+	// resume previous state
+	if ( !states.empty() ) {
+		states.back()->Resume();
+	}
+}
+
 void Game::Run()
 {
-	// Create Level
-	Level level("Data/level1.xml", window, &eventHandler);
-	
-	bool should_quit = false;
+	//Switch to Level State
+	ChangeState(Level::Instance());
 
 	sf::Event sf_event;
 	Event event;
 
-	while (window->IsOpened() && !should_quit)
+	while (Running())
     {
 		// Events
-		event.loadFromMousePos(sf::Mouse::GetPosition(*window));					
-		if (event.x > 0 && event.x < window->GetWidth() && event.y > 0 && event.y < window->GetHeight())
-			eventHandler.dispatchEvent(&event);										
+		HandleEvents(event,sf_event);
 		
-		while (window->PollEvent(sf_event)) {
-			event.loadFromSFEvent(&sf_event);		// Convert sfml event to our own type
-			
-			// Close window : exit
-		    if (event.type == CLOSED)
-				window->Close();
-			
-			// Keys
-			if (event.type == KEYPRESS) {
-				if (event.key == K_ESC || event.key == K_Q)
-					should_quit = true;
-				else if (event.key == K_P)
-					level.createPlaceable();
-			}
-			
-			// Mouse events sent via eventhandler
-			if (event.type == MOUSEMOVE) ;				// Ignore actual mouse moves
-			eventHandler.dispatchEvent(&event);
-		}
-		
-		level.updateObjects();
-		level.destroyThings();	// Removed destroyed objects.
+		//Updates
+		Update();
 		
 		// Drawing
-		window->Clear(sf::Color(138,43,226));		// Electric Indigo, bitches
-		level.draw();
-        
-        window->Display();	// Refresh the window
+		Draw();
     }
 
-	return;	// error?
+	//We left the game loop
+	Cleanup();
+
 }

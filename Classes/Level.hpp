@@ -26,6 +26,8 @@
 #include "Unit.hpp"
 #include "View.hpp"
 #include "EventHandler.hpp"
+#include "GameState.hpp"
+#include "Game.hpp"
 
 using boost::property_tree::ptree;
 
@@ -39,23 +41,33 @@ public:
 	
 };
 
-class Level
+class Level : public GameState
 {
 public:
-	Level(std::string fileName, sf::RenderWindow *_window, EventHandler *);
-	~Level();
-
 	// Methods
-	void draw();
-
 	Unit* createUnit(int atX, int atY);
 	Building* createBuilding(int atX, int atY);
 	void createPlaceable();
 	
+	//Update Methods
 	void updateObjects();
-	
 	void destroyThings();
 	void destroyAllThings();
+
+	//GameState Methods
+	void Init(sf::RenderWindow *_window, EventHandler *);
+	void Cleanup();
+
+	void Pause();
+	void Resume();
+
+	void HandleEvents(Game* g,Event* event);
+	void Update(Game* g);
+	void Draw(Game* g);
+
+	static Level* Instance() {
+		return &level_instance;
+	}
 	
 	// Properties
 	int columns, rows;
@@ -64,7 +76,8 @@ public:
 	std::vector<Unit*> units;
 
 protected:
-	
+	Level() { } //Singleton Constructor
+
 	// Methods
 	ptree readLevel(std::string fileName);
 	void buildLevel(ptree level_tree);
@@ -76,11 +89,12 @@ protected:
 	
 	NavMap *navmap;
 	LevelView *levelview;
-	View uiview;
+	//View uiview;
 	
+	int framecount;
 
-	int framecount;	
-
+private:
+	static Level level_instance;
 };
 
 #endif
