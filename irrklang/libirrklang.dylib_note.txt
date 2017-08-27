@@ -1,0 +1,3 @@
+NB: For compatibility with dyld's expectations, this copy of irrklang has been updated like so:
+
+  install_name_tool -id "@executable_path/../Frameworks/libirrklang.dylib" libirrklang.dylib 

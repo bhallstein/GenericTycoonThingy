@@ -28,7 +28,7 @@ struct MrPaths::init {
 	init() {
 		using std::string;
 #ifdef __APPLE__
-		// Log path
+		// Desktop path
 		char path[MRPATHS_MAX_PATH] = "";
 		[NSHomeDirectory() getCString:path maxLength:MRPATHS_MAX_PATH encoding:NSUTF8StringEncoding];
 		desktopPath = string(path) + "/Desktop/";

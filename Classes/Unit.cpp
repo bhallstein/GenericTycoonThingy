@@ -164,7 +164,7 @@ void Unit::placementLoopUpdate() {
 }
 void Unit::placementLoopCancelled() {
 	if (typeInfo->isStaff) {
-		// If were hiring a staff unit: destroy the object
+		// If we're hiring a staff unit: destroy the object
 		if (!hired) destroy();
 	}
 	// Otherwise, put the unit back where we found it

@@ -21,7 +21,9 @@
 #include "PlaceableManager.hpp"
 #include "Serializable.hpp"
 
-class W::NavMap;
+namespace W {
+	class NavMap;
+}
 
 class SpawnPoint : public PlaceableManager {
 public:

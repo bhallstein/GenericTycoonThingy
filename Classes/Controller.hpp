@@ -13,7 +13,7 @@
 /*
  * Controller.hpp
  *
- * A Controller issues tasks to  Units and Furnishings for its own devious
+ * A Controller issues tasks to Units and Furnishings for its own devious
  * aims & purposes
  *
  */

@@ -2,7 +2,7 @@
  * Generic Tycoon Thingy
  *
  * =================
- *  Buliding.cpp
+ *  Building.cpp
  * =================
  *
  * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
