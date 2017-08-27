@@ -15,9 +15,6 @@
 
 #include "W.h"
 
-#include "Unit.hpp"
-#include "Furnishing.hpp"
-
 class LevelView : public W::View {
 public:
 	LevelView();

@@ -13,6 +13,17 @@ mapData = {
 	width = 55,
 	height = 45,
 	
+	buildings = {
+		{
+			rct = {
+				position = { x=0,y=0,a=0,b=0 },
+			},
+			uid = 348756,
+			type = "shop",
+			destroyed = false,
+		}
+	},
+	
 	units = {
 		{
 			destroyed = false,

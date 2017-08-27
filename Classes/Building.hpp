@@ -13,15 +13,7 @@
 /*
  * Building.hpp
  * 
- * Buildings are slightly different from the other TLOs. They aren’t really
- * first-class game objects in their own right, but just loose collections
- * of other objects on the map, for convenience.
- *
- * Therefore, a Building does not “own” anything, nor is it updated. It is
- * just a receptacle for other things -- a helper class for letting LevelMap
- * discern the rules by which the “true” top-level objects interact.
- * 
- * Building is, however, a TLO subclass, since Buildings are saved in levels
+ * Building is a TLO subclass, since Buildings are saved in levels
  * and hence need to be serializable.
  *
  */
@@ -48,25 +40,45 @@ struct buildingInfo {
 
 class Building : public TLO {
 public:
-	Building(LevelState *, LevelMap *, LevelView *, W::NavMap *, const char *_type, std::vector<W::rect> *_plan, W::position &);
+	Building(LevelState *, LevelMap *, LevelView *, W::NavMap *);
 	~Building();
+	void _setUp();
+		// See note in Unit.hpp on creation & setup
 	
-	// Properties
-	std::string type;
-	struct buildingInfo *bInfo;
-	
-	// Methods
-	W::EventPropagation::T mouseEvent(W::Event *);
 	void update() { }
 	
 	static bool initialize();
-	
-protected:
-	
-	static std::map<std::string, buildingInfo*> buildingTypeInfo;
 	static bool initialized;
 	
-	static std::vector<std::map<Furnishing*, Unit*>::iterator> _ind_array;
+	void setPos(const W::position &);
+	
+protected:
+	// Serialization
+//	virtual void getSDs(sdvec &vec) {
+//		TLO::getSDs(vec);
+//		vec.push_back(&Building::sd);
+//	}
+//	static serialization_descriptor sd;
+	
+	// Type info
+	struct buildingInfo *typeInfo;
+	static std::map<std::string, buildingInfo*> buildingTypeInfo;
+	
+	// Drawing
+	class DrawnBuilding;
+	DrawnBuilding *drawnBuilding;
+};
+
+
+class Building::DrawnBuilding {
+public:
+	DrawnBuilding(LevelView *, const W::position &);
+	~DrawnBuilding();
+	void setPosn(const W::position &);
+//	void setOpac(float);
+private:
+	W::DRect *r;
+	LevelView *lv;
 };
 
 #endif

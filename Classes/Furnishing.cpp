@@ -57,7 +57,7 @@ Furnishing::Furnishing(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap
 	purchased(false)
 {
 	rct.sz = W::size(2,2);
-	// Create DrawnFurnishing
+
 	drawnFurnishing = new DrawnFurnishing(levelView);
 	drawnFurnishing->setPosn(rct.pos);
 	
@@ -78,16 +78,14 @@ Furnishing::~Furnishing()
 }
 
 void Furnishing::_setUp() {
-	using std::string;
-	
-	if (type == NO_TYPE)
+	if (type == NO_TYPE) {
 		throw W::Exception("setUp() called on Furnishing with type NO_TYPE. Call setType() or deserialize first.");
+	}
 	
 	// Set typeInfo pointer
-	std::map<string,furnishingInfo*>::iterator it = furnishingTypeInfo.find(type);
+	auto it = furnishingTypeInfo.find(type);
 	if (it == furnishingTypeInfo.end()) {
-		string msg = string("Info for furnishing type \"") + type + "\" not found";
-		throw W::Exception(msg);
+		throw W::Exception(std::string("Info for furnishing type \"") + type + "\" not found");
 	}
 	typeInfo = Furnishing::furnishingTypeInfo[type];
 	

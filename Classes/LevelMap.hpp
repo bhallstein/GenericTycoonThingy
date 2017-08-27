@@ -23,9 +23,11 @@
 class LevelState;
 class LevelView;
 class TLO;
-class Unit;
 class Furnishing;
+class Building;
+class Unit;
 class SpawnPoint;
+
 
 class LevelMap {
 public:
@@ -41,11 +43,13 @@ public:
 	int width() { return mapSize.width; }
 	int height() { return mapSize.height; }
 	
-	Furnishing* createFurnishing(bool placeableMode, const std::string &type, const W::position &pos = W::position());
+	Furnishing* createFurnishing(bool placeableMode, const std::string &type, const W::position &pos);
 	Furnishing* createFurnishing(LuaObj &);
-	Unit* createUnit(bool placeableMode, const std::string &type, const W::position &pos = W::position());
+	Building* createBuilding(const std::string &type, const W::position &pos);
+	Building* createBuilding(LuaObj &);
+	Unit* createUnit(bool placeableMode, const std::string &type, const W::position &pos);
 	Unit* createUnit(LuaObj &);
-	SpawnPoint* createSpawnPoint(bool placeableMode, const W::position &pos = W::position());
+	SpawnPoint* createSpawnPoint(bool placeableMode, const W::position &pos);
 	SpawnPoint* createSpawnPoint(LuaObj &);
 	Controller* createController(const std::string &type, bool active = true);
 	Controller* createController(LuaObj &, bool active = true);
@@ -65,6 +69,7 @@ private:
 	tloVec furnishings;
 	tloVec spawnPoints;
 	tloVec controllers;
+	tloVec buildings;
 	tloVec inactiveControllers;
 	
 	void updateTLOVec(tloVec &);

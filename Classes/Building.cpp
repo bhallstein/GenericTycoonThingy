@@ -26,51 +26,62 @@ buildingInfo::buildingInfo(LuaObj &o) {
 	l = &o["allowedFurnishings"];
 	for (LuaObj::_descendantmap::iterator it = l->descendants.begin(); it != l->descendants.end(); ++it) {
 		LuaObj &d = it->second;
-		if (!d.isString()) throw W::Exception("Error creating buildingInfo: allowedFurnishing entries must be strings");
+		if (!d.isString()) throw W::Exception("Error creating buildingInfo: allowedBuilding entries must be strings");
 		allowedFurnishings.push_back(d.str_value);
 	}
 }
 
 
-/* Building impl */
+/* Building: static properties */
 
 std::map<std::string, buildingInfo*> Building::buildingTypeInfo;
+//Serializable::serialization_descriptor Building::sd;
 bool Building::initialized = false;
-std::vector<std::map<Furnishing*, Unit*>::iterator> Building::_ind_array;
 
-Building::Building(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, const char *_type, std::vector<W::rect> *_plan, W::position &_pos) :
-	TLO(_ls, _lm, _lv, _nm),
-	type(_type)
+
+/*** Building ***/
+
+Building::Building(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+	TLO(_ls, _lm, _lv, _nm)
 {
-	rct.setPos(_pos);
-//	bInfo = &Building::buildingTypes[type];	// Save ptr to properties for this building type
+	drawnBuilding = new DrawnBuilding(levelView, W::position());
 	
-	W::Messenger::subscribeInView(levelView, W::EventType::LMouseDown, W::Callback(&Building::mouseEvent, this), &rct);
-	
-	if (!navmap->isPassableUnder(rct))
-		throw W::Exception("Navmap was not passable under Building plan.");
-	navmap->isolate(rct);
+//	if (!navmap->isPassableUnder(rct)) {
+//		throw W::Exception("Navmap was not passable under Building plan.");
+//	}
 }
 Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
 	navmap->unisolate(rct);		// NOTE: W::NavMap::unisolate() is not yet functional
-	W::Messenger::unsubscribeInView(levelView, W::EventType::LMouseDown, this);
+	delete drawnBuilding;
 }
 
-W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
-	using namespace W::EventType;
-	if (ev->type == LMouseDown) {
-		std::cout << "Building " << this << " lmousedown\n";
-//		level->openFurnishingPurchasingView(this);
+void Building::_setUp() {
+	if (type == NO_TYPE) {
+		throw W::Exception("setUp() called on Building with type NO_TYPE. Call setType() or deserialize first.");
 	}
-	return W::EventPropagation::ShouldContinue;
+	
+	// Set typeInfo pointer
+	auto it = buildingTypeInfo.find(type);
+	if (it == buildingTypeInfo.end()) {
+		throw W::Exception(std::string("Info for building type \"") + type + "\" not found");
+	}
+	typeInfo = Building::buildingTypeInfo[type];
+	
+	// Perform set-up for buildings constructed programmatically
+	if (!deserialized) {
+		// ...
+	}
+	
+	// Set up state of DrawnFurnishing
 }
+
 
 bool Building::initialize() {
 	if (Building::initialized) return true;
-		
-	// 1. Get furnishingTypeInfo LuaObj
+	
+	// 1. Get buildingTypeInfo LuaObj
 	
 	std::string path = MrPaths::resourcesPath + "Data/Object info/buildings.lua";
 	lua_State *L;
@@ -93,4 +104,27 @@ bool Building::initialize() {
 
 	Building::initialized = true;
 	return true;
+}
+
+void Building::setPos(const W::position &_pos) {
+	rct.pos = _pos;
+	drawnBuilding->setPosn(_pos);
+}
+
+
+
+// DrawnBuilding impl
+
+Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, const W::position &_pos) : lv(_lv)
+{
+	r = new W::DRect(
+		_lv, _pos, _lv->convertGridToPixelCoords(W::size(5,3)), W::Colour::TransparentBlack
+	);
+}
+Building::DrawnBuilding::~DrawnBuilding()
+{
+	delete r;
+}
+void Building::DrawnBuilding::setPosn(const W::position &_pos) {
+	r->setPos(lv->convertGridToPixelCoords(_pos));
 }

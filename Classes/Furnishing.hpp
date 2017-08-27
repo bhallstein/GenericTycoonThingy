@@ -44,8 +44,6 @@ public:
 	
 	static int costForType(const char *);
 	
-	class DrawnFurnishing;
-	
 protected:
 	bool purchased;
 	
@@ -68,6 +66,7 @@ protected:
 	static std::map<std::string, furnishingInfo*> furnishingTypeInfo;
 	
 	// Drawing
+	class DrawnFurnishing;
 	DrawnFurnishing *drawnFurnishing;
 };
 

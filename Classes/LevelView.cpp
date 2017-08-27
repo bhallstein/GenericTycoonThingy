@@ -11,7 +11,6 @@
  */
 
 #include "LevelView.hpp"
-#include "Unit.hpp"
 
 /********************************/
 /*** LevelView implementation ***/

@@ -15,6 +15,9 @@
 #include "TLO.hpp"
 #include "LuaObj.h"
 #include "SpawnPoint.hpp"
+#include "Unit.hpp"
+#include "Furnishing.hpp"
+#include "Building.hpp"
 
 LevelMap::LevelMap(LevelState *_ls, LevelView *_lv) :
 	levelState(_ls),
@@ -29,14 +32,16 @@ LevelMap::~LevelMap()
 }
 
 void LevelMap::update() {
+	updateTLOVec(spawnPoints);
 	updateTLOVec(units);
 	updateTLOVec(furnishings);
 	updateTLOVec(controllers);
+	updateTLOVec(buildings);
 }
 
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_U) createUnit(true, "customer");
-	else if (ev->key == W::KeyCode::_F) createFurnishing(true, "barberschair");
+	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::position());
+	else if (ev->key == W::KeyCode::_F) createFurnishing(true, "barberschair", W::position());
 	return W::EventPropagation::ShouldContinue;
 }
 
@@ -109,6 +114,14 @@ bool LevelMap::load(LuaObj &mapData) {
 	d = &inactiveControllersObj.descendants;
 	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
 		createController(it->second, false);
+	
+	// Get buildings
+	LuaObj &buildingsObj = mapData["buildings"];
+	if (buildingsObj.isTable()) {
+		d = &buildingsObj.descendants;
+		for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+			createBuilding(it->second);
+	}
 	
 	return loaded = true;
 }
@@ -189,6 +202,21 @@ Furnishing* LevelMap::createFurnishing(LuaObj &o) {
 	}
 	return f;
 }
+Building* LevelMap::createBuilding(const std::string &type, const W::position &pos) {
+	Building *b = new Building(levelState, this, levelView, navmap);
+	b->setType(type);
+	b->setUp();
+	b->setPos(pos);
+	return b;
+}
+Building* LevelMap::createBuilding(LuaObj &o) {
+	Building *b = new Building(levelState, this, levelView, navmap);
+	b->deserialize(o);
+	b->setUp();
+	buildings.push_back(b);
+	return b;
+}
+
 Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W::position &pos) {
 	Unit *u = new Unit(levelState, this, levelView, navmap, placeableMode);
 	u->setType(type);
