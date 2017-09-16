@@ -58,6 +58,8 @@ Unit::Unit(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool 
 	// Create DrawnUnit
 	drawnUnit = new DrawnUnit(levelView);
 	drawnUnit->setPosn(rct.pos);
+
+	W::Messenger::subscribeInView(levelView, W::EventType::LMouseUp, W::Callback(&Unit::mouseEvent, this), &rct);
 }
 Unit::~Unit()
 {
@@ -71,12 +73,13 @@ Unit::~Unit()
 	delete drawnUnit;
 }
 void Unit::_setUp() {
-	if (type == NO_TYPE)
+	if (type == NO_TYPE) {
 		throw W::Exception("setUp() called on Unit with type NO_TYPE. Call setType() or deserialize first.");
+	}
 	
 	// Set typeInfo pointer
 	using std::string;
-	std::map<string,unitInfo*>::iterator it = unitTypeInfo.find(type);
+	auto it = unitTypeInfo.find(type);
 	if (it == unitTypeInfo.end()) {
 		string msg = string("Info for unit type \"") + type + "\" not found";
 		throw W::Exception(msg);
@@ -94,15 +97,22 @@ void Unit::_setUp() {
 
 W::EventPropagation::T Unit::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
-	
-	W::EventPropagation::T v = W::EventPropagation::ShouldStop;
 
-	if (mode == UnitMode::ANIMATING) return v;
+	auto v = W::EventPropagation::ShouldStop;
+
+	if (mode == UnitMode::ANIMATING) { return v; }
 //	if      (ev->type == LV_MOUSEMOVE) { /* hover = true; */ }
 //	else if (ev->type == LV_LEFTMOUSEDOWN) printDebugInfo();
-//	else if (ev->type == LV_RIGHTMOUSEDOWN) {
-//		if (typeInfo->isStaff) pickUp();
-//	}
+	else if (ev->type == LMouseUp) {
+		if (typeInfo->isStaff) {
+			// Dispatch interrupt event (used by controller)
+			W::Event ev_interrupt(W::EventType::INTERRUPT_UNITPICKUP);
+			ev_interrupt._payload = this;
+			W::Messenger::dispatchEvent(&ev_interrupt);
+			
+			pickUp();
+		}
+	}
 	
 	return v;
 }
@@ -276,8 +286,9 @@ bool Unit::initialize() {
 		W::log << "Could not get unitTypes table from units.lua" << std::endl;
 		return false;
 	}
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it)
+	for (auto it = o.descendants.begin(); it != o.descendants.end(); ++it) {
 		unitTypeInfo[it->first] = new unitInfo(it->second);
+	}
 	
 	/* 2. Set up Serialization Descriptor */
 	sd["dest"]  = makeSerializer(&Unit::dest);

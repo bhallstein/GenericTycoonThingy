@@ -74,7 +74,8 @@ void Building::_setUp() {
 		// ...
 	}
 	
-	// Set up state of DrawnFurnishing
+	// Set up state of DrawnBuilding
+	drawnBuilding->setPosn(rct.pos);
 }
 
 
