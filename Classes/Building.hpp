@@ -51,6 +51,11 @@ public:
 	static bool initialized;
 	
 	void setPos(const W::position &);
+	void setSz(const W::size &);
+	
+	void addShopkeeper(UID);
+	void removeShopkeeper(UID);
+	std::vector<UID> shopkeeper__getAll() { return activeShopkeepers; }
 	
 protected:
 	// Serialization
@@ -67,14 +72,18 @@ protected:
 	// Drawing
 	class DrawnBuilding;
 	DrawnBuilding *drawnBuilding;
+	
+	// Active shopkeeper controllers
+	std::vector<UID> activeShopkeepers;
 };
 
 
 class Building::DrawnBuilding {
 public:
-	DrawnBuilding(LevelView *, const W::position &);
+	DrawnBuilding(LevelView *, const W::rect &);
 	~DrawnBuilding();
 	void setPosn(const W::position &);
+	void setSz(const W::size &);
 //	void setOpac(float);
 private:
 	W::DRect *r;

@@ -54,7 +54,7 @@ W::EventPropagation::T MenuState::keyEvent(W::Event *ev) {
 	return W::EventPropagation::ShouldContinue;
 }
 W::EventPropagation::T MenuState::uiEvent(W::Event *ev) {
-	startLevel("a save game");
+	startLevel("shopkeeper_test");
 	return W::EventPropagation::ShouldContinue;
 }
 

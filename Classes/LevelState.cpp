@@ -21,6 +21,7 @@
 #include "Furnishing.hpp"
 #include "Unit.hpp"
 #include "Controller.hpp"
+#include "W.h"
 
 LevelState::LevelState() :
 	levelView(NULL),
@@ -56,7 +57,7 @@ LevelState::~LevelState()
 }
 
 W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_S) saveLevel("a save game");
+	if (ev->key == W::KeyCode::_S) saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000)));
 	else if (ev->key == W::KeyCode::ESC) W::popState(W::EmptyReturny);
 	else if (ev->key == W::KeyCode::_Q)  W::popState(W::KillerReturny);
 	return W::EventPropagation::ShouldContinue;
@@ -109,6 +110,7 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	if (!Furnishing::initialize()) { W::log << "Couldn't initialize Furnishing class" << std::endl; return false; }
 	Controller::initialize();
 	CustomerController::initialize();
+	ShopkeeperController::initialize();
 	
 	// Load level lua file
 	string path = MrPaths::resourcesPath + string("Data/Levels/") + levelName + ".lua";

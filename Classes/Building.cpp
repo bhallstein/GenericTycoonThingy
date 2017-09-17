@@ -44,7 +44,7 @@ bool Building::initialized = false;
 Building::Building(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 	TLO(_ls, _lm, _lv, _nm)
 {
-	drawnBuilding = new DrawnBuilding(levelView, W::position());
+	drawnBuilding = new DrawnBuilding(levelView, W::rect());
 	
 //	if (!navmap->isPassableUnder(rct)) {
 //		throw W::Exception("Navmap was not passable under Building plan.");
@@ -76,6 +76,7 @@ void Building::_setUp() {
 	
 	// Set up state of DrawnBuilding
 	drawnBuilding->setPosn(rct.pos);
+	drawnBuilding->setSz(rct.sz);
 }
 
 
@@ -111,15 +112,30 @@ void Building::setPos(const W::position &_pos) {
 	rct.pos = _pos;
 	drawnBuilding->setPosn(_pos);
 }
+void Building::setSz(const W::size &_sz) {
+	rct.sz = _sz;
+	drawnBuilding->setSz(_sz);
+}
+
+void Building::addShopkeeper(UID sk) {
+	activeShopkeepers.push_back(sk);
+}
+void Building::removeShopkeeper(UID sk) {
+	for (auto it = activeShopkeepers.begin(); it != activeShopkeepers.end(); ++it) {
+		if ((*it).id == sk.id) {
+			it = activeShopkeepers.erase(it);
+		}
+	}
+}
 
 
 
 // DrawnBuilding impl
 
-Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, const W::position &_pos) : lv(_lv)
+Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, const W::rect &_rct) : lv(_lv)
 {
 	r = new W::DRect(
-		_lv, _pos, _lv->convertGridToPixelCoords(W::size(5,3)), W::Colour::TransparentBlack
+		_lv, _rct.pos, _lv->convertGridToPixelCoords(_rct.sz), W::Colour::TransparentBlack
 	);
 }
 Building::DrawnBuilding::~DrawnBuilding()
@@ -128,4 +144,7 @@ Building::DrawnBuilding::~DrawnBuilding()
 }
 void Building::DrawnBuilding::setPosn(const W::position &_pos) {
 	r->setPos(lv->convertGridToPixelCoords(_pos));
+}
+void Building::DrawnBuilding::setSz(const W::size &_sz) {
+	r->setSz(lv->convertGridToPixelCoords(_sz));
 }

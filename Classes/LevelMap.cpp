@@ -207,6 +207,7 @@ Building* LevelMap::createBuilding(const std::string &type, const W::position &p
 	b->setType(type);
 	b->setUp();
 	b->setPos(pos);
+	buildings.push_back(b);
 	return b;
 }
 Building* LevelMap::createBuilding(LuaObj &o) {
@@ -286,6 +287,9 @@ Controller* LevelMap::createController(const std::string &type, bool active) {
 	if (type == "CustomerController") {
 		c = new CustomerController(levelState, this, levelView, navmap);
 	}
+	else if (type == "ShopkeeperController") {
+		c = new ShopkeeperController(levelState, this, levelView, navmap);
+	}
 	if (c != NULL) {
 		c->setUp();
 		(active ? controllers : inactiveControllers).push_back(c);
@@ -298,9 +302,12 @@ Controller* LevelMap::createController(LuaObj &o, bool active) {
 	const std::string &type = o["type"].str_value;
 	if (type == "CustomerController") {
 		c = new CustomerController(levelState, this, levelView, navmap);
-		c->deserialize(o);
+	}
+	else if (type == "ShopkeeperController") {
+		c = new ShopkeeperController(levelState, this, levelView, navmap);
 	}
 	if (c != NULL) {
+		c->deserialize(o);
 		c->setUp();
 		(active ? controllers : inactiveControllers).push_back(c);
 		W::log << "Controller (" << type << ") " << c->uid.id << " deserialized" << std::endl;
@@ -323,11 +330,28 @@ Controller* LevelMap::createControllerForUnit(Unit *u) {
 	return c;
 }
 
+Building* LevelMap::building__getRandom() {
+	if (buildings.size() == 0) {
+		return NULL;
+	}
+	return (Building*) buildings[W::Rand::intUpTo((int) buildings.size())];
+}
+Building* LevelMap::building__findAt(W::position &p) {
+	for (auto it = buildings.begin(); it != buildings.end(); ++it) {
+		TLO *b = *it;
+		if (b->rct.overlapsWith(p)) {
+			return (Building*) b;
+		}
+	}
+	return NULL;
+}
+
 void LevelMap::deactivateController(Controller *c) {
 	inactiveControllers.push_back(c);
-	for (tloVec::iterator it = controllers.begin(); it < controllers.end(); )
+	for (auto it = controllers.begin(); it < controllers.end(); ) {
 		if (*it == c) it = controllers.erase(it);
 		else ++it;
+	}
 }
 void LevelMap::reactivateController(Controller *c) {
 	controllers.push_back(c);

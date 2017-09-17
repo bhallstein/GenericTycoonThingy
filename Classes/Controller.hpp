@@ -40,7 +40,7 @@ public:
 	
 	bool dispatchUnit(Unit *);
 		// If canDispatchUnitType( ) returns true, calls _dispatchUnit().
-	bool dispatchUnit(Unit *, Controller *);
+	bool dispatchUnit(Unit *, Controller *c_passback);
 		// Does the same, but first adds the Unit to the pass-back map
 		// (i.e. use if the Unit should be passed back to another Controller
 		//  when finished with.)
@@ -118,6 +118,7 @@ protected:
 	int failureStage;
 	int timeWaited;
 	UID customer;
+	UID dest_building;
 	
 	virtual void getSDs(sdvec &vec) {
 		Controller::getSDs(vec);
@@ -128,5 +129,52 @@ private:
 	Unit* customerPtr() { return (Unit *) customer.get(); }
 	static serialization_descriptor sd;
 };
+
+
+/* ShopkeeperController */
+
+class ShopkeeperController : public Controller {
+public:
+	ShopkeeperController(LevelState *, LevelMap *, LevelView *, W::NavMap *);
+	
+	void resume(Unit *, ControllerCompletion::T);
+	void success(Unit *) { ++stage; }
+	void failure(Unit *) { stage = failureStage; }
+	
+	void update();
+	
+	static void initialize() {
+		sd["stage"] = makeSerializer(&ShopkeeperController::stage);
+		sd["failureStage"] = makeSerializer(&ShopkeeperController::failureStage);
+		sd["timeWaited"] = makeSerializer(&ShopkeeperController::timeWaited);
+		sd["shopkeeper"] = makeSerializer(&ShopkeeperController::shopkeeper);
+	}
+	
+	void unitPickedUp(Unit *);
+	void unitPutDown(Unit *);
+	
+//	bool dispatchCustomer(Unit *);
+	
+protected:
+	bool canDispatch(const std::string &);
+	void _dispatchUnit(Unit *);
+	
+	int stage;
+	int failureStage;
+	int timeWaited;
+	UID shopkeeper;
+	UID building;
+	UID customer;
+	
+	virtual void getSDs(sdvec &vec) {
+		Controller::getSDs(vec);
+		vec.push_back(&sd);
+	}
+	
+private:
+	static serialization_descriptor sd;
+};
+
+
 
 #endif

@@ -184,17 +184,22 @@ void Unit::placementLoopCancelled() {
 		c->unitPutDown(this);
 }
 void Unit::placementLoopSucceeded() {
-	if (!hired && typeInfo->isStaff) {
-		// If hiring a staff unit: charge player
+	// If hiring a staff unit for the first time: charge player
+	if (typeInfo->isStaff && !hired) {
 		levelState->addPlayerMoneys(-typeInfo->hireCost);
 		hired = true;
 	}
 	drawnUnit->setPosn(rct.pos);	// Update DrawnUnit to new position
 	drawnUnit->setOpac(1);			// Put D.U. back in normal mode
-	// TODO: if voyaging, should recalculate route when placed
-	// TODO: notify behaviour of placement event: may want to change associations to other TLOs, etc.
-	if (Controller *c = controllerPtr())
+	
+	// Remove route
+	route.clear();
+	mode = UnitMode::IDLE;
+	
+	// Notify contrller of placement event
+	if (Controller *c = controllerPtr()) {
 		c->unitPutDown(this);
+	}
 }
 bool Unit::canPlace(const W::position &_pos) {
 	return navmap->isPassableAt(_pos);

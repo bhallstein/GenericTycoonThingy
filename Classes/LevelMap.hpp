@@ -55,6 +55,9 @@ public:
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
 	
+	Building* building__getRandom();
+	Building* building__findAt(W::position &);
+	
 	void deactivateController(Controller *);
 	void reactivateController(Controller *);
 	
