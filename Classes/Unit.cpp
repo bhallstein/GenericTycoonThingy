@@ -17,7 +17,7 @@
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"
 #include "W.h"
-#include "LevelState.hpp"
+#include "LevelMap.hpp"
 #include "LevelView.hpp"
 #include "Placeable.hpp"
 
@@ -48,8 +48,8 @@ bool Unit::initialized = false;
 
 /*** Unit ***/
 
-Unit::Unit(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
-	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode),
+Unit::Unit(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+	PlaceableManager(_lm, _lv, _nm, _placeableMode),
 	mode(UnitMode::IDLE),
 	hired(false)
 {
@@ -129,19 +129,8 @@ void Unit::update() {
 /*** Utility methods ***/
 
 void Unit::wanderToRandomMapDestination() {
-	W::position _dest(
-		W::Rand::intUpTo(levelMap->width()),
-		W::Rand::intUpTo(levelMap->height())
-	);
-	voyage(_dest);
+	voyage(levelMap->map__randomCoord());
 		// TODO: call bhvr.failure if cannot voyage, or if obstacle encountered
-}
-void Unit::getDespawnPoint(W::position &p) {
-	int w = navmap->width(), h = navmap->height(), n = W::Rand::intUpTo(2*w + 2*h - 4);
-	if (n < w)            p.x = n,     p.y = 0;
-	else if (n < 2*w)     p.x = n - w, p.y = h - 1;
-	else if (n < 2*w + h) p.x = 0,     p.y = n - 2*w;
-	else                  p.x = w - 1, p.y = n - (2*w + h);
 }
 bool Unit::voyage(const W::position &_dest) {
 	dest = _dest;
@@ -165,8 +154,9 @@ bool Unit::voyage(const W::position &_dest) {
 
 void Unit::placementLoopStarted() {
 	drawnUnit->setOpac(0.2);		// Put DU in placement-loop mode
-	if (Controller *c = controllerPtr())
+	if (Controller *c = controllerPtr()) {
 		c->unitPickedUp(this);
+	}
 }
 void Unit::placementLoopUpdate() {
 	W::position p(placeable.pos.x, placeable.pos.y, 0, 0);
@@ -186,7 +176,7 @@ void Unit::placementLoopCancelled() {
 void Unit::placementLoopSucceeded() {
 	// If hiring a staff unit for the first time: charge player
 	if (typeInfo->isStaff && !hired) {
-		levelState->addPlayerMoneys(-typeInfo->hireCost);
+		levelMap->addPlayerMoneys(-typeInfo->hireCost);
 		hired = true;
 	}
 	drawnUnit->setPosn(rct.pos);	// Update DrawnUnit to new position

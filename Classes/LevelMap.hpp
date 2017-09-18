@@ -26,7 +26,6 @@ class TLO;
 class Furnishing;
 class Building;
 class Unit;
-class SpawnPoint;
 
 
 class LevelMap {
@@ -34,8 +33,8 @@ public:
 	LevelMap(LevelState *, LevelView *);
 	~LevelMap();
 	
-	void update();
-	bool load(LuaObj &mapObj);
+	void update(int frame_microseconds, float time_in_level);
+	bool load(lua_State*);
 	std::string save();
 	
 	W::EventPropagation::T keyEvent(W::Event *);
@@ -49,8 +48,6 @@ public:
 	Building* createBuilding(LuaObj &);
 	Unit* createUnit(bool placeableMode, const std::string &type, const W::position &pos);
 	Unit* createUnit(LuaObj &);
-	SpawnPoint* createSpawnPoint(bool placeableMode, const W::position &pos);
-	SpawnPoint* createSpawnPoint(LuaObj &);
 	Controller* createController(const std::string &type, bool active = true);
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
@@ -58,8 +55,12 @@ public:
 	Building* building__getRandom();
 	Building* building__findAt(W::position &);
 	
+	W::position map__randomCoord();
+	
 	void deactivateController(Controller *);
 	void reactivateController(Controller *);
+	
+	bool addPlayerMoneys(int);
 	
 private:
 	LevelState *levelState;
@@ -67,15 +68,22 @@ private:
 	
 	W::NavMap *navmap;
 	
-	typedef std::vector<TLO*> tloVec;
-	tloVec units;
-	tloVec furnishings;
-	tloVec spawnPoints;
-	tloVec controllers;
-	tloVec buildings;
-	tloVec inactiveControllers;
+	// Game objects
+	typedef std::vector<TLO*> tlovec;
+	tlovec units;
+	tlovec furnishings;
+	tlovec controllers;
+	tlovec buildings;
+	tlovec inactiveControllers;
 	
-	void updateTLOVec(tloVec &);
+	// Level goal data
+	int monetaryTarget;
+	int timeLimit;
+	
+	// Player state
+	int playerMoneys;
+	
+	void updateTLOVec(tlovec &);
 		// Calls update() on each TLO.
 		//  - After update(), if the TLO is 'destroyed', destroy it.
 		//  - It is the dying TLO's responsibility to inform any subscribers

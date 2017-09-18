@@ -34,7 +34,7 @@ namespace ControllerCompletion {
 
 class Controller : public TLO {
 public:
-	Controller(LevelState *, LevelMap *, LevelView *, W::NavMap *);
+	Controller(LevelMap *, LevelView *, W::NavMap *);
 	virtual ~Controller();
 	void _setUp();
 	
@@ -92,7 +92,7 @@ private:
 
 class CustomerController : public Controller {
 public:
-	CustomerController(LevelState *, LevelMap *, LevelView *, W::NavMap *);
+	CustomerController(LevelMap *, LevelView *, W::NavMap *);
 	
 	void resume(Unit *, ControllerCompletion::T);
 	void success(Unit *) { ++stage; }
@@ -135,7 +135,7 @@ private:
 
 class ShopkeeperController : public Controller {
 public:
-	ShopkeeperController(LevelState *, LevelMap *, LevelView *, W::NavMap *);
+	ShopkeeperController(LevelMap *, LevelView *, W::NavMap *);
 	
 	void resume(Unit *, ControllerCompletion::T);
 	void success(Unit *) { ++stage; }

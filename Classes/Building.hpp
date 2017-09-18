@@ -40,7 +40,7 @@ struct buildingInfo {
 
 class Building : public TLO {
 public:
-	Building(LevelState *, LevelMap *, LevelView *, W::NavMap *);
+	Building(LevelMap *, LevelView *, W::NavMap *);
 	~Building();
 	void _setUp();
 		// See note in Unit.hpp on creation & setup

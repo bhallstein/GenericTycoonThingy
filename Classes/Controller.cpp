@@ -22,14 +22,14 @@
 
 Serializable::serialization_descriptor Controller::sd;
 
-Controller::Controller(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-	TLO(_ls, _lm, _lv, _nm)
+Controller::Controller(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+	TLO(_lm, _lv, _nm)
 {
 	// Hai mr controlley
 }
 Controller::~Controller()
 {
-	// Bye now
+	std::cout << "controller " << this << " destruct" << std::endl;
 }
 void Controller::_setUp() {
 	
@@ -83,8 +83,8 @@ void Controller::releaseUnit(Unit *u, ControllerCompletion::T succ) {
 
 Serializable::serialization_descriptor CustomerController::sd;
 
-CustomerController::CustomerController(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-	Controller(_ls, _lm, _lv, _nm),
+CustomerController::CustomerController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+	Controller(_lm, _lv, _nm),
 	stage(0),
 	failureStage(0)
 {
@@ -216,8 +216,8 @@ void CustomerController::unitPutDown(Unit *u) {
 
 Serializable::serialization_descriptor ShopkeeperController::sd;
 
-ShopkeeperController::ShopkeeperController(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-Controller(_ls, _lm, _lv, _nm),
+ShopkeeperController::ShopkeeperController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+Controller(_lm, _lv, _nm),
 stage(0),
 failureStage(0)
 {
@@ -286,6 +286,10 @@ void ShopkeeperController::update() {
 			releaseUnit((Unit*) customer.get());
 			++stage;
 		}
+	}
+	else if (stage == 205) {
+		// Interaction finished: wait for next customer
+		stage = 200;
 	}
 	else if (stage == 299) {
 		// Failure: one of the units has failed to reach the interaction destination

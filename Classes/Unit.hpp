@@ -36,7 +36,7 @@ class Controller;
 
 class Unit : public PlaceableManager {
 public:
-	Unit(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
+	Unit(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Unit();
 	void _setUp();
 		// When a unit is constructed, we may not yet know its type, which is therefore
@@ -55,7 +55,6 @@ public:
 	
 	// Utility methods
 	void wanderToRandomMapDestination();
-	void getDespawnPoint(W::position &);
 	bool voyage(const W::position &_dest);
 	
 	static bool initialize(); 	// Populate static unitTypes from units.lua

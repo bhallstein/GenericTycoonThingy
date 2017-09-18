@@ -39,8 +39,6 @@ public:
 	void pause();
 	void unpause();
 	
-	bool addPlayerMoneys(int);
-	
 	bool loadLevel(const std::string &levelName);
 	bool saveLevel(const std::string &saveName);
 	
@@ -51,19 +49,8 @@ private:
 	// Map
 	LevelMap *levelMap;
 	
-	// Level-specific data
-	int monetaryTarget;
-	int timeLimit;
-	
-	// Player state
-	int playerMoneys;
-	
-	// Building editing
-	Building *currentlyEditedBuilding;
-	
 	// Time
 	bool paused;
-	int framecount;
 	W::Timer *realtimetimer;
 	float realtimetime;	// Number of real-time seconds elapsed while level running
 	int timeRemaining;	// integer time remaining calculated from realtimetime and the level's time limit - passed to levelview for display, don't use for calculations

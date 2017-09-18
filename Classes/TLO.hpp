@@ -31,8 +31,7 @@ class LevelView;
 
 class TLO : public Serializable {
 public:
-	TLO(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-		levelState(_ls),
+	TLO(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 		levelMap(_lm),
 		levelView(_lv),
 		navmap(_nm),
@@ -76,7 +75,6 @@ protected:
 		vec.push_back(&TLO::sd);
 	}
 	
-	LevelState *levelState;
 	LevelMap   *levelMap;
 	LevelView  *levelView;
 	W::NavMap *navmap;

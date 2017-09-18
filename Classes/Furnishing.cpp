@@ -17,7 +17,7 @@
 #include "W.h"
 #include "Placeable.hpp"
 #include "LevelView.hpp"
-#include "LevelState.hpp"
+#include "LevelMap.hpp"
 
 /* furnishingInfo constructor impl */
 
@@ -52,8 +52,8 @@ bool Furnishing::initialized = false;
 
 /*** Furnishing ***/
 
-Furnishing::Furnishing(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
-	PlaceableManager(_ls, _lm, _lv, _nm, _placeableMode),
+Furnishing::Furnishing(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+	PlaceableManager(_lm, _lv, _nm, _placeableMode),
 	purchased(false)
 {
 	rct.sz = W::size(2,2);
@@ -169,7 +169,7 @@ void Furnishing::placementLoopCancelled() {
 void Furnishing::placementLoopSucceeded() {
 	// If purchasing: charge player
 	if (!purchased) {
-		levelState->addPlayerMoneys(-typeInfo->cost);
+		levelMap->addPlayerMoneys(-typeInfo->cost);
 		purchased = true;
 	}
 	navmap->makeImpassable(rct);

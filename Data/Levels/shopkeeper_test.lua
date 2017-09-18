@@ -67,9 +67,6 @@ mapData = {
 			purchased = true
 		}
 	},
-	spawnPoints = {
-		
-	},
 	controllers = {
 		{
 			destroyed = false,

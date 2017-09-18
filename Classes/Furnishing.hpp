@@ -29,7 +29,7 @@ struct furnishingInfo {
 
 class Furnishing : public PlaceableManager {
 public:
-	Furnishing(LevelState *, LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
+	Furnishing(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
 	~Furnishing();
 	void _setUp();
 		// See note in Unit.hpp on creation & setup

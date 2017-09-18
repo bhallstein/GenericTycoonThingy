@@ -41,8 +41,8 @@ bool Building::initialized = false;
 
 /*** Building ***/
 
-Building::Building(LevelState *_ls, LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-	TLO(_ls, _lm, _lv, _nm)
+Building::Building(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+	TLO(_lm, _lv, _nm)
 {
 	drawnBuilding = new DrawnBuilding(levelView, W::rect());
 	
@@ -120,10 +120,14 @@ void Building::setSz(const W::size &_sz) {
 void Building::addShopkeeper(UID sk) {
 	activeShopkeepers.push_back(sk);
 }
-void Building::removeShopkeeper(UID sk) {
-	for (auto it = activeShopkeepers.begin(); it != activeShopkeepers.end(); ++it) {
-		if ((*it).id == sk.id) {
+void Building::removeShopkeeper(UID sk_to_remove) {
+	for (auto it = activeShopkeepers.begin(); it != activeShopkeepers.end(); ) {
+		UID sk = *it;
+		if (sk == sk_to_remove) {
 			it = activeShopkeepers.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }

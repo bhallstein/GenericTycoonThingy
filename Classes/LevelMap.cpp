@@ -14,7 +14,6 @@
 #include "LevelView.hpp"
 #include "TLO.hpp"
 #include "LuaObj.h"
-#include "SpawnPoint.hpp"
 #include "Unit.hpp"
 #include "Furnishing.hpp"
 #include "Building.hpp"
@@ -31,8 +30,17 @@ LevelMap::~LevelMap()
 	// bai
 }
 
-void LevelMap::update() {
-	updateTLOVec(spawnPoints);
+void LevelMap::update(int frame_microseconds, float time_in_level) {
+	// Spawn units
+	// The % chance of spawning a unit is kT, where T is the current fraction of the level time limit
+	// Note: this chance is per-frame, so depends on the framerate, which is bad.
+	float k = 0.2;
+	float p_spawn = k * time_in_level / timeLimit;
+	if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
+		createUnit(false, "customer", map__randomCoord());
+	}
+	
+	// Update object vectors
 	updateTLOVec(units);
 	updateTLOVec(furnishings);
 	updateTLOVec(controllers);
@@ -45,10 +53,31 @@ W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 	return W::EventPropagation::ShouldContinue;
 }
 
-bool LevelMap::load(LuaObj &mapData) {
-	if (loaded) return false;
+bool LevelMap::load(lua_State *L) {
+	if (loaded) {
+		return false;
+	}
 	
-	// Note: LevelState::loadLevel() has already checked mapData is a table.
+	// Get LuaObjs from file
+	lua_getglobal(L, "levelData");   LuaObj levelData(L);
+	lua_getglobal(L, "playerState"); LuaObj playerState(L);
+	lua_getglobal(L, "mapData");     LuaObj mapData(L);
+	lua_close(L);
+	
+	if (!levelData.isTable()) {
+		W::log << "Error: levelData table not found" << std::endl;
+		return false;
+	}
+	if (!playerState.isTable()) {
+		W::log << "Error: playerState table not found" << std::endl;
+		return false;
+	}
+	if (!mapData.isTable()) {
+		W::log << "Error: mapData table not found" << std::endl;
+		return false;
+	}
+	
+	
 	
 	// Get width & height
 	LuaObj &wObj = mapData["width"];
@@ -80,8 +109,9 @@ bool LevelMap::load(LuaObj &mapData) {
 		return false;
 	}
 	d = &furnishingsObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
 		createFurnishing(it->second);
+	}
 	
 	// Get units
 	LuaObj &unitsObj = mapData["units"];
@@ -90,38 +120,56 @@ bool LevelMap::load(LuaObj &mapData) {
 		return false;
 	}
 	d = &unitsObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
 		createUnit(it->second);
-	
-	// Get spawn points
-	LuaObj &spawnPointsObj = mapData["spawnPoints"];
-	if (!spawnPointsObj.isTable()) {
-		W::log << "mapData.spawnPoints table not found" << std::endl;
-		return false;
 	}
-	d = &spawnPointsObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
-		createSpawnPoint(it->second);
 	
 	// Get controllers
 	LuaObj &controllersObj = mapData["controllers"];
 	d = &controllersObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
 		createController(it->second, true);
+	}
 	
 	// Get inactive controllers
 	LuaObj &inactiveControllersObj = mapData["inactiveControllers"];
 	d = &inactiveControllersObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
 		createController(it->second, false);
+	}
 	
 	// Get buildings
 	LuaObj &buildingsObj = mapData["buildings"];
 	if (buildingsObj.isTable()) {
 		d = &buildingsObj.descendants;
-		for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it)
+		for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
 			createBuilding(it->second);
+		}
 	}
+	
+	
+	/* Load player & level data */
+	// Level Data
+	LuaObj &monetaryTargetObj = levelData["monetaryTarget"];
+	if (!monetaryTargetObj.isNumber()) {
+		W::log << "levelData.monetaryTarget not found or not number" << std::endl;
+		return false;
+	}
+	monetaryTarget = monetaryTargetObj.number_value;
+	LuaObj &timeLimitObj = levelData["timeLimit"];
+	if (!timeLimitObj.isNumber()) {
+		W::log << "levelData.timeLimit not found or not number" << std::endl;
+		return false;
+	}
+	timeLimit = timeLimitObj.number_value;
+	
+	// Player State
+	LuaObj &balanceObj = playerState["balance"];
+	if (!balanceObj.isNumber()) {
+		W::log << "playerState.balance not found or not number" << std::endl;
+		return false;
+	}
+	playerMoneys = balanceObj.number_value;
 	
 	return loaded = true;
 }
@@ -130,49 +178,58 @@ std::string LevelMap::save() {
 	using std::string;
 	std::stringstream ss;
 	
+	// Level Data
+	ss << "levelData = {\n";
+	ss << "monetaryTarget = " << monetaryTarget << ",\n";
+	ss << "timeLimit = " << timeLimit << "\n";
+	ss << "}\n\n";
+	
+	// Player State
+	ss << "playerState = {\n";
+	ss << "balance = " << playerMoneys << "\n";
+	ss << "}\n\n";
+	
+	// Map contents
+	ss << "mapData = {\n";
+	
 	ss << "width = " << mapSize.width << ",\n";
 	ss << "height = " << mapSize.height << ",\n\n";
 	
 	// Units
 	ss << "units = {\n";
 	if (units.size() == 0) ss << "\n";
-	for (tloVec::iterator it = units.begin(), itend = units.end(); it < itend; ++it)
+	for (tlovec::iterator it = units.begin(), itend = units.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
 	ss << "},\n";
 	
 	// Furnishings
 	ss << "furnishings = {\n";
 	if (furnishings.size() == 0) ss << "\n";
-	for (tloVec::iterator it = furnishings.begin(), itend = furnishings.end(); it < itend; ++it)
-		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
-	ss << "},\n";
-	
-	// SPs
-	ss << "spawnPoints = {\n";
-	if (spawnPoints.size() == 0) ss << "\n";
-	for (tloVec::iterator it = spawnPoints.begin(), itend = spawnPoints.end(); it < itend; ++it)
+	for (tlovec::iterator it = furnishings.begin(), itend = furnishings.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
 	ss << "},\n";
 	
 	// Controllers
 	ss << "controllers = {\n";
 	if (controllers.size() == 0) ss << "\n";
-	for (tloVec::iterator it = controllers.begin(), itend = controllers.end(); it < itend; ++it)
+	for (tlovec::iterator it = controllers.begin(), itend = controllers.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
 	ss << "},\n";
 	
 	// Inactive Controllers
 	ss << "inactiveControllers = {\n";
 	if (inactiveControllers.size() == 0) ss << "\n";
-	for (tloVec::iterator it = inactiveControllers.begin(), itend = inactiveControllers.end(); it < itend; ++it)
+	for (tlovec::iterator it = inactiveControllers.begin(), itend = inactiveControllers.end(); it < itend; ++it)
 		ss << "{\n" << (*it)->serialize() << (it == itend-1 ? "}\n" : "},\n");
+	ss << "}\n";
+	
 	ss << "}\n";
 	
 	return ss.str();
 }
 
 Furnishing* LevelMap::createFurnishing(bool placeableMode, const std::string &type, const W::position &pos) {
-	Furnishing *f = new Furnishing(levelState, this, levelView, navmap, placeableMode);
+	Furnishing *f = new Furnishing(this, levelView, navmap, placeableMode);
 	f->setType(type);
 	f->setUp();
 	bool initsuccess = f->init(placeableMode ? W::position(-100,-100) : pos);
@@ -188,7 +245,7 @@ Furnishing* LevelMap::createFurnishing(bool placeableMode, const std::string &ty
 	return f;
 }
 Furnishing* LevelMap::createFurnishing(LuaObj &o) {
-	Furnishing *f = new Furnishing(levelState, this, levelView, navmap, false);
+	Furnishing *f = new Furnishing(this, levelView, navmap, false);
 	f->deserialize(o);
 	f->setUp();
 	if (f->init()) {
@@ -203,7 +260,7 @@ Furnishing* LevelMap::createFurnishing(LuaObj &o) {
 	return f;
 }
 Building* LevelMap::createBuilding(const std::string &type, const W::position &pos) {
-	Building *b = new Building(levelState, this, levelView, navmap);
+	Building *b = new Building(this, levelView, navmap);
 	b->setType(type);
 	b->setUp();
 	b->setPos(pos);
@@ -211,7 +268,7 @@ Building* LevelMap::createBuilding(const std::string &type, const W::position &p
 	return b;
 }
 Building* LevelMap::createBuilding(LuaObj &o) {
-	Building *b = new Building(levelState, this, levelView, navmap);
+	Building *b = new Building(this, levelView, navmap);
 	b->deserialize(o);
 	b->setUp();
 	buildings.push_back(b);
@@ -219,7 +276,7 @@ Building* LevelMap::createBuilding(LuaObj &o) {
 }
 
 Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W::position &pos) {
-	Unit *u = new Unit(levelState, this, levelView, navmap, placeableMode);
+	Unit *u = new Unit(this, levelView, navmap, placeableMode);
 	u->setType(type);
 	u->setUp();
 	bool initsuccess = u->init(placeableMode ? W::position(-100,-100) : pos);
@@ -238,7 +295,7 @@ Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W:
 	return u;
 }
 Unit* LevelMap::createUnit(LuaObj &o) {
-	Unit *u = new Unit(levelState, this, levelView, navmap, false);
+	Unit *u = new Unit(this, levelView, navmap, false);
 	u->deserialize(o);
 	u->setUp();
 	if (u->init()) {
@@ -252,45 +309,15 @@ Unit* LevelMap::createUnit(LuaObj &o) {
 	}
 	return u;
 }
-SpawnPoint* LevelMap::createSpawnPoint(bool placeableMode, const W::position &pos) {
-	SpawnPoint *sp = new SpawnPoint(levelState, this, levelView, navmap, placeableMode);
-	sp->setUp();
-	bool initsuccess = sp->init(placeableMode ? W::position(-100,-100) : pos);
-	if (initsuccess) {
-		spawnPoints.push_back(sp);
-		W::log << "SpawnPoint " << sp->uid.id << " created and initialized "
-			<< (placeableMode ? "in placeable mode" : std::string("at ") + sp->rct.pos.xyStr()) << std::endl;
-	}
-	else {
-		delete sp;
-		sp = NULL;
-	}
-	return sp;
-}
-SpawnPoint* LevelMap::createSpawnPoint(LuaObj &o) {
-	SpawnPoint *sp = new SpawnPoint(levelState, this, levelView, navmap, false);
-	sp->deserialize(o);
-	sp->setUp();
-	if (sp->init()) {
-		spawnPoints.push_back(sp);
-		W::log << "SpawnPoint " << sp->uid.id << "deserialized and initialized at " << sp->rct.pos.xyStr() << std::endl;
-	}
-	else {
-		W::log << "SpawnPoint " << sp->uid.id << " deserialized then failed to initialize at " << sp->rct.pos.xyStr() << std::endl;
-		delete sp;
-		sp = NULL;
-	}
-	return sp;
-}
 Controller* LevelMap::createController(const std::string &type, bool active) {
 	Controller *c = NULL;
 	if (type == "CustomerController") {
-		c = new CustomerController(levelState, this, levelView, navmap);
+		c = new CustomerController(this, levelView, navmap);
 	}
 	else if (type == "ShopkeeperController") {
-		c = new ShopkeeperController(levelState, this, levelView, navmap);
+		c = new ShopkeeperController(this, levelView, navmap);
 	}
-	if (c != NULL) {
+	if (c) {
 		c->setUp();
 		(active ? controllers : inactiveControllers).push_back(c);
 		W::log << "Controller (" << type << ") " << c->uid.id << " created" << std::endl;
@@ -301,10 +328,10 @@ Controller* LevelMap::createController(LuaObj &o, bool active) {
 	Controller *c = NULL;
 	const std::string &type = o["type"].str_value;
 	if (type == "CustomerController") {
-		c = new CustomerController(levelState, this, levelView, navmap);
+		c = new CustomerController(this, levelView, navmap);
 	}
 	else if (type == "ShopkeeperController") {
-		c = new ShopkeeperController(levelState, this, levelView, navmap);
+		c = new ShopkeeperController(this, levelView, navmap);
 	}
 	if (c != NULL) {
 		c->deserialize(o);
@@ -346,6 +373,13 @@ Building* LevelMap::building__findAt(W::position &p) {
 	return NULL;
 }
 
+W::position LevelMap::map__randomCoord() {
+	return W::position(
+		W::Rand::intUpTo(width()),
+		W::Rand::intUpTo(height())
+	);
+}
+
 void LevelMap::deactivateController(Controller *c) {
 	inactiveControllers.push_back(c);
 	for (auto it = controllers.begin(); it < controllers.end(); ) {
@@ -355,19 +389,30 @@ void LevelMap::deactivateController(Controller *c) {
 }
 void LevelMap::reactivateController(Controller *c) {
 	controllers.push_back(c);
-	for (tloVec::iterator it = inactiveControllers.begin(); it < inactiveControllers.end(); )
+	for (tlovec::iterator it = inactiveControllers.begin(); it < inactiveControllers.end(); )
 		if (*it == c) it = inactiveControllers.erase(it);
 		else ++it;
 }
 
+bool LevelMap::addPlayerMoneys(int x) {
+	int result = playerMoneys + x;
+	if (result < 0) {
+		return false;
+	}
+	playerMoneys = result;
+	return true;
+}
+
 void LevelMap::updateTLOVec(std::vector<TLO *> &v) {
-	for (tloVec::iterator it = v.begin(); it < v.end(); ) {
+	for (tlovec::iterator it = v.begin(); it != v.end(); ) {
 		TLO *tlo = *it;
-		tlo->update();
 		if (tlo->destroyed) {
-			delete tlo;
 			it = v.erase(it);
+			delete tlo;
 		}
-		else ++it;
+		else {
+			tlo->update();
+			++it;
+		}
 	}
 }

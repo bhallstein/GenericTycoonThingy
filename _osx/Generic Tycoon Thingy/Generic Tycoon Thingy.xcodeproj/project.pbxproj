@@ -24,7 +24,6 @@
 		B58829201F40EA1700C07AEB /* PlaceableManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B58829061F40EA1700C07AEB /* PlaceableManager.cpp */; };
 		B58829211F40EA1700C07AEB /* Serializable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B58829081F40EA1700C07AEB /* Serializable.cpp */; };
 		B58829221F40EA1700C07AEB /* Serializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B588290A1F40EA1700C07AEB /* Serializer.cpp */; };
-		B58829231F40EA1700C07AEB /* SpawnPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B588290C1F40EA1700C07AEB /* SpawnPoint.cpp */; };
 		B58829241F40EA1700C07AEB /* TLO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B588290E1F40EA1700C07AEB /* TLO.cpp */; };
 		B58829251F40EA1700C07AEB /* types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B58829101F40EA1700C07AEB /* types.cpp */; };
 		B58829261F40EA1700C07AEB /* UIDManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B58829121F40EA1700C07AEB /* UIDManager.cpp */; };
@@ -141,8 +140,6 @@
 		B58829091F40EA1700C07AEB /* Serializable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Serializable.hpp; sourceTree = "<group>"; };
 		B588290A1F40EA1700C07AEB /* Serializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serializer.cpp; sourceTree = "<group>"; };
 		B588290B1F40EA1700C07AEB /* Serializer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Serializer.hpp; sourceTree = "<group>"; };
-		B588290C1F40EA1700C07AEB /* SpawnPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpawnPoint.cpp; sourceTree = "<group>"; };
-		B588290D1F40EA1700C07AEB /* SpawnPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SpawnPoint.hpp; sourceTree = "<group>"; };
 		B588290E1F40EA1700C07AEB /* TLO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TLO.cpp; sourceTree = "<group>"; };
 		B588290F1F40EA1700C07AEB /* TLO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TLO.hpp; sourceTree = "<group>"; };
 		B58829101F40EA1700C07AEB /* types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = types.cpp; sourceTree = "<group>"; };
@@ -383,8 +380,6 @@
 				B58829091F40EA1700C07AEB /* Serializable.hpp */,
 				B588290A1F40EA1700C07AEB /* Serializer.cpp */,
 				B588290B1F40EA1700C07AEB /* Serializer.hpp */,
-				B588290C1F40EA1700C07AEB /* SpawnPoint.cpp */,
-				B588290D1F40EA1700C07AEB /* SpawnPoint.hpp */,
 				B588290E1F40EA1700C07AEB /* TLO.cpp */,
 				B588290F1F40EA1700C07AEB /* TLO.hpp */,
 				B58829101F40EA1700C07AEB /* types.cpp */,
@@ -732,7 +727,6 @@
 				B588298A1F40EAEE00C07AEB /* lmathlib.c in Sources */,
 				B58829951F40EAEE00C07AEB /* ltablib.c in Sources */,
 				B5882A371F40EC1B00C07AEB /* mtrand.cpp in Sources */,
-				B58829231F40EA1700C07AEB /* SpawnPoint.cpp in Sources */,
 				B588274D1F40E44100C07AEB /* main.m in Sources */,
 				B588274A1F40E44100C07AEB /* AppDelegate.m in Sources */,
 				B588291C1F40EA1700C07AEB /* MenuState.cpp in Sources */,

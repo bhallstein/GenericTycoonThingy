@@ -26,7 +26,6 @@
 LevelState::LevelState() :
 	levelView(NULL),
 	levelMap(NULL),
-	currentlyEditedBuilding(NULL),
 	paused(false)
 {
 	// Initialize views
@@ -37,8 +36,6 @@ LevelState::LevelState() :
 	levelMap = new LevelMap(this, levelView);
 	
 	// Time
-	framecount = 0;
-	timeRemaining = timeLimit;
 	realtimetime = 0.0;
 	realtimetimer = new W::Timer();
 	
@@ -57,23 +54,34 @@ LevelState::~LevelState()
 }
 
 W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_S) saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000)));
-	else if (ev->key == W::KeyCode::ESC) W::popState(W::EmptyReturny);
-	else if (ev->key == W::KeyCode::_Q)  W::popState(W::KillerReturny);
+	if (ev->key == W::KeyCode::_S) { saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000))); }
+	else if (ev->key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
+	else if (ev->key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
+	else if (ev->key == W::KeyCode::_P) {
+		if (paused) { unpause(); }
+		else { pause(); }
+	}
 	return W::EventPropagation::ShouldContinue;
 }
 
 void LevelState::update() {
 	// Time
-	if (paused) return;
-	++framecount;
-	realtimetime += realtimetimer->getMicroseconds() / 1000000.0;
+	if (paused) {
+		return;
+	}
+	
+	int microseconds_elapsed = realtimetimer->getMicroseconds();
+	if (microseconds_elapsed > 100000) {
+		microseconds_elapsed = 100000;
+	}
+	
+	realtimetime += microseconds_elapsed / 1000000.0;
 	realtimetimer->reset();
-	timeRemaining = timeLimit - (int) realtimetime;
 	
 	// Update
-	if (levelMap)
-		levelMap->update();
+	if (levelMap) {
+		levelMap->update(microseconds_elapsed, realtimetime);
+	}
 }
 void LevelState::resume(W::Returny *ret) {
 	if (ret->type == W::ReturnyType::Payload) {
@@ -88,12 +96,6 @@ void LevelState::pause() {
 void LevelState::unpause() {
 	realtimetimer->reset();
 	paused = false;
-}
-
-bool LevelState::addPlayerMoneys(int x) {
-	if (playerMoneys + x < 0) return false;
-	playerMoneys += x;
-	return true;
 }
 
 bool LevelState::loadLevel(const std::string &levelName) {
@@ -120,49 +122,8 @@ bool LevelState::loadLevel(const std::string &levelName) {
 		return false;
 	}
 	
-	// Get LuaObjs from file
-	lua_getglobal(L, "levelData");   LuaObj levelDataObj(L);
-	lua_getglobal(L, "playerState"); LuaObj playerStateObj(L);
-	lua_getglobal(L, "mapData");     LuaObj mapDataObj(L);
-	lua_close(L);
-	
-	if (!levelDataObj.isTable()) {
-		W::log << "Error: levelData table not found" << std::endl;
-		return false;
-	}
-	if (!playerStateObj.isTable()) {
-		W::log << "Error: playerState table not found" << std::endl;
-		return false;
-	}
-	if (!mapDataObj.isTable()) {
-		W::log << "Error: mapData table not found" << std::endl;
-		return false;
-	}
-	
-	// Level Data
-	LuaObj &monetaryTargetObj = levelDataObj["monetaryTarget"];
-	if (!monetaryTargetObj.isNumber()) {
-		W::log << "levelData.monetaryTarget not found or not number" << std::endl;
-		return false;
-	}
-	monetaryTarget = monetaryTargetObj.number_value;
-	LuaObj &timeLimitObj = levelDataObj["timeLimit"];
-	if (!timeLimitObj.isNumber()) {
-		W::log << "levelData.timeLimit not found or not number" << std::endl;
-		return false;
-	}
-	timeLimit = timeLimitObj.number_value;
-	
-	// Player State
-	LuaObj &balanceObj = playerStateObj["balance"];
-	if (!balanceObj.isNumber()) {
-		W::log << "playerState.balance not found or not number" << std::endl;
-		return false;
-	}
-	playerMoneys = balanceObj.number_value;
-	
 	// Map contents
-	bool mapload_success = levelMap->load(mapDataObj);
+	bool mapload_success = levelMap->load(L);
 	// Note: since the level's size info is loaded by levelMap,
 	// levelMap also calls levelView.setLevelSize, and creates the NavMap.
 	if (!mapload_success) {
@@ -176,36 +137,24 @@ bool LevelState::loadLevel(const std::string &levelName) {
 
 bool LevelState::saveLevel(const std::string &saveName) {
 	using std::string;
-	std::stringstream ss;
 	
-	// Title
-	ss << "-- " << saveName << "\n\n";
+	string s = levelMap->save();
 	
-	// Level Data
-	ss << "levelData = {\n";
-	ss << "monetaryTarget = " << monetaryTarget << ",\n";
-	ss << "timeLimit = " << timeLimit << "\n";
-	ss << "}\n\n";
-	
-	// Player State
-	ss << "playerState = {\n";
-	ss << "balance = " << playerMoneys << "\n";
-	ss << "}\n\n";
-	
-	// Map contents
-	ss << "mapData = {\n";
-	ss << levelMap->save();
-	ss << "}\n";
+	// Prepend title
+	s = string("-- ") + saveName + string("\n\n") + s;
 	
 	// Save file to save games directory
 	string saveDir = MrPaths::settingsPath + "Saved games/";
 	string saveFileName = saveDir + saveName + ".lua";
 	if (!W::isValidDir(MrPaths::settingsPath))
 		if (!W::createDir(MrPaths::settingsPath)) return false;
-	if (!W::isValidDir(saveDir))
-		if (!W::createDir(saveDir)) return false;
+	if (!W::isValidDir(saveDir)) {
+		bool dir_created = W::createDir(saveDir);
+		if (!dir_created) {
+			return false;
+		}
+	}
 	std::ofstream f(saveFileName.c_str());
-	std::string s = ss.str();
 	reindentLuaString(s);
 	f << s;
 	f.close();
