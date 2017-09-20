@@ -74,6 +74,9 @@ private:
 	tlovec furnishings;
 	tlovec controllers;
 	tlovec buildings;
+	
+	tlovec controllers_to_deactivate;
+	tlovec controllers_to_reactivate;
 	tlovec inactiveControllers;
 	
 	// Level goal data
@@ -83,11 +86,12 @@ private:
 	// Player state
 	int playerMoneys;
 	
-	void updateTLOVec(tlovec &);
+	void tlovec__update(tlovec &);
 		// Calls update() on each TLO.
 		//  - After update(), if the TLO is 'destroyed', destroy it.
 		//  - It is the dying TLO's responsibility to inform any subscribers
 		//    of its demise.
+	void tlovec__clearDestroyeds(tlovec &);
 	
 	// Map properties & loading
 	bool loaded;

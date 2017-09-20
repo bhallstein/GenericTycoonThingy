@@ -38,17 +38,38 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
 	float p_spawn = k * time_in_level / timeLimit;
 	if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
 		createUnit(false, "customer", map__randomCoord());
+		printf("%lu units, %lu controllers\n", units.size(), controllers.size());
 	}
 	
 	// Update object vectors
-	updateTLOVec(units);
-	updateTLOVec(furnishings);
-	updateTLOVec(controllers);
-	updateTLOVec(buildings);
+	tlovec__update(units);
+	tlovec__update(furnishings);
+	tlovec__update(controllers);
+	tlovec__update(buildings);
+	
+	// Update controllers
+	for (auto it = controllers_to_deactivate.begin(); it < controllers_to_deactivate.end(); ++it) {
+		for (auto it_active = controllers.begin(); it_active < controllers.end(); ) {
+			if (*it == *it_active) { it_active = controllers.erase(it_active); }
+			else ++it_active;
+		}
+	}
+	controllers_to_deactivate.clear();
+	for (auto it = controllers_to_reactivate.begin(); it < controllers_to_reactivate.end(); ++it) {
+		controllers.push_back(*it);
+	}
+	controllers_to_reactivate.clear();
+	
+	// Clear destroyed items
+	tlovec__clearDestroyeds(units);
+	tlovec__clearDestroyeds(furnishings);
+	tlovec__clearDestroyeds(controllers);
+	tlovec__clearDestroyeds(buildings);
 }
 
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::position());
+	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::position());
 	else if (ev->key == W::KeyCode::_F) createFurnishing(true, "barberschair", W::position());
 	return W::EventPropagation::ShouldContinue;
 }
@@ -347,10 +368,10 @@ Controller* LevelMap::createControllerForUnit(Unit *u) {
 	const string &type = u->type;
 	Controller *c = NULL;
 	if (type == "customer") c = createController("CustomerController");
-	else if (type == "blah") { } // ...
+	else if (type == "shopkeeper") c = createController("ShopkeeperController");
 	
 	if (c == NULL) throw W::Exception(
-		string("Error: couldn't create unit behaviour - unrecognised type ") +
+		string("Error: couldn't create controller for unit - unrecognised type: ") +
 		string("'") + type + string("'")
 	);
 	
@@ -381,17 +402,12 @@ W::position LevelMap::map__randomCoord() {
 }
 
 void LevelMap::deactivateController(Controller *c) {
-	inactiveControllers.push_back(c);
-	for (auto it = controllers.begin(); it < controllers.end(); ) {
-		if (*it == c) it = controllers.erase(it);
-		else ++it;
-	}
+	printf("Deactivate controller %p\n", c);
+	controllers_to_deactivate.push_back(c);
 }
 void LevelMap::reactivateController(Controller *c) {
-	controllers.push_back(c);
-	for (tlovec::iterator it = inactiveControllers.begin(); it < inactiveControllers.end(); )
-		if (*it == c) it = inactiveControllers.erase(it);
-		else ++it;
+	printf("Reactivate controller %p\n", c);
+	controllers_to_reactivate.push_back(c);
 }
 
 bool LevelMap::addPlayerMoneys(int x) {
@@ -403,15 +419,19 @@ bool LevelMap::addPlayerMoneys(int x) {
 	return true;
 }
 
-void LevelMap::updateTLOVec(std::vector<TLO *> &v) {
-	for (tlovec::iterator it = v.begin(); it != v.end(); ) {
+void LevelMap::tlovec__update(tlovec &v) {
+	for (auto it = v.begin(); it != v.end(); ++it) {
+		(*it)->update();
+	}
+}
+void LevelMap::tlovec__clearDestroyeds(tlovec &v) {
+	for (auto it = v.begin(); it != v.end(); ) {
 		TLO *tlo = *it;
 		if (tlo->destroyed) {
-			it = v.erase(it);
 			delete tlo;
+			it = v.erase(it);
 		}
 		else {
-			tlo->update();
 			++it;
 		}
 	}
