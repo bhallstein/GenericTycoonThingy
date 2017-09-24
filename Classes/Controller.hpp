@@ -53,9 +53,7 @@ public:
 		// These methods are called by Unit when it has successfully carried
 		// out, or failed to sucessfully carry out, a task.
 	
-	static void initialize() {
-		sd["passbackMap"] = makeSerializer(&Controller::passbackMap);
-	}
+	static void initialize();
 	
 	virtual void unitPickedUp(Unit *) = 0;
 	virtual void unitPutDown(Unit *) = 0;
@@ -92,7 +90,7 @@ private:
 
 class CustomerController : public Controller {
 public:
-	CustomerController(LevelMap *, LevelView *, W::NavMap *);
+	CustomerController(LevelMap *, LevelView *, W::NavMap *, SeekTarget::Type);
 	
 	void resume(Unit *, ControllerCompletion::T);
 	void success(Unit *) { ++stage; }
@@ -100,12 +98,7 @@ public:
 	
 	void update();
 	
-	static void initialize() {
-		sd["stage"] = makeSerializer(&CustomerController::stage);
-		sd["failureStage"] = makeSerializer(&CustomerController::failureStage);
-		sd["timeWaited"] = makeSerializer(&CustomerController::timeWaited);
-		sd["customer"] = makeSerializer(&CustomerController::customer);
-	}
+	static void initialize();
 	
 	void unitPickedUp(Unit *);
 	void unitPutDown(Unit *);
@@ -119,6 +112,7 @@ protected:
 	int timeWaited;
 	UID customer;
 	UID dest_building;
+	SeekTarget::Type seek_target;
 	
 	virtual void getSDs(sdvec &vec) {
 		Controller::getSDs(vec);
@@ -143,12 +137,7 @@ public:
 	
 	void update();
 	
-	static void initialize() {
-		sd["stage"] = makeSerializer(&ShopkeeperController::stage);
-		sd["failureStage"] = makeSerializer(&ShopkeeperController::failureStage);
-		sd["timeWaited"] = makeSerializer(&ShopkeeperController::timeWaited);
-		sd["shopkeeper"] = makeSerializer(&ShopkeeperController::shopkeeper);
-	}
+	static void initialize();
 	
 	void unitPickedUp(Unit *);
 	void unitPutDown(Unit *);

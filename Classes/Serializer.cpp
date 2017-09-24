@@ -63,13 +63,15 @@ std::string _serialize(const UnitMode::T &m) {
 std::string _serialize(const std::map<UID,UID> &m) {
 	std::stringstream ss;
 	ss << "{ ";
-	int i=0, n = m.size();
+	int i=0, n = (int) m.size();
 	for (std::map<UID,UID>::const_iterator it = m.begin(); it != m.end(); ++it)
 		ss << it->first.id << " = " << it->second.id << (++i == n ? "" : ", ");
 	ss << " }";
 	return ss.str();
 }
-
+std::string _serialize(const SeekTarget::Type &targ) {
+	return SeekTarget::Targets[targ];
+}
 
 /* _deserialize fn implementations */
 
@@ -150,6 +152,16 @@ void _deserialize(LuaObj &o, std::map<UID,UID> &m) {
 		std::stringstream(it->first) >> x;
 		_deserialize(it->second, u2);		// TODO: check this
 		m[UID(u1)] = UID(u2);				// Seems like an error
+	}
+}
+void _deserialize(LuaObj &o, SeekTarget::Type &targ) {
+	std::string o_type = o.str_value;
+	int n_types = (int) SeekTarget::__N;
+	for (int i=0; i < n_types; ++i) {
+		SeekTarget::Type type = (SeekTarget::Type) i;
+		if (SeekTarget::Targets[type] == o_type) {
+			targ = type;
+		}
 	}
 }
 

@@ -22,6 +22,7 @@
 #include "Unit.hpp"
 #include "Controller.hpp"
 #include "W.h"
+#include "Serializer.hpp"
 
 LevelState::LevelState() :
 	levelView(NULL),

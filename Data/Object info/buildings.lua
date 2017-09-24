@@ -4,18 +4,10 @@ buildingTypes = {
 	shop = {
 		allowedFurnishings = { "barberschair" }
 	},
-	-- pieshop = {
-	-- 	colour = "yellow",
-	-- 	allowedFurnishings = { "piecounter" }
-	-- },
-	-- home = {
-	-- 	colour = "black",
-	-- 	allowedFurnishings = {  }
-	-- },
-	-- asylum = {
-	-- 	colour = "purple",
-	-- 	allowedFurnishings = {  }
-	-- }
+	pieshop = {
+		allowedFurnishings = { "piecounter" }
+	},
+	home = {
+		allowedFurnishings = {  }
+	},
 }
-
-numberOfAubergines = 4

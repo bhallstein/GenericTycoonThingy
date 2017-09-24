@@ -12,6 +12,8 @@
 
 #include "PlaceableManager.hpp"
 
+class LevelMap;
+
 PlaceableManager::PlaceableManager(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	TLO(_lm, _lv, _nm),
 	placeableMode(_placeableMode), placeable(this, levelView)

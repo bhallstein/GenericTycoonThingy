@@ -15,6 +15,7 @@
 #include "UIDManager.hpp"
 #include "LevelMap.hpp"
 #include "Building.hpp"
+#include "Serializer.hpp"
 
 /********************/
 /* Controller impl. */
@@ -31,9 +32,14 @@ Controller::~Controller()
 {
 	std::cout << "controller " << this << " destruct" << std::endl;
 }
+void Controller::initialize() {
+	sd["passbackMap"] = makeSerializer(&Controller::passbackMap);
+}
 void Controller::_setUp() {
 	
 }
+
+
 
 // Public:
 bool Controller::dispatchUnit(Unit *u) {
@@ -83,12 +89,20 @@ void Controller::releaseUnit(Unit *u, ControllerCompletion::T succ) {
 
 Serializable::serialization_descriptor CustomerController::sd;
 
-CustomerController::CustomerController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+CustomerController::CustomerController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, SeekTarget::Type _seek) :
 	Controller(_lm, _lv, _nm),
 	stage(0),
-	failureStage(0)
+	failureStage(0),
+	seek_target(_seek)
 {
 	type = "CustomerController";
+}
+void CustomerController::initialize() {
+	sd["stage"] = makeSerializer(&CustomerController::stage);
+	sd["failureStage"] = makeSerializer(&CustomerController::failureStage);
+	sd["timeWaited"] = makeSerializer(&CustomerController::timeWaited);
+	sd["customer"] = makeSerializer(&CustomerController::customer);
+	sd["seek_target"] = makeSerializer(&CustomerController::seek_target);
 }
 
 void CustomerController::resume(Unit *_u, ControllerCompletion::T succ) {
@@ -110,15 +124,20 @@ void CustomerController::update() {
 	else if (stage == 1) {
 		failureStage = 99;
 		
-		// Try to find a building
-		Building *b = levelMap->building__getRandom();
+		// Try to find a building supporting the seek target
+		Building *b = levelMap->building__withFurnishingSupportingSeekTarget(seek_target);
 		if (b) {
 			dest_building = b->uid;
 			stage = 100;
 		}
 		else {
-			customerPtr()->wanderToRandomMapDestination();
-			++stage;
+			bool route_found = customerPtr()->wanderToRandomMapDestination();
+			if (route_found) {
+				++stage;
+			}
+			else {
+				stage = failureStage;
+			}
 		}
 	}
 	else if (stage == 2) {
@@ -126,7 +145,7 @@ void CustomerController::update() {
 	}
 	else if (stage == 3) {
 		// pause for ~2s
-		if (++timeWaited >= 120) {
+		if (++timeWaited >= 1) {
 			timeWaited = 0;
 			stage = 1;
 		}
@@ -175,6 +194,7 @@ void CustomerController::update() {
 	
 	/* Send unit home */
 	else if (stage == 200) {
+		failureStage = 299;
 		customerPtr()->wanderToRandomMapDestination();
 		++stage;
 	}
@@ -185,11 +205,20 @@ void CustomerController::update() {
 		customerPtr()->destroy();
 		this->destroy();
 	}
+	else if (stage == 299) {
+		// Failure
+		stage = 200;
+	}
 	
 	
 	/* Unit has been picked up */
 	else if (stage == 500) {
 		
+	}
+	
+	
+	else {
+		throw new W::Exception(std::string("CustomerController '") + type + "' entered unexpected stage");
 	}
 }
 
@@ -217,12 +246,19 @@ void CustomerController::unitPutDown(Unit *u) {
 Serializable::serialization_descriptor ShopkeeperController::sd;
 
 ShopkeeperController::ShopkeeperController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
-Controller(_lm, _lv, _nm),
-stage(0),
-failureStage(0)
+	Controller(_lm, _lv, _nm),
+	stage(0),
+	failureStage(0)
 {
 	type = "ShopkeeperController";
 }
+void ShopkeeperController::initialize() {
+	sd["stage"] = makeSerializer(&ShopkeeperController::stage);
+	sd["failureStage"] = makeSerializer(&ShopkeeperController::failureStage);
+	sd["timeWaited"] = makeSerializer(&ShopkeeperController::timeWaited);
+	sd["shopkeeper"] = makeSerializer(&ShopkeeperController::shopkeeper);
+}
+
 
 void ShopkeeperController::resume(Unit *_u, ControllerCompletion::T succ) {
 	// if success, do things, otherwise, do other things
@@ -238,8 +274,14 @@ void ShopkeeperController::update() {
 	else if (stage == 1) {
 		failureStage = 99;
 		Unit *sk = (Unit*) shopkeeper.get();
-		sk->wanderToRandomMapDestination();
-		++stage;
+		bool route_found = sk->wanderToRandomMapDestination();
+		if (route_found) {
+			timeWaited = 0;
+			++stage;
+		}
+		else {
+			stage = failureStage;
+		}
 	}
 	else if (stage == 2) {
 		// wait for unit to arrive at destination
@@ -260,10 +302,10 @@ void ShopkeeperController::update() {
 	/* Shop-keeping */
 	else if (stage == 200) {
 		// Wait for customer
+		failureStage = 299;
 	}
 	else if (stage == 201) {
 		// Send customer & shopkeeper to their destinations
-		failureStage = 299;
 		Unit *sk = (Unit*) shopkeeper.get();
 		Unit *cust = (Unit*) customer.get();
 		Building *b = (Building*) building.get();
@@ -302,6 +344,11 @@ void ShopkeeperController::update() {
 	/* Unit has been picked up */
 	else if (stage == 500) {
 		
+	}
+	
+	
+	else {
+		throw new W::Exception(std::string("ShopkeeperController '") + type + "' entered unexpected stage");
 	}
 }
 
@@ -345,7 +392,7 @@ void ShopkeeperController::unitPutDown(Unit *u) {
 		stage = 200;
 	}
 	else {
-		building = 0;
+		building = NULL;
 	}
 }
 

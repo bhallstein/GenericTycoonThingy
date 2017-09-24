@@ -27,7 +27,6 @@ class Furnishing;
 class Building;
 class Unit;
 
-
 class LevelMap {
 public:
 	LevelMap(LevelState *, LevelView *);
@@ -51,9 +50,11 @@ public:
 	Controller* createController(const std::string &type, bool active = true);
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
+	SeekTarget::Type unitSeekTarget();
 	
 	Building* building__getRandom();
 	Building* building__findAt(W::position &);
+	Building* building__withFurnishingSupportingSeekTarget(SeekTarget::Type);
 	
 	W::position map__randomCoord();
 	
@@ -87,11 +88,10 @@ private:
 	int playerMoneys;
 	
 	void tlovec__update(tlovec &);
-		// Calls update() on each TLO.
-		//  - After update(), if the TLO is 'destroyed', destroy it.
+	void tlovec__clearDestroyeds(tlovec &);
+		// Delete & remove destroyed TLOs from vector.
 		//  - It is the dying TLO's responsibility to inform any subscribers
 		//    of its demise.
-	void tlovec__clearDestroyeds(tlovec &);
 	
 	// Map properties & loading
 	bool loaded;

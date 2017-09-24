@@ -18,6 +18,8 @@
 #include "Placeable.hpp"
 #include "LevelView.hpp"
 #include "LevelMap.hpp"
+#include "Serializer.hpp"
+#include <algorithm>
 
 /* furnishingInfo constructor impl */
 
@@ -30,15 +32,32 @@ furnishingInfo::furnishingInfo(LuaObj &o) {
 	
 	// Plan
 	l = &o["plan"];
-	if (!l->isTable()) throw W::Exception("Error creating furnishingInfo: 'plan' not found or not table");
-	LuaObj::_descendantmap &desc = l->descendants;
-	for (LuaObj::_descendantmap::iterator it = desc.begin(); it != desc.end(); ++it) {
+	if (!l->isTable()) {
+		throw W::Exception("Error creating furnishingInfo: 'plan' not found or not table");
+	}
+	auto &descs_plan = l->descendants;
+	for (auto it = descs_plan.begin(); it != descs_plan.end(); ++it) {
 		LuaObj &planComponent = it->second;
 		LuaObj &posObj = planComponent["0"], &szObj = planComponent["1"];
 		plan.push_back(W::rect(
 			W::position((int)posObj["0"].number_value, (int)posObj["1"].number_value),
 			W::size(szObj["0"].number_value, szObj["1"].number_value)
 		));
+	}
+	
+	// Seekables (compatible seek targets)
+	l = &o["seekables"];
+	if (l->isTable()) {
+		auto &descs_seekables = l->descendants;
+		for (auto it = descs_seekables.begin(); it != descs_seekables.end(); ++it) {
+			LuaObj &seekable = it->second;
+			if (!seekable.isString()) {
+				throw W::Exception("Error creating furnishingInfo: invalid (non-string) seekable");
+			}
+			SeekTarget::Type seekable_type;
+			_deserialize(seekable, seekable_type);
+			seekables.push_back(seekable_type);
+		}
 	}
 }
 
@@ -95,7 +114,12 @@ void Furnishing::_setUp() {
 	}
 	
 	// Set up state of DrawnFurnishing
-	// ...
+	if (type == "piecounter") {
+		drawnFurnishing->setColour(W::Colour::Yellow);
+	}
+	else {
+		drawnFurnishing->setColour(W::Colour::Pink);
+	}
 }
 
 W::EventPropagation::T Furnishing::mouseEvent(W::Event *ev) {
@@ -133,8 +157,9 @@ bool Furnishing::initialize() {
 		W::log << "Could not get furnishingTypes table from furnishings.lua" << std::endl;
 		return false;
 	}
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it)
+	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
 		furnishingTypeInfo[it->first] = new furnishingInfo(it->second);
+	}
 	
 	// 2. Set up Serialization Descriptor
 	sd["purchased"] = makeSerializer(&Furnishing::purchased);
@@ -144,6 +169,10 @@ bool Furnishing::initialize() {
 }
 int Furnishing::costForType(const char *_type) {
 	return furnishingTypeInfo[_type]->cost;
+}
+bool Furnishing::supports_seekTarget(SeekTarget::Type targ) const {
+	auto types = typeInfo->seekables;
+	return std::find(types.begin(), types.end(), targ) != types.end();
 }
 
 /* PlaceableManager overrides */
@@ -210,6 +239,11 @@ void Furnishing::DrawnFurnishing::setOpac(float x) {
 	W::Colour c = r->col;
 	c.a = x;
 	r->setCol(c);
+}
+void Furnishing::DrawnFurnishing::setColour(W::Colour _col) {
+	float alpha = r->col.a;
+	r->col = _col;
+	r->col.a = alpha;
 }
 
 

@@ -19,7 +19,8 @@
 #define TLO_H
 
 #include "W.h"
-#include "Serializer.hpp"
+//#include "Serializer.hpp"
+#include "UIDManager.hpp"
 #include "Serializable.hpp"
 
 #define NO_TYPE "no_type"
@@ -57,13 +58,7 @@ public:
 	bool destroyed;
 	void destroy() { destroyed = true; }
 	
-	static void initialize() {
-		TLO::sd["uid"] = makeSerializer(&TLO::uid);
-		TLO::sd["rct"] = makeSerializer(&TLO::rct);
-		TLO::sd["type"] = makeSerializer(&TLO::type);
-		TLO::sd["destroyed"] = makeSerializer(&TLO::destroyed);
-			// Should `destroyed` ever be serialized as true?!
-	}
+	static void initialize();
 	
 	UID uid;
 	W::rect rct;

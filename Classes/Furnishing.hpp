@@ -25,6 +25,7 @@ struct furnishingInfo {
 	furnishingInfo(LuaObj &);
 	int cost;
 	std::vector<W::rect> plan;
+	std::vector<SeekTarget::Type> seekables;
 };
 
 class Furnishing : public PlaceableManager {
@@ -43,6 +44,7 @@ public:
 	static bool initialized;
 	
 	static int costForType(const char *);
+	bool supports_seekTarget(SeekTarget::Type) const;
 	
 protected:
 	bool purchased;
@@ -77,6 +79,7 @@ public:
 	~DrawnFurnishing();
 	void setPosn(const W::position &);
 	void setOpac(float);
+	void setColour(W::Colour);
 private:
 	LevelView *lv;
 	W::DRect *r;

@@ -56,16 +56,7 @@ mapData = {
 		},
 	},
 	furnishings = {
-		{
-			destroyed = false,
-			rct = {
-				position = { x=0,y=0,a=0,b=0 },
-				size = { width=2,height=2 }
-			},
-			type = "barberschair",
-			uid = 3,
-			purchased = true
-		}
+		
 	},
 	controllers = {
 		{

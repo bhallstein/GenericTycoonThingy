@@ -54,7 +54,7 @@ public:
 	void update();
 	
 	// Utility methods
-	void wanderToRandomMapDestination();
+	bool wanderToRandomMapDestination();
 	bool voyage(const W::position &_dest);
 	
 	static bool initialize(); 	// Populate static unitTypes from units.lua

@@ -29,6 +29,7 @@
 #include "W.h"
 #include "Serializable.hpp"
 #include "UIDManager.hpp"
+#include "Controller.hpp"
 
 /*
  * Serializer functions:
@@ -86,6 +87,7 @@ void _deserialize(LuaObj &, std::vector<W::position> &);
 void _deserialize(LuaObj &, UID &);
 void _deserialize(LuaObj &, UnitMode::T &);
 void _deserialize(LuaObj &, std::map<UID,UID> &);
+void _deserialize(LuaObj &o, SeekTarget::Type &);
 
 
 /* SerializerBase class */

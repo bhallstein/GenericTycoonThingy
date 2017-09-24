@@ -36,6 +36,16 @@ namespace UnitMode {
 	enum T { IDLE, VOYAGING, ANIMATING };
 }
 
+namespace SeekTarget {
+	enum Type {
+		Pie,
+		Haircut,
+		
+		__N
+	};
+	extern std::map<Type, std::string> Targets;
+};
+
 typedef struct door {
 	W::position pos;
 	Direction::T orientation;

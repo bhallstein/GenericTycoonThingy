@@ -20,6 +20,7 @@
 #include "LevelMap.hpp"
 #include "LevelView.hpp"
 #include "Placeable.hpp"
+#include "Serializer.hpp"
 
 W::EventType::T W::EventType::INTERRUPT_UNITPICKUP = W::Event::registerType();
 
@@ -128,9 +129,9 @@ void Unit::update() {
 
 /*** Utility methods ***/
 
-void Unit::wanderToRandomMapDestination() {
-	voyage(levelMap->map__randomCoord());
-		// TODO: call bhvr.failure if cannot voyage, or if obstacle encountered
+bool Unit::wanderToRandomMapDestination() {
+	W::position dest = levelMap->map__randomCoord();
+	return voyage(dest);
 }
 bool Unit::voyage(const W::position &_dest) {
 	dest = _dest;

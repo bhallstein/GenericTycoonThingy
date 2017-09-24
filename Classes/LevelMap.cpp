@@ -17,6 +17,7 @@
 #include "Unit.hpp"
 #include "Furnishing.hpp"
 #include "Building.hpp"
+#include <algorithm>
 
 LevelMap::LevelMap(LevelState *_ls, LevelView *_lv) :
 	levelState(_ls),
@@ -70,7 +71,8 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::position());
 	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::position());
-	else if (ev->key == W::KeyCode::_F) createFurnishing(true, "barberschair", W::position());
+	else if (ev->key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::position());
+	else if (ev->key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::position());
 	return W::EventPropagation::ShouldContinue;
 }
 
@@ -330,10 +332,13 @@ Unit* LevelMap::createUnit(LuaObj &o) {
 	}
 	return u;
 }
+SeekTarget::Type LevelMap::unitSeekTarget() {
+	return (SeekTarget::Type) W::Rand::intUpTo(SeekTarget::__N);
+}
 Controller* LevelMap::createController(const std::string &type, bool active) {
 	Controller *c = NULL;
 	if (type == "CustomerController") {
-		c = new CustomerController(this, levelView, navmap);
+		c = new CustomerController(this, levelView, navmap, unitSeekTarget());
 	}
 	else if (type == "ShopkeeperController") {
 		c = new ShopkeeperController(this, levelView, navmap);
@@ -349,7 +354,7 @@ Controller* LevelMap::createController(LuaObj &o, bool active) {
 	Controller *c = NULL;
 	const std::string &type = o["type"].str_value;
 	if (type == "CustomerController") {
-		c = new CustomerController(this, levelView, navmap);
+		c = new CustomerController(this, levelView, navmap, unitSeekTarget());
 	}
 	else if (type == "ShopkeeperController") {
 		c = new ShopkeeperController(this, levelView, navmap);
@@ -393,6 +398,22 @@ Building* LevelMap::building__findAt(W::position &p) {
 	}
 	return NULL;
 }
+Building* LevelMap::building__withFurnishingSupportingSeekTarget(SeekTarget::Type seek_target) {
+	// Find a furnishing supporting the SeekTarget
+	std::vector<TLO*> supporting_furnishings;
+	std::copy_if(furnishings.begin(), furnishings.end(), std::back_inserter(supporting_furnishings), [=](const TLO *x) {
+		Furnishing *f = (Furnishing*) x;
+		return f->supports_seekTarget(seek_target);
+	});
+	
+	int n_found = (int) supporting_furnishings.size();
+	if (n_found == 0) {
+		return NULL;
+	}
+	
+	TLO *f = supporting_furnishings[W::Rand::intUpTo(n_found)];
+	return building__findAt(f->rct.pos);
+}
 
 W::position LevelMap::map__randomCoord() {
 	return W::position(
@@ -406,7 +427,7 @@ void LevelMap::deactivateController(Controller *c) {
 	controllers_to_deactivate.push_back(c);
 }
 void LevelMap::reactivateController(Controller *c) {
-	printf("Reactivate controller %p\n", c);
+	printf("Reactivate controller %p\n", c); 
 	controllers_to_reactivate.push_back(c);
 }
 

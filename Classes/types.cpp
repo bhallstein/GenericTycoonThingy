@@ -55,3 +55,9 @@ bool luaLoad(const std::string &filename, lua_State **L) {
 	}
 	return true;
 }
+
+std::map<SeekTarget::Type, std::string> SeekTarget::Targets = {
+	{ Pie, "pie" },
+	{ Haircut, "haircut" },
+};
+

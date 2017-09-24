@@ -1,14 +1,17 @@
 -- Furnishing definitions
 
 furnishingTypes = {
-	door = {
-		plan = {
-			{ pos = {0,0}, sz = {2,1} }
-		}
-	},
+	-- door = {
+	-- 	plan = {
+	-- 		{ pos = {0,0}, sz = {2,1} }
+	-- 	}
+	-- },
 	barberschair = {
 		plan = {
 			{ pos = {0,0}, sz = {2,2} }
+		},
+		seekables = {
+			"haircut",
 		},
 		cost = 20
 	},
@@ -16,8 +19,9 @@ furnishingTypes = {
 		plan = {
 			{ pos = {0,0}, sz = {2,1} }
 		},
+		seekables = {
+			"pie",
+		},
 		cost = 20
 	}
 }
-
-numberOfAubergines = 18
