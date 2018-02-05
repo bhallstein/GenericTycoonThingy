@@ -79,6 +79,8 @@ private:
 	tlovec controllers_to_deactivate;
 	tlovec controllers_to_reactivate;
 	tlovec inactiveControllers;
+
+  bool first_frame = true;
 	
 	// Level goal data
 	int monetaryTarget;

@@ -41,7 +41,7 @@ void MenuState::resume(W::Returny *ret) {
 		W::popState(W::KillerReturny);
 	}
 	else if (ret->type == W::ReturnyType::Payload) {
-		if (ret->payload == "replay") startLevel("level1");
+		if (ret->payload == "replay") startLevel("qj-level");
 	}
 }
 void MenuState::update() {
@@ -54,7 +54,7 @@ W::EventPropagation::T MenuState::keyEvent(W::Event *ev) {
 	return W::EventPropagation::ShouldContinue;
 }
 W::EventPropagation::T MenuState::uiEvent(W::Event *ev) {
-	startLevel("shopkeeper_test");
+	startLevel("qj-level");
 	return W::EventPropagation::ShouldContinue;
 }
 

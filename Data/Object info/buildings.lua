@@ -1,7 +1,7 @@
 -- Building definitions
 
 buildingTypes = {
-	shop = {
+	barber = {
 		allowedFurnishings = { "barberschair" }
 	},
 	pieshop = {

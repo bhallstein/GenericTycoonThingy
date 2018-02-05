@@ -16,6 +16,7 @@
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"
 #include "W.h"
+#include "Serializer.hpp"
 
 /* buildingInfo constructor impl */
 
@@ -35,8 +36,15 @@ buildingInfo::buildingInfo(LuaObj &o) {
 /* Building: static properties */
 
 std::map<std::string, buildingInfo*> Building::buildingTypeInfo;
-//Serializable::serialization_descriptor Building::sd;
+Serializable::serialization_descriptor Building::sd;
 bool Building::initialized = false;
+
+
+std::map<std::string, W::Colour> building_colors = {
+  { "home",    {0,0,0,0.8} },
+  { "barber",  W::Colour::Red },
+  { "pieshop", W::Colour::Yellow },
+};
 
 
 /*** Building ***/
@@ -44,7 +52,7 @@ bool Building::initialized = false;
 Building::Building(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
-	drawnBuilding = new DrawnBuilding(levelView, W::rect());
+  drawnBuilding = new DrawnBuilding(levelView, W::position());
 	
 //	if (!navmap->isPassableUnder(rct)) {
 //		throw W::Exception("Navmap was not passable under Building plan.");
@@ -53,7 +61,7 @@ Building::Building(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 Building::~Building()
 {
 	std::cout << "building destruct" << std::endl;
-	navmap->unisolate(rct);		// NOTE: W::NavMap::unisolate() is not yet functional
+//  navmap->unisolate(rct);    // NOTE: W::NavMap::unisolate() is not yet functional
 	delete drawnBuilding;
 }
 
@@ -75,8 +83,30 @@ void Building::_setUp() {
 	}
 	
 	// Set up state of DrawnBuilding
-	drawnBuilding->setPosn(rct.pos);
-	drawnBuilding->setSz(rct.sz);
+  drawnBuilding->setPos(rct.pos);
+  drawnBuilding->setGroundplan(groundplan);
+  auto col = building_colors.find(type);
+  if (col == building_colors.end()) {
+    drawnBuilding->setCol(W::Colour::Pink);
+  }
+  else {
+    drawnBuilding->setCol(col->second);
+  }
+
+  // Add to navmap
+  auto groundplan_levelcoords = groundplan;
+  for (auto &p : groundplan_levelcoords) {
+    p += rct.pos;
+  }
+  navmap->isolate(groundplan_levelcoords);
+
+  auto doors_levelcoords = doors;
+  for (auto &p : doors_levelcoords) {
+    p += rct.pos;
+  }
+  for (auto it = doors_levelcoords.begin(); it < doors_levelcoords.end(); it += 2) {
+    navmap->createConnection(*it, *(it + 1));
+  }
 }
 
 
@@ -84,7 +114,6 @@ bool Building::initialize() {
 	if (Building::initialized) return true;
 	
 	// 1. Get buildingTypeInfo LuaObj
-	
 	std::string path = MrPaths::resourcesPath + "Data/Object info/buildings.lua";
 	lua_State *L;
 	if (!luaLoad(path, &L)) {
@@ -98,11 +127,13 @@ bool Building::initialize() {
 		return false;
 	}
 	LuaObj::_descendantmap &desc = o.descendants;
-	for (LuaObj::_descendantmap::iterator it = desc.begin(); it != desc.end(); ++it)
+  for (auto it = desc.begin(); it != desc.end(); ++it) {
 		buildingTypeInfo[it->first] = new buildingInfo(it->second);
+  }
 	
 	// 2. Set up Serialization Descriptor
-	// ...
+  sd["groundplan"] = makeSerializer(&Building::groundplan);
+  sd["doors"] = makeSerializer(&Building::doors);
 
 	Building::initialized = true;
 	return true;
@@ -110,11 +141,7 @@ bool Building::initialize() {
 
 void Building::setPos(const W::position &_pos) {
 	rct.pos = _pos;
-	drawnBuilding->setPosn(_pos);
-}
-void Building::setSz(const W::size &_sz) {
-	rct.sz = _sz;
-	drawnBuilding->setSz(_sz);
+	drawnBuilding->setPos(_pos);
 }
 
 void Building::addShopkeeper(UID sk) {
@@ -136,19 +163,51 @@ void Building::removeShopkeeper(UID sk_to_remove) {
 
 // DrawnBuilding impl
 
-Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, const W::rect &_rct) : lv(_lv)
+Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, W::position _pos) :
+  lv(_lv),
+  col(W::Colour::SkyBlue)
 {
-	r = new W::DRect(
-		_lv, _rct.pos, _lv->convertGridToPixelCoords(_rct.sz), W::Colour::TransparentBlack
-	);
+  setPos(_pos);
 }
+
 Building::DrawnBuilding::~DrawnBuilding()
 {
-	delete r;
+  for (auto it : rects) {
+    delete it;
+  }
+  rects.clear();
 }
-void Building::DrawnBuilding::setPosn(const W::position &_pos) {
-	r->setPos(lv->convertGridToPixelCoords(_pos));
+
+void Building::DrawnBuilding::setGroundplan(std::vector<W::position> _groundplan) {
+  for (auto it : rects) {
+    delete it;
+  }
+  rects.clear();
+
+  W::size grid_element_size = lv->convertGridToPixelCoords(W::size(1,1));
+  for (size_t i=0; i < _groundplan.size(); ++i) {
+    rects.push_back(new W::DRect(lv,
+                                 lv->convertGridToPixelCoords(_groundplan[i]) + pos,
+                                 grid_element_size,
+                                 col));
+  }
 }
-void Building::DrawnBuilding::setSz(const W::size &_sz) {
-	r->setSz(lv->convertGridToPixelCoords(_sz));
+
+void Building::DrawnBuilding::setPos(W::position _pos) {
+  pos = lv->convertGridToPixelCoords(_pos);
+
+  for (size_t i=0; i < groundplan.size(); ++i) {
+    auto pl = groundplan[i];
+    auto r = rects[i];
+
+    r->setPos(pos + lv->convertGridToPixelCoords(pl));
+  }
+}
+
+void Building::DrawnBuilding::setCol(W::Colour _c) {
+  col = _c;
+
+  for (auto r : rects) {
+    r->setCol(_c);
+  }
 }

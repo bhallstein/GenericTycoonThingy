@@ -66,6 +66,7 @@ std::string _serialize(const std::vector<T> &x) {
 }
 std::string _serialize(const std::map<UID,UID> &);
 
+
 /*
  * Deserializer functions
  *  - used by a Serializer to set a property of a Serializable from a given LuaObj

@@ -71,7 +71,7 @@ void LevelState::update() {
 		return;
 	}
 	
-	int microseconds_elapsed = realtimetimer->getMicroseconds();
+	int microseconds_elapsed = (int) realtimetimer->getMicroseconds();
 	if (microseconds_elapsed > 100000) {
 		microseconds_elapsed = 100000;
 	}

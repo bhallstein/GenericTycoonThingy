@@ -34,14 +34,22 @@ LevelMap::~LevelMap()
 void LevelMap::update(int frame_microseconds, float time_in_level) {
 	// Spawn units
 	// The % chance of spawning a unit is kT, where T is the current fraction of the level time limit
-	// Note: this chance is per-frame, so depends on the framerate, which is bad.
-	float k = 0.2;
-	float p_spawn = k * time_in_level / timeLimit;
-	if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
-		createUnit(false, "customer", map__randomCoord());
-		printf("%lu units, %lu controllers\n", units.size(), controllers.size());
-	}
-	
+  // Note: this chance is per-frame, so depends on the framerate, which is bad.
+  float k = 0.2;
+  float p_spawn = k * time_in_level / timeLimit;
+  if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
+    createUnit(false, "customer", map__randomCoord());
+    printf("%lu units, %lu controllers\n", units.size(), controllers.size());
+  }
+
+//  if (first_frame) {
+//    for (int i=0; i < 100; ++i) {
+//      createUnit(false, "customer", map__randomCoord());
+//    }
+//
+//    first_frame = false;
+//  }
+
 	// Update object vectors
 	tlovec__update(units);
 	tlovec__update(furnishings);
