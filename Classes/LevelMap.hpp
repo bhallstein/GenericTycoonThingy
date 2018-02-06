@@ -57,6 +57,7 @@ public:
 	Building* building__withFurnishingSupportingSeekTarget(SeekTarget::Type);
 	
 	W::position map__randomCoord();
+	Building* map__randomBuilding(std::string type = "");
 	
 	void deactivateController(Controller *);
 	void reactivateController(Controller *);

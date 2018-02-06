@@ -57,6 +57,7 @@ public:
   std::vector<UID> shopkeeper__getAll() { return activeShopkeepers; }
 
   bool contains_point(W::position);
+  W::position centrePoint();
 
 protected:
   std::vector<W::position> groundplan;

@@ -11,7 +11,7 @@ public:
     // Also want to add the economy, & setter for its contents
     d_econ = new W::DText(this, {0,0}, "", W::Colour::White, W::TextAlign::Right);
     setEcon(7);
-    this->updatePosition({0,0});
+    d_econ->setPos({rct.sz.width - 10, 10});
   }
 
   void setEcon(int money) {
@@ -21,6 +21,7 @@ public:
   }
 
   void updatePosition(const W::size &winsize) {
+    W::UIView::updatePosition(winsize);
     d_econ->setPos({rct.sz.width - 10, 10});
   }
 

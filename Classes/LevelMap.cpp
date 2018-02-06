@@ -38,8 +38,11 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
   float k = 0.2;
   float p_spawn = k * time_in_level / timeLimit;
   if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
-    createUnit(false, "customer", map__randomCoord());
-    printf("%lu units, %lu controllers\n", units.size(), controllers.size());
+    Building *b = map__randomBuilding("home");
+    if (b) {
+      createUnit(false, "customer", b->centrePoint());
+      printf("%lu units, %lu controllers\n", units.size(), controllers.size());
+    }
   }
 
 //  if (first_frame) {
@@ -424,6 +427,23 @@ W::position LevelMap::map__randomCoord() {
 		W::Rand::intUpTo(width()),
 		W::Rand::intUpTo(height())
 	);
+}
+Building* LevelMap::map__randomBuilding(std::string type) {
+  tlovec vec;
+  if (type != "") {
+    std::copy_if(buildings.begin(), buildings.end(), std::back_inserter(vec), [=](TLO* _b) {
+      Building *b = (Building*) _b;
+      return b->type == type;
+    });
+  }
+  else {
+    vec = buildings;
+  }
+
+  if (vec.size() == 0) {
+    return NULL;
+  }
+  return (Building*) vec[W::Rand::intUpTo((int)vec.size())];
 }
 
 void LevelMap::deactivateController(Controller *c) {

@@ -169,6 +169,29 @@ bool Building::contains_point(W::position p) {
   return false;
 }
 
+W::position Building::centrePoint() {
+  // Return groundplan item closest to average_position
+  W::position gp_sum;
+  for (auto gp : groundplan) {
+    gp_sum += gp;
+  }
+  float avg_x = float(gp_sum.x) / groundplan.size();
+  float avg_y = float(gp_sum.y) / groundplan.size();
+
+  float min_dist = 10000000000.f;
+  W::position best = groundplan[0];
+  for (auto gp : groundplan) {
+    float dist = (avg_x - gp.x)*(avg_x - gp.x) + (avg_y - gp.y)*(avg_y - gp.y);
+    if (dist < min_dist) {
+      min_dist = dist;
+      best = gp;
+    }
+  }
+
+  best += rct.pos;
+  return best;
+}
+
 
 
 // DrawnBuilding impl

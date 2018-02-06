@@ -115,13 +115,13 @@ void CustomerController::resume(Unit *_u, ControllerCompletion::T succ) {
 	}
 }
 void CustomerController::update() {
-	/* No unit dispatched */
+	// No unit dispatched
 	if (stage == 0) {
 		
 	}
 	
 	
-	/* Wander to an available building or between random locations */
+	// Wander to an available building or between random locations
 	else if (stage == 1) {
 		failureStage = 99;
 		
@@ -157,7 +157,7 @@ void CustomerController::update() {
 	}
 	
 	
-	/* Navigate to dest building */
+	// Navigate to dest building
 	else if (stage == 100) {
 		failureStage = 199;
 		Building *b = (Building*) dest_building.get();
@@ -193,7 +193,7 @@ void CustomerController::update() {
 	}
 	
 	
-	/* Send unit home */
+	// Send unit home
 	else if (stage == 200) {
 		failureStage = 299;
 		customerPtr()->wanderToRandomMapDestination();
@@ -212,7 +212,7 @@ void CustomerController::update() {
 	}
 	
 	
-	/* Unit has been picked up */
+	// Unit has been picked up
 	else if (stage == 500) {
 		
 	}
@@ -265,13 +265,13 @@ void ShopkeeperController::resume(Unit *_u, ControllerCompletion::T succ) {
 	// if success, do things, otherwise, do other things
 }
 void ShopkeeperController::update() {
-	/* No unit dispatched */
+	// No unit dispatched
 	if (stage == 0) {
 		
 	}
 	
 	
-	/* Wander between random locations */
+	// Wander between random locations
 	else if (stage == 1) {
 		failureStage = 99;
 		Unit *sk = (Unit*) shopkeeper.get();
@@ -300,7 +300,7 @@ void ShopkeeperController::update() {
 	}
 	
 	
-	/* Shop-keeping */
+	// Shop-keeping
 	else if (stage == 200) {
 		// Wait for customer
 		failureStage = 299;
@@ -342,7 +342,7 @@ void ShopkeeperController::update() {
 	}
 	
 	
-	/* Unit has been picked up */
+	// Unit has been picked up
 	else if (stage == 500) {
 		
 	}
