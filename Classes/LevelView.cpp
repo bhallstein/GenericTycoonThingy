@@ -17,12 +17,12 @@
 /********************************/
 
 LevelView::LevelView() :
-	View(new W::Positioner(
-		W::Corner::TopLeft,
-		W::PosType::Fixed, W::PosType::Fixed,
-		W::PosType::Proportional, W::PosType::Proportional,
-		0, 0, 1, 1
-	)),
+	View(new W::Positioner(W::Corner::TopLeft,
+                         W::PosType::Fixed,
+                         W::PosType::Fixed,
+                         W::PosType::Proportional,
+                         W::PosType::Proportional,
+                         0, 0, 1, 1)),
 	gridsize(20),
 	level_width(-1), level_height(-1)
 {
@@ -96,45 +96,3 @@ W::position LevelView::convertPixelToGridCoords(const W::position &_p) {
 		float((_p.y)%gridsize) / float(gridsize)
 	);
 }
-
-
-/**********************************/
-/*** GTTHelpView implementation ***/
-/**********************************/
-
-GTTHelpView::GTTHelpView() : W::UIView("UIViews/GTTHelpView.lua")
-{
-	t1 = new W::DText(this, W::position(220,10), "Help", W::Colour::White);
-	t2 = new W::DText(this, W::position(14,54), "place furniture and staff in your", W::Colour::White);
-	t3 = new W::DText(this, W::position(14,74), "buildings. customers will come and", W::Colour::White);
-	t4 = new W::DText(this, W::position(14,94), "give you money.", W::Colour::White);
-	t5 = new W::DText(this, W::position(14,144), "[time left]", W::Colour::White);
-	t6 = new W::DText(this, W::position(14,184), "Get cracking! GO!", W::Colour::White);
-	
-	r1 = new W::DRect(this, W::position(10,234), W::size(500,1), W::Colour(1, 1, 1, 0.3));
-	
-	t7 = new W::DText(this, W::position(14,264), "Esc: quit to main menu", W::Colour::White);
-	t8 = new W::DText(this, W::position(14,284), "Q: quit completely", W::Colour::White);
-	t9 = new W::DText(this, W::position(14,304), "H: help", W::Colour::White);
-}
-void GTTHelpView::setTimeRemaining(int t) {
-	timeRemaining = t;
-	setTimeRemainingText();
-}
-void GTTHelpView::setMonetaryTarget(int m) {
-	monetaryTarget = m;
-}
-void GTTHelpView::setTimeRemainingText() {
-	if (t5) delete t5;
-	char s[100];
-	int time_minutes = timeRemaining/60;
-	int time_seconds = timeRemaining%60;
-	sprintf(s, "you've got %02d:%02d left to earn %c%d", time_minutes, time_seconds, MR_CURRENCY, monetaryTarget);
-	t5 = new W::DText(this, W::position(14,144), s, W::Colour::White);
-}
-//	// Draw close button
-//	W::Button *b = buttons[0];
-//	drawRect(b->pos.x,   b->pos.y, b->plan[0].sz.width, b->plan[0].sz.height, b->col());
-//	drawRect(b->pos.x+2, b->pos.y+5, 8, 2, W::Colour::White, 45);
-//	drawRect(b->pos.x+2, b->pos.y+5, 8, 2, W::Colour::White, -45);
-

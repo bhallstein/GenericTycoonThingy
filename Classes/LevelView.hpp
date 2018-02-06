@@ -46,40 +46,4 @@ protected:
 	friend class DrawnFurnishing;
 };
 
-
-class BottomUIBarView : public W::UIView {
-public:
-	BottomUIBarView() : W::UIView("UIViews/BottomUIBarView.lua") { }
-	// Also want to add the economy, & setter for its contents
-//	char econ[14];
-//	sprintf(econ, "%c%d", MR_CURRENCY, *economy);
-//	drawText(790, 10, W::Colour::White, econ, true);
-};
-
-
-class FurnishingPurchasingUIView : public W::UIView {
-public:
-	FurnishingPurchasingUIView() : W::UIView("UIViews/FurnishingPurchasingUIView.lua") { }
-};
-
-
-class HiringUIView : public W::UIView {
-public:
-	HiringUIView() : W::UIView("UIViews/HiringUIView.lua") { }
-};
-
-
-class GTTHelpView  : public W::UIView {
-public:
-	GTTHelpView();
-	void setTimeRemaining(int);
-	void setMonetaryTarget(int);
-	
-private:
-	int timeRemaining, monetaryTarget;
-	void setTimeRemainingText();
-	W::DText *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9;
-	W::DRect *r1;
-};
-
 #endif

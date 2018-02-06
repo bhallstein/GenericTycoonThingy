@@ -107,6 +107,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B53CD0492029C5DC00B76231 /* Views__UI.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Views__UI.hpp; sourceTree = "<group>"; };
+		B53CD04B2029C66100B76231 /* View__Help.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = View__Help.hpp; sourceTree = "<group>"; };
 		B58827451F40E44100C07AEB /* Generic Tycoon Thingy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Generic Tycoon Thingy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58827481F40E44100C07AEB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B58827491F40E44100C07AEB /* AppDelegate.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -396,6 +398,8 @@
 				B5C6ACA32022405E00E750AE /* UIDManager.hpp */,
 				B5C6ACA22022405E00E750AE /* Unit.cpp */,
 				B5C6AC972022405E00E750AE /* Unit.hpp */,
+				B53CD0492029C5DC00B76231 /* Views__UI.hpp */,
+				B53CD04B2029C66100B76231 /* View__Help.hpp */,
 			);
 			name = Classes;
 			path = ../Classes;

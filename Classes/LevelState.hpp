@@ -20,7 +20,8 @@ class Building;
 
 /* View-related forward class declarations */
 class LevelView;
-class BottomUIBarView;
+class View__BottomUIBar;
+class View__Help;
 class FurnishingPurchasingUIView;
 class HiringUIView;
 class GTTHelpView;
@@ -45,6 +46,8 @@ public:
 private:
 	// Views
 	LevelView *levelView;
+  View__BottomUIBar *view__btmUIBar;
+  View__Help *view__help;
 	
 	// Map
 	LevelMap *levelMap;

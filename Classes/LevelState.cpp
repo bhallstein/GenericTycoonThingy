@@ -24,6 +24,9 @@
 #include "W.h"
 #include "Serializer.hpp"
 
+#include "Views__UI.hpp"
+#include "View__Help.hpp"
+
 LevelState::LevelState() :
 	levelView(NULL),
 	levelMap(NULL),
@@ -32,6 +35,13 @@ LevelState::LevelState() :
 	// Initialize views
 	levelView = new LevelView();
 	addView(levelView);
+
+  view__btmUIBar = new View__BottomUIBar();
+  addView(view__btmUIBar);
+
+  view__help = new View__Help();
+  addView(view__help);
+
 	
 	// Create map
 	levelMap = new LevelMap(this, levelView);
@@ -48,7 +58,6 @@ LevelState::~LevelState()
 {
 	removeView(levelView);
 	delete levelView;
-	
 	delete levelMap;
 	
 //	MrKlangy::stopBGM();

@@ -4,7 +4,7 @@ landscape = {
 	
 	["100"] = {
 		size = "100%,10%",
-		position = "10,10",
+		position = "0,0",
 		positioning_corner = "bottom left",
 		elements = {
 			OpenHiringViewBtn = {
