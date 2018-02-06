@@ -16,6 +16,7 @@
 #include "LevelMap.hpp"
 #include "Building.hpp"
 #include "Serializer.hpp"
+#include "Messenger.h"
 
 /********************/
 /* Controller impl. */

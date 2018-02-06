@@ -53,7 +53,7 @@ public:
 	SeekTarget::Type unitSeekTarget();
 	
 	Building* building__getRandom();
-	Building* building__findAt(W::position &);
+	Building* building__findAt(W::position);
 	Building* building__withFurnishingSupportingSeekTarget(SeekTarget::Type);
 	
 	W::position map__randomCoord();

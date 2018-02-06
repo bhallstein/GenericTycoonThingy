@@ -396,14 +396,11 @@ Building* LevelMap::building__getRandom() {
 	}
 	return (Building*) buildings[W::Rand::intUpTo((int) buildings.size())];
 }
-Building* LevelMap::building__findAt(W::position &p) {
-	for (auto it = buildings.begin(); it != buildings.end(); ++it) {
-		TLO *b = *it;
-		if (b->rct.overlapsWith(p)) {
-			return (Building*) b;
-		}
-	}
-	return NULL;
+Building* LevelMap::building__findAt(W::position p) {
+  auto it = std::find_if(buildings.begin(), buildings.end(), [=](TLO *b) {
+    return ((Building*)b)->contains_point(p);
+  });
+  return it == buildings.end() ? NULL : (Building*)*it;
 }
 Building* LevelMap::building__withFurnishingSupportingSeekTarget(SeekTarget::Type seek_target) {
 	// Find a furnishing supporting the SeekTarget

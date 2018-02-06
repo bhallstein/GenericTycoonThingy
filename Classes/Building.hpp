@@ -56,6 +56,8 @@ public:
   void removeShopkeeper(UID);
   std::vector<UID> shopkeeper__getAll() { return activeShopkeepers; }
 
+  bool contains_point(W::position);
+
 protected:
   std::vector<W::position> groundplan;
   std::vector<W::position> doors;

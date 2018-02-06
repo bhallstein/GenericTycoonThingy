@@ -159,6 +159,16 @@ void Building::removeShopkeeper(UID sk_to_remove) {
 	}
 }
 
+bool Building::contains_point(W::position p) {
+  for (auto it : groundplan) {
+    W::position gp_lv = it + rct.pos;
+    if (gp_lv == p) {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 
 // DrawnBuilding impl

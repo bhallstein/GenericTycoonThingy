@@ -19,12 +19,6 @@
 #include "types.hpp"
 #include "PlaceableManager.hpp"
 
-namespace W {
-  namespace EventType {
-    extern T INTERRUPT_UNITPICKUP;
-  }
-}
-
 struct unitInfo {
 	unitInfo(LuaObj &);
 	bool isStaff;
