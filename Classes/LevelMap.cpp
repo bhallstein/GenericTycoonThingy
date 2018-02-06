@@ -376,19 +376,18 @@ Controller* LevelMap::createController(LuaObj &o, bool active) {
 	return c;
 }
 Controller* LevelMap::createControllerForUnit(Unit *u) {
-	using std::string;
+  const std::map<std::string, std::string> types = {
+    {"customer", "CustomerController"},
+    {"shopkeeper", "ShopkeeperController"},
+  };
+
+  auto it = types.find(u->type);
+  if (it == types.end()) {
+    throw W::Exception(std::string("Error: couldn't create controller for unit - unrecognised type: ") +
+                       std::string("'") + u->type + std::string("'"));
+  }
 	
-	const string &type = u->type;
-	Controller *c = NULL;
-	if (type == "customer") c = createController("CustomerController");
-	else if (type == "shopkeeper") c = createController("ShopkeeperController");
-	
-	if (c == NULL) throw W::Exception(
-		string("Error: couldn't create controller for unit - unrecognised type: ") +
-		string("'") + type + string("'")
-	);
-	
-	return c;
+  return createController(it->second);
 }
 
 Building* LevelMap::building__getRandom() {

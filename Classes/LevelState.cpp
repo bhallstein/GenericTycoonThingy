@@ -30,18 +30,18 @@
 LevelState::LevelState() :
 	levelView(NULL),
 	levelMap(NULL),
-	paused(false)
+	paused(false),
+  view__help(NULL),
+  view__hiring(NULL)
 {
 	// Initialize views
 	levelView = new LevelView();
 	addView(levelView);
 
-  view__btmUIBar = new View__BottomUIBar();
+  view__btmUIBar = new View__BottomBar();
   addView(view__btmUIBar);
 
-  view__help = new View__Help();
-  addView(view__help);
-
+  openView_help();
 	
 	// Create map
 	levelMap = new LevelMap(this, levelView);
@@ -53,6 +53,10 @@ LevelState::LevelState() :
 //	MrKlangy::playBGM("level.mod");
 	
 	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
+  W::Messenger::subscribeToUIEvent("help_close_btn", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("open_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("hire_staff", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
 }
 LevelState::~LevelState()
 {
@@ -64,14 +68,51 @@ LevelState::~LevelState()
 }
 
 W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_S) { saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000))); }
-	else if (ev->key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
-	else if (ev->key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
-	else if (ev->key == W::KeyCode::_P) {
-		if (paused) { unpause(); }
-		else { pause(); }
-	}
-	return W::EventPropagation::ShouldContinue;
+  // Quit
+  if (ev->key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
+  else if (ev->key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
+
+  // Save
+  else if (ev->key == W::KeyCode::_S) {
+    saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000)));
+  }
+
+  // Help view open/close
+  else if (ev->key == W::KeyCode::_H)  {
+    if (view__help) { closeView_help(); }
+    else { openView_help(); }
+  }
+
+  // Pause/unpause
+  else if (ev->key == W::KeyCode::_P) {
+    if (!view__help) {
+      if (paused) { unpause(); }
+      else { pause(); }
+    }
+  }
+
+  return W::EventPropagation::ShouldContinue;
+}
+
+W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
+  std::string *name = (std::string*) ev->_payload;
+
+  if (*name == "help_close_btn") {
+    closeView_help();
+  }
+
+  // Hiring view
+  else if (*name == "open_hiring_view") {
+    openView_hiring();
+  }
+  else if (*name == "close_hiring_view") {
+    closeView_hiring();
+  }
+  else if (*name == "hire_staff") {
+    levelMap->createUnit(true, "shopkeeper", {-1,-1});
+  }
+
+  return W::EventPropagation::ShouldContinue;
 }
 
 void LevelState::update() {
@@ -170,4 +211,38 @@ bool LevelState::saveLevel(const std::string &saveName) {
 	f.close();
 	
 	return true;
+}
+
+void LevelState::openView_help() {
+  if (view__help) {
+    return;
+  }
+  pause();
+  view__help = new View__Help();
+  addView(view__help);
+}
+void LevelState::closeView_help() {
+  if (!view__help) {
+    return;
+  }
+  unpause();
+  removeView(view__help);
+  delete view__help;
+  view__help = NULL;
+}
+
+void LevelState::openView_hiring() {
+  if (view__hiring) {
+    return;
+  }
+  view__hiring = new View__Hiring();
+  addView(view__hiring);
+}
+void LevelState::closeView_hiring() {
+  if (!view__hiring) {
+    return;
+  }
+  removeView(view__hiring);
+  delete view__hiring;
+  view__hiring = NULL;
 }

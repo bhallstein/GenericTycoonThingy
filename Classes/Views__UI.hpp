@@ -3,9 +3,9 @@
 
 #include "W.h"
 
-class View__BottomUIBar : public W::UIView {
+class View__BottomBar : public W::UIView {
 public:
-  View__BottomUIBar() : W::UIView(MrPaths::resourcesPath + "Data/UIViews/BottomUIBar.lua") { }
+  View__BottomBar() : W::UIView(MrPaths::resourcesPath + "Data/UIViews/BottomBar.lua") { }
   // Also want to add the economy, & setter for its contents
   //  char econ[14];
   //  sprintf(econ, "%c%d", MR_CURRENCY, *economy);
@@ -13,15 +13,15 @@ public:
 };
 
 
-class View__FurnishingPurchasingUIView : public W::UIView {
+class View__FurnishingPurchasing : public W::UIView {
 public:
-  View__FurnishingPurchasingUIView() : W::UIView("UIViews/FurnishingPurchasingUIView.lua") { }
+  View__FurnishingPurchasing() : W::UIView("UIViews/FurnishingPurchasing.lua") { }
 };
 
 
-class View__HiringUIView : public W::UIView {
+class View__Hiring : public W::UIView {
 public:
-  View__HiringUIView() : W::UIView("UIViews/HiringUIView.lua") { }
+  View__Hiring() : W::UIView(MrPaths::resourcesPath + "Data/UIViews/Hiring.lua") { }
 };
 
 #endif

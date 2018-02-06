@@ -47,7 +47,7 @@ public:
 
     updatePosition(W::_controller.window->getSize());
   }
-  ~View__Help()
+  virtual ~View__Help()
   {
     delete t1;
     delete t2;

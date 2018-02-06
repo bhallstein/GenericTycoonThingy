@@ -20,11 +20,10 @@ class Building;
 
 /* View-related forward class declarations */
 class LevelView;
-class View__BottomUIBar;
+class View__BottomBar;
 class View__Help;
+class View__Hiring;
 class FurnishingPurchasingUIView;
-class HiringUIView;
-class GTTHelpView;
 
 
 class LevelState : public W::GameState {
@@ -33,6 +32,7 @@ public:
 	~LevelState();
 	
 	W::EventPropagation::T keyEvent(W::Event *);
+	W::EventPropagation::T buttonEvent(W::Event *);
 	
 	void update();
 	void resume(W::Returny *);
@@ -42,12 +42,19 @@ public:
 	
 	bool loadLevel(const std::string &levelName);
 	bool saveLevel(const std::string &saveName);
+
+	void openView_help();
+	void closeView_help();
+
+	void openView_hiring();
+	void closeView_hiring();
 	
 private:
 	// Views
 	LevelView *levelView;
-  View__BottomUIBar *view__btmUIBar;
-  View__Help *view__help;
+	View__BottomBar *view__btmUIBar;
+	View__Help      *view__help;
+	View__Hiring    *view__hiring;
 	
 	// Map
 	LevelMap *levelMap;
