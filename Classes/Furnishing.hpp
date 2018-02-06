@@ -42,7 +42,8 @@ public:
 	
 	static bool initialize();
 	static bool initialized;
-	
+
+  static std::vector<std::string> get_furnishing_types();
 	static int costForType(const char *);
 	bool supports_seekTarget(SeekTarget::Type) const;
 	

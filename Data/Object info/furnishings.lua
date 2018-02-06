@@ -1,11 +1,6 @@
 -- Furnishing definitions
 
 furnishingTypes = {
-	-- door = {
-	-- 	plan = {
-	-- 		{ pos = {0,0}, sz = {2,1} }
-	-- 	}
-	-- },
 	barberschair = {
 		plan = {
 			{ pos = {0,0}, sz = {2,2} }

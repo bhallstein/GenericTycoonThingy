@@ -23,7 +23,7 @@ class LevelView;
 class View__BottomBar;
 class View__Help;
 class View__Hiring;
-class FurnishingPurchasingUIView;
+class View__FurnishingPurchasing;
 
 
 class LevelState : public W::GameState {
@@ -48,6 +48,9 @@ public:
 
 	void openView_hiring();
 	void closeView_hiring();
+
+  void openView_furnishingPurchasing();
+  void closeView_furnishingPurchasing();
 	
 private:
 	// Views
@@ -55,6 +58,7 @@ private:
 	View__BottomBar *view__btmUIBar;
 	View__Help      *view__help;
 	View__Hiring    *view__hiring;
+  View__FurnishingPurchasing *view__furnishingPurchasing;
 	
 	// Map
 	LevelMap *levelMap;

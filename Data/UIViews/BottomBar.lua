@@ -12,7 +12,13 @@ landscape = {
 				position = "10,10",
 				["type"] = "button",
 				positioning_corner = "top left"
-			}
+			},
+      open_furnishing_purchasing_view = {
+        size = "20,20",
+        position = "40,10",
+        ["type"] = "button",
+        positioning_corner = "top left"
+      }
 		}
 	}
 	

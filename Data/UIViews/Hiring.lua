@@ -14,6 +14,7 @@ landscape = {
 				["type"] = "button",
 				positioning_corner = "top left",
 			},
+
       close_hiring_view = {
         position = "10,10",
         size = "10,10",

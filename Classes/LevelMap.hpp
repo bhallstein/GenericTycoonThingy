@@ -61,7 +61,8 @@ public:
 	void deactivateController(Controller *);
 	void reactivateController(Controller *);
 	
-	bool addPlayerMoneys(int);
+  int getPlayerMoneys() { return playerMoneys; }
+  bool addPlayerMoneys(int);
 	
 private:
 	LevelState *levelState;

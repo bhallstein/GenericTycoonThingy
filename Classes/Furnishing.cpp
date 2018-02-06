@@ -134,10 +134,7 @@ W::EventPropagation::T Furnishing::mouseEvent(W::Event *ev) {
 }
 
 void Furnishing::update() {
-//	if (animating) {
-//		if (++animFrames == animationDuration)
-//			animating = false, animationFinished = true;
-//	}
+
 }
 
 bool Furnishing::initialize() {
@@ -157,7 +154,7 @@ bool Furnishing::initialize() {
 		W::log << "Could not get furnishingTypes table from furnishings.lua" << std::endl;
 		return false;
 	}
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
+	for (auto it = o.descendants.begin(); it != o.descendants.end(); ++it) {
 		furnishingTypeInfo[it->first] = new furnishingInfo(it->second);
 	}
 	
@@ -166,6 +163,14 @@ bool Furnishing::initialize() {
 	
 	Furnishing::initialized = true;
 	return true;
+}
+
+std::vector<std::string> Furnishing::get_furnishing_types() {
+  std::vector<std::string> out;
+  for (auto it : furnishingTypeInfo) {
+    out.push_back(it.first);
+  }
+  return out;
 }
 int Furnishing::costForType(const char *_type) {
 	return furnishingTypeInfo[_type]->cost;

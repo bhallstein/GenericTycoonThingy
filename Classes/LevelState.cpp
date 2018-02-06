@@ -32,7 +32,8 @@ LevelState::LevelState() :
 	levelMap(NULL),
 	paused(false),
   view__help(NULL),
-  view__hiring(NULL)
+  view__hiring(NULL),
+  view__furnishingPurchasing(NULL)
 {
 	// Initialize views
 	levelView = new LevelView();
@@ -43,8 +44,8 @@ LevelState::LevelState() :
 
   openView_help();
 	
-	// Create map
-	levelMap = new LevelMap(this, levelView);
+  // Create map
+  levelMap = new LevelMap(this, levelView);
 	
 	// Time
 	realtimetime = 0.0;
@@ -53,10 +54,18 @@ LevelState::LevelState() :
 //	MrKlangy::playBGM("level.mod");
 	
 	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
+
+  // UI triggered events
   W::Messenger::subscribeToUIEvent("help_close_btn", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+
   W::Messenger::subscribeToUIEvent("open_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
   W::Messenger::subscribeToUIEvent("close_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
   W::Messenger::subscribeToUIEvent("hire_staff", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+
+  W::Messenger::subscribeToUIEvent("open_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("buy_furnishing:barberschair", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("buy_furnishing:piecounter", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
 }
 LevelState::~LevelState()
 {
@@ -110,6 +119,20 @@ W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
   }
   else if (*name == "hire_staff") {
     levelMap->createUnit(true, "shopkeeper", {-1,-1});
+  }
+
+  // Furnishing view
+  else if (*name == "open_furnishing_purchasing_view") {
+    openView_furnishingPurchasing();
+  }
+  else if (*name == "close_furnishing_purchasing_view") {
+    closeView_furnishingPurchasing();
+  }
+  else if (*name == "buy_furnishing:barberschair") {
+    levelMap->createFurnishing(true, "barberschair", {-1,-1});
+  }
+  else if (*name == "buy_furnishing:piecounter") {
+    levelMap->createFurnishing(true, "piecounter", {-1,-1});
   }
 
   return W::EventPropagation::ShouldContinue;
@@ -182,7 +205,10 @@ bool LevelState::loadLevel(const std::string &levelName) {
 		return false;
 	}
 	
-	W::log << "...loaded." << std::endl;	
+	W::log << "...loaded." << std::endl;
+
+  // Update player money display
+  view__btmUIBar->setEcon(levelMap->getPlayerMoneys());
 	return true;
 }
 
@@ -245,4 +271,20 @@ void LevelState::closeView_hiring() {
   removeView(view__hiring);
   delete view__hiring;
   view__hiring = NULL;
+}
+
+void LevelState::openView_furnishingPurchasing() {
+  if (view__furnishingPurchasing) {
+    return;
+  }
+  view__furnishingPurchasing = new View__FurnishingPurchasing(Furnishing::get_furnishing_types());
+  addView(view__furnishingPurchasing);
+}
+void LevelState::closeView_furnishingPurchasing() {
+  if (!view__furnishingPurchasing) {
+    return;
+  }
+  removeView(view__furnishingPurchasing);
+  delete view__furnishingPurchasing;
+  view__furnishingPurchasing = NULL;
 }

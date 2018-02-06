@@ -294,8 +294,7 @@ void Unit::printDebugInfo() {
          this, rct.pos.x, rct.pos.y, rct.pos.a, rct.pos.b, dest.x, dest.y,
          mode == UnitMode::VOYAGING ? "VOYAGING" :
          mode == UnitMode::ANIMATING ? "ANIMATING" :
-         mode == UnitMode::IDLE ? "IDLE" : "UNKNOWN"
-         );
+         mode == UnitMode::IDLE ? "IDLE" : "UNKNOWN");
 }
 
 
