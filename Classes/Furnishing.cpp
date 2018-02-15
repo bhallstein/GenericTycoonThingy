@@ -73,7 +73,9 @@ bool Furnishing::initialized = false;
 
 Furnishing::Furnishing(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
 	PlaceableManager(_lm, _lv, _nm, _placeableMode),
-	purchased(false)
+	purchased(false),
+  placed(false),
+  owned_by_controller(false)
 {
 	rct.sz = W::size(2,2);
 
@@ -92,7 +94,7 @@ Furnishing::~Furnishing()
 //	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
 //	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEUP,   this);
 //	W::Messenger::unsubscribeFromEventType(LV_MOUSEMOVE,      this);
-	navmap->makePassable(rct);
+//  navmap->makePassable(rct);
 	delete drawnFurnishing;
 }
 
@@ -184,7 +186,9 @@ bool Furnishing::supports_seekTarget(SeekTarget::Type targ) const {
 
 void Furnishing::placementLoopStarted() {
 	drawnFurnishing->setOpac(0.2);		// Put DF in placement-loop mode
-	navmap->makePassable(rct);			// Make previous location passable
+  if (placed) {
+//    navmap->makePassable(rct);      // Make previous location passable
+  }
 }
 void Furnishing::placementLoopUpdate() {
 	drawnFurnishing->setPosn(placeable.pos);
@@ -195,7 +199,10 @@ void Furnishing::placementLoopCancelled() {
 	
 	// Put the furnishing back where we found it
 	drawnFurnishing->setPosn(rct.pos);
-	navmap->makeImpassable(rct);
+  if (placed) {
+//    navmap->isolate(rct);
+//    navmap->makeImpassable(rct);
+  }
 	
 	// Put DrawnFurnishing back in normal mode
 	drawnFurnishing->setOpac(1);
@@ -206,19 +213,26 @@ void Furnishing::placementLoopSucceeded() {
 		levelMap->addPlayerMoneys(-typeInfo->cost);
 		purchased = true;
 	}
-	navmap->makeImpassable(rct);
+  placed = true;
+//  navmap->isolate(rct);
+//  navmap->makeImpassable(rct);
 	drawnFurnishing->setPosn(rct.pos);	// Update DrawnFurnishing to new position
 	drawnFurnishing->setOpac(1);		// Put DF back in normal mode
 }
 bool Furnishing::canPlace(const W::position &_pos) {
 	// Can place if:
+  //  - can afford the item
 	//  - passable underneath
 	//  - *in future, no units underneath
 	//  - *perhaps in future, is entirely inside its context room/building
+  if (!levelMap->can_afford(typeInfo->cost)) {
+    return false;
+  }
+
 	W::position prev_pos = rct.pos;
 	rct.setPos(_pos);
 	bool can_place;
-	can_place = navmap->isPassableUnder(rct);
+  can_place = true; //navmap->isPassableUnder(rct);
 	rct.setPos(prev_pos);
 	
 	return can_place;
@@ -229,9 +243,10 @@ bool Furnishing::canPlace(const W::position &_pos) {
 
 Furnishing::DrawnFurnishing::DrawnFurnishing(LevelView *_lv) : lv(_lv)
 {
-	r = new W::DRect(
-		lv, W::position(), lv->convertGridToPixelCoords(W::size(2,2)), W::Colour::Blue
-	);
+	r = new W::DRect(lv,
+                   W::position(),
+                   lv->convertGridToPixelCoords(W::size(2,2)),
+                   W::Colour::Blue);
 }
 Furnishing::DrawnFurnishing::~DrawnFurnishing()
 {

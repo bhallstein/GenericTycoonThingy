@@ -2,6 +2,7 @@
 #define Views__UI_hpp
 
 #include "W.h"
+#include "MrPaths.hpp"
 
 class View__BottomBar : public W::UIView {
 public:
@@ -10,7 +11,7 @@ public:
   {
     // Also want to add the economy, & setter for its contents
     d_econ = new W::DText(this, {0,0}, "", W::Colour::White, W::TextAlign::Right);
-    setEcon(7);
+    setEcon(0);
     d_econ->setPos({rct.sz.width - 10, 10});
   }
 

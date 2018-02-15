@@ -1,41 +1,41 @@
 /*
  * Generic Tycoon Thingy
  *
- * =================
- *  MenuState.cpp
- * =================
+ * =====================
+ *  State__TopMenu.cpp
+ * =====================
  *
  * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
  * All rights reserved
  *
  */
 
-#include "MenuState.hpp"
+#include "State__TopMenu.hpp"
 #include "LevelState.hpp"
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 
-MenuState::MenuState() : W::GameState(W::GS_OPAQUE)
+State__TopMenu::State__TopMenu() : W::GameState(W::GS_OPAQUE)
 {
 //	menubackgroundview = new MenuBackgroundView(win);
 //	addView(menubackgroundview);
-	clicktobeginview = new ClickToBeginView(this);
+	clicktobeginview = new ClickToBeginView();
 	addView(clicktobeginview);
 	
 	// Key subscriptions
-	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&MenuState::keyEvent, this));
-	W::Messenger::subscribeToUIEvent("LevelStartBtn", W::EventType::ButtonClick, W::Callback(&MenuState::uiEvent, this));
+	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__TopMenu::keyEvent, this));
+	W::Messenger::subscribeToUIEvent("LevelStartBtn", W::EventType::ButtonClick, W::Callback(&State__TopMenu::uiEvent, this));
 	
 //	MrKlangy::playBGM("menu.xm");
 }
-MenuState::~MenuState()
+State__TopMenu::~State__TopMenu()
 {
 //	removeView(menubackgroundview); delete menubackgroundview;
 	removeView(clicktobeginview);   delete clicktobeginview;
 //	MrKlangy::stopBGM();
 }
 
-void MenuState::resume(W::Returny *ret) {
+void State__TopMenu::resume(W::Returny *ret) {
 //	MrKlangy::playBGM("menu.xm");
 	if (ret->type == W::ReturnyType::Killer) {
 		W::popState(W::KillerReturny);
@@ -44,21 +44,21 @@ void MenuState::resume(W::Returny *ret) {
 		if (ret->payload == "replay") startLevel("qj-level");
 	}
 }
-void MenuState::update() {
+void State__TopMenu::update() {
 	
 }
 
-W::EventPropagation::T MenuState::keyEvent(W::Event *ev) {
+W::EventPropagation::T State__TopMenu::keyEvent(W::Event *ev) {
 	if (ev->key == W::KeyCode::_Q || ev->key == W::KeyCode::ESC)
 		W::popState(W::EmptyReturny);
 	return W::EventPropagation::ShouldContinue;
 }
-W::EventPropagation::T MenuState::uiEvent(W::Event *ev) {
+W::EventPropagation::T State__TopMenu::uiEvent(W::Event *ev) {
 	startLevel("qj-level");
 	return W::EventPropagation::ShouldContinue;
 }
 
-void MenuState::startLevel(const std::string &levelName) {
+void State__TopMenu::startLevel(const std::string &levelName) {
 	W::log << "Starting level: " << levelName << std::endl;
 	try {
 		levelState = new LevelState();
@@ -72,9 +72,8 @@ void MenuState::startLevel(const std::string &levelName) {
 }
 
 
-ClickToBeginView::ClickToBeginView(MenuState *_ms) :
-	W::UIView(MrPaths::resourcesPath + "Data/UIViews/Menu_ClickToBeginView.lua"),
-	menuState(_ms)
+ClickToBeginView::ClickToBeginView() :
+	W::UIView(MrPaths::resourcesPath + "Data/UIViews/Menu_ClickToBeginView.lua")
 {
 	t1 = new W::DText(this, W::position(186,30), "Welcome to Generic Tycoon Thingy", W::Colour::Black);
 	t2 = new W::DText(this, W::position(308,60), "Click to begin", W::Colour::White);

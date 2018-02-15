@@ -21,7 +21,7 @@ PlaceableManager::PlaceableManager(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm
 	// Hai managey
 }
 
-bool PlaceableManager::init(const W::position &_pos) {
+bool PlaceableManager::init(W::position _pos) {
 	if (placeableMode)
 		return pickUp();
 	else

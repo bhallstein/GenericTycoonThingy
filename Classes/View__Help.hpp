@@ -21,7 +21,7 @@ public:
                                                       10, 10, 500, 340,
                                                       true));
     auto elements = element_list();
-    elements.push_back(new W::Button("help_close_btn",
+    elements.push_back(new W::Button("close_help_view",
                                      new W::Positioner(W::Corner::TopLeft,
                                                        W::PosType::Fixed,
                                                        W::PosType::Fixed,

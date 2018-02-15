@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B531F2B22035B7BE005A41FD /* State__WinLose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B531F2B12035B7BE005A41FD /* State__WinLose.cpp */; };
 		B588274A1F40E44100C07AEB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B58827491F40E44100C07AEB /* AppDelegate.m */; };
 		B588274D1F40E44100C07AEB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B588274C1F40E44100C07AEB /* main.m */; };
 		B588274F1F40E44100C07AEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B588274E1F40E44100C07AEB /* Assets.xcassets */; };
 		B58827521F40E44100C07AEB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B58827501F40E44100C07AEB /* MainMenu.xib */; };
 		B5C6AC872022404A00E750AE /* Data in Resources */ = {isa = PBXBuildFile; fileRef = B5C6AC862022404A00E750AE /* Data */; };
-		B5C6ACAB2022405E00E750AE /* MenuState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC892022405E00E750AE /* MenuState.cpp */; };
+		B5C6ACAB2022405E00E750AE /* State__TopMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC892022405E00E750AE /* State__TopMenu.cpp */; };
 		B5C6ACAC2022405E00E750AE /* types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC8C2022405E00E750AE /* types.cpp */; };
 		B5C6ACAD2022405E00E750AE /* MrKlangy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC8F2022405E00E750AE /* MrKlangy.cpp */; };
 		B5C6ACAE2022405E00E750AE /* LevelView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC902022405E00E750AE /* LevelView.cpp */; };
@@ -107,6 +108,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B531F2B02035B7BE005A41FD /* State__WinLose.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = State__WinLose.hpp; sourceTree = "<group>"; };
+		B531F2B12035B7BE005A41FD /* State__WinLose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = State__WinLose.cpp; sourceTree = "<group>"; };
 		B53CD0492029C5DC00B76231 /* Views__UI.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Views__UI.hpp; sourceTree = "<group>"; };
 		B53CD04B2029C66100B76231 /* View__Help.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = View__Help.hpp; sourceTree = "<group>"; };
 		B58827451F40E44100C07AEB /* Generic Tycoon Thingy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Generic Tycoon Thingy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,7 +120,7 @@
 		B58827511F40E44100C07AEB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		B58827531F40E44100C07AEB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5C6AC862022404A00E750AE /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = ../Data; sourceTree = "<group>"; };
-		B5C6AC892022405E00E750AE /* MenuState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MenuState.cpp; sourceTree = "<group>"; };
+		B5C6AC892022405E00E750AE /* State__TopMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = State__TopMenu.cpp; sourceTree = "<group>"; };
 		B5C6AC8A2022405E00E750AE /* Controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Controller.hpp; sourceTree = "<group>"; };
 		B5C6AC8B2022405E00E750AE /* LevelMap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LevelMap.hpp; sourceTree = "<group>"; };
 		B5C6AC8C2022405E00E750AE /* types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = types.cpp; sourceTree = "<group>"; };
@@ -144,7 +147,7 @@
 		B5C6ACA12022405E00E750AE /* TLO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TLO.hpp; sourceTree = "<group>"; };
 		B5C6ACA22022405E00E750AE /* Unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Unit.cpp; sourceTree = "<group>"; };
 		B5C6ACA32022405E00E750AE /* UIDManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIDManager.hpp; sourceTree = "<group>"; };
-		B5C6ACA42022405E00E750AE /* MenuState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MenuState.hpp; sourceTree = "<group>"; };
+		B5C6ACA42022405E00E750AE /* State__TopMenu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = State__TopMenu.hpp; sourceTree = "<group>"; };
 		B5C6ACA52022405E00E750AE /* Controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Controller.cpp; sourceTree = "<group>"; };
 		B5C6ACA62022405E00E750AE /* LevelMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LevelMap.cpp; sourceTree = "<group>"; };
 		B5C6ACA72022405E00E750AE /* types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = types.hpp; sourceTree = "<group>"; };
@@ -376,8 +379,10 @@
 				B5C6AC9D2022405E00E750AE /* LevelState.hpp */,
 				B5C6AC902022405E00E750AE /* LevelView.cpp */,
 				B5C6AC9A2022405E00E750AE /* LevelView.hpp */,
-				B5C6AC892022405E00E750AE /* MenuState.cpp */,
-				B5C6ACA42022405E00E750AE /* MenuState.hpp */,
+				B5C6AC892022405E00E750AE /* State__TopMenu.cpp */,
+				B5C6ACA42022405E00E750AE /* State__TopMenu.hpp */,
+				B531F2B12035B7BE005A41FD /* State__WinLose.cpp */,
+				B531F2B02035B7BE005A41FD /* State__WinLose.hpp */,
 				B5C6AC8F2022405E00E750AE /* MrKlangy.cpp */,
 				B5C6ACA92022405E00E750AE /* MrKlangy.hpp */,
 				B5C6AC9F2022405E00E750AE /* MrPaths.cpp */,
@@ -715,7 +720,8 @@
 				B5C6AD76202240C500E750AE /* Messenger.cpp in Sources */,
 				B5C6AD74202240C500E750AE /* UpdateTimer.cpp in Sources */,
 				B5C6AD2B2022409E00E750AE /* ltablib.c in Sources */,
-				B5C6ACAB2022405E00E750AE /* MenuState.cpp in Sources */,
+				B531F2B22035B7BE005A41FD /* State__WinLose.cpp in Sources */,
+				B5C6ACAB2022405E00E750AE /* State__TopMenu.cpp in Sources */,
 				B5C6AD81202240C500E750AE /* DObj.cpp in Sources */,
 				B5C6ACBB2022405E00E750AE /* Placeable.cpp in Sources */,
 				B5C6AD73202240C500E750AE /* UIElement.cpp in Sources */,

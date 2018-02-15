@@ -1,6 +1,6 @@
 #import "AppDelegate.h"
 #include "W.h"
-#include "MenuState.hpp"
+#include "State__TopMenu.hpp"
 #include "MrPaths.hpp"
 
 @interface AppDelegate ()
@@ -17,7 +17,7 @@
 	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;
 	
 	W::createWindow(W::size(800,600), "Generic Tycoon Thingy");
-	W::pushState(new MenuState());
+	W::pushState(new State__TopMenu());
 	W::start();
 }
 

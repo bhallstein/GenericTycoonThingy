@@ -1,9 +1,9 @@
 /*
  * Generic Tycoon Thingy
  *
- * =================
- *  MenuState.hpp
- * =================
+ * =====================
+ *  State__TopMenu.hpp
+ * =====================
  *
  * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
  * All rights reserved
@@ -11,15 +11,15 @@
  */
 
 /*
- * MenuState.hpp - a primitive menu state
+ * State__TopMenu.hpp - a primitive menu state
  * 
  * Instantiates a ClickToBeginView, which is a UIView containing a single button
  * and a MenuBackgroundView, which has flashy colours.
  *
  */ 
  
-#ifndef MENUSTATE_H
-#define MENUSTATE_H
+#ifndef State__TopMenu_H
+#define State__TopMenu_H
 
 #include "W.h"
 
@@ -28,10 +28,10 @@ class LevelState;
 class MenuBackgroundView;
 class ClickToBeginView;
 
-class MenuState : public W::GameState {
+class State__TopMenu : public W::GameState {
 public:
-	MenuState();
-	~MenuState();
+	State__TopMenu();
+	~State__TopMenu();
 	
 	// Methods
 	void resume(W::Returny *);
@@ -53,10 +53,10 @@ protected:
 
 class ClickToBeginView : public W::UIView {
 public:
-	ClickToBeginView(MenuState *);
+	ClickToBeginView();
 	void draw();
 private:
-	MenuState *menuState;
+	State__TopMenu *state__topMenu;
 	W::DText *t1, *t2;
 };
 

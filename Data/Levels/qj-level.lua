@@ -1,12 +1,12 @@
 -- GTT level from QJ, restored
 
 levelData = {
-  monetaryTarget = 1200,
+  financialTarget = 1200,
   timeLimit = 300
 }
 
 playerState = {
-  balance = 70
+  cash = 70
 }
 
 

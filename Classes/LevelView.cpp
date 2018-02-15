@@ -24,7 +24,8 @@ LevelView::LevelView() :
                          W::PosType::Proportional,
                          0, 0, 1, 1)),
 	gridsize(20),
-	level_width(-1), level_height(-1)
+	level_width(-1), level_height(-1),
+  remaining_time_txt(NULL)
 {
 	bgRect = new W::DRect(this, rct.pos, rct.sz, W::Colour::White);
 	
@@ -74,6 +75,23 @@ void LevelView::scroll(int x, int y) {
 	if (_offset.y < max_offset_y) _offset.y = max_offset_y;
 	
 	bgRect->setPos(W::position(-_offset.x, -_offset.y));
+}
+
+void LevelView::setRemainingTime(float seconds) {
+  char s[100];
+  int time_minutes = seconds / 60;
+  int time_seconds = int(seconds)%60;
+  sprintf(s, "%02d:%02d", time_minutes, time_seconds);
+
+  if (!remaining_time_txt) {
+    remaining_time_txt = new W::DText(this,
+                                      {10,10},
+                                      s,
+                                      W::Colour::TransparentBlack);
+  }
+  else {
+    remaining_time_txt->setTxt(s);
+  }
 }
 
 W::position LevelView::convertGridToPixelCoords(const W::position &_p) {

@@ -17,6 +17,7 @@
 #include "MrPaths.hpp"
 #include "W.h"
 #include "Serializer.hpp"
+#include "Messenger.h"
 
 /* buildingInfo constructor impl */
 
@@ -53,7 +54,7 @@ Building::Building(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
   drawnBuilding = new DrawnBuilding(levelView, W::position());
-	
+
 //	if (!navmap->isPassableUnder(rct)) {
 //		throw W::Exception("Navmap was not passable under Building plan.");
 //	}
@@ -81,6 +82,21 @@ void Building::_setUp() {
 	if (!deserialized) {
 		// ...
 	}
+
+  // Create groundplan_rects
+  groundplan_rects.clear();
+  for (auto p : groundplan) {
+    W::rect r = { p + rct.pos, {1,1} };
+    groundplan_rects.push_back(r);
+  }
+
+  // Subscribe to mouse clicks
+  for (auto &r : groundplan_rects) {
+    W::Messenger::subscribeInView(levelView,
+                                  W::EventType::LMouseUp,
+                                  W::Callback(&Building::mouseEvent, this),
+                                  &r);
+  }
 	
 	// Set up state of DrawnBuilding
   drawnBuilding->setPos(rct.pos);
@@ -144,21 +160,6 @@ void Building::setPos(const W::position &_pos) {
 	drawnBuilding->setPos(_pos);
 }
 
-void Building::addShopkeeper(UID sk) {
-	activeShopkeepers.push_back(sk);
-}
-void Building::removeShopkeeper(UID sk_to_remove) {
-	for (auto it = activeShopkeepers.begin(); it != activeShopkeepers.end(); ) {
-		UID sk = *it;
-		if (sk == sk_to_remove) {
-			it = activeShopkeepers.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-}
-
 bool Building::contains_point(W::position p) {
   for (auto it : groundplan) {
     W::position gp_lv = it + rct.pos;
@@ -190,6 +191,31 @@ W::position Building::centrePoint() {
 
   best += rct.pos;
   return best;
+}
+
+W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
+  static W::Event *btn_ev = NULL;
+  if (btn_ev == NULL) {
+    btn_ev = new W::Event(W::EventType::ButtonClick);
+    btn_ev->_payload = new std::string("open_furnishing_purchasing_view");
+  }
+
+  W::Messenger::dispatchEvent(btn_ev);
+  return W::EventPropagation::ShouldStop;
+}
+
+void Building::add_controller(UID c) {
+  operating_controllers.push_back(c);
+}
+void Building::remove_controller(UID c) {
+  std::vector<UID> out;
+  std::copy_if(operating_controllers.begin(), operating_controllers.end(), std::back_inserter(out), [=](UID _c) {
+    return c != _c;
+  });
+  operating_controllers = out;
+}
+std::vector<UID> Building::get_operating_controllers() {
+  return operating_controllers;
 }
 
 

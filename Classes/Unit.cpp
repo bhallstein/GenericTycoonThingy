@@ -45,6 +45,12 @@ Serializable::serialization_descriptor Unit::sd;
 bool Unit::initialized = false;
 
 
+std::map<std::string, W::Colour> unit_colors = {
+  { "customer", W::Colour::Black },
+  { "shopkeeper",    {0,0.9882,0.7922,1} },
+};
+
+
 /*** Unit ***/
 
 Unit::Unit(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
@@ -78,6 +84,11 @@ void Unit::_setUp() {
     throw W::Exception(msg);
   }
   typeInfo = Unit::unitTypeInfo[type];
+
+  // Set state of drawnUnit
+  std::cout << type << "\n";
+  auto col = unit_colors.find(type);
+  drawnUnit->setCol(col == unit_colors.end() ? W::Colour::Purple : col->second);
 
   // Perform set-up for units constructed programmatically
   if (!deserialized) {
@@ -183,7 +194,12 @@ void Unit::placementLoopSucceeded() {
   }
 }
 bool Unit::canPlace(const W::position &_pos) {
-  return navmap->isPassableAt(_pos);
+  bool can_afford =
+    !typeInfo->isStaff ||
+    (typeInfo->isStaff && hired) ||
+    (typeInfo->isStaff && !hired && levelMap->can_afford(typeInfo->hireCost));
+
+  return can_afford && navmap->isPassableAt(_pos);
 }
 
 
@@ -302,19 +318,23 @@ void Unit::printDebugInfo() {
 
 Unit::DrawnUnit::DrawnUnit(LevelView *_lv) : lv(_lv)
 {
-  r = new W::DRect(
-                   lv, W::position(), lv->convertGridToPixelCoords(W::size(1,1)), W::Colour::Black
-                   );
+  r = new W::DRect(lv,
+                   W::position(),
+                   lv->convertGridToPixelCoords(W::size(1,1)),
+                   W::Colour::Black);
 }
 Unit::DrawnUnit::~DrawnUnit() {
   delete r;
 }
-void Unit::DrawnUnit::setPosn(const W::position &p) {
+void Unit::DrawnUnit::setPosn(W::position p) {
   r->setPos(lv->convertGridToPixelCoords(p));
 }
 void Unit::DrawnUnit::setOpac(float x) {
   W::Colour c = r->col;
   c.a = x;
+  setCol(c);
+}
+void Unit::DrawnUnit::setCol(W::Colour c) {
   r->setCol(c);
 }
 void Unit::DrawnUnit::incRot() {

@@ -39,33 +39,29 @@ LevelState::LevelState() :
 	levelView = new LevelView();
 	addView(levelView);
 
-  view__btmUIBar = new View__BottomBar();
-  addView(view__btmUIBar);
+  view__btmBar = new View__BottomBar();
+  addView(view__btmBar);
 
   openView_help();
 	
   // Create map
-  levelMap = new LevelMap(this, levelView);
+  levelMap = new LevelMap(this, levelView, view__btmBar);
 	
 	// Time
-	realtimetime = 0.0;
-	realtimetimer = new W::Timer();
+	time_elapsed_s = 0.0;
+	timer = new W::Timer();
 	
 //	MrKlangy::playBGM("level.mod");
 	
 	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
 
   // UI triggered events
-  W::Messenger::subscribeToUIEvent("help_close_btn", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_help_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
 
   W::Messenger::subscribeToUIEvent("open_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
   W::Messenger::subscribeToUIEvent("close_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("hire_staff", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-
   W::Messenger::subscribeToUIEvent("open_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
   W::Messenger::subscribeToUIEvent("close_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("buy_furnishing:barberschair", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("buy_furnishing:piecounter", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
 }
 LevelState::~LevelState()
 {
@@ -106,7 +102,7 @@ W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
 W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
   std::string *name = (std::string*) ev->_payload;
 
-  if (*name == "help_close_btn") {
+  if (*name == "close_help_view") {
     closeView_help();
   }
 
@@ -117,9 +113,6 @@ W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
   else if (*name == "close_hiring_view") {
     closeView_hiring();
   }
-  else if (*name == "hire_staff") {
-    levelMap->createUnit(true, "shopkeeper", {-1,-1});
-  }
 
   // Furnishing view
   else if (*name == "open_furnishing_purchasing_view") {
@@ -127,12 +120,6 @@ W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
   }
   else if (*name == "close_furnishing_purchasing_view") {
     closeView_furnishingPurchasing();
-  }
-  else if (*name == "buy_furnishing:barberschair") {
-    levelMap->createFurnishing(true, "barberschair", {-1,-1});
-  }
-  else if (*name == "buy_furnishing:piecounter") {
-    levelMap->createFurnishing(true, "piecounter", {-1,-1});
   }
 
   return W::EventPropagation::ShouldContinue;
@@ -144,21 +131,24 @@ void LevelState::update() {
 		return;
 	}
 	
-	int microseconds_elapsed = (int) realtimetimer->getMicroseconds();
-	if (microseconds_elapsed > 100000) {
-		microseconds_elapsed = 100000;
+	int frame_microseconds = (int) timer->getMicroseconds();
+	if (frame_microseconds > 100000) {
+		frame_microseconds = 100000;
 	}
-	
-	realtimetime += microseconds_elapsed / 1000000.0;
-	realtimetimer->reset();
+
+  time_elapsed_s += frame_microseconds / 1000000.0;
+  timer->reset();
 	
 	// Update
 	if (levelMap) {
-		levelMap->update(microseconds_elapsed, realtimetime);
+		levelMap->update(frame_microseconds, time_elapsed_s);
 	}
 }
 void LevelState::resume(W::Returny *ret) {
-	if (ret->type == W::ReturnyType::Payload) {
+  if (ret->type == W::ReturnyType::Killer) {
+    W::popState(W::KillerReturny);
+  }
+  else if (ret->type == W::ReturnyType::Payload) {
 		if (ret->payload == "exit to menu") W::popState(W::EmptyReturny);
 		else if (ret->payload == "replay")  W::popState(*ret);
 	}
@@ -168,7 +158,7 @@ void LevelState::pause() {
 	paused = true;
 }
 void LevelState::unpause() {
-	realtimetimer->reset();
+	timer->reset();
 	paused = false;
 }
 
@@ -207,8 +197,6 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	
 	W::log << "...loaded." << std::endl;
 
-  // Update player money display
-  view__btmUIBar->setEcon(levelMap->getPlayerMoneys());
 	return true;
 }
 

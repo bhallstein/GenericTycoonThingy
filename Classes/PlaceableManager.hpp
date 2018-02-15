@@ -28,7 +28,7 @@
 class PlaceableManager : public TLO {
 public:
 	PlaceableManager(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
-	bool init(const W::position &);	// Attempt to init at supplied position
+	bool init(W::position);	// Attempt to init at supplied position
 	bool init(); // Attempt to init at current position
 	
 	bool pickUp();

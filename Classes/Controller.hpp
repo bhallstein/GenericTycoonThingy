@@ -127,6 +127,13 @@ private:
 
 /* ShopkeeperController */
 
+namespace W {
+  namespace EventType {
+    extern int Haircut;
+    extern int PieSale;
+  }
+}
+
 class ShopkeeperController : public Controller {
 public:
 	ShopkeeperController(LevelMap *, LevelView *, W::NavMap *);
@@ -154,6 +161,7 @@ protected:
 	UID shopkeeper;
 	UID building;
 	UID customer;
+  UID furnishing;
 	
 	virtual void getSDs(sdvec &vec) {
 		Controller::getSDs(vec);

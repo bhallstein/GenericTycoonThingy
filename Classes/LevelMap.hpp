@@ -22,6 +22,7 @@
 
 class LevelState;
 class LevelView;
+class View__BottomBar;
 class TLO;
 class Furnishing;
 class Building;
@@ -29,14 +30,16 @@ class Unit;
 
 class LevelMap {
 public:
-	LevelMap(LevelState *, LevelView *);
+	LevelMap(LevelState*, LevelView*, View__BottomBar*);
 	~LevelMap();
 	
 	void update(int frame_microseconds, float time_in_level);
 	bool load(lua_State*);
 	std::string save();
 	
-	W::EventPropagation::T keyEvent(W::Event *);
+	W::EventPropagation::T keyEvent(W::Event*);
+  W::EventPropagation::T buttonEvent(W::Event*);
+  W::EventPropagation::T economicEvent(W::Event*);
 	
 	int width() { return mapSize.width; }
 	int height() { return mapSize.height; }
@@ -50,11 +53,16 @@ public:
 	Controller* createController(const std::string &type, bool active = true);
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
-	SeekTarget::Type unitSeekTarget();
+
+  void buyUnit(std::string type);
+  void buyFurnishing(std::string type);
+
+  SeekTarget::Type seekTarget__getRandom();
 	
 	Building* building__getRandom();
 	Building* building__findAt(W::position);
 	Building* building__withFurnishingSupportingSeekTarget(SeekTarget::Type);
+  std::vector<Furnishing*> furnishings__inBuilding__NotOwnedByController(Building*);
 	
 	W::position map__randomCoord();
 	Building* map__randomBuilding(std::string type = "");
@@ -62,12 +70,14 @@ public:
 	void deactivateController(Controller *);
 	void reactivateController(Controller *);
 	
-  int getPlayerMoneys() { return playerMoneys; }
+  int get_cash() { return cash; }
+  bool can_afford(int cost) { return cash >= cost; }
   bool addPlayerMoneys(int);
 	
 private:
 	LevelState *levelState;
-	LevelView *levelView;
+	LevelView *view__level;
+  View__BottomBar *view__btmBar;
 	
 	W::NavMap *navmap;
 	
@@ -85,11 +95,11 @@ private:
   bool first_frame = true;
 	
 	// Level goal data
-	int monetaryTarget;
-	int timeLimit;
+	int level_financial_target;
+	int level_time_limit_s;
 	
 	// Player state
-	int playerMoneys;
+	int cash;
 	
 	void tlovec__update(tlovec &);
 	void tlovec__clearDestroyeds(tlovec &);

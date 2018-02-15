@@ -32,8 +32,10 @@ struct UID {
 	UID() : id(0) { }
 	TLO* get();
 	bool isEmpty() { return id == 0; }
+  void clear() { id = 0; }
 	unsigned int id;
-	bool operator== (const UID &u) const { return id == u.id; }
+	bool operator== (UID u) const { return id == u.id; }
+  bool operator!= (UID u) const { return id != u.id; }
 	bool operator<  (const UID &u) const { return id < u.id; }
 	bool operator>  (const UID &u) const { return id > u.id; }
 	bool operator<= (const UID &u) const { return id <= u.id; }

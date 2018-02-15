@@ -32,6 +32,7 @@
 class LevelState;
 class Unit;
 class Furnishing;
+class Controller;
 
 struct buildingInfo {
   buildingInfo(LuaObj &);
@@ -52,15 +53,18 @@ public:
 
   void setPos(const W::position &);
 
-  void addShopkeeper(UID);
-  void removeShopkeeper(UID);
-  std::vector<UID> shopkeeper__getAll() { return activeShopkeepers; }
-
   bool contains_point(W::position);
   W::position centrePoint();
 
+  W::EventPropagation::T mouseEvent(W::Event*);
+
+  void remove_controller(UID);
+  void add_controller(UID);
+  std::vector<UID> get_operating_controllers();
+
 protected:
   std::vector<W::position> groundplan;
+  std::vector<W::rect> groundplan_rects;  // For event subscription :/
   std::vector<W::position> doors;
 
   // Serialization
@@ -80,8 +84,9 @@ protected:
   class DrawnBuilding;
   DrawnBuilding *drawnBuilding;
 
-  // Active shopkeeper controllers
-  std::vector<UID> activeShopkeepers;
+  // Controllers operating in the building
+  // (necessary because controllers cannot be queried positionally)
+  std::vector<UID> operating_controllers;
 };
 
 

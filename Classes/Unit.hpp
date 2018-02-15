@@ -56,9 +56,6 @@ public:
 	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
 	
-	// Unit state properties: regrettably, a big-ass list for now
-	// ...
-	
 	UID controller;
 	
 protected:
@@ -105,8 +102,9 @@ class Unit::DrawnUnit {
 public:
 	DrawnUnit(LevelView *);
 	~DrawnUnit();
-	void setPosn(const W::position &);
+	void setPosn(W::position);
 	void setOpac(float x);
+  void setCol(W::Colour);
 	void incRot();
 	
 private:

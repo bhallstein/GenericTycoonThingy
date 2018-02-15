@@ -55,7 +55,7 @@ public:
 private:
 	// Views
 	LevelView *levelView;
-	View__BottomBar *view__btmUIBar;
+	View__BottomBar *view__btmBar;
 	View__Help      *view__help;
 	View__Hiring    *view__hiring;
   View__FurnishingPurchasing *view__furnishingPurchasing;
@@ -65,9 +65,9 @@ private:
 	
 	// Time
 	bool paused;
-	W::Timer *realtimetimer;
-	float realtimetime;	// Number of real-time seconds elapsed while level running
-	int timeRemaining;	// integer time remaining calculated from realtimetime and the level's time limit - passed to levelview for display, don't use for calculations
+  W::Timer *timer;
+	float time_elapsed_s;
+
 };
 
 #endif

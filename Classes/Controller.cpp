@@ -15,6 +15,7 @@
 #include "UIDManager.hpp"
 #include "LevelMap.hpp"
 #include "Building.hpp"
+#include "Furnishing.hpp"
 #include "Serializer.hpp"
 #include "Messenger.h"
 
@@ -123,7 +124,8 @@ void CustomerController::update() {
 	
 	// Wander to an available building or between random locations
 	else if (stage == 1) {
-		failureStage = 99;
+    failureStage = 99;
+    timeWaited = 0;
 		
 		// Try to find a building supporting the seek target
 		Building *b = levelMap->building__withFurnishingSupportingSeekTarget(seek_target);
@@ -146,7 +148,7 @@ void CustomerController::update() {
 	}
 	else if (stage == 3) {
 		// pause for ~2s
-		if (++timeWaited >= 1) {
+		if (++timeWaited >= 60) {
 			timeWaited = 0;
 			stage = 1;
 		}
@@ -171,10 +173,13 @@ void CustomerController::update() {
 	else if (stage == 102) {
 		// wait for a shopkeeper to be available
 		Building *b = (Building*) dest_building.get();
-		auto sks = b->shopkeeper__getAll();
+    auto sks = b->get_operating_controllers();
 		
 		for (auto it = sks.begin(); it != sks.end(); ++it) {
-			ShopkeeperController *sk = (ShopkeeperController*) (*it).get();
+			Controller *sk = (ShopkeeperController*) (*it).get();
+      if (sk->type != "ShopkeeperController") {
+        continue;
+      }
 			if (sendUnitToController(customerPtr(), sk)) {
 				++stage;
 				break;
@@ -196,8 +201,13 @@ void CustomerController::update() {
 	// Send unit home
 	else if (stage == 200) {
 		failureStage = 299;
-		customerPtr()->wanderToRandomMapDestination();
-		++stage;
+		bool route_found = customerPtr()->wanderToRandomMapDestination();
+    if (route_found) {
+      ++stage;
+    }
+    else {
+      stage = failureStage;
+    }
 	}
 	else if (stage == 201) {
 		
@@ -245,6 +255,10 @@ void CustomerController::unitPutDown(Unit *u) {
 /****************************/
 
 Serializable::serialization_descriptor ShopkeeperController::sd;
+W::Event *sk_event_haircut = NULL;
+W::Event *sk_event_piesale = NULL;
+int W::EventType::Haircut = W::Event::registerType();
+int W::EventType::PieSale = W::Event::registerType();
 
 ShopkeeperController::ShopkeeperController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
 	Controller(_lm, _lv, _nm),
@@ -252,6 +266,10 @@ ShopkeeperController::ShopkeeperController(LevelMap *_lm, LevelView *_lv, W::Nav
 	failureStage(0)
 {
 	type = "ShopkeeperController";
+  if (sk_event_haircut == NULL) {
+    sk_event_haircut = new W::Event(W::EventType::Haircut);
+    sk_event_piesale = new W::Event(W::EventType::PieSale);
+  }
 }
 void ShopkeeperController::initialize() {
 	sd["stage"] = makeSerializer(&ShopkeeperController::stage);
@@ -259,7 +277,6 @@ void ShopkeeperController::initialize() {
 	sd["timeWaited"] = makeSerializer(&ShopkeeperController::timeWaited);
 	sd["shopkeeper"] = makeSerializer(&ShopkeeperController::shopkeeper);
 }
-
 
 void ShopkeeperController::resume(Unit *_u, ControllerCompletion::T succ) {
 	// if success, do things, otherwise, do other things
@@ -309,10 +326,11 @@ void ShopkeeperController::update() {
 		// Send customer & shopkeeper to their destinations
 		Unit *sk = (Unit*) shopkeeper.get();
 		Unit *cust = (Unit*) customer.get();
-		Building *b = (Building*) building.get();
-		
-		sk->voyage(b->rct.pos);
-		cust->voyage(b->rct.pos + W::position(1, 0));
+    Furnishing *f = (Furnishing*) furnishing.get();
+
+    W::position dest = f->rct.pos - W::position(1,1);
+		sk->voyage(dest);
+		cust->voyage(dest + W::position(1,0));
 		
 		timeWaited = 0;
 		++stage;
@@ -333,6 +351,7 @@ void ShopkeeperController::update() {
 	else if (stage == 205) {
 		// Interaction finished: wait for next customer
 		stage = 200;
+    W::Messenger::dispatchEvent(sk_event_haircut);
 	}
 	else if (stage == 299) {
 		// Failure: one of the units has failed to reach the interaction destination
@@ -340,7 +359,32 @@ void ShopkeeperController::update() {
 		releaseUnit(cust);
 		stage = 200;
 	}
-	
+
+
+  // In shop, await furnishing
+  else if (stage == 300) {
+    Building *b = (Building*) building.get();
+    auto fs = levelMap->furnishings__inBuilding__NotOwnedByController(b);
+    if (fs.size() == 0) {
+      timeWaited = 0;
+      ++stage;
+    }
+    else {
+      Furnishing *f = fs[W::Rand::intUpTo((int)fs.size())];
+      furnishing = f->uid;
+      f->owned_by_controller = true;
+      stage = 200;
+    }
+  }
+  else if (stage == 301) {
+    if (++timeWaited >= 600) {
+      stage = 300;
+    }
+  }
+  else if (stage == 302) {
+
+  }
+
 	
 	// Unit has been picked up
 	else if (stage == 500) {
@@ -377,10 +421,18 @@ void ShopkeeperController::unitPickedUp(Unit *u) {
 	stage = 500;
 	
 	// Remove from any current building
-	Building *b = levelMap->building__findAt(u->rct.pos);
-	if (b) {
-		b->removeShopkeeper(uid);
-	}
+  if (!building.isEmpty()) {
+    Building *b = (Building*) building.get();
+    b->remove_controller(uid);
+    building.clear();
+  }
+
+  // Release any current furnishing
+  if (!furnishing.isEmpty()) {
+    Furnishing *f = (Furnishing*) furnishing.get();
+    f->owned_by_controller = false;
+    furnishing.clear();
+  }
 }
 void ShopkeeperController::unitPutDown(Unit *u) {
 	stage = 1;
@@ -389,8 +441,8 @@ void ShopkeeperController::unitPutDown(Unit *u) {
 	Building *b = levelMap->building__findAt(u->rct.pos);
 	if (b) {
 		building = b->uid;
-		b->addShopkeeper(uid);
-		stage = 200;
+		b->add_controller(uid);
+		stage = 300;
 	}
 	else {
 		building = NULL;

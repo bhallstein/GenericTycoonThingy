@@ -46,6 +46,8 @@ public:
   static std::vector<std::string> get_furnishing_types();
 	static int costForType(const char *);
 	bool supports_seekTarget(SeekTarget::Type) const;
+
+  bool owned_by_controller;
 	
 protected:
 	bool purchased;
@@ -56,6 +58,7 @@ protected:
 	void placementLoopCancelled();
 	void placementLoopSucceeded();
 	bool canPlace(const W::position &);
+  bool placed;
 	
 	// Serialization
 	virtual void getSDs(sdvec &vec) {

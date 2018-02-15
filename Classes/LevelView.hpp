@@ -29,6 +29,9 @@ public:
 		level_width = sz.width;
 		level_height = sz.height;
 	}
+
+  void setRemainingTime(float seconds);
+
 	W::position convertGridToPixelCoords(const W::position &);
 	W::size     convertGridToPixelCoords(const W::size &);
 	W::position convertPixelToGridCoords(const W::position &);
@@ -36,6 +39,7 @@ public:
 	
 protected:
 	W::DRect *bgRect;
+  W::DText *remaining_time_txt;
 	
 	int gridsize;
 	int level_width, level_height;	// -1 until set with setLevelSize()
