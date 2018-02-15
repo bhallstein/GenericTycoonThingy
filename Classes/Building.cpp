@@ -11,7 +11,6 @@
  */
 
 #include "Building.hpp"
-#include "LevelState.hpp"
 #include "LevelView.hpp"
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"

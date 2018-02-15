@@ -11,7 +11,7 @@
  */
 
 #include "State__WinLose.hpp"
-#include "LevelState.hpp"
+#include "State__Game.hpp"
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 

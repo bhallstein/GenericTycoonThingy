@@ -29,7 +29,6 @@
 #include "types.hpp"
 #include "TLO.hpp"
 
-class LevelState;
 class Unit;
 class Furnishing;
 class Controller;

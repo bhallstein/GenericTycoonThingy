@@ -2,7 +2,7 @@
  * Generic Tycoon Thingy
  *
  * ==================
- *  LevelState.cpp
+ *  State__Game.cpp
  * ==================
  *
  * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
@@ -10,7 +10,7 @@
  *
  */
 
-#include "LevelState.hpp"
+#include "State__Game.hpp"
 #include "LevelView.hpp"
 #include "LevelMap.hpp"
 #include "MrPaths.hpp"
@@ -27,7 +27,7 @@
 #include "Views__UI.hpp"
 #include "View__Help.hpp"
 
-LevelState::LevelState() :
+State__Game::State__Game() :
 	levelView(NULL),
 	levelMap(NULL),
 	paused(false),
@@ -53,17 +53,17 @@ LevelState::LevelState() :
 	
 //	MrKlangy::playBGM("level.mod");
 	
-	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelState::keyEvent, this));
+	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__Game::keyEvent, this));
 
   // UI triggered events
-  W::Messenger::subscribeToUIEvent("close_help_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_help_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
 
-  W::Messenger::subscribeToUIEvent("open_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("close_hiring_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("open_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("close_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&LevelState::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("open_hiring_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_hiring_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("open_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
+  W::Messenger::subscribeToUIEvent("close_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
 }
-LevelState::~LevelState()
+State__Game::~State__Game()
 {
 	removeView(levelView);
 	delete levelView;
@@ -72,7 +72,7 @@ LevelState::~LevelState()
 //	MrKlangy::stopBGM();
 }
 
-W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
+W::EventPropagation::T State__Game::keyEvent(W::Event *ev) {
   // Quit
   if (ev->key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
   else if (ev->key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
@@ -99,7 +99,7 @@ W::EventPropagation::T LevelState::keyEvent(W::Event *ev) {
   return W::EventPropagation::ShouldContinue;
 }
 
-W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
+W::EventPropagation::T State__Game::buttonEvent(W::Event *ev) {
   std::string *name = (std::string*) ev->_payload;
 
   if (*name == "close_help_view") {
@@ -125,7 +125,7 @@ W::EventPropagation::T LevelState::buttonEvent(W::Event *ev) {
   return W::EventPropagation::ShouldContinue;
 }
 
-void LevelState::update() {
+void State__Game::update() {
 	// Time
 	if (paused) {
 		return;
@@ -144,7 +144,7 @@ void LevelState::update() {
 		levelMap->update(frame_microseconds, time_elapsed_s);
 	}
 }
-void LevelState::resume(W::Returny *ret) {
+void State__Game::resume(W::Returny *ret) {
   if (ret->type == W::ReturnyType::Killer) {
     W::popState(W::KillerReturny);
   }
@@ -154,18 +154,18 @@ void LevelState::resume(W::Returny *ret) {
 	}
 }
 
-void LevelState::pause() {
+void State__Game::pause() {
 	paused = true;
 }
-void LevelState::unpause() {
+void State__Game::unpause() {
 	timer->reset();
 	paused = false;
 }
 
-bool LevelState::loadLevel(const std::string &levelName) {
+bool State__Game::loadLevel(const std::string &levelName) {
 	using std::string;
 	
-	W::log << "LevelState: loading level '" << levelName << "'..." << std::endl;
+	W::log << "State__Game: loading level '" << levelName << "'..." << std::endl;
 	
 	// Game entity class initialization
 	// - loads type info
@@ -200,7 +200,7 @@ bool LevelState::loadLevel(const std::string &levelName) {
 	return true;
 }
 
-bool LevelState::saveLevel(const std::string &saveName) {
+bool State__Game::saveLevel(const std::string &saveName) {
 	using std::string;
 	
 	string s = levelMap->save();
@@ -227,7 +227,7 @@ bool LevelState::saveLevel(const std::string &saveName) {
 	return true;
 }
 
-void LevelState::openView_help() {
+void State__Game::openView_help() {
   if (view__help) {
     return;
   }
@@ -235,7 +235,7 @@ void LevelState::openView_help() {
   view__help = new View__Help();
   addView(view__help);
 }
-void LevelState::closeView_help() {
+void State__Game::closeView_help() {
   if (!view__help) {
     return;
   }
@@ -245,14 +245,14 @@ void LevelState::closeView_help() {
   view__help = NULL;
 }
 
-void LevelState::openView_hiring() {
+void State__Game::openView_hiring() {
   if (view__hiring) {
     return;
   }
   view__hiring = new View__Hiring();
   addView(view__hiring);
 }
-void LevelState::closeView_hiring() {
+void State__Game::closeView_hiring() {
   if (!view__hiring) {
     return;
   }
@@ -261,14 +261,14 @@ void LevelState::closeView_hiring() {
   view__hiring = NULL;
 }
 
-void LevelState::openView_furnishingPurchasing() {
+void State__Game::openView_furnishingPurchasing() {
   if (view__furnishingPurchasing) {
     return;
   }
   view__furnishingPurchasing = new View__FurnishingPurchasing(Furnishing::get_furnishing_types());
   addView(view__furnishingPurchasing);
 }
-void LevelState::closeView_furnishingPurchasing() {
+void State__Game::closeView_furnishingPurchasing() {
   if (!view__furnishingPurchasing) {
     return;
   }

@@ -12,7 +12,6 @@
 
 #include "Placeable.hpp"
 #include "PlaceableManager.hpp"
-#include "LevelState.hpp"
 #include "LevelView.hpp"
 
 Placeable::Placeable(PlaceableManager *_mngr, LevelView *_lv) :

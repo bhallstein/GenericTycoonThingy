@@ -25,7 +25,6 @@ struct unitInfo {
 	int hireCost;
 };
 
-class LevelState;
 class LevelView;
 class Furnishing;
 class Controller;

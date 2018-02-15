@@ -23,7 +23,7 @@
 
 #include "W.h"
 
-class LevelState;
+class State__Game;
 
 class MenuBackgroundView;
 class ClickToBeginView;
@@ -47,7 +47,7 @@ protected:
 	MenuBackgroundView *menubackgroundview;
 	ClickToBeginView *clicktobeginview;
 
-	LevelState *levelState;
+	State__Game *state__game;
 };
 
 

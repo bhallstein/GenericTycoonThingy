@@ -2,7 +2,7 @@
  * Generic Tycoon Thingy
  *
  * ==================
- *  LevelState.hpp
+ *  State__Game.hpp
  * ==================
  *
  * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __DBT__LevelState__
-#define __DBT__LevelState__
+#ifndef __DBT__State__Game__
+#define __DBT__State__Game__
 
 #include "W.h"
 
@@ -26,10 +26,10 @@ class View__Hiring;
 class View__FurnishingPurchasing;
 
 
-class LevelState : public W::GameState {
+class State__Game : public W::GameState {
 public:
-	LevelState();
-	~LevelState();
+	State__Game();
+	~State__Game();
 	
 	W::EventPropagation::T keyEvent(W::Event *);
 	W::EventPropagation::T buttonEvent(W::Event *);

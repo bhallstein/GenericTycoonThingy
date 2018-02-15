@@ -19,7 +19,7 @@
 		B5C6ACAE2022405E00E750AE /* LevelView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC902022405E00E750AE /* LevelView.cpp */; };
 		B5C6ACAF2022405E00E750AE /* Building.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC912022405E00E750AE /* Building.cpp */; };
 		B5C6ACB02022405E00E750AE /* Furnishing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC922022405E00E750AE /* Furnishing.cpp */; };
-		B5C6ACB12022405E00E750AE /* LevelState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC932022405E00E750AE /* LevelState.cpp */; };
+		B5C6ACB12022405E00E750AE /* State__Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC932022405E00E750AE /* State__Game.cpp */; };
 		B5C6ACB22022405E00E750AE /* PlaceableManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC962022405E00E750AE /* PlaceableManager.cpp */; };
 		B5C6ACB32022405E00E750AE /* TLO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC982022405E00E750AE /* TLO.cpp */; };
 		B5C6ACB42022405E00E750AE /* UIDManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC992022405E00E750AE /* UIDManager.cpp */; };
@@ -130,7 +130,7 @@
 		B5C6AC902022405E00E750AE /* LevelView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LevelView.cpp; sourceTree = "<group>"; };
 		B5C6AC912022405E00E750AE /* Building.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Building.cpp; sourceTree = "<group>"; };
 		B5C6AC922022405E00E750AE /* Furnishing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Furnishing.cpp; sourceTree = "<group>"; };
-		B5C6AC932022405E00E750AE /* LevelState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LevelState.cpp; sourceTree = "<group>"; };
+		B5C6AC932022405E00E750AE /* State__Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = State__Game.cpp; sourceTree = "<group>"; };
 		B5C6AC942022405E00E750AE /* Serializable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Serializable.hpp; sourceTree = "<group>"; };
 		B5C6AC952022405E00E750AE /* MrPaths.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MrPaths.hpp; sourceTree = "<group>"; };
 		B5C6AC962022405E00E750AE /* PlaceableManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaceableManager.cpp; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		B5C6AC9A2022405E00E750AE /* LevelView.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LevelView.hpp; sourceTree = "<group>"; };
 		B5C6AC9B2022405E00E750AE /* Furnishing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Furnishing.hpp; sourceTree = "<group>"; };
 		B5C6AC9C2022405E00E750AE /* Building.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Building.hpp; sourceTree = "<group>"; };
-		B5C6AC9D2022405E00E750AE /* LevelState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LevelState.hpp; sourceTree = "<group>"; };
+		B5C6AC9D2022405E00E750AE /* State__Game.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = State__Game.hpp; sourceTree = "<group>"; };
 		B5C6AC9E2022405E00E750AE /* Serializable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serializable.cpp; sourceTree = "<group>"; };
 		B5C6AC9F2022405E00E750AE /* MrPaths.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MrPaths.cpp; sourceTree = "<group>"; };
 		B5C6ACA02022405E00E750AE /* PlaceableManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PlaceableManager.hpp; sourceTree = "<group>"; };
@@ -375,10 +375,10 @@
 				B5C6AC9B2022405E00E750AE /* Furnishing.hpp */,
 				B5C6ACA62022405E00E750AE /* LevelMap.cpp */,
 				B5C6AC8B2022405E00E750AE /* LevelMap.hpp */,
-				B5C6AC932022405E00E750AE /* LevelState.cpp */,
-				B5C6AC9D2022405E00E750AE /* LevelState.hpp */,
 				B5C6AC902022405E00E750AE /* LevelView.cpp */,
 				B5C6AC9A2022405E00E750AE /* LevelView.hpp */,
+				B5C6AC932022405E00E750AE /* State__Game.cpp */,
+				B5C6AC9D2022405E00E750AE /* State__Game.hpp */,
 				B5C6AC892022405E00E750AE /* State__TopMenu.cpp */,
 				B5C6ACA42022405E00E750AE /* State__TopMenu.hpp */,
 				B531F2B12035B7BE005A41FD /* State__WinLose.cpp */,
@@ -675,7 +675,7 @@
 				B5C6ACB52022405E00E750AE /* Serializable.cpp in Sources */,
 				B5C6AD1F2022409E00E750AE /* lundump.c in Sources */,
 				B5C6ACB62022405E00E750AE /* MrPaths.cpp in Sources */,
-				B5C6ACB12022405E00E750AE /* LevelState.cpp in Sources */,
+				B5C6ACB12022405E00E750AE /* State__Game.cpp in Sources */,
 				B5C6ACB32022405E00E750AE /* TLO.cpp in Sources */,
 				B5C6AD122022409E00E750AE /* lauxlib.c in Sources */,
 				B5C6AD222022409E00E750AE /* ltable.c in Sources */,

@@ -20,7 +20,7 @@
 #include "LuaObj.h"
 #include "Controller.hpp"
 
-class LevelState;
+class State__Game;
 class LevelView;
 class View__BottomBar;
 class TLO;
@@ -30,7 +30,7 @@ class Unit;
 
 class LevelMap {
 public:
-	LevelMap(LevelState*, LevelView*, View__BottomBar*);
+	LevelMap(State__Game*, LevelView*, View__BottomBar*);
 	~LevelMap();
 	
 	void update(int frame_microseconds, float time_in_level);
@@ -75,7 +75,7 @@ public:
   bool addPlayerMoneys(int);
 	
 private:
-	LevelState *levelState;
+	State__Game *state__game;
 	LevelView *view__level;
   View__BottomBar *view__btmBar;
 	

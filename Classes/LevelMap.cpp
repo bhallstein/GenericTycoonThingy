@@ -21,8 +21,8 @@
 #include "State__WinLose.hpp"
 #include <algorithm>
 
-LevelMap::LevelMap(LevelState *_ls, LevelView *_lv, View__BottomBar *_view__btmBar) :
-	levelState(_ls),
+LevelMap::LevelMap(State__Game *_ls, LevelView *_lv, View__BottomBar *_view__btmBar) :
+	state__game(_ls),
 	view__level(_lv),
   view__btmBar(_view__btmBar),
 	loaded(false)

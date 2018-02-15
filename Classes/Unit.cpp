@@ -12,7 +12,6 @@
 
 #include "Unit.hpp"
 #include "Building.hpp"
-#include "LevelState.hpp"
 #include "LevelMap.hpp"
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"

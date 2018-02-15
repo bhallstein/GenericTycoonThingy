@@ -11,7 +11,7 @@
  */
 
 #include "State__TopMenu.hpp"
-#include "LevelState.hpp"
+#include "State__Game.hpp"
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 
@@ -61,11 +61,11 @@ W::EventPropagation::T State__TopMenu::uiEvent(W::Event *ev) {
 void State__TopMenu::startLevel(const std::string &levelName) {
 	W::log << "Starting level: " << levelName << std::endl;
 	try {
-		levelState = new LevelState();
-		if (levelState->loadLevel(levelName))
-			W::pushState(levelState);
+		state__game = new State__Game();
+		if (state__game->loadLevel(levelName))
+			W::pushState(state__game);
 		else
-			delete levelState;
+			delete state__game;
 	} catch (W::Exception &exc) {
 		W::log << "Error: " << exc.what() << std::endl;
 	}

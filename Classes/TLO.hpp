@@ -26,7 +26,6 @@
 #define NO_TYPE "no_type"
 	// When a typed TLO is constructed, its type is not yet known
 
-class LevelState;
 class LevelMap;
 class LevelView;
 
