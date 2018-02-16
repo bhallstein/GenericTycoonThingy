@@ -32,7 +32,7 @@ public:
     landscape_elements.push_back(elements);
 
     // Add other elements
-    bgDRect = new W::DRect(this, {0,0}, rct.sz, W::Colour::TransparentBlack);
+    bgDRect = new W::DRect(this, {0,0}, rct.sz, {0,0,0,0.8});
 
     t1 = new W::DText(this, {220,10}, "Help", W::Colour::White);
     t2 = new W::DText(this, {14,54}, "place furniture and staff in your", W::Colour::White);
@@ -40,7 +40,7 @@ public:
     t4 = new W::DText(this, {14,94}, "give you money.", W::Colour::White);
     t5 = new W::DText(this, {14,144}, "[time left]", W::Colour::White);
     t6 = new W::DText(this, {14,184}, "Get cracking! GO!", W::Colour::White);
-    r1 = new W::DRect(this, {10,234}, {480,1}, W::Colour(0, 0, 0, 0.3));
+    r1 = new W::DRect(this, {10,234}, {480,1}, {1,1,1,0.4});
     t7 = new W::DText(this, {14,264}, "Esc: quit to main menu", W::Colour::White);
     t8 = new W::DText(this, {14,284}, "Q: quit completely", W::Colour::White);
     t9 = new W::DText(this, {14,304}, "H: this help screen", W::Colour::White);

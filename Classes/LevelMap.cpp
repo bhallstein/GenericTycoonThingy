@@ -86,9 +86,12 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
 	tlovec__clearDestroyeds(controllers);
 	tlovec__clearDestroyeds(buildings);
 
-  // Check for win condition
+  // Check for win & lose condition
   if (cash >= 1000) {
-    W::pushState(new State__WinLose());
+    W::pushState(new State__WinLose(true));
+  }
+  else if (time_in_level > level_time_limit_s) {
+    W::pushState(new State__WinLose(false));
   }
 }
 
@@ -97,7 +100,8 @@ W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::position());
 	else if (ev->key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::position());
 	else if (ev->key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::position());
-  else if (ev->key == W::KeyCode::_W) W::pushState(new State__WinLose());
+  else if (ev->key == W::KeyCode::_W) W::pushState(new State__WinLose(true));
+  else if (ev->key == W::KeyCode::_L) W::pushState(new State__WinLose(false));
 	return W::EventPropagation::ShouldContinue;
 }
 

@@ -28,7 +28,7 @@ class View__WinLose;
 
 class State__WinLose : public W::GameState {
 public:
-	State__WinLose();
+	State__WinLose(bool victory);
 	~State__WinLose();
 
   void resume(W::Returny *) { }
@@ -47,20 +47,19 @@ protected:
   void exit_to_menu();
   void exit_completely();
 
-  W::DRect *bg;
-
+  bool victory;
 };
 
 
 
 class View__WinLose  : public W::UIView {
 public:
-  View__WinLose() : W::UIView()
+  View__WinLose(bool victory) : W::UIView()
   {
     orientation_check = false;
     orientation = O_LANDSCAPE;
 
-    // Add positioner & close button
+    // Add positioner & replay/exit btns
     landscape_positioning_limits.push_back(100);
     landscape_positioners.push_back(new W::Positioner(W::Corner::TopLeft,
                                                       W::PosType::Proportional,
@@ -70,7 +69,6 @@ public:
                                                       0.2, 0.2, 0.6, 0.6,
                                                       false));
     auto elements = element_list();
-    float btn_w = 0.1;
     elements.push_back(new W::Button("winlose__replay",
                                      new W::Positioner(W::Corner::TopLeft,
                                                        W::PosType::Proportional,
@@ -91,17 +89,34 @@ public:
     landscape_elements.push_back(elements);
 
     // Add other elements
-    bgDRect = new W::DRect(this, {0,0}, rct.sz, {0,0,0,0.8});
+    bgDRect = new W::DRect(this, {0,0}, {0,0}, {0,0,0,0.8});
+
+    std::string msg = victory ? "You win!" : "You lose!";
+    win_lose_msg = new W::DText(this, {0,0}, msg, W::Colour::White, W::TextAlign::Centre);
+
+    txt_replay = new W::DText(this, {0,0}, "Replay", W::Colour::White, W::TextAlign::Centre);
+    txt_quit   = new W::DText(this, {0,0}, "Quit", W::Colour::White, W::TextAlign::Centre);
 
     updatePosition(W::_controller.window->getSize());
   }
   virtual ~View__WinLose()
   {
+    delete win_lose_msg;
+  }
 
+  void updatePosition_uiview(W::size winsize) {
+    win_lose_msg->setPos({rct.sz.width/2, 40});
+
+    txt_replay->setPos(W::position(int((0.48 - btn_w/2.)*rct.sz.width), rct.sz.height * 0.6));
+    txt_quit  ->setPos(W::position(int((0.52 + btn_w/2.)*rct.sz.width), rct.sz.height * 0.6));
   }
 
 private:
+  W::DText *win_lose_msg;
+  W::DText *txt_replay;
+  W::DText *txt_quit;
 
+  constexpr static const float btn_w = 0.1;
 };
 
 #endif

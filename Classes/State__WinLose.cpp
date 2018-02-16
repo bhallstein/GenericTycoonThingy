@@ -15,17 +15,12 @@
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 
-State__WinLose::State__WinLose() :
-  W::GameState(W::GS_TRANSLUCENT)
+State__WinLose::State__WinLose(bool _victory) :
+  W::GameState(W::GS_TRANSLUCENT),
+  victory(_victory)
 {
-  view = new View__WinLose();
+  view = new View__WinLose(victory);
 	addView(view);
-
-  bg = new W::DRect(view,
-                    {0,0},
-                    {100,100},
-                    W::Colour::TransparentBlack);
-	
 
   W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__WinLose::keyEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__replay", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
@@ -33,7 +28,6 @@ State__WinLose::State__WinLose() :
 }
 State__WinLose::~State__WinLose()
 {
-  delete bg;
 	removeView(view);
   delete view;
 }
