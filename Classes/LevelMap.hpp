@@ -54,9 +54,6 @@ public:
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
 
-  void buyUnit(std::string type);
-  void buyFurnishing(std::string type);
-
   SeekTarget::Type seekTarget__getRandom();
 	
 	Building* building__getRandom();

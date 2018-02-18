@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B531F2B22035B7BE005A41FD /* State__WinLose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B531F2B12035B7BE005A41FD /* State__WinLose.cpp */; };
+		B531F2B52039DC6C005A41FD /* View__TopMenuBG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B531F2B42039DC6C005A41FD /* View__TopMenuBG.cpp */; };
 		B588274A1F40E44100C07AEB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B58827491F40E44100C07AEB /* AppDelegate.m */; };
 		B588274D1F40E44100C07AEB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B588274C1F40E44100C07AEB /* main.m */; };
 		B588274F1F40E44100C07AEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B588274E1F40E44100C07AEB /* Assets.xcassets */; };
@@ -110,6 +111,8 @@
 /* Begin PBXFileReference section */
 		B531F2B02035B7BE005A41FD /* State__WinLose.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = State__WinLose.hpp; sourceTree = "<group>"; };
 		B531F2B12035B7BE005A41FD /* State__WinLose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = State__WinLose.cpp; sourceTree = "<group>"; };
+		B531F2B32039DC5D005A41FD /* View__TopMenuBG.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = View__TopMenuBG.hpp; sourceTree = "<group>"; };
+		B531F2B42039DC6C005A41FD /* View__TopMenuBG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View__TopMenuBG.cpp; sourceTree = "<group>"; };
 		B53CD0492029C5DC00B76231 /* Views__UI.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Views__UI.hpp; sourceTree = "<group>"; };
 		B53CD04B2029C66100B76231 /* View__Help.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = View__Help.hpp; sourceTree = "<group>"; };
 		B58827451F40E44100C07AEB /* Generic Tycoon Thingy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Generic Tycoon Thingy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -405,6 +408,8 @@
 				B5C6AC972022405E00E750AE /* Unit.hpp */,
 				B53CD0492029C5DC00B76231 /* Views__UI.hpp */,
 				B53CD04B2029C66100B76231 /* View__Help.hpp */,
+				B531F2B42039DC6C005A41FD /* View__TopMenuBG.cpp */,
+				B531F2B32039DC5D005A41FD /* View__TopMenuBG.hpp */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -683,6 +688,7 @@
 				B5C6AD84202240C500E750AE /* Event.cpp in Sources */,
 				B5C6AD79202240C500E750AE /* Timer.cpp in Sources */,
 				B5C6AD7F202240C500E750AE /* Colour.cpp in Sources */,
+				B531F2B52039DC6C005A41FD /* View__TopMenuBG.cpp in Sources */,
 				B5C6AD182022409E00E750AE /* loadlib.c in Sources */,
 				B5C6AD322022409E00E750AE /* ltm.c in Sources */,
 				B5C6AD86202240C500E750AE /* MegaTexture.cpp in Sources */,

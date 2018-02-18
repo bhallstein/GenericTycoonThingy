@@ -109,7 +109,6 @@ W::EventPropagation::T LevelMap::buttonEvent(W::Event *ev) {
   std::string *name = (std::string*) ev->_payload;
 
   if (*name == "hire_staff") {
-//    buyUnit("shopkeeper");
     createUnit(true, "shopkeeper", {-1,-1});
   }
   else if (*name == "buy_furnishing:barberschair") {
@@ -437,14 +436,6 @@ Controller* LevelMap::createControllerForUnit(Unit *u) {
 	
   return createController(it->second);
 }
-
-//void LevelMap::buyUnit(std::string type) {
-//  int cost = Unit::cost_for_type(type);
-//  bool bought = addPlayerMoneys(-cost);
-//  if (bought) {
-//    createUnit(true, type, {-1,-1});
-//  }
-//}
 
 SeekTarget::Type LevelMap::seekTarget__getRandom() {
   return (SeekTarget::Type) W::Rand::intUpTo(SeekTarget::__N);

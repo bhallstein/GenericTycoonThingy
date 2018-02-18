@@ -1,4 +1,4 @@
--- ClickToBeginView - view with one button, which starts the level
+-- MenuUI - view with one button, which starts the level
 
 landscape = {
 	
