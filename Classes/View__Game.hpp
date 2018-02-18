@@ -2,23 +2,23 @@
  * Generic Tycoon Thingy
  *
  * =================
- *  LevelView.hpp
+ *  View__Game.hpp
  * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
-#ifndef __DBT__LevelView__
-#define __DBT__LevelView__
+#ifndef __DBT__View__Game
+#define __DBT__View__Game
 
 #include "W.h"
 
-class LevelView : public W::View {
+class View__Game : public W::View {
 public:
-	LevelView();
-	~LevelView();
+	View__Game();
+	~View__Game();
 	
 	void updatePosition(const W::size &);
 	
@@ -45,9 +45,6 @@ protected:
 	int level_width, level_height;	// -1 until set with setLevelSize()
 	
 	void scroll(int x, int y);
-	
-	friend class DrawnUnit;
-	friend class DrawnFurnishing;
 };
 
 #endif

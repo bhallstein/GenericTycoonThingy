@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ========================
+ * =======================
  *  PlaceableManager.cpp
- * ========================
+ * =======================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -14,9 +14,9 @@
 
 class LevelMap;
 
-PlaceableManager::PlaceableManager(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+PlaceableManager::PlaceableManager(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm, bool _placeableMode) :
 	TLO(_lm, _lv, _nm),
-	placeableMode(_placeableMode), placeable(this, levelView)
+	placeableMode(_placeableMode), placeable(this, view__game)
 {
 	// Hai managey
 }

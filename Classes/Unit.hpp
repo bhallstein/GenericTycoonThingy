@@ -1,23 +1,21 @@
 /*
  * Generic Tycoon Thingy
  *
- * ============
+ * ===========
  *  Unit.hpp
- * ============
+ * ===========
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
-#ifndef UNIT_H
-#define UNIT_H
-
-#include <iostream>
-#include <map>
+#ifndef __DBT__Unit_h
+#define __DBT__Unit_h
 
 #include "types.hpp"
 #include "PlaceableManager.hpp"
+#include <map>
 
 struct unitInfo {
 	unitInfo(LuaObj &);
@@ -25,13 +23,13 @@ struct unitInfo {
 	int hireCost;
 };
 
-class LevelView;
+class View__Game;
 class Furnishing;
 class Controller;
 
 class Unit : public PlaceableManager {
 public:
-	Unit(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
+	Unit(LevelMap *, View__Game *, W::NavMap *, bool _placeableMode);
 	~Unit();
 	void _setUp();
 		// When a unit is constructed, we may not yet know its type, which is therefore
@@ -99,7 +97,7 @@ protected:
 
 class Unit::DrawnUnit {
 public:
-	DrawnUnit(LevelView *);
+	DrawnUnit(View__Game *);
 	~DrawnUnit();
 	void setPosn(W::position);
 	void setOpac(float x);
@@ -107,7 +105,7 @@ public:
 	void incRot();
 	
 private:
-	LevelView *lv;
+	View__Game *lv;
 	W::DRect *r;
 };
 

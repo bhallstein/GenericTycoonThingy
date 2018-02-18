@@ -5,13 +5,14 @@
  *  State__WinLose.cpp
  * =====================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
 #include "State__WinLose.hpp"
 #include "State__Game.hpp"
+#include "View__TwoBtns.hpp"
 #include "MrKlangy.hpp"
 #include "MrPaths.hpp"
 
@@ -19,10 +20,14 @@ State__WinLose::State__WinLose(bool _victory) :
   W::GameState(W::GS_TRANSLUCENT),
   victory(_victory)
 {
-  view = new View__WinLose(victory);
-	addView(view);
+  view = new View__TwoBtns(victory ? "You win!" : "You lose!",
+                           "Replay",
+                           "winlose__replay",
+                           "Quit",
+                           "winlose__exit_to_menu");
+  addView(view);
 
-  W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__WinLose::keyEvent, this));
+  W::Messenger::subscribe(W::EventType::KeyDown, W::Callback(&State__WinLose::keyEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__replay", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__exit_to_menu", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
 }
@@ -45,6 +50,7 @@ W::EventPropagation::T State__WinLose::keyEvent(W::Event *ev) {
 
   return W::EventPropagation::ShouldStop;
 }
+
 W::EventPropagation::T State__WinLose::btnEvent(W::Event *ev) {
   std::string *s = (std::string*) ev->_payload;
 
@@ -71,14 +77,3 @@ void State__WinLose::exit_to_menu() {
 void State__WinLose::exit_completely() {
   popState(W::KillerReturny);
 }
-
-//W::EventPropagation::T State__WinLose::keyEvent(W::Event *ev) {
-//  if (ev->key == W::KeyCode::_Q || ev->key == W::KeyCode::ESC)
-//    W::popState(W::EmptyReturny);
-//  return W::EventPropagation::ShouldContinue;
-//}
-//W::EventPropagation::T State__WinLose::uiEvent(W::Event *ev) {
-//  startLevel("qj-level");
-//  return W::EventPropagation::ShouldContinue;
-//}
-

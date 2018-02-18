@@ -1,21 +1,21 @@
 /*
  * Generic Tycoon Thingy
  *
- * =================
+ * ================
  *  Placeable.cpp
- * =================
+ * ================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
 #include "Placeable.hpp"
 #include "PlaceableManager.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 
-Placeable::Placeable(PlaceableManager *_mngr, LevelView *_lv) :
-	mngr(_mngr), levelView(_lv)
+Placeable::Placeable(PlaceableManager *_mngr, View__Game *_lv) :
+	mngr(_mngr), view__game(_lv)
 {
 	// hai placeable
 }
@@ -48,19 +48,19 @@ W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
 bool Placeable::activate() {
 	using namespace W::EventType;
 	W::Callback cb(&Placeable::mouseEvent, this);
-	bool success = W::Messenger::requestPrivilegedEventResponderStatus(levelView, MouseMove, cb)
-		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, LMouseDown, cb)
-		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, LMouseUp, cb)
-		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, RMouseDown, cb)
-		&& W::Messenger::requestPrivilegedEventResponderStatus(levelView, RMouseUp, cb);
+	bool success = W::Messenger::requestPrivilegedEventResponderStatus(view__game, MouseMove, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(view__game, LMouseDown, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(view__game, LMouseUp, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(view__game, RMouseDown, cb)
+		&& W::Messenger::requestPrivilegedEventResponderStatus(view__game, RMouseUp, cb);
 	if (!success) deactivate();
 	return success;
 }
 void Placeable::deactivate() {
 	using namespace W::EventType;
-	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, MouseMove, this);
-	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, LMouseDown, this);
-	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, LMouseUp, this);
-	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, RMouseDown, this);
-	W::Messenger::relinquishPrivilegedEventResponderStatus(levelView, RMouseUp, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(view__game, MouseMove, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(view__game, LMouseDown, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(view__game, LMouseUp, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(view__game, RMouseDown, this);
+	W::Messenger::relinquishPrivilegedEventResponderStatus(view__game, RMouseUp, this);
 }

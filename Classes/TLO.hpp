@@ -1,17 +1,12 @@
 /*
  * Generic Tycoon Thingy
  *
- * ===========
+ * ==========
  *  TLO.hpp
- * ===========
+ * ==========
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
- *
- */
-
-/*
- * TLO.hpp - contains useful top-level-object related functionality
  *
  */
 
@@ -19,21 +14,20 @@
 #define TLO_H
 
 #include "W.h"
-//#include "Serializer.hpp"
 #include "UIDManager.hpp"
 #include "Serializable.hpp"
 
 #define NO_TYPE "no_type"
-	// When a typed TLO is constructed, its type is not yet known
+  // When a typed TLO is constructed, its type is not yet known
 
 class LevelMap;
-class LevelView;
+class View__Game;
 
 class TLO : public Serializable {
 public:
-	TLO(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+	TLO(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 		levelMap(_lm),
-		levelView(_lv),
+		view__game(_lv),
 		navmap(_nm),
 		type(NO_TYPE),
 		destroyed(false)
@@ -70,7 +64,7 @@ protected:
 	}
 	
 	LevelMap   *levelMap;
-	LevelView  *levelView;
+	View__Game  *view__game;
 	W::NavMap *navmap;
 	
 private:

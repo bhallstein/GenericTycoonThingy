@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ==================
+ * =================
  *  Furnishing.cpp
- * ==================
+ * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -16,7 +16,7 @@
 #include "MrPaths.hpp"
 #include "W.h"
 #include "Placeable.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 #include "LevelMap.hpp"
 #include "Serializer.hpp"
 #include <algorithm>
@@ -71,7 +71,7 @@ bool Furnishing::initialized = false;
 
 /*** Furnishing ***/
 
-Furnishing::Furnishing(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+Furnishing::Furnishing(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm, bool _placeableMode) :
 	PlaceableManager(_lm, _lv, _nm, _placeableMode),
 	purchased(false),
   placed(false),
@@ -79,16 +79,16 @@ Furnishing::Furnishing(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _plac
 {
 	rct.sz = W::size(2,2);
 
-	drawnFurnishing = new DrawnFurnishing(levelView);
+	drawnFurnishing = new DrawnFurnishing(view__game);
 	drawnFurnishing->setPosn(rct.pos);
 	
-	W::Messenger::subscribeInView(levelView, W::EventType::LMouseUp, W::Callback(&Furnishing::mouseEvent, this), &rct);
+	W::Messenger::subscribeInView(view__game, W::EventType::LMouseUp, W::Callback(&Furnishing::mouseEvent, this), &rct);
 }
 Furnishing::~Furnishing()
 {
 	std::cout << "furnishing destruct" << std::endl;
 	using namespace W::EventType;
-	W::Messenger::unsubscribeInView(levelView, LMouseUp, this);
+	W::Messenger::unsubscribeInView(view__game, LMouseUp, this);
 //	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEDOWN,  this);
 //	W::Messenger::unsubscribeFromEventType(LV_LEFTMOUSEUP,    this);
 //	W::Messenger::unsubscribeFromEventType(LV_RIGHTMOUSEDOWN, this);
@@ -241,7 +241,7 @@ bool Furnishing::canPlace(const W::position &_pos) {
 
 /* DrawnFurnishing impl */
 
-Furnishing::DrawnFurnishing::DrawnFurnishing(LevelView *_lv) : lv(_lv)
+Furnishing::DrawnFurnishing::DrawnFurnishing(View__Game *_lv) : lv(_lv)
 {
 	r = new W::DRect(lv,
                    W::position(),

@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * ======================
+ *  View__TopMenuBG.hpp
+ * ======================
+ *
+ * Copyright (C) 2012 - Ben Hallstein
+ * All rights reserved
+ *
+ */
+
 #ifndef View__TopMenuBG_h
 #define View__TopMenuBG_h
 

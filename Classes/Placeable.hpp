@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * =================
+ * ================
  *  Placeable.hpp
- * =================
+ * ================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -24,18 +24,18 @@
 #include "W.h"
 
 class PlaceableManager;
-class LevelView;
+class View__Game;
 
 class Placeable {
 public:
-	Placeable(PlaceableManager *, LevelView *);
+	Placeable(PlaceableManager *, View__Game *);
 	~Placeable();
 	bool activate();
 	void deactivate();
 	W::EventPropagation::T mouseEvent(W::Event *);
 	PlaceableManager *mngr;
 	W::position pos;
-	LevelView *levelView;
+	View__Game *view__game;
 };
 
 #endif

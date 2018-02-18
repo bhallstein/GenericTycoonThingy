@@ -1,17 +1,17 @@
 /*
  * Generic Tycoon Thingy
  *
- * =================
+ * ===============
  *  Building.cpp
- * =================
+ * ===============
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
 #include "Building.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 #include "Furnishing.hpp"
 #include "MrPaths.hpp"
 #include "W.h"
@@ -49,10 +49,10 @@ std::map<std::string, W::Colour> building_colors = {
 
 /*** Building ***/
 
-Building::Building(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+Building::Building(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
-  drawnBuilding = new DrawnBuilding(levelView, W::position());
+  drawnBuilding = new DrawnBuilding(view__game, W::position());
 
 //	if (!navmap->isPassableUnder(rct)) {
 //		throw W::Exception("Navmap was not passable under Building plan.");
@@ -91,7 +91,7 @@ void Building::_setUp() {
 
   // Subscribe to mouse clicks
   for (auto &r : groundplan_rects) {
-    W::Messenger::subscribeInView(levelView,
+    W::Messenger::subscribeInView(view__game,
                                   W::EventType::LMouseUp,
                                   W::Callback(&Building::mouseEvent, this),
                                   &r);
@@ -221,7 +221,7 @@ std::vector<UID> Building::get_operating_controllers() {
 
 // DrawnBuilding impl
 
-Building::DrawnBuilding::DrawnBuilding(LevelView *_lv, W::position _pos) :
+Building::DrawnBuilding::DrawnBuilding(View__Game *_lv, W::position _pos) :
   lv(_lv),
   col(W::Colour::SkyBlue)
 {

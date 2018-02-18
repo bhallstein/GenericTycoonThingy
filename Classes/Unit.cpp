@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ============
+ * ===========
  *  Unit.cpp
- * ============
+ * ===========
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -17,12 +17,12 @@
 #include "MrPaths.hpp"
 #include "W.h"
 #include "LevelMap.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 #include "Placeable.hpp"
 #include "Serializer.hpp"
 
 
-/* unitInfo constructor impl */
+// unitInfo
 
 unitInfo::unitInfo(LuaObj &o) {
   LuaObj *l;
@@ -37,12 +37,11 @@ unitInfo::unitInfo(LuaObj &o) {
 }
 
 
-/* Unit: static properties */
+// Unit static properties
 
 std::map<std::string, unitInfo*> Unit::unitTypeInfo;
 Serializable::serialization_descriptor Unit::sd;
 bool Unit::initialized = false;
-
 
 std::map<std::string, W::Colour> unit_colors = {
   { "customer", W::Colour::Black },
@@ -50,9 +49,9 @@ std::map<std::string, W::Colour> unit_colors = {
 };
 
 
-/*** Unit ***/
+// Unit
 
-Unit::Unit(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, bool _placeableMode) :
+Unit::Unit(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm, bool _placeableMode) :
 PlaceableManager(_lm, _lv, _nm, _placeableMode),
 mode(UnitMode::IDLE),
 hired(false)
@@ -60,14 +59,14 @@ hired(false)
   rct.setSz(W::size(1, 1));
 
   // Create DrawnUnit
-  drawnUnit = new DrawnUnit(levelView);
+  drawnUnit = new DrawnUnit(view__game);
   drawnUnit->setPosn(rct.pos);
 
-  W::Messenger::subscribeInView(levelView, W::EventType::LMouseUp, W::Callback(&Unit::mouseEvent, this), &rct);
+  W::Messenger::subscribeInView(view__game, W::EventType::LMouseUp, W::Callback(&Unit::mouseEvent, this), &rct);
 }
 Unit::~Unit()
 {
-  W::Messenger::unsubscribeInView(levelView, W::EventType::LMouseUp, this);
+  W::Messenger::unsubscribeInView(view__game, W::EventType::LMouseUp, this);
   delete drawnUnit;
 }
 void Unit::_setUp() {
@@ -315,7 +314,7 @@ void Unit::printDebugInfo() {
 
 /* DrawnUnit impl */
 
-Unit::DrawnUnit::DrawnUnit(LevelView *_lv) : lv(_lv)
+Unit::DrawnUnit::DrawnUnit(View__Game *_lv) : lv(_lv)
 {
   r = new W::DRect(lv,
                    W::position(),

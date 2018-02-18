@@ -5,13 +5,13 @@
  *  State__Game.cpp
  * ==================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
 #include "State__Game.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 #include "LevelMap.hpp"
 #include "MrPaths.hpp"
 #include "MrKlangy.hpp"
@@ -28,7 +28,7 @@
 #include "View__Help.hpp"
 
 State__Game::State__Game() :
-	levelView(NULL),
+	view__game(NULL),
 	levelMap(NULL),
 	paused(false),
   view__help(NULL),
@@ -36,8 +36,8 @@ State__Game::State__Game() :
   view__furnishingPurchasing(NULL)
 {
 	// Initialize views
-	levelView = new LevelView();
-	addView(levelView);
+	view__game = new View__Game();
+	addView(view__game);
 
   view__btmBar = new View__BottomBar();
   addView(view__btmBar);
@@ -45,7 +45,7 @@ State__Game::State__Game() :
   openView_help();
 	
   // Create map
-  levelMap = new LevelMap(this, levelView, view__btmBar);
+  levelMap = new LevelMap(this, view__game, view__btmBar);
 	
 	// Time
 	time_elapsed_s = 0.0;
@@ -65,8 +65,8 @@ State__Game::State__Game() :
 }
 State__Game::~State__Game()
 {
-	removeView(levelView);
-	delete levelView;
+	removeView(view__game);
+	delete view__game;
 	delete levelMap;
 	
 //	MrKlangy::stopBGM();
@@ -189,7 +189,7 @@ bool State__Game::loadLevel(const std::string &levelName) {
 	// Map contents
 	bool mapload_success = levelMap->load(L);
 	// Note: since the level's size info is loaded by levelMap,
-	// levelMap also calls levelView.setLevelSize, and creates the NavMap.
+	// levelMap also calls view__game.setLevelSize, and creates the NavMap.
 	if (!mapload_success) {
 		W::log << "Error loading map" << std::endl;
 		return false;

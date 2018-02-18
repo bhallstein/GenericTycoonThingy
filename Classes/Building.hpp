@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ================
+ * ===============
  *  Building.hpp
- * ================
+ * ===============
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -40,7 +40,7 @@ struct buildingInfo {
 
 class Building : public TLO {
 public:
-  Building(LevelMap *, LevelView *, W::NavMap *);
+  Building(LevelMap *, View__Game *, W::NavMap *);
   ~Building();
 
   void _setUp();  // See note in Unit.hpp on creation & setup
@@ -91,7 +91,7 @@ protected:
 
 class Building::DrawnBuilding {
 public:
-  DrawnBuilding(LevelView *, W::position pos);
+  DrawnBuilding(View__Game *, W::position pos);
   ~DrawnBuilding();
   void setPos(W::position);
   void setGroundplan(std::vector<W::position>);
@@ -101,7 +101,7 @@ private:
   W::Colour col;
   std::vector<W::position> groundplan;
   std::vector<W::DRect*> rects;
-  LevelView *lv;
+  View__Game *lv;
 };
 
 #endif

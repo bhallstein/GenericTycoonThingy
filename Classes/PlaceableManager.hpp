@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ========================
+ * =======================
  *  PlaceableManager.hpp
- * ========================
+ * =======================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -27,7 +27,7 @@
 
 class PlaceableManager : public TLO {
 public:
-	PlaceableManager(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
+	PlaceableManager(LevelMap *, View__Game *, W::NavMap *, bool _placeableMode);
 	bool init(W::position);	// Attempt to init at supplied position
 	bool init(); // Attempt to init at current position
 	

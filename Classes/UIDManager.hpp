@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ==================
+ * =================
  *  UIDManager.hpp
- * ==================
+ * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */

@@ -2,21 +2,17 @@
  * Generic Tycoon Thingy
  *
  * =================
- *  LevelView.cpp
+ *  View__Game.cpp
  * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 
-/********************************/
-/*** LevelView implementation ***/
-/********************************/
-
-LevelView::LevelView() :
+View__Game::View__Game() :
 	View(new W::Positioner(W::Corner::TopLeft,
                          W::PosType::Fixed,
                          W::PosType::Fixed,
@@ -30,13 +26,13 @@ LevelView::LevelView() :
 	bgRect = new W::DRect(this, rct.pos, rct.sz, W::Colour::White);
 	
 	// Screenedge scrolling
-	W::Callback scrCb(&LevelView::scrollEvent, this);
+	W::Callback scrCb(&View__Game::scrollEvent, this);
 	W::Messenger::subscribe(W::EventType::ScreenEdgeLeft,   scrCb);
 	W::Messenger::subscribe(W::EventType::ScreenEdgeRight,  scrCb);
 	W::Messenger::subscribe(W::EventType::ScreenEdgeTop,    scrCb);
 	W::Messenger::subscribe(W::EventType::ScreenEdgeBottom, scrCb);
 }
-LevelView::~LevelView()
+View__Game::~View__Game()
 {
 	W::Messenger::unsubscribe(W::EventType::ScreenEdgeLeft,   this);
 	W::Messenger::unsubscribe(W::EventType::ScreenEdgeRight,  this);
@@ -44,14 +40,14 @@ LevelView::~LevelView()
 	W::Messenger::unsubscribe(W::EventType::ScreenEdgeBottom, this);
 }
 
-void LevelView::updatePosition(const W::size &winsize) {
+void View__Game::updatePosition(const W::size &winsize) {
 	bgRect->setSz(rct.sz);
 }
 
-void LevelView::convertEventCoords(W::Event *ev) {
+void View__Game::convertEventCoords(W::Event *ev) {
 	ev->pos = convertPixelToGridCoords(ev->pos);
 }
-W::EventPropagation::T LevelView::scrollEvent(W::Event *ev) {
+W::EventPropagation::T View__Game::scrollEvent(W::Event *ev) {
 	using namespace W::EventType;
 	int scrollDist = 10;
 	if (ev->type == ScreenEdgeLeft)        scroll(-scrollDist, 0);
@@ -60,7 +56,7 @@ W::EventPropagation::T LevelView::scrollEvent(W::Event *ev) {
 	else if (ev->type == ScreenEdgeBottom) scroll(0, scrollDist);
 	return W::EventPropagation::ShouldContinue;
 }
-void LevelView::scroll(int x, int y) {
+void View__Game::scroll(int x, int y) {
 	_offset.x -= x;
 	_offset.y -= y;
 		// The offset is added to DrawnObjs’ positions to achieve scrolling.
@@ -77,7 +73,7 @@ void LevelView::scroll(int x, int y) {
 	bgRect->setPos(W::position(-_offset.x, -_offset.y));
 }
 
-void LevelView::setRemainingTime(float seconds) {
+void View__Game::setRemainingTime(float seconds) {
   char s[100];
   int time_minutes = seconds / 60;
   int time_seconds = int(seconds)%60;
@@ -94,19 +90,19 @@ void LevelView::setRemainingTime(float seconds) {
   }
 }
 
-W::position LevelView::convertGridToPixelCoords(const W::position &_p) {
+W::position View__Game::convertGridToPixelCoords(const W::position &_p) {
 	return W::position(
 		(int)((_p.x + _p.a) * gridsize),
 		(int)((_p.y + _p.b) * gridsize)
 	);
 }
-W::size LevelView::convertGridToPixelCoords(const W::size &_s) {
+W::size View__Game::convertGridToPixelCoords(const W::size &_s) {
 	return W::size(
 		_s.width * gridsize,
 		_s.height * gridsize
 	);
 }
-W::position LevelView::convertPixelToGridCoords(const W::position &_p) {
+W::position View__Game::convertPixelToGridCoords(const W::position &_p) {
 	return W::position(
 		_p.x/gridsize,
 		_p.y/gridsize,

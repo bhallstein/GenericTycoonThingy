@@ -1,3 +1,15 @@
+/*
+ * Generic Tycoon Thingy
+ *
+ * =================
+ *  View__Help.hpp
+ * =================
+ *
+ * Copyright (C) 2012 - Ben Hallstein
+ * All rights reserved
+ *
+ */
+
 #ifndef View__Help_h
 #define View__Help_h
 

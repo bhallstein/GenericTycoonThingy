@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ================
+ * ===============
  *  LevelMap.hpp
- * ================
+ * ===============
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -21,7 +21,7 @@
 #include "Controller.hpp"
 
 class State__Game;
-class LevelView;
+class View__Game;
 class View__BottomBar;
 class TLO;
 class Furnishing;
@@ -30,7 +30,7 @@ class Unit;
 
 class LevelMap {
 public:
-	LevelMap(State__Game*, LevelView*, View__BottomBar*);
+	LevelMap(State__Game*, View__Game*, View__BottomBar*);
 	~LevelMap();
 	
 	void update(int frame_microseconds, float time_in_level);
@@ -73,7 +73,7 @@ public:
 	
 private:
 	State__Game *state__game;
-	LevelView *view__level;
+	View__Game *view__level;
   View__BottomBar *view__btmBar;
 	
 	W::NavMap *navmap;

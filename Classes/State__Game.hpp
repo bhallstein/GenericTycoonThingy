@@ -5,13 +5,13 @@
  *  State__Game.hpp
  * ==================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
-#ifndef __DBT__State__Game__
-#define __DBT__State__Game__
+#ifndef __DBT__State__Game
+#define __DBT__State__Game
 
 #include "W.h"
 
@@ -19,7 +19,7 @@ class LevelMap;
 class Building;
 
 /* View-related forward class declarations */
-class LevelView;
+class View__Game;
 class View__BottomBar;
 class View__Help;
 class View__Hiring;
@@ -54,7 +54,7 @@ public:
 	
 private:
 	// Views
-	LevelView *levelView;
+	View__Game *view__game;
 	View__BottomBar *view__btmBar;
 	View__Help      *view__help;
 	View__Hiring    *view__hiring;

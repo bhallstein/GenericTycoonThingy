@@ -1,17 +1,17 @@
 /*
  * Generic Tycoon Thingy
  *
- * ================
+ * ===============
  *  LevelMap.cpp
- * ================
+ * ===============
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
 
 #include "LevelMap.hpp"
-#include "LevelView.hpp"
+#include "View__Game.hpp"
 #include "Views__UI.hpp"
 #include "TLO.hpp"
 #include "LuaObj.h"
@@ -21,7 +21,7 @@
 #include "State__WinLose.hpp"
 #include <algorithm>
 
-LevelMap::LevelMap(State__Game *_ls, LevelView *_lv, View__BottomBar *_view__btmBar) :
+LevelMap::LevelMap(State__Game *_ls, View__Game *_lv, View__BottomBar *_view__btmBar) :
 	state__game(_ls),
 	view__level(_lv),
   view__btmBar(_view__btmBar),

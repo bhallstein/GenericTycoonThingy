@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ==================
+ * =================
  *  Furnishing.hpp
- * ==================
+ * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -30,7 +30,7 @@ struct furnishingInfo {
 
 class Furnishing : public PlaceableManager {
 public:
-	Furnishing(LevelMap *, LevelView *, W::NavMap *, bool _placeableMode);
+	Furnishing(LevelMap *, View__Game *, W::NavMap *, bool _placeableMode);
 	~Furnishing();
 	void _setUp();
 		// See note in Unit.hpp on creation & setup
@@ -79,13 +79,13 @@ protected:
 
 class Furnishing::DrawnFurnishing {
 public:
-	DrawnFurnishing(LevelView *);
+	DrawnFurnishing(View__Game *);
 	~DrawnFurnishing();
 	void setPosn(const W::position &);
 	void setOpac(float);
 	void setColour(W::Colour);
 private:
-	LevelView *lv;
+	View__Game *lv;
 	W::DRect *r;
 };
 

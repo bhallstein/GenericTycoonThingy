@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ==================
+ * =================
  *  Controller.hpp
- * ==================
+ * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -34,7 +34,7 @@ namespace ControllerCompletion {
 
 class Controller : public TLO {
 public:
-	Controller(LevelMap *, LevelView *, W::NavMap *);
+	Controller(LevelMap *, View__Game *, W::NavMap *);
 	virtual ~Controller();
 	void _setUp();
 	
@@ -90,7 +90,7 @@ private:
 
 class CustomerController : public Controller {
 public:
-	CustomerController(LevelMap *, LevelView *, W::NavMap *, SeekTarget::Type);
+	CustomerController(LevelMap *, View__Game *, W::NavMap *, SeekTarget::Type);
 	
 	void resume(Unit *, ControllerCompletion::T);
 	void success(Unit *) { ++stage; }
@@ -136,7 +136,7 @@ namespace W {
 
 class ShopkeeperController : public Controller {
 public:
-	ShopkeeperController(LevelMap *, LevelView *, W::NavMap *);
+	ShopkeeperController(LevelMap *, View__Game *, W::NavMap *);
 	
 	void resume(Unit *, ControllerCompletion::T);
 	void success(Unit *) { ++stage; }

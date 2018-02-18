@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ==================
+ * =================
  *  Controller.cpp
- * ==================
+ * =================
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -25,7 +25,7 @@
 
 Serializable::serialization_descriptor Controller::sd;
 
-Controller::Controller(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+Controller::Controller(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
 	// Hai mr controlley
@@ -91,7 +91,7 @@ void Controller::releaseUnit(Unit *u, ControllerCompletion::T succ) {
 
 Serializable::serialization_descriptor CustomerController::sd;
 
-CustomerController::CustomerController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm, SeekTarget::Type _seek) :
+CustomerController::CustomerController(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm, SeekTarget::Type _seek) :
 	Controller(_lm, _lv, _nm),
 	stage(0),
 	failureStage(0),
@@ -260,7 +260,7 @@ W::Event *sk_event_piesale = NULL;
 int W::EventType::Haircut = W::Event::registerType();
 int W::EventType::PieSale = W::Event::registerType();
 
-ShopkeeperController::ShopkeeperController(LevelMap *_lm, LevelView *_lv, W::NavMap *_nm) :
+ShopkeeperController::ShopkeeperController(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	Controller(_lm, _lv, _nm),
 	stage(0),
 	failureStage(0)

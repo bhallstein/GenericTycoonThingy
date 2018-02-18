@@ -1,11 +1,11 @@
 /*
  * Generic Tycoon Thingy
  *
- * ===========
+ * ==========
  *  TLO.cpp
- * ===========
+ * ==========
  *
- * Copyright (C) 2012 - Ben Hallstein, Jon Couldridge & Philip Berry
+ * Copyright (C) 2012 - Ben Hallstein
  * All rights reserved
  *
  */
@@ -20,5 +20,5 @@ void TLO::initialize() {
 	TLO::sd["rct"] = makeSerializer(&TLO::rct);
 	TLO::sd["type"] = makeSerializer(&TLO::type);
 	TLO::sd["destroyed"] = makeSerializer(&TLO::destroyed);
-	// Should `destroyed` ever be serialized as true?!
+  // Should `destroyed` ever be serialized as true?!
 }
