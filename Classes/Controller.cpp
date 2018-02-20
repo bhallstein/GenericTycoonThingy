@@ -163,8 +163,12 @@ void CustomerController::update() {
 	else if (stage == 100) {
 		failureStage = 199;
 		Building *b = (Building*) dest_building.get();
-		
-		customerPtr()->voyage(b->rct.pos - W::position(1, 0));
+
+    W::v2i dest = {
+      int(b->rct.position.a - 1),
+      int(b->rct.position.b),
+    };
+		customerPtr()->voyage(dest);
 		++stage;
 	}
 	else if (stage == 101) {
@@ -328,9 +332,13 @@ void ShopkeeperController::update() {
 		Unit *cust = (Unit*) customer.get();
     Furnishing *f = (Furnishing*) furnishing.get();
 
-    W::position dest = f->rct.pos - W::position(1,1);
-		sk->voyage(dest);
-		cust->voyage(dest + W::position(1,0));
+    W::v2i dest_cust = {
+      int(f->rct.position.a) - 1,
+      int(f->rct.position.b) - 1,
+    };
+    W::v2i dest_sk = dest_cust + W::v2i{1,0};
+    cust->voyage(dest_cust);
+    sk->voyage(dest_sk);
 		
 		timeWaited = 0;
 		++stage;
@@ -438,7 +446,11 @@ void ShopkeeperController::unitPutDown(Unit *u) {
 	stage = 1;
 
 	// If in a building, act accordingly
-	Building *b = levelMap->building__findAt(u->rct.pos);
+  W::v2i p = {
+    int(u->rct.position.a),
+    int(u->rct.position.b),
+  };
+	Building *b = levelMap->building__findAt(p);
 	if (b) {
 		building = b->uid;
 		b->add_controller(uid);

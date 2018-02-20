@@ -26,8 +26,10 @@ Placeable::~Placeable()
 
 W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
 	using namespace W::EventType;
-	W::position p = ev->pos;
-	p.a = p.b = 0;
+	W::v2f p = ev->pos;
+  p.a = (int) p.a;
+  p.b = (int) p.b;
+
 	if (ev->type == MouseMove) {
 		pos = p;
 		mngr->placementLoopUpdate();

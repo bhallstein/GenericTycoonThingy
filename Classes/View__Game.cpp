@@ -23,7 +23,7 @@ View__Game::View__Game() :
 	level_width(-1), level_height(-1),
   remaining_time_txt(NULL)
 {
-	bgRect = new W::DRect(this, rct.pos, rct.sz, W::Colour::White);
+  bgrect = new W::Rectangle(this, rct.position, rct.size, W::Colour::White);
 	
 	// Screenedge scrolling
 	W::Callback scrCb(&View__Game::scrollEvent, this);
@@ -40,8 +40,8 @@ View__Game::~View__Game()
 	W::Messenger::unsubscribe(W::EventType::ScreenEdgeBottom, this);
 }
 
-void View__Game::updatePosition(const W::size &winsize) {
-	bgRect->setSz(rct.sz);
+void View__Game::updatePosition(W::v2i winsize) {
+  bgrect->setSz(rct.size);
 }
 
 void View__Game::convertEventCoords(W::Event *ev) {
@@ -49,28 +49,42 @@ void View__Game::convertEventCoords(W::Event *ev) {
 }
 W::EventPropagation::T View__Game::scrollEvent(W::Event *ev) {
 	using namespace W::EventType;
-	int scrollDist = 10;
-	if (ev->type == ScreenEdgeLeft)        scroll(-scrollDist, 0);
-	else if (ev->type == ScreenEdgeRight)  scroll(scrollDist, 0);
-	else if (ev->type == ScreenEdgeTop)    scroll(0, -scrollDist);
-	else if (ev->type == ScreenEdgeBottom) scroll(0, scrollDist);
+  int scrollDist = 10;
+
+  if (ev->type == ScreenEdgeLeft)        { scroll(-scrollDist, 0); }
+  else if (ev->type == ScreenEdgeRight)  { scroll(scrollDist, 0); }
+  if (ev->type == ScreenEdgeTop)         { scroll(0, -scrollDist); }
+  else if (ev->type == ScreenEdgeBottom) { scroll(0, scrollDist); }
+
 	return W::EventPropagation::ShouldContinue;
 }
 void View__Game::scroll(int x, int y) {
-	_offset.x -= x;
-	_offset.y -= y;
+	_offset.a -= x;
+	_offset.b -= y;
 		// The offset is added to DrawnObjs’ positions to achieve scrolling.
 		// When the offset is zero, we view the top left of the map; it can’t be greater than zero
-	if (_offset.x > 0) _offset.x = 0;
-	if (_offset.y > 0) _offset.y = 0;
+	if (_offset.a > 0) _offset.a = 0;
+	if (_offset.b > 0) _offset.b = 0;
 		// The max (i.e. maximally negative) offset is the difference between the pixel size of the map
 		// and the view’s actual on-screen size
-	int max_offset_x = rct.sz.width - level_width * gridsize;
-	int max_offset_y = rct.sz.height - level_height * gridsize;
-	if (_offset.x < max_offset_x) _offset.x = max_offset_x;
-	if (_offset.y < max_offset_y) _offset.y = max_offset_y;
-	
-	bgRect->setPos(W::position(-_offset.x, -_offset.y));
+	int max_offset_x = rct.size.a - level_width * gridsize;
+	int max_offset_y = rct.size.b - level_height * gridsize;
+	if (_offset.a < max_offset_x) _offset.a = max_offset_x;
+	if (_offset.b < max_offset_y) _offset.b = max_offset_y;
+
+  center_if_necessary();
+	bgrect->setPos(W::v2i(-_offset.a, -_offset.b));
+}
+
+void View__Game::center_if_necessary() {
+  if (rct.size.a >= gridsize * level_width) {
+    _offset.a = (rct.size.a - gridsize * level_width) / 2;
+  }
+  if (rct.size.b >= gridsize * level_height) {
+    _offset.b = (rct.size.b - gridsize * level_height) / 2;
+  }
+
+  bgrect->setPos(W::v2i(-_offset.a, -_offset.b));
 }
 
 void View__Game::setRemainingTime(float seconds) {
@@ -80,33 +94,20 @@ void View__Game::setRemainingTime(float seconds) {
   sprintf(s, "%02d:%02d", time_minutes, time_seconds);
 
   if (!remaining_time_txt) {
-    remaining_time_txt = new W::DText(this,
-                                      {10,10},
-                                      s,
-                                      W::Colour::TransparentBlack);
+    remaining_time_txt = new W::RetroText(this,
+                                          {10,10},
+                                          s,
+                                          W::Colour::TransparentBlack,
+                                          W::TextAlign::Left);
   }
   else {
-    remaining_time_txt->setTxt(s);
+    remaining_time_txt->setText(s);
   }
 }
 
-W::position View__Game::convertGridToPixelCoords(const W::position &_p) {
-	return W::position(
-		(int)((_p.x + _p.a) * gridsize),
-		(int)((_p.y + _p.b) * gridsize)
-	);
+W::v2f View__Game::convertGridToPixelCoords(W::v2f p) {
+  return p * gridsize;
 }
-W::size View__Game::convertGridToPixelCoords(const W::size &_s) {
-	return W::size(
-		_s.width * gridsize,
-		_s.height * gridsize
-	);
-}
-W::position View__Game::convertPixelToGridCoords(const W::position &_p) {
-	return W::position(
-		_p.x/gridsize,
-		_p.y/gridsize,
-		float((_p.x)%gridsize) / float(gridsize),
-		float((_p.y)%gridsize) / float(gridsize)
-	);
+W::v2f View__Game::convertPixelToGridCoords(W::v2f p) {
+  return p / gridsize;
 }

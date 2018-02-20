@@ -14,7 +14,6 @@
 #define View__Help_h
 
 #include "W.h"
-#include "Controller.h"
 
 class View__Help  : public W::UIView {
 public:
@@ -44,20 +43,20 @@ public:
     landscape_elements.push_back(elements);
 
     // Add other elements
-    bgDRect = new W::DRect(this, {0,0}, rct.sz, {0,0,0,0.8});
+    bgrect = new W::Rectangle(this, {0,0}, rct.size, {0,0,0,0.8});
 
-    t1 = new W::DText(this, {220,10}, "Help", W::Colour::White);
-    t2 = new W::DText(this, {14,54}, "place furniture and staff in your", W::Colour::White);
-    t3 = new W::DText(this, {14,74}, "buildings. customers will come and", W::Colour::White);
-    t4 = new W::DText(this, {14,94}, "give you money.", W::Colour::White);
-    t5 = new W::DText(this, {14,144}, "[time left]", W::Colour::White);
-    t6 = new W::DText(this, {14,184}, "Get cracking! GO!", W::Colour::White);
-    r1 = new W::DRect(this, {10,234}, {480,1}, {1,1,1,0.4});
-    t7 = new W::DText(this, {14,264}, "Esc: quit to main menu", W::Colour::White);
-    t8 = new W::DText(this, {14,284}, "Q: quit completely", W::Colour::White);
-    t9 = new W::DText(this, {14,304}, "H: this help screen", W::Colour::White);
+    t1 = new W::RetroText(this, {220,10}, "Help", W::Colour::White);
+    t2 = new W::RetroText(this, {14,54}, "place furniture and staff in your", W::Colour::White);
+    t3 = new W::RetroText(this, {14,74}, "buildings. customers will come and", W::Colour::White);
+    t4 = new W::RetroText(this, {14,94}, "give you money.", W::Colour::White);
+    t5 = new W::RetroText(this, {14,144}, "[time left]", W::Colour::White);
+    t6 = new W::RetroText(this, {14,184}, "Get cracking! GO!", W::Colour::White);
+    r1 = new W::Rectangle(this, {10,234}, {480,1}, {1,1,1,0.4});
+    t7 = new W::RetroText(this, {14,264}, "Esc: quit to main menu", W::Colour::White);
+    t8 = new W::RetroText(this, {14,284}, "Q: quit completely", W::Colour::White);
+    t9 = new W::RetroText(this, {14,304}, "H: this help screen", W::Colour::White);
 
-    updatePosition(W::_controller.window->getSize());
+    updatePosition(W::windowSize());
   }
   virtual ~View__Help()
   {
@@ -78,13 +77,14 @@ public:
   }
   void setMonetaryTarget(int m) {
     monetaryTarget = m;
+    setTimeRemainingText();
   }
 
 private:
   int timeRemaining, monetaryTarget;
 
-  W::DText *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9;
-  W::DRect *r1;
+  W::RetroText *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9;
+  W::Rectangle *r1;
 
   void setTimeRemainingText() {
     if (t5) delete t5;
@@ -92,7 +92,7 @@ private:
     int time_minutes = timeRemaining/60;
     int time_seconds = timeRemaining%60;
     sprintf(s, "you've got %02d:%02d left to earn %c%d", time_minutes, time_seconds, MR_CURRENCY, monetaryTarget);
-    t5 = new W::DText(this, W::position(14,144), s, W::Colour::White);
+    t5 = new W::RetroText(this, W::v2f(14,144), s, W::Colour::White);
   }
 
 //  void updatePosition(const W::size &winsize) {

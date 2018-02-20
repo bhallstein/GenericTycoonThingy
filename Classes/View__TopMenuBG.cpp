@@ -18,7 +18,7 @@
 View__MenuBG::View__MenuBG() :
 W::View(W::Positioner::WholeAreaPositioner)
 {
-  bg = new W::DRect(this, {0,0}, {0,0}, W::Colour::Black);
+  bg = new W::Rectangle(this, {0,0}, {0,0}, W::Colour::Black);
 
   color_cycle.resize(60);
   for (int i=0; i < 60; i++) {
@@ -58,7 +58,7 @@ W::View(W::Positioner::WholeAreaPositioner)
 
   color_indices.resize(40 * 30);
   for (int i=0; i < 40 * 30; ++i) {
-    rects.push_back(new W::DRect(this, {0,0}, {0,0}, color_cycle[0]));
+    rects.push_back(new W::Rectangle(this, {0,0}, {0,0}, color_cycle[0]));
   }
 
   frame = 0;
@@ -66,7 +66,7 @@ W::View(W::Positioner::WholeAreaPositioner)
   mode = Mode::None;
   randomised = false;
 
-  updatePosition(W::_controller.window->getSize());
+  updatePosition(W::windowSize());
 }
 View__MenuBG::~View__MenuBG() {
   for (auto r : rects) {
@@ -75,21 +75,21 @@ View__MenuBG::~View__MenuBG() {
   delete bg;
 }
 
-void View__MenuBG::updatePosition(const W::size &winsize) {
-  int rw = winsize.width / 40;
-  int rh = winsize.height / 30;
+void View__MenuBG::updatePosition(W::v2i winsize) {
+  float rw = winsize.a / 40.;
+  float rh = winsize.b / 30.;
 
   for (int i=0; i < 40; ++i) {
     for (int j=0; j < 30; ++j) {
       int n = j*40 + i;
-      W::DRect *r = rects[n];
+      W::Rectangle *r = rects[n];
 
       r->setPos({rw*i, rh*j});
       r->setSz({rw, rh});
     }
   }
 
-  bg->setSz(rct.sz);
+  bg->setSz(rct.size);
 }
 
 void View__MenuBG::customOpenGLDrawing() {

@@ -20,14 +20,14 @@ public:
   View__MenuBG();
   ~View__MenuBG();
 
-  void updatePosition(const W::size &winsize);
+  void updatePosition(W::v2i winsize);
   void customOpenGLDrawing();
 
 private:
-  W::DRect *bg;
+  W::Rectangle *bg;
   std::vector<W::Colour> color_cycle;
   std::vector<size_t> color_indices;
-  std::vector<W::DRect*> rects;
+  std::vector<W::Rectangle*> rects;
   std::vector<size_t> bar_transition_heights;
   bool randomised;
 

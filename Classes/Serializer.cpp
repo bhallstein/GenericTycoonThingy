@@ -27,24 +27,22 @@ std::string _serialize(std::string &s) {
 	ss << "\"";
 	return ss.str();
 }
-std::string _serialize(W::position &p) {
+std::string _serialize(W::v2i &p) {
+  W::v2f pf = p;
+  return _serialize(pf);
+}
+std::string _serialize(W::v2f &p) {
 	std::stringstream ss;
 	ss << "{ "
-	   << "x=" << p.x << "," << "y=" << p.y << ","
 	   << "a=" << p.a << "," << "b=" << p.b
 	   << " }";
 	return ss.str();
 }
-std::string _serialize(W::size &s) {
-	std::stringstream ss;
-	ss << "{ width=" << s.width << ",height=" << s.height << " }";
-	return ss.str();
-}
-std::string _serialize(W::rect &r) {
+std::string _serialize(W::fRect &r) {
 	std::stringstream ss;
 	ss << "{\n"
-	   << "position = " << _serialize(r.pos) << ",\n"
-	   << "size = " << _serialize(r.sz)
+	   << "position = " << _serialize(r.position) << ",\n"
+	   << "size = " << _serialize(r.size)
 	   << "\n}";
 	return ss.str();
 }
@@ -75,87 +73,93 @@ std::string _serialize(const SeekTarget::Type &targ) {
 
 /* _deserialize fn implementations */
 
-void _deserialize(LuaObj &o, int &x)   { x = o.number_value; }
-void _deserialize(LuaObj &o, float &x) { x = o.number_value; }
-void _deserialize(LuaObj &o, bool &b)  { b = o.bool_value; }
-void _deserialize(LuaObj &o, std::string &s) { s = o.str_value; }
-void _deserialize(LuaObj &o, W::position &p) {
-	p.x = o["x"].number_value;
-	p.y = o["y"].number_value;
-	p.a = o["a"].number_value;
-	p.b = o["b"].number_value;
+void _deserialize(LuaObj &o, int &x)   { x = o.number_value(); }
+void _deserialize(LuaObj &o, float &x) { x = o.number_value(); }
+void _deserialize(LuaObj &o, bool &b)  { b = o.bool_value(); }
+void _deserialize(LuaObj &o, std::string &s) { s = o.str_value(); }
+void _deserialize(LuaObj &o, W::v2i &p) {
+  p.a = o["a"].number_value();
+  p.b = o["b"].number_value();
 }
-void _deserialize(LuaObj &o, W::size &s) {
-	s.width = o["width"].number_value;
-	s.height = o["height"].number_value;
+void _deserialize(LuaObj &o, W::v2f &p) {
+	p.a = o["a"].number_value();
+	p.b = o["b"].number_value();
 }
-void _deserialize(LuaObj &o, W::rect &r) {
-	_deserialize(o["position"], r.pos);
-	_deserialize(o["size"], r.sz);
+void _deserialize(LuaObj &o, W::fRect &r) {
+	_deserialize(o["position"], r.position);
+	_deserialize(o["size"], r.size);
 }
 void _deserialize(LuaObj &o, std::vector<int> &v) {
 	v.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		LuaObj &d = it->second;
+  for (auto it : o.descendants()) {
+    LuaObj &d = it.second;
 		if (!d.isNumber()) ; // error
-		else v.push_back(d.number_value);
+		else v.push_back(d.number_value());
 	}
 }
 void _deserialize(LuaObj &o, std::vector<float> &v) {
 	v.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		LuaObj &d = it->second;
+  for (auto it : o.descendants()) {
+    LuaObj &d = it.second;
 		if (!d.isNumber()) ; // error
-		else v.push_back(d.number_value);
+		else v.push_back(d.number_value());
 	}
 }
 void _deserialize(LuaObj &o, std::vector<bool> &v) {
 	v.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		LuaObj &d = it->second;
+  for (auto it : o.descendants()) {
+    LuaObj &d = it.second;
 		if (!d.isBool()) ; // error
-		else v.push_back(d.bool_value);
+		else v.push_back(d.bool_value());
 	}
 }
 void _deserialize(LuaObj &o, std::vector<std::string> &v) {
 	v.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		LuaObj &d = it->second;
+  for (auto it : o.descendants()) {
+		LuaObj &d = it.second;
 		if (!d.isString()) ; // error
-		else v.push_back(d.str_value);
+		else v.push_back(d.str_value());
 	}
 }
-void _deserialize(LuaObj &o, std::vector<W::position> &v) {
+void _deserialize(LuaObj &o, std::vector<W::v2i> &v) {
+  v.clear();
+  for (auto it : o.descendants()) {
+    W::v2i p;
+    _deserialize(it.second, p);
+    v.push_back(p);
+  }
+}
+void _deserialize(LuaObj &o, std::vector<W::v2f> &v) {
 	v.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		W::position p;
-		_deserialize(it->second, p);
+  for (auto it : o.descendants()) {
+		W::v2f p;
+		_deserialize(it.second, p);
 		v.push_back(p);
 	}
 }
 void _deserialize(LuaObj &o, UID &uid) {
-	uid = UID(o.number_value);
+	uid = UID(o.number_value());
 	UIDManager::translateLoadedUID(uid);
 }
 void _deserialize(LuaObj &o, UnitMode::T &m) {
 	using namespace UnitMode;
-	std::string &s = o.str_value;
+	std::string s = o.str_value();
 	if (s == "VOYAGING") m = VOYAGING;
 	else if (s == "ANIMATING") m = ANIMATING;
 	else m = IDLE;
 }
 void _deserialize(LuaObj &o, std::map<UID,UID> &m) {
 	m.clear();
-	for (LuaObj::_descendantmap::iterator it = o.descendants.begin(); it != o.descendants.end(); ++it) {
+  for (auto it : o.descendants()) {
 		UID u1, u2;
 		unsigned int x;
-		std::stringstream(it->first) >> x;
-		_deserialize(it->second, u2);		// TODO: check this
+		std::stringstream(it.first) >> x;
+		_deserialize(it.second, u2);		// TODO: check this
 		m[UID(u1)] = UID(u2);				// Seems like an error
 	}
 }
 void _deserialize(LuaObj &o, SeekTarget::Type &targ) {
-	std::string o_type = o.str_value;
+	std::string o_type = o.str_value();
 	int n_types = (int) SeekTarget::__N;
 	for (int i=0; i < n_types; ++i) {
 		SeekTarget::Type type = (SeekTarget::Type) i;

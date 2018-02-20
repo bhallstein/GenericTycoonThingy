@@ -62,14 +62,13 @@ public:
     landscape_elements.push_back(elements);
 
     // Add other elements
-    bgDRect = new W::DRect(this, {0,0}, {0,0}, {0,0,0,0.8});
+    bgrect = new W::Rectangle(this, {0,0}, {0,0}, {0,0,0,0.8});
 
-    win_lose_msg = new W::DText(this, {0,0}, msg, W::Colour::White, W::TextAlign::Centre);
+    win_lose_msg = new W::RetroText(this, {0,0}, msg, W::Colour::White, W::TextAlign::Centre);
+    txt_replay = new W::RetroText(this, {0,0}, btn1_label, W::Colour::White, W::TextAlign::Centre);
+    txt_quit   = new W::RetroText(this, {0,0}, btn2_label, W::Colour::White, W::TextAlign::Centre);
 
-    txt_replay = new W::DText(this, {0,0}, btn1_label, W::Colour::White, W::TextAlign::Centre);
-    txt_quit   = new W::DText(this, {0,0}, btn2_label, W::Colour::White, W::TextAlign::Centre);
-
-    updatePosition(W::_controller.window->getSize());
+    updatePosition(W::windowSize());
   }
   virtual ~View__TwoBtns()
   {
@@ -78,17 +77,17 @@ public:
     delete txt_quit;
   }
 
-  void updatePosition_uiview(W::size winsize) {
-    win_lose_msg->setPos({rct.sz.width/2, 40});
+  void updatePosition__uiview(W::v2i winsize) {
+    win_lose_msg->setPos({float(rct.size.a/2), 40.});
 
-    txt_replay->setPos(W::position(int((0.5 - offset_from_center - btn_w/2.)*rct.sz.width), rct.sz.height * 0.6));
-    txt_quit  ->setPos(W::position(int((0.5 + offset_from_center + btn_w/2.)*rct.sz.width), rct.sz.height * 0.6));
+    txt_replay->setPos(W::v2f(float((0.5 - offset_from_center - btn_w/2.)*rct.size.a), rct.size.b * 0.6));
+    txt_quit  ->setPos(W::v2f(float((0.5 + offset_from_center + btn_w/2.)*rct.size.a), rct.size.b * 0.6));
   }
 
 private:
-  W::DText *win_lose_msg;
-  W::DText *txt_replay;
-  W::DText *txt_quit;
+  W::RetroText *win_lose_msg;
+  W::RetroText *txt_replay;
+  W::RetroText *txt_quit;
 
   std::string msg;
   std::string btn1_label;

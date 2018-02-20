@@ -42,7 +42,7 @@ namespace SeekTarget {
 };
 
 typedef struct door {
-	W::position pos;
+	W::v2i pos;
 	Direction::T orientation;
 } door;
 

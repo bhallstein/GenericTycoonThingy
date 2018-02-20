@@ -34,7 +34,7 @@ public:
 	void deactivate();
 	W::EventPropagation::T mouseEvent(W::Event *);
 	PlaceableManager *mngr;
-	W::position pos;
+	W::v2f pos;
 	View__Game *view__game;
 };
 

@@ -16,7 +16,7 @@
 	W::log << "resources path: "     << MrPaths::resourcesPath << std::endl;
 	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;
 	
-	W::createWindow(W::size(800,600), "Generic Tycoon Thingy");
+  W::createWindow({800,600}, "Generic Tycoon Thingy");
 	W::pushState(new State__TopMenu());
 	W::start();
 }

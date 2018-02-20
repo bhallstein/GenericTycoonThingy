@@ -14,80 +14,80 @@ playerState = {
 -- some helpful building definitions
 
 shopLayout = {
-  {x=0,y=0,a=0,b=0}, {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0}, {x=4,y=0,a=0,b=0}, {x=5,y=0,a=0,b=0},
-  {x=0,y=1,a=0,b=0}, {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0}, {x=5,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0}, {x=5,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0}, {x=5,y=3,a=0,b=0},
-                                        {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0},
+  {a=0,b=0,}, {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,}, {a=4,b=0,}, {a=5,b=0,},
+  {a=0,b=1,}, {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,}, {a=5,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,}, {a=5,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,}, {a=5,b=3,},
+                          {a=2,b=4,}, {a=3,b=4,},
 }
 shopDoors = {
-  {x=2,y=4,a=0,b=0}, {x=2,y=5,a=0,b=0},
-  {x=3,y=4,a=0,b=0}, {x=3,y=5,a=0,b=0},
+  {a=2,b=4,}, {a=2,b=5,},
+  {a=3,b=4,}, {a=3,b=5,},
 }
 shopLayout__flipped = {
-                                        {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0},
-  {x=0,y=1,a=0,b=0}, {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0}, {x=5,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0}, {x=5,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0}, {x=5,y=3,a=0,b=0},
-  {x=0,y=4,a=0,b=0}, {x=1,y=4,a=0,b=0}, {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0}, {x=4,y=4,a=0,b=0}, {x=5,y=4,a=0,b=0},
+                          {a=2,b=0,}, {a=3,b=0,},
+  {a=0,b=1,}, {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,}, {a=5,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,}, {a=5,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,}, {a=5,b=3,},
+  {a=0,b=4,}, {a=1,b=4,}, {a=2,b=4,}, {a=3,b=4,}, {a=4,b=4,}, {a=5,b=4,},
 }
 shopDoors__flipped = {
-  {x=2,y=0,a=0,b=0}, {x=2,y=-1,a=0,b=0},
-  {x=3,y=0,a=0,b=0}, {x=3,y=-1,a=0,b=0},
+  {a=2,b=0,}, {a=2,b=-1,},
+  {a=3,b=0,}, {a=3,b=-1,},
 }
 houseLayout = {
-  {x=0,y=0,a=0,b=0}, {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0}, {x=4,y=0,a=0,b=0},
-  {x=0,y=1,a=0,b=0}, {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0},
-                                        {x=2,y=4,a=0,b=0},
+  {a=0,b=0,}, {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,}, {a=4,b=0,},
+  {a=0,b=1,}, {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,},
+                          {a=2,b=4,},
 }
 houseDoors = {
-  {x=2,y=4,a=0,b=0}, {x=2,y=5,a=0,b=0},
+  {a=2,b=4,}, {a=2,b=5,},
 }
 houseLayout__flipped = {
-                                        {x=2,y=0,a=0,b=0},
-  {x=0,y=1,a=0,b=0}, {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0},
-  {x=0,y=4,a=0,b=0}, {x=1,y=4,a=0,b=0}, {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0}, {x=4,y=4,a=0,b=0},
+                          {a=2,b=0,},
+  {a=0,b=1,}, {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,},
+  {a=0,b=4,}, {a=1,b=4,}, {a=2,b=4,}, {a=3,b=4,}, {a=4,b=4,},
 }
 houseDoors__flipped = {
-  {x=2,y=0,a=0,b=0}, {x=2,y=-1,a=0,b=0},
+  {a=2,b=0,}, {a=2,b=-1,},
 }
 houseLayout__r90 = {
-                     {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0}, {x=4,y=0,a=0,b=0},
-                     {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0},
-                     {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0},
-                     {x=1,y=4,a=0,b=0}, {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0}, {x=4,y=4,a=0,b=0},
+              {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,}, {a=4,b=0,},
+              {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,},
+              {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,},
+              {a=1,b=4,}, {a=2,b=4,}, {a=3,b=4,}, {a=4,b=4,},
 }
 houseDoors__r90 = {
-  {x=0,y=2,a=0,b=0}, {x=-1,y=2,a=0,b=0},
+  {a=0,b=2,}, {a=-1,b=2,},
 }
 shopLayout__r90 = {
-  {x=0,y=0,a=0,b=0}, {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0},
-  {x=0,y=1,a=0,b=0}, {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0},
-  {x=0,y=4,a=0,b=0}, {x=1,y=4,a=0,b=0}, {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0},
-  {x=0,y=5,a=0,b=0}, {x=1,y=5,a=0,b=0}, {x=2,y=5,a=0,b=0}, {x=3,y=5,a=0,b=0},
+  {a=0,b=0,}, {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,},
+  {a=0,b=1,}, {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,},
+  {a=0,b=4,}, {a=1,b=4,}, {a=2,b=4,}, {a=3,b=4,},
+  {a=0,b=5,}, {a=1,b=5,}, {a=2,b=5,}, {a=3,b=5,},
 }
 shopDoors__r90 = {
-  {x=4,y=2,a=0,b=0}, {x=5,y=2,a=0,b=0},
-  {x=4,y=3,a=0,b=0}, {x=5,y=3,a=0,b=0},
+  {a=4,b=2,}, {a=5,b=2,},
+  {a=4,b=3,}, {a=5,b=3,},
 }
 shopLayout__r270 = {
-                     {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0}, {x=4,y=0,a=0,b=0},
-                     {x=1,y=1,a=0,b=0}, {x=2,y=1,a=0,b=0}, {x=3,y=1,a=0,b=0}, {x=4,y=1,a=0,b=0},
-  {x=0,y=2,a=0,b=0}, {x=1,y=2,a=0,b=0}, {x=2,y=2,a=0,b=0}, {x=3,y=2,a=0,b=0}, {x=4,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0}, {x=3,y=3,a=0,b=0}, {x=4,y=3,a=0,b=0},
-                     {x=1,y=4,a=0,b=0}, {x=2,y=4,a=0,b=0}, {x=3,y=4,a=0,b=0}, {x=4,y=4,a=0,b=0},
-                     {x=1,y=5,a=0,b=0}, {x=2,y=5,a=0,b=0}, {x=3,y=5,a=0,b=0}, {x=4,y=5,a=0,b=0},
+              {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,}, {a=4,b=0,},
+              {a=1,b=1,}, {a=2,b=1,}, {a=3,b=1,}, {a=4,b=1,},
+  {a=0,b=2,}, {a=1,b=2,}, {a=2,b=2,}, {a=3,b=2,}, {a=4,b=2,},
+  {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,}, {a=3,b=3,}, {a=4,b=3,},
+              {a=1,b=4,}, {a=2,b=4,}, {a=3,b=4,}, {a=4,b=4,},
+              {a=1,b=5,}, {a=2,b=5,}, {a=3,b=5,}, {a=4,b=5,},
 }
 shopDoors__r270 = {
-  {x=0,y=2,a=0,b=0}, {x=-1,y=2,a=0,b=0},
-  {x=0,y=3,a=0,b=0}, {x=-1,y=3,a=0,b=0},
+  {a=0,b=2,}, {a=-1,b=2,},
+  {a=0,b=3,}, {a=-1,b=3,},
 }
 
 
@@ -108,7 +108,7 @@ mapData = {
 
     -- Top row of houses
     {
-      rct = { position={x=2,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=2,b=2,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -116,7 +116,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=9,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=9,b=2,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout,
       doors = houseDoors,
@@ -124,7 +124,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=16,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=16,b=2,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout,
       doors = houseDoors,
@@ -132,7 +132,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=22,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=22,b=2,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -140,7 +140,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=29,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=29,b=2,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout,
       doors = houseDoors,
@@ -148,7 +148,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=35,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=35,b=2,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -159,7 +159,7 @@ mapData = {
 
     -- Row of houses facing the previous row
     {
-      rct = { position={x=2,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=2,b=10,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -167,7 +167,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=8,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=8,b=10,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout__flipped,
       doors = shopDoors__flipped,
@@ -175,7 +175,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=15,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=15,b=10,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -183,7 +183,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=21,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=21,b=10,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout__flipped,
       doors = shopDoors__flipped,
@@ -191,7 +191,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=28,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=28,b=10,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -199,7 +199,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=34,y=10,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=34,b=10,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout__flipped,
       doors = shopDoors__flipped,
@@ -209,39 +209,39 @@ mapData = {
 
     -- WALL
     {
-      rct = { position={x=2,y=16,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=2,b=16,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = {
-        {x=0,y=0,a=0,b=0}, {x=1,y=0,a=0,b=0}, {x=2,y=0,a=0,b=0}, {x=3,y=0,a=0,b=0}, {x=4,y=0,a=0,b=0}, {x=5,y=0,a=0,b=0}, {x=6,y=0,a=0,b=0}, {x=7,y=0,a=0,b=0}, {x=8,y=0,a=0,b=0}, {x=9,y=0,a=0,b=0}, {x=10,y=0,a=0,b=0},
-        {x=0,y=1,a=0,b=0},                                                                                                                                                                            {x=10,y=1,a=0,b=0},
-        {x=0,y=2,a=0,b=0},                                                                                                                                                                            {x=10,y=2,a=0,b=0},
-        {x=0,y=3,a=0,b=0}, {x=1,y=3,a=0,b=0}, {x=2,y=3,a=0,b=0},                                                                                                                                      {x=10,y=3,a=0,b=0},
-                                                                                                                                                                                                      {x=10,y=4,a=0,b=0},
-        {x=0,y=5,a=0,b=0}, {x=1,y=5,a=0,b=0}, {x=2,y=5,a=0,b=0},                                                                                                                                      {x=10,y=5,a=0,b=0},
-        {x=0,y=6,a=0,b=0},                                                                                                                                                                            {x=10,y=6,a=0,b=0},
-        {x=0,y=7,a=0,b=0},                                                                                                                                                                            {x=10,y=7,a=0,b=0},
-        {x=0,y=8,a=0,b=0}, {x=1,y=8,a=0,b=0}, {x=2,y=8,a=0,b=0}, {x=3,y=8,a=0,b=0}, {x=4,y=8,a=0,b=0}, {x=5,y=8,a=0,b=0}, {x=6,y=8,a=0,b=0}, {x=7,y=8,a=0,b=0}, {x=8,y=8,a=0,b=0}, {x=9,y=8,a=0,b=0}, {x=10,y=8,a=0,b=0},
+        {a=0,b=0,}, {a=1,b=0,}, {a=2,b=0,}, {a=3,b=0,}, {a=4,b=0,}, {a=5,b=0,}, {a=6,b=0,}, {a=7,b=0,}, {a=8,b=0,}, {a=9,b=0,}, {a=10,b=0,},
+        {a=0,b=1,},                                                                                                             {a=10,b=1,},
+        {a=0,b=2,},                                                                                                             {a=10,b=2,},
+        {a=0,b=3,}, {a=1,b=3,}, {a=2,b=3,},                                                                                     {a=10,b=3,},
+                                                                                                                                {a=10,b=4,},
+        {a=0,b=5,}, {a=1,b=5,}, {a=2,b=5,},                                                                                     {a=10,b=5,},
+        {a=0,b=6,},                                                                                                             {a=10,b=6,},
+        {a=0,b=7,},                                                                                                             {a=10,b=7,},
+        {a=0,b=8,}, {a=1,b=8,}, {a=2,b=8,}, {a=3,b=8,}, {a=4,b=8,}, {a=5,b=8,}, {a=6,b=8,}, {a=7,b=8,}, {a=8,b=8,}, {a=9,b=8,}, {a=10,b=8,},
 
-        {x=12,y=0,a=0,b=0}, {x=13,y=0,a=0,b=0}, {x=14,y=0,a=0,b=0}, {x=15,y=0,a=0,b=0}, {x=16,y=0,a=0,b=0}, {x=17,y=0,a=0,b=0}, {x=18,y=0,a=0,b=0}, {x=19,y=0,a=0,b=0}, {x=20,y=0,a=0,b=0}, {x=21,y=0,a=0,b=0}, {x=22,y=0,a=0,b=0}, {x=23,y=0,a=0,b=0}, {x=24,y=0,a=0,b=0}, {x=25,y=0,a=0,b=0}, {x=26,y=0,a=0,b=0}, {x=27,y=0,a=0,b=0}, {x=28,y=0,a=0,b=0},
-        {x=12,y=1,a=0,b=0},                                                                                                                                             {x=20,y=1,a=0,b=0},                                                                                                                                             {x=28,y=1,a=0,b=0},
-        {x=12,y=2,a=0,b=0},                                                                                                                                             {x=20,y=2,a=0,b=0},                                                                                                                                             {x=28,y=2,a=0,b=0},
-        {x=12,y=3,a=0,b=0},                                                                                                                                             {x=20,y=3,a=0,b=0},                                                                                                                                             {x=28,y=3,a=0,b=0},
-        {x=12,y=4,a=0,b=0},                                                                                                                                             {x=20,y=4,a=0,b=0},                                                                                                                                             {x=28,y=4,a=0,b=0},
-        {x=12,y=5,a=0,b=0},                                                                                                                                             {x=20,y=5,a=0,b=0},                                                                                                                                             {x=28,y=5,a=0,b=0},
-        {x=12,y=6,a=0,b=0},                                                                                                                                             {x=20,y=6,a=0,b=0},                                                                                                                                             {x=28,y=6,a=0,b=0},
-        {x=12,y=7,a=0,b=0},                     {x=14,y=7,a=0,b=0},                                                             {x=18,y=7,a=0,b=0},                     {x=20,y=7,a=0,b=0},                     {x=22,y=7,a=0,b=0},                                                             {x=26,y=7,a=0,b=0},                     {x=28,y=7,a=0,b=0},
-        {x=12,y=8,a=0,b=0}, {x=13,y=8,a=0,b=0}, {x=14,y=8,a=0,b=0},                                                             {x=18,y=8,a=0,b=0}, {x=19,y=8,a=0,b=0}, {x=20,y=8,a=0,b=0}, {x=21,y=8,a=0,b=0}, {x=22,y=8,a=0,b=0},                                                             {x=26,y=8,a=0,b=0}, {x=27,y=8,a=0,b=0}, {x=28,y=8,a=0,b=0},
+        {a=12,b=0,}, {a=13,b=0,}, {a=14,b=0,}, {a=15,b=0,}, {a=16,b=0,}, {a=17,b=0,}, {a=18,b=0,}, {a=19,b=0,}, {a=20,b=0,}, {a=21,b=0,}, {a=22,b=0,}, {a=23,b=0,}, {a=24,b=0,}, {a=25,b=0,}, {a=26,b=0,}, {a=27,b=0,}, {a=28,b=0,},
+        {a=12,b=1,},                                                                                            {a=20,b=1,},                                                                                            {a=28,b=1,},
+        {a=12,b=2,},                                                                                            {a=20,b=2,},                                                                                            {a=28,b=2,},
+        {a=12,b=3,},                                                                                            {a=20,b=3,},                                                                                            {a=28,b=3,},
+        {a=12,b=4,},                                                                                            {a=20,b=4,},                                                                                            {a=28,b=4,},
+        {a=12,b=5,},                                                                                            {a=20,b=5,},                                                                                            {a=28,b=5,},
+        {a=12,b=6,},                                                                                            {a=20,b=6,},                                                                                            {a=28,b=6,},
+        {a=12,b=7,},              {a=14,b=7,},                                        {a=18,b=7,},              {a=20,b=7,},              {a=22,b=7,},                                        {a=26,b=7,},              {a=28,b=7,},
+        {a=12,b=8,}, {a=13,b=8,}, {a=14,b=8,},                                        {a=18,b=8,}, {a=19,b=8,}, {a=20,b=8,}, {a=21,b=8,}, {a=22,b=8,},                                        {a=26,b=8,}, {a=27,b=8,}, {a=28,b=8,},
 
-        {x=30,y=0,a=0,b=0}, {x=31,y=0,a=0,b=0}, {x=32,y=0,a=0,b=0}, {x=33,y=0,a=0,b=0}, {x=34,y=0,a=0,b=0}, {x=35,y=0,a=0,b=0}, {x=36,y=0,a=0,b=0}, {x=37,y=0,a=0,b=0}, {x=38,y=0,a=0,b=0},
-        {x=30,y=1,a=0,b=0},                                                                                                                                             {x=38,y=1,a=0,b=0},
-        {x=30,y=2,a=0,b=0},                                                                                                                                             {x=38,y=2,a=0,b=0},
-        {x=30,y=3,a=0,b=0},                                                                                                                                             {x=38,y=3,a=0,b=0},
-        {x=30,y=4,a=0,b=0},
-        {x=30,y=5,a=0,b=0},
-        {x=30,y=6,a=0,b=0},                                                                                                                                             {x=38,y=6,a=0,b=0},
-        {x=30,y=7,a=0,b=0},                                                                                                                                             {x=38,y=7,a=0,b=0},
-        {x=30,y=8,a=0,b=0},                                                                                                                                             {x=38,y=8,a=0,b=0},
-        {x=30,y=9,a=0,b=0}, {x=31,y=9,a=0,b=0}, {x=32,y=9,a=0,b=0}, {x=33,y=9,a=0,b=0}, {x=34,y=9,a=0,b=0}, {x=35,y=9,a=0,b=0}, {x=36,y=9,a=0,b=0}, {x=37,y=9,a=0,b=0}, {x=38,y=9,a=a,b=0},
+        {a=30,b=0,}, {a=31,b=0,}, {a=32,b=0,}, {a=33,b=0,}, {a=34,b=0,}, {a=35,b=0,}, {a=36,b=0,}, {a=37,b=0,}, {a=38,b=0,},
+        {a=30,b=1,},                                                                                            {a=38,b=1,},
+        {a=30,b=2,},                                                                                            {a=38,b=2,},
+        {a=30,b=3,},                                                                                            {a=38,b=3,},
+        {a=30,b=4,},
+        {a=30,b=5,},
+        {a=30,b=6,},                                                                                            {a=38,b=6,},
+        {a=30,b=7,},                                                                                            {a=38,b=7,},
+        {a=30,b=8,},                                                                                            {a=38,b=8,},
+        {a=30,b=9,}, {a=31,b=9,}, {a=32,b=9,}, {a=33,b=9,}, {a=34,b=9,}, {a=35,b=9,}, {a=36,b=9,}, {a=37,b=9,}, {a=38,b=9,},
       },
       doors = { },
       uid = 1012,
@@ -251,7 +251,7 @@ mapData = {
 
     -- Walled-in houses
     {
-      rct = { position={x=6,y=18,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=6,b=18,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__r90,
       doors = houseDoors__r90,
@@ -259,7 +259,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=16,y=18,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=16,b=18,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout,
       doors = houseDoors,
@@ -267,7 +267,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=24,y=18,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=24,b=18,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout,
       doors = houseDoors,
@@ -275,7 +275,7 @@ mapData = {
       destroyed = false,
     },
     {
-      rct = { position={x=34,y=18,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=34,b=18,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout__r90,
       doors = shopDoors__r90,
@@ -287,7 +287,7 @@ mapData = {
     -- Bottom row of buildings
 
     {
-      rct = { position={x=2,y=31,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=2,b=31,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -295,7 +295,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=9,y=32,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=9,b=32,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -303,7 +303,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=17,y=31,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=17,b=31,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout__flipped,
       doors = shopDoors__flipped,
@@ -311,7 +311,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=25,y=32,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=25,b=32,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout,
       doors = houseDoors,
@@ -319,7 +319,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=32,y=31,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=32,b=31,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -327,7 +327,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=39,y=32,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=39,b=32,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -335,7 +335,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=48,y=8,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=48,b=8,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout__r270,
       doors = shopDoors__r270,
@@ -346,7 +346,7 @@ mapData = {
 
     -- Small rightward ganglion of shops
     {
-      rct = { position={x=44,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=44,b=2,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -354,7 +354,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=48,y=8,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=48,b=8,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout__r270,
       doors = shopDoors__r270,
@@ -362,7 +362,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=44,y=15,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=44,b=15,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = houseLayout__flipped,
       doors = houseDoors__flipped,
@@ -370,7 +370,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=48,y=22,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=48,b=22,}, size={width=0,height=0} },
       ["type"] = "barber",
       groundplan = shopLayout,
       doors = shopDoors,
@@ -378,7 +378,7 @@ mapData = {
       destroyed = false
     },
     {
-      rct = { position={x=48,y=31,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=48,b=31,}, size={width=0,height=0} },
       ["type"] = "pieshop",
       groundplan = shopLayout__flipped,
       doors = shopDoors__flipped,
@@ -389,22 +389,22 @@ mapData = {
 
     -- wall the 2nd
     {
-      rct = { position={x=42,y=2,a=0,b=0}, size={width=0,height=0} },
+      rct = { position={a=42,b=2,}, size={width=0,height=0} },
       ["type"] = "home",
       groundplan = {
-        {x=0,y=0,a=0,b=0},
-        {x=0,y=1,a=0,b=0},
-        {x=0,y=2,a=0,b=0},
-        {x=0,y=3,a=0,b=0},
-        {x=0,y=4,a=0,b=0},
-        {x=0,y=5,a=0,b=0},
+        {a=0,b=0,},
+        {a=0,b=1,},
+        {a=0,b=2,},
+        {a=0,b=3,},
+        {a=0,b=4,},
+        {a=0,b=5,},
 
-        {x=0,y=7,a=0,b=0},
-        {x=0,y=8,a=0,b=0},
-        {x=0,y=9,a=0,b=0},
-        {x=0,y=10,a=0,b=0},
-        {x=0,y=11,a=0,b=0},
-        {x=0,y=12,a=0,b=0},
+        {a=0,b=7,},
+        {a=0,b=8,},
+        {a=0,b=9,},
+        {a=0,b=10,},
+        {a=0,b=11,},
+        {a=0,b=12,},
       },
       doors = { },
       uid = 1029,
@@ -412,55 +412,3 @@ mapData = {
     },
   }
 }
-
-
-
-  -- spawnPoints = {
-  --   { x = 4,  y = 13, name = "something" },
-  --   { x = 18, y = 4, name = "something" },
-  --   { x = 17, y = 13, name = "something" },
-  --   { x = 31, y = 4, name = "something" },
-  --   { x = 30, y = 13, name = "something" },
-  --   { x = 8,  y = 20, name = "something" },
-  --   { x = 18, y = 20, name = "something" },
-  --   { x = 26, y = 20, name = "something" },
-  --   { x = 46, y = 18, name = "something" },
-  --   { x = 34, y = 34, name = "something" },
-  --   { x = 27, y = 34, name = "something" },
-  --   { x = 4,  y = 34, name = "something" }
-  -- }
-
-
-
--- spawnPoints = {
---   {
---     name = "OffTheEdgeOfTheMap1EndNameHere",
---     x = 0,
---     y = 15,
---     -- rate = 70,
---     -- types = {
---     --   { Peasants, 5 },
---     --   { Judges, 8 },
---     -- },
---   },
---   {
---     name = "InAHouse",
---     x = 33,
---     y = 11,
---     -- rate = 80,
---     -- types = {
---     --   { Peasants, 5 },
---     --   { Judges, 8 },
---     -- },
---   },
---   {
---     name = "InAHouse1",
---     x = 33,
---     y = 21,
---     -- rate = 90,
---     -- types = {
---     --   { Peasants, 5 },
---     --   { Judges, 8 },
---     -- },
---   }
--- }

@@ -50,10 +50,10 @@ public:
   static bool initialize();
   static bool initialized;
 
-  void setPos(const W::position &);
+  void setPos(W::v2f);
 
-  bool contains_point(W::position);
-  W::position centrePoint();
+  bool contains_point(W::v2f);
+  W::v2i centrePoint();
 
   W::EventPropagation::T mouseEvent(W::Event*);
 
@@ -62,9 +62,9 @@ public:
   std::vector<UID> get_operating_controllers();
 
 protected:
-  std::vector<W::position> groundplan;
-  std::vector<W::rect> groundplan_rects;  // For event subscription :/
-  std::vector<W::position> doors;
+  std::vector<W::v2i> groundplan;
+  std::vector<W::fRect> groundplan_rects;  // For event subscription :/
+  std::vector<W::v2i> doors;
 
   // Serialization
   virtual void getSDs(sdvec &vec) {
@@ -91,16 +91,16 @@ protected:
 
 class Building::DrawnBuilding {
 public:
-  DrawnBuilding(View__Game *, W::position pos);
+  DrawnBuilding(View__Game *, W::v2f pos);
   ~DrawnBuilding();
-  void setPos(W::position);
-  void setGroundplan(std::vector<W::position>);
+  void setPos(W::v2f);
+  void setGroundplan(std::vector<W::v2i>);
   void setCol(W::Colour);
 private:
-  W::position pos;
+  W::v2f pos;
   W::Colour col;
-  std::vector<W::position> groundplan;
-  std::vector<W::DRect*> rects;
+  std::vector<W::v2f> groundplan;
+  std::vector<W::Rectangle*> rects;
   View__Game *lv;
 };
 

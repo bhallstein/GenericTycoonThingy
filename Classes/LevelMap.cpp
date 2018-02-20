@@ -40,12 +40,20 @@ LevelMap::~LevelMap()
 	// bai
 }
 
-void LevelMap::update(int frame_microseconds, float time_in_level) {
-	// Spawn units
-	// The % chance of spawning a unit is kT, where T is the current fraction of the level time limit
+void LevelMap::update(int frame_microseconds, float _time_in_level_s) {
+  // Set time remaining
+  time_in_level_s = _time_in_level_s;
+  update_time_remaining();
+  view__level->setRemainingTime(time_remaining_s);
+
+  // Set economy
+  view__btmBar->setEcon(cash);
+
+  // Spawn units
+  // The % chance of spawning a unit is kT, where T is the current fraction of the level time limit
   // Note: this chance is per-frame, so depends on the framerate, which is bad.
   float k = 0.2;
-  float p_spawn = k * time_in_level / level_time_limit_s;
+  float p_spawn = k * _time_in_level_s / level_time_limit_s;
   if (W::Rand::intUpTo(1000) < p_spawn * 1000) {
     Building *b = map__randomBuilding("home");
     if (b) {
@@ -53,13 +61,6 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
       printf("%lu units, %lu controllers\n", units.size(), controllers.size());
     }
   }
-
-  // Set time remaining
-  int time_remaining_s = level_time_limit_s - int(time_in_level);
-  view__level->setRemainingTime(time_remaining_s);
-
-  // Set economy
-  view__btmBar->setEcon(cash);
 
 	// Update object vectors
 	tlovec__update(units);
@@ -90,16 +91,16 @@ void LevelMap::update(int frame_microseconds, float time_in_level) {
   if (cash >= 1000) {
     W::pushState(new State__WinLose(true));
   }
-  else if (time_in_level > level_time_limit_s) {
+  else if (_time_in_level_s > level_time_limit_s) {
     W::pushState(new State__WinLose(false));
   }
 }
 
 W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::position());
-	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::position());
-	else if (ev->key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::position());
-	else if (ev->key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::position());
+	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::v2f());
+	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::v2f());
+	else if (ev->key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::v2f());
+	else if (ev->key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::v2f());
   else if (ev->key == W::KeyCode::_W) W::pushState(new State__WinLose(true));
   else if (ev->key == W::KeyCode::_L) W::pushState(new State__WinLose(false));
 	return W::EventPropagation::ShouldContinue;
@@ -157,7 +158,6 @@ bool LevelMap::load(lua_State *L) {
 	}
 	
 	
-	
 	// Get width & height
 	LuaObj &wObj = mapData["width"];
 	LuaObj &hObj = mapData["height"];
@@ -169,7 +169,7 @@ bool LevelMap::load(lua_State *L) {
 		W::log << "mapData.height not found" << std::endl;
 		return false;
 	}
-	mapSize = W::size(wObj.number_value, hObj.number_value);
+	mapSize = W::v2i(wObj.number_value(), hObj.number_value());
 	view__level->setLevelSize(mapSize);
 	navmap = new W::NavMap(mapSize);
 	
@@ -179,7 +179,6 @@ bool LevelMap::load(lua_State *L) {
 		// This call is important: it resets UIDManager’s UID translation table –
 		// necessary since when deserialized, all UIDs are auto-translated to "fresh"
 		// UIDs, via said table.
-	LuaObj::_descendantmap *d;
 	
 	// Get furnishings
 	LuaObj &furnishingsObj = mapData["furnishings"];
@@ -187,9 +186,8 @@ bool LevelMap::load(lua_State *L) {
 		W::log << "mapData.furnishings table not found" << std::endl;
 		return false;
 	}
-	d = &furnishingsObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
-		createFurnishing(it->second);
+  for (auto it : furnishingsObj.descendants()) {
+		createFurnishing(it.second);
 	}
 	
 	// Get units
@@ -198,31 +196,27 @@ bool LevelMap::load(lua_State *L) {
 		W::log << "mapData.units table not found" << std::endl;
 		return false;
 	}
-	d = &unitsObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
-		createUnit(it->second);
+  for (auto it : unitsObj.descendants()) {
+		createUnit(it.second);
 	}
 	
 	// Get controllers
 	LuaObj &controllersObj = mapData["controllers"];
-	d = &controllersObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
-		createController(it->second, true);
+  for (auto it : controllersObj.descendants()) {
+		createController(it.second, true);
 	}
 	
 	// Get inactive controllers
 	LuaObj &inactiveControllersObj = mapData["inactiveControllers"];
-	d = &inactiveControllersObj.descendants;
-	for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
-		createController(it->second, false);
+  for (auto it : inactiveControllersObj.descendants()) {
+		createController(it.second, false);
 	}
 	
 	// Get buildings
 	LuaObj &buildingsObj = mapData["buildings"];
 	if (buildingsObj.isTable()) {
-		d = &buildingsObj.descendants;
-		for (LuaObj::_descendantmap::iterator it = d->begin(); it != d->end(); ++it) {
-			createBuilding(it->second);
+    for (auto it : buildingsObj.descendants()) {
+			createBuilding(it.second);
 		}
 	}
 	
@@ -234,14 +228,16 @@ bool LevelMap::load(lua_State *L) {
 		W::log << "levelData.financialTarget not found or not number" << std::endl;
 		return false;
 	}
-	level_financial_target = obj__financial_target.number_value;
+	level_financial_target = obj__financial_target.number_value();
 
   LuaObj &obj__time_limit = levelData["timeLimit"];
 	if (!obj__time_limit.isNumber()) {
 		W::log << "levelData.timeLimit not found or not number" << std::endl;
 		return false;
 	}
-	level_time_limit_s = obj__time_limit.number_value;
+	level_time_limit_s = obj__time_limit.number_value();
+  time_in_level_s = 0;
+  update_time_remaining();
 	
 	// Player State
 	LuaObj &obj__cash = playerState["cash"];
@@ -249,7 +245,7 @@ bool LevelMap::load(lua_State *L) {
 		W::log << "playerState.cash not found or not number" << std::endl;
 		return false;
 	}
-	cash = obj__cash.number_value;
+	cash = obj__cash.number_value();
   view__btmBar->setEcon(cash);
 	
 	return loaded = true;
@@ -273,8 +269,8 @@ std::string LevelMap::save() {
 	// Map contents
 	ss << "mapData = {\n";
 	
-	ss << "width = " << mapSize.width << ",\n";
-	ss << "height = " << mapSize.height << ",\n\n";
+	ss << "width = " << mapSize.a << ",\n";
+	ss << "height = " << mapSize.b << ",\n\n";
 	
 	// Units
 	ss << "units = {\n";
@@ -309,15 +305,15 @@ std::string LevelMap::save() {
 	return ss.str();
 }
 
-Furnishing* LevelMap::createFurnishing(bool placeableMode, const std::string &type, const W::position &pos) {
+Furnishing* LevelMap::createFurnishing(bool placeableMode, std::string type, W::v2f pos) {
 	Furnishing *f = new Furnishing(this, view__level, navmap, placeableMode);
 	f->setType(type);
 	f->setUp();
-	bool initsuccess = f->init(placeableMode ? W::position(-100,-100) : pos);
+	bool initsuccess = f->init(placeableMode ? W::v2f(-100,-100) : pos);
 	if (initsuccess) {
 		furnishings.push_back(f);
-		W::log << "Furnishing " << f->uid.id << " created and initialized "
-			<< (placeableMode ? " in placeable mode" : std::string("at ") + f->rct.pos.xyStr()) << std::endl;
+//    W::log << "Furnishing " << f->uid.id << " created and initialized "
+//      << (placeableMode ?  : std::string("at ") + f->rct.position.xyStr()) << std::endl;
 	}
 	else {
 		delete f;
@@ -331,16 +327,16 @@ Furnishing* LevelMap::createFurnishing(LuaObj &o) {
 	f->setUp();
 	if (f->init()) {
 		furnishings.push_back(f);
-		W::log << "Furnishing " << f->uid.id << " deserialized and initialized at " << f->rct.pos.xyStr() << std::endl;
+//    W::log << "Furnishing " << f->uid.id << " deserialized and initialized at " << f->rct.pos.xyStr() << std::endl;
 	}
 	else {
-		W::log << "Furnishing " << f->uid.id << " deserialized then failed to initialize at " << f->rct.pos.xyStr() << std::endl;
+//    W::log << "Furnishing " << f->uid.id << " deserialized then failed to initialize at " << f->rct.pos.xyStr() << std::endl;
 		delete f;
 		f = NULL;
 	}
 	return f;
 }
-Building* LevelMap::createBuilding(const std::string &type, const W::position &pos) {
+Building* LevelMap::createBuilding(std::string type, W::v2f pos) {
 	Building *b = new Building(this, view__level, navmap);
 	b->setType(type);
 	b->setUp();
@@ -356,20 +352,20 @@ Building* LevelMap::createBuilding(LuaObj &o) {
 	return b;
 }
 
-Unit* LevelMap::createUnit(bool placeableMode, const std::string &type, const W::position &pos) {
+Unit* LevelMap::createUnit(bool placeableMode, std::string type, W::v2f pos) {
 	Unit *u = new Unit(this, view__level, navmap, placeableMode);
 	u->setType(type);
 	u->setUp();
-	bool initsuccess = u->init(placeableMode ? W::position(-100,-100) : pos);
+	bool initsuccess = u->init(placeableMode ? W::v2f(-100,-100) : pos);
 	if (initsuccess) {
 		units.push_back(u);
-		W::log << "Unit (" << u->type << ") " << u->uid.id << " created and initialized "
-			<< (placeableMode ? "in placeable mode" : std::string("at ") + u->rct.pos.xyStr()) << std::endl;
+//    W::log << "Unit (" << u->type << ") " << u->uid.id << " created and initialized "
+//      << (placeableMode ? "in placeable mode" : std::string("at ") + u->rct.pos.xyStr()) << std::endl;
 		Controller *c = createControllerForUnit(u);
 		c->dispatchUnit(u);
 	}
 	else {
-		W::log << "Unit (" << u->type << ") " << u->uid.id << " created then failed to initialize" << std::endl;
+    W::log << "Unit (" << u->type << ") " << u->uid.id << " created then failed to initialize" << std::endl;
 		delete u;
 		u = NULL;
 	}
@@ -381,16 +377,16 @@ Unit* LevelMap::createUnit(LuaObj &o) {
 	u->setUp();
 	if (u->init()) {
 		units.push_back(u);
-		W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized and initialized at " << u->rct.pos.xyStr() << std::endl;
+//    W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized and initialized at " << u->rct.pos.xyStr() << std::endl;
 	}
 	else {
-		W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized then failed to initialize at " << u->rct.pos.xyStr() << std::endl;
+//    W::log << "Unit (" << u->type << ") " << u->uid.id << " deserialized then failed to initialize at " << u->rct.pos.xyStr() << std::endl;
 		delete u;
 		u = NULL;
 	}
 	return u;
 }
-Controller* LevelMap::createController(const std::string &type, bool active) {
+Controller* LevelMap::createController(std::string type, bool active) {
 	Controller *c = NULL;
 	if (type == "CustomerController") {
 		c = new CustomerController(this, view__level, navmap, seekTarget__getRandom());
@@ -407,7 +403,7 @@ Controller* LevelMap::createController(const std::string &type, bool active) {
 }
 Controller* LevelMap::createController(LuaObj &o, bool active) {
 	Controller *c = NULL;
-	const std::string &type = o["type"].str_value;
+	const std::string &type = o["type"].str_value();
 	if (type == "CustomerController") {
 		c = new CustomerController(this, view__level, navmap, seekTarget__getRandom());
 	}
@@ -447,7 +443,7 @@ Building* LevelMap::building__getRandom() {
 	}
 	return (Building*) buildings[W::Rand::intUpTo((int) buildings.size())];
 }
-Building* LevelMap::building__findAt(W::position p) {
+Building* LevelMap::building__findAt(W::v2i p) {
   auto it = std::find_if(buildings.begin(), buildings.end(), [=](TLO *b) {
     return ((Building*)b)->contains_point(p);
   });
@@ -467,7 +463,8 @@ Building* LevelMap::building__withFurnishingSupportingSeekTarget(SeekTarget::Typ
 
   tlovec containing_buildings;
   std::transform(supporting_furnishings.begin(), supporting_furnishings.end(), std::back_inserter(containing_buildings), [=](const TLO *x) {
-    return building__findAt(x->rct.pos);
+    return building__findAt(W::v2i(x->rct.position.a,
+                                   x->rct.position.b));
   });
   if (containing_buildings.size() == 0) {
     return NULL;
@@ -485,7 +482,8 @@ std::vector<Furnishing*> LevelMap::furnishings__inBuilding__NotOwnedByController
     if (f->owned_by_controller) {
       return false;
     }
-    Building *b_pos = building__findAt(f->rct.pos);
+    Building *b_pos = building__findAt(W::v2i(f->rct.position.a,
+                                              f->rct.position.b));
     return b_pos == b;
   });
 
@@ -498,11 +496,11 @@ std::vector<Furnishing*> LevelMap::furnishings__inBuilding__NotOwnedByController
 }
 
 
-W::position LevelMap::map__randomCoord() {
-	return W::position(
+W::v2i LevelMap::map__randomCoord() {
+  return {
 		W::Rand::intUpTo(width()),
-		W::Rand::intUpTo(height())
-	);
+		W::Rand::intUpTo(height()),
+  };
 }
 Building* LevelMap::map__randomBuilding(std::string type) {
   tlovec vec;

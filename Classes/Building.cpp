@@ -25,10 +25,10 @@ buildingInfo::buildingInfo(LuaObj &o) {
 	
 	// Allowed furnishings
 	l = &o["allowedFurnishings"];
-	for (LuaObj::_descendantmap::iterator it = l->descendants.begin(); it != l->descendants.end(); ++it) {
-		LuaObj &d = it->second;
+  for (auto it : l->descendants()) {
+		LuaObj &d = it.second;
 		if (!d.isString()) throw W::Exception("Error creating buildingInfo: allowedBuilding entries must be strings");
-		allowedFurnishings.push_back(d.str_value);
+		allowedFurnishings.push_back(d.str_value());
 	}
 }
 
@@ -40,11 +40,7 @@ Serializable::serialization_descriptor Building::sd;
 bool Building::initialized = false;
 
 
-std::map<std::string, W::Colour> building_colors = {
-  { "home",    {0,0,0,0.8} },
-  { "barber",  W::Colour::Red },
-  { "pieshop", W::Colour::Yellow },
-};
+std::map<std::string, W::Colour> building_colors;
 
 
 /*** Building ***/
@@ -52,7 +48,15 @@ std::map<std::string, W::Colour> building_colors = {
 Building::Building(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
-  drawnBuilding = new DrawnBuilding(view__game, W::position());
+  if (building_colors.size() == 0) {
+    building_colors = {
+      { "home",    {0,0,0,0.85} },
+      { "barber",  {0,0,0,0.4} },
+      { "pieshop", {0,0,0,0.6} },
+    };
+  }
+
+  drawnBuilding = new DrawnBuilding(view__game, W::v2f());
 
 //	if (!navmap->isPassableUnder(rct)) {
 //		throw W::Exception("Navmap was not passable under Building plan.");
@@ -85,7 +89,11 @@ void Building::_setUp() {
   // Create groundplan_rects
   groundplan_rects.clear();
   for (auto p : groundplan) {
-    W::rect r = { p + rct.pos, {1,1} };
+    W::v2f r_pos = {
+      p.a + rct.position.a,
+      p.b + rct.position.b,
+    };
+    W::fRect r = { r_pos, {1,1} };
     groundplan_rects.push_back(r);
   }
 
@@ -98,7 +106,7 @@ void Building::_setUp() {
   }
 	
 	// Set up state of DrawnBuilding
-  drawnBuilding->setPos(rct.pos);
+  drawnBuilding->setPos(rct.position);
   drawnBuilding->setGroundplan(groundplan);
   auto col = building_colors.find(type);
   if (col == building_colors.end()) {
@@ -111,13 +119,15 @@ void Building::_setUp() {
   // Add to navmap
   auto groundplan_levelcoords = groundplan;
   for (auto &p : groundplan_levelcoords) {
-    p += rct.pos;
+    p.a += rct.position.a;
+    p.b += rct.position.b;
   }
   navmap->isolate(groundplan_levelcoords);
 
   auto doors_levelcoords = doors;
   for (auto &p : doors_levelcoords) {
-    p += rct.pos;
+    p.a += rct.position.a;
+    p.b += rct.position.b;
   }
   for (auto it = doors_levelcoords.begin(); it < doors_levelcoords.end(); it += 2) {
     navmap->createConnection(*it, *(it + 1));
@@ -141,9 +151,8 @@ bool Building::initialize() {
 		W::log << "Could not get buildingTypes table from buildings.lua" << std::endl;
 		return false;
 	}
-	LuaObj::_descendantmap &desc = o.descendants;
-  for (auto it = desc.begin(); it != desc.end(); ++it) {
-		buildingTypeInfo[it->first] = new buildingInfo(it->second);
+  for (auto it : o.descendants()) {
+		buildingTypeInfo[it.first] = new buildingInfo(it.second);
   }
 	
 	// 2. Set up Serialization Descriptor
@@ -154,14 +163,18 @@ bool Building::initialize() {
 	return true;
 }
 
-void Building::setPos(const W::position &_pos) {
-	rct.pos = _pos;
+void Building::setPos(W::v2f _pos) {
+	rct.position = _pos;
 	drawnBuilding->setPos(_pos);
 }
 
-bool Building::contains_point(W::position p) {
+bool Building::contains_point(W::v2f _p) {
+  W::v2i p = { int(_p.a), int(_p.b) };
   for (auto it : groundplan) {
-    W::position gp_lv = it + rct.pos;
+    W::v2i gp_lv = {
+      it.a + int(rct.position.a),
+      it.b + int(rct.position.b),
+    };
     if (gp_lv == p) {
       return true;
     }
@@ -169,26 +182,29 @@ bool Building::contains_point(W::position p) {
   return false;
 }
 
-W::position Building::centrePoint() {
+W::v2i Building::centrePoint() {
   // Return groundplan item closest to average_position
-  W::position gp_sum;
+  W::v2i gp_sum;
   for (auto gp : groundplan) {
     gp_sum += gp;
   }
-  float avg_x = float(gp_sum.x) / groundplan.size();
-  float avg_y = float(gp_sum.y) / groundplan.size();
+  float avg_x = float(gp_sum.a) / groundplan.size();
+  float avg_y = float(gp_sum.b) / groundplan.size();
 
   float min_dist = 10000000000.f;
-  W::position best = groundplan[0];
+  W::v2i best = groundplan[0];
   for (auto gp : groundplan) {
-    float dist = (avg_x - gp.x)*(avg_x - gp.x) + (avg_y - gp.y)*(avg_y - gp.y);
+    float dist = (avg_x - gp.a)*(avg_x - gp.a) + (avg_y - gp.b)*(avg_y - gp.b);
     if (dist < min_dist) {
       min_dist = dist;
       best = gp;
     }
   }
 
-  best += rct.pos;
+  best += W::v2i(
+    rct.position.a,
+    rct.position.b
+  );
   return best;
 }
 
@@ -221,7 +237,7 @@ std::vector<UID> Building::get_operating_controllers() {
 
 // DrawnBuilding impl
 
-Building::DrawnBuilding::DrawnBuilding(View__Game *_lv, W::position _pos) :
+Building::DrawnBuilding::DrawnBuilding(View__Game *_lv, W::v2f _pos) :
   lv(_lv),
   col(W::Colour::SkyBlue)
 {
@@ -236,22 +252,22 @@ Building::DrawnBuilding::~DrawnBuilding()
   rects.clear();
 }
 
-void Building::DrawnBuilding::setGroundplan(std::vector<W::position> _groundplan) {
+void Building::DrawnBuilding::setGroundplan(std::vector<W::v2i> _groundplan) {
   for (auto it : rects) {
     delete it;
   }
   rects.clear();
 
-  W::size grid_element_size = lv->convertGridToPixelCoords(W::size(1,1));
+  W::v2f grid_element_size = lv->convertGridToPixelCoords(W::v2f(1.,1.));
   for (size_t i=0; i < _groundplan.size(); ++i) {
-    rects.push_back(new W::DRect(lv,
-                                 lv->convertGridToPixelCoords(_groundplan[i]) + pos,
-                                 grid_element_size,
-                                 col));
+    rects.push_back(new W::Rectangle(lv,
+                                     lv->convertGridToPixelCoords(_groundplan[i]) + pos,
+                                     grid_element_size,
+                                     col));
   }
 }
 
-void Building::DrawnBuilding::setPos(W::position _pos) {
+void Building::DrawnBuilding::setPos(W::v2f _pos) {
   pos = lv->convertGridToPixelCoords(_pos);
 
   for (size_t i=0; i < groundplan.size(); ++i) {

@@ -35,17 +35,18 @@ State__Game::State__Game() :
   view__hiring(NULL),
   view__furnishingPurchasing(NULL)
 {
-	// Initialize views
+	// Create game view
 	view__game = new View__Game();
 	addView(view__game);
 
+  // Create bottom bar view
   view__btmBar = new View__BottomBar();
   addView(view__btmBar);
 
-  openView_help();
-	
-  // Create map
+  // Create game runner
   levelMap = new LevelMap(this, view__game, view__btmBar);
+
+  openView_help();
 	
 	// Time
 	time_elapsed_s = 0.0;
@@ -197,6 +198,9 @@ bool State__Game::loadLevel(const std::string &levelName) {
 	
 	W::log << "...loaded." << std::endl;
 
+  view__help->setTimeRemaining(levelMap->get_time_remaining_s());
+  view__help->setMonetaryTarget(levelMap->get_level_financial_target());
+
 	return true;
 }
 
@@ -234,6 +238,7 @@ void State__Game::openView_help() {
   pause();
   view__help = new View__Help();
   addView(view__help);
+  view__help->setTimeRemaining(levelMap->get_time_remaining_s());
 }
 void State__Game::closeView_help() {
   if (!view__help) {

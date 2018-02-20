@@ -28,11 +28,11 @@
 class PlaceableManager : public TLO {
 public:
 	PlaceableManager(LevelMap *, View__Game *, W::NavMap *, bool _placeableMode);
-	bool init(W::position);	// Attempt to init at supplied position
+	bool init(W::v2f);	// Attempt to init at supplied position
 	bool init(); // Attempt to init at current position
 	
 	bool pickUp();
-	bool attemptToPlace(const W::position &);
+	bool attemptToPlace(W::v2f);
 	void cancel();
 	
 	// Fn overrides to implement placeability
@@ -40,7 +40,7 @@ public:
 	virtual void placementLoopUpdate() = 0;
 	virtual void placementLoopCancelled() = 0;
 	virtual void placementLoopSucceeded() = 0;
-	virtual bool canPlace(const W::position &) = 0;
+	virtual bool canPlace(W::v2f) = 0;
 	
 	bool placeableMode;
 	Placeable placeable;

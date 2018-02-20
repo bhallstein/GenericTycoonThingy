@@ -41,27 +41,27 @@ public:
   W::EventPropagation::T buttonEvent(W::Event*);
   W::EventPropagation::T economicEvent(W::Event*);
 	
-	int width() { return mapSize.width; }
-	int height() { return mapSize.height; }
+	int width() { return mapSize.a; }
+	int height() { return mapSize.b; }
 	
-	Furnishing* createFurnishing(bool placeableMode, const std::string &type, const W::position &pos);
+	Furnishing* createFurnishing(bool placeableMode, std::string type, W::v2f pos);
 	Furnishing* createFurnishing(LuaObj &);
-	Building* createBuilding(const std::string &type, const W::position &pos);
+	Building* createBuilding(std::string type, W::v2f pos);
 	Building* createBuilding(LuaObj &);
-	Unit* createUnit(bool placeableMode, const std::string &type, const W::position &pos);
+	Unit* createUnit(bool placeableMode, std::string type, W::v2f pos);
 	Unit* createUnit(LuaObj &);
-	Controller* createController(const std::string &type, bool active = true);
+	Controller* createController(std::string type, bool active = true);
 	Controller* createController(LuaObj &, bool active = true);
 	Controller* createControllerForUnit(Unit *);
 
   SeekTarget::Type seekTarget__getRandom();
 	
 	Building* building__getRandom();
-	Building* building__findAt(W::position);
+	Building* building__findAt(W::v2i);
 	Building* building__withFurnishingSupportingSeekTarget(SeekTarget::Type);
   std::vector<Furnishing*> furnishings__inBuilding__NotOwnedByController(Building*);
 	
-	W::position map__randomCoord();
+	W::v2i map__randomCoord();
 	Building* map__randomBuilding(std::string type = "");
 	
 	void deactivateController(Controller *);
@@ -70,6 +70,14 @@ public:
   int get_cash() { return cash; }
   bool can_afford(int cost) { return cash >= cost; }
   bool addPlayerMoneys(int);
+
+  int get_time_remaining_s() {
+    return time_remaining_s;
+  }
+
+  int get_level_financial_target() {
+    return level_financial_target;
+  }
 	
 private:
 	State__Game *state__game;
@@ -94,6 +102,12 @@ private:
 	// Level goal data
 	int level_financial_target;
 	int level_time_limit_s;
+  float time_in_level_s;
+  int time_remaining_s;
+
+  void update_time_remaining() {
+    time_remaining_s = level_time_limit_s - (int)time_in_level_s;
+  }
 	
 	// Player state
 	int cash;
@@ -106,7 +120,7 @@ private:
 	
 	// Map properties & loading
 	bool loaded;
-	W::size mapSize;
+	W::v2i mapSize;
 };
 
 #endif

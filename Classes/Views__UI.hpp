@@ -22,23 +22,23 @@ public:
     : W::UIView(MrPaths::resourcesPath + "Data/UIViews/BottomBar.lua")
   {
     // Also want to add the economy, & setter for its contents
-    d_econ = new W::DText(this, {0,0}, "", W::Colour::White, W::TextAlign::Right);
+    d_econ = new W::RetroText(this, {0,0}, "", W::Colour::White, W::TextAlign::Right);
     setEcon(0);
-    d_econ->setPos({rct.sz.width - 10, 10});
+    d_econ->setPos({float(rct.size.a - 10), 10});
   }
 
   void setEcon(int money) {
     char econ[14];
     sprintf(econ, "%c%d", MR_CURRENCY, money);
-    d_econ->setTxt(econ);
+    d_econ->setText(econ);
   }
 
-  void updatePosition(const W::size &winsize) {
+  void updatePosition(W::v2i winsize) {
     W::UIView::updatePosition(winsize);
-    d_econ->setPos({rct.sz.width - 10, 10});
+    d_econ->setPos({float(rct.size.a - 10), 10});
   }
 
-  W::DText *d_econ;
+  W::RetroText *d_econ;
 };
 
 
@@ -71,7 +71,7 @@ public:
       i += 1;
     }
 
-    updatePosition(W::_controller.window->getSize());
+    updatePosition(W::windowSize());
   }
 };
 

@@ -54,7 +54,7 @@ public:
 	static void initialize();
 	
 	UID uid;
-	W::rect rct;
+	W::fRect rct;
 	
 	std::string type;
 	

@@ -28,29 +28,27 @@ furnishingInfo::furnishingInfo(LuaObj &o) {
 	
 	// Cost (optional: def. 0)
 	l = &o["cost"];
-	cost = (o["cost"].isNumber() ? o["cost"].number_value : 0);
+	cost = (o["cost"].isNumber() ? o["cost"].number_value() : 0);
 	
 	// Plan
 	l = &o["plan"];
 	if (!l->isTable()) {
 		throw W::Exception("Error creating furnishingInfo: 'plan' not found or not table");
 	}
-	auto &descs_plan = l->descendants;
-	for (auto it = descs_plan.begin(); it != descs_plan.end(); ++it) {
-		LuaObj &planComponent = it->second;
+  for (auto it : l->descendants()) {
+		LuaObj &planComponent = it.second;
 		LuaObj &posObj = planComponent["0"], &szObj = planComponent["1"];
-		plan.push_back(W::rect(
-			W::position((int)posObj["0"].number_value, (int)posObj["1"].number_value),
-			W::size(szObj["0"].number_value, szObj["1"].number_value)
+		plan.push_back(W::iRect(
+			W::v2i((int)posObj["0"].number_value(), (int)posObj["1"].number_value()),
+			W::v2i(szObj["0"].number_value(), szObj["1"].number_value())
 		));
 	}
 	
 	// Seekables (compatible seek targets)
 	l = &o["seekables"];
 	if (l->isTable()) {
-		auto &descs_seekables = l->descendants;
-		for (auto it = descs_seekables.begin(); it != descs_seekables.end(); ++it) {
-			LuaObj &seekable = it->second;
+    for (auto it : l->descendants()) {
+			LuaObj &seekable = it.second;
 			if (!seekable.isString()) {
 				throw W::Exception("Error creating furnishingInfo: invalid (non-string) seekable");
 			}
@@ -77,10 +75,10 @@ Furnishing::Furnishing(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm, bool _pla
   placed(false),
   owned_by_controller(false)
 {
-	rct.sz = W::size(2,2);
+	rct.size = W::v2f(2,2);
 
 	drawnFurnishing = new DrawnFurnishing(view__game);
-	drawnFurnishing->setPosn(rct.pos);
+	drawnFurnishing->setPosn(rct.position);
 	
 	W::Messenger::subscribeInView(view__game, W::EventType::LMouseUp, W::Callback(&Furnishing::mouseEvent, this), &rct);
 }
@@ -156,8 +154,8 @@ bool Furnishing::initialize() {
 		W::log << "Could not get furnishingTypes table from furnishings.lua" << std::endl;
 		return false;
 	}
-	for (auto it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-		furnishingTypeInfo[it->first] = new furnishingInfo(it->second);
+  for (auto it : o.descendants()) {
+		furnishingTypeInfo[it.first] = new furnishingInfo(it.second);
 	}
 	
 	// 2. Set up Serialization Descriptor
@@ -198,7 +196,7 @@ void Furnishing::placementLoopCancelled() {
 	if (!purchased) destroy();
 	
 	// Put the furnishing back where we found it
-	drawnFurnishing->setPosn(rct.pos);
+	drawnFurnishing->setPosn(rct.position);
   if (placed) {
 //    navmap->isolate(rct);
 //    navmap->makeImpassable(rct);
@@ -216,10 +214,10 @@ void Furnishing::placementLoopSucceeded() {
   placed = true;
 //  navmap->isolate(rct);
 //  navmap->makeImpassable(rct);
-	drawnFurnishing->setPosn(rct.pos);	// Update DrawnFurnishing to new position
+	drawnFurnishing->setPosn(rct.position);	// Update DrawnFurnishing to new position
 	drawnFurnishing->setOpac(1);		// Put DF back in normal mode
 }
-bool Furnishing::canPlace(const W::position &_pos) {
+bool Furnishing::canPlace(W::v2f _pos) {
 	// Can place if:
   //  - can afford the item
 	//  - passable underneath
@@ -229,11 +227,11 @@ bool Furnishing::canPlace(const W::position &_pos) {
     return false;
   }
 
-	W::position prev_pos = rct.pos;
-	rct.setPos(_pos);
+	W::v2f prev_pos = rct.position;
+  rct.position = _pos;
 	bool can_place;
   can_place = true; //navmap->isPassableUnder(rct);
-	rct.setPos(prev_pos);
+	rct.position = prev_pos;
 	
 	return can_place;
 }
@@ -243,16 +241,16 @@ bool Furnishing::canPlace(const W::position &_pos) {
 
 Furnishing::DrawnFurnishing::DrawnFurnishing(View__Game *_lv) : lv(_lv)
 {
-	r = new W::DRect(lv,
-                   W::position(),
-                   lv->convertGridToPixelCoords(W::size(2,2)),
-                   W::Colour::Blue);
+	r = new W::Rectangle(lv,
+                       W::v2f(),
+                       lv->convertGridToPixelCoords({2,2}),
+                       W::Colour::Blue);
 }
 Furnishing::DrawnFurnishing::~DrawnFurnishing()
 {
 	delete r;
 }
-void Furnishing::DrawnFurnishing::setPosn(const W::position &p) {
+void Furnishing::DrawnFurnishing::setPosn(W::v2f p) {
 	r->setPos(lv->convertGridToPixelCoords(p));
 }
 void Furnishing::DrawnFurnishing::setOpac(float x) {

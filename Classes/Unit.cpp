@@ -29,11 +29,11 @@ unitInfo::unitInfo(LuaObj &o) {
 
   // Staffness (optional: def. no)
   l = &o["isStaff"];
-  isStaff = (!l->isBool() ? false : l->bool_value);
+  isStaff = (!l->isBool() ? false : l->bool_value());
 
   // Hire cost (optional: def. 0)
   l = &o["hireCost"];
-  hireCost = (l->isNumber() ? l->number_value : 0);
+  hireCost = (l->isNumber() ? l->number_value() : 0);
 }
 
 
@@ -45,7 +45,7 @@ bool Unit::initialized = false;
 
 std::map<std::string, W::Colour> unit_colors = {
   { "customer", W::Colour::Black },
-  { "shopkeeper",    {0,0.9882,0.7922,1} },
+  { "shopkeeper", {0,0.9882,0.7922,1} },
 };
 
 
@@ -56,11 +56,11 @@ PlaceableManager(_lm, _lv, _nm, _placeableMode),
 mode(UnitMode::IDLE),
 hired(false)
 {
-  rct.setSz(W::size(1, 1));
+  rct.size = {1, 1};
 
   // Create DrawnUnit
   drawnUnit = new DrawnUnit(view__game);
-  drawnUnit->setPosn(rct.pos);
+  drawnUnit->setPosn(rct.position);
 
   W::Messenger::subscribeInView(view__game, W::EventType::LMouseUp, W::Callback(&Unit::mouseEvent, this), &rct);
 }
@@ -123,18 +123,20 @@ void Unit::update() {
   if (mode == UnitMode::IDLE) { }
   else if (mode == UnitMode::VOYAGING) { incrementLocation(); }
   //  else if (mode == ANIMATING) { incrementAnimation(); }
+
+  drawnUnit->setPosn(rct.position);
 }
 
 
 /*** Utility methods ***/
 
 bool Unit::wanderToRandomMapDestination() {
-  W::position dest = levelMap->map__randomCoord();
+  W::v2i dest = levelMap->map__randomCoord();
   return voyage(dest);
 }
-bool Unit::voyage(const W::position &_dest) {
+bool Unit::voyage(W::v2i _dest) {
   dest = _dest;
-  if (navmap->getRoute(rct.pos.x, rct.pos.y, dest.x, dest.y, route)) {
+  if (navmap->getRoute(rct.position.a, rct.position.b, dest.a, dest.b, route)) {
     mode = UnitMode::VOYAGING;
     return true;
   }
@@ -159,7 +161,7 @@ void Unit::placementLoopStarted() {
   }
 }
 void Unit::placementLoopUpdate() {
-  W::position p(placeable.pos.x, placeable.pos.y, 0, 0);
+  W::v2f p(placeable.pos.a, placeable.pos.b);
   drawnUnit->setPosn(p);
 }
 void Unit::placementLoopCancelled() {
@@ -168,7 +170,7 @@ void Unit::placementLoopCancelled() {
     if (!hired) destroy();
   }
   // Otherwise, put the unit back where we found it
-  else drawnUnit->setPosn(rct.pos);
+  else drawnUnit->setPosn(rct.position);
   drawnUnit->setOpac(1);    // Put DrawnUnit back in normal mode
   if (Controller *c = controllerPtr())
     c->unitPutDown(this);
@@ -179,7 +181,7 @@ void Unit::placementLoopSucceeded() {
     levelMap->addPlayerMoneys(-typeInfo->hireCost);
     hired = true;
   }
-  drawnUnit->setPosn(rct.pos);  // Update DrawnUnit to new position
+  drawnUnit->setPosn(rct.position);  // Update DrawnUnit to new position
   drawnUnit->setOpac(1);      // Put D.U. back in normal mode
 
   // Remove route
@@ -191,79 +193,71 @@ void Unit::placementLoopSucceeded() {
     c->unitPutDown(this);
   }
 }
-bool Unit::canPlace(const W::position &_pos) {
+bool Unit::canPlace(W::v2f _pos) {
   bool can_afford =
     !typeInfo->isStaff ||
     (typeInfo->isStaff && hired) ||
     (typeInfo->isStaff && !hired && levelMap->can_afford(typeInfo->hireCost));
 
-  return can_afford && navmap->isPassableAt(_pos);
+  return can_afford && navmap->isPassableAt(W::v2i(_pos.a,
+                                                   _pos.b));
 }
 
 
 /*** Voyaging-related ***/
 
+bool arrived(W::v2i dest, W::v2f p, float step) {
+  step += 0.01;
+
+  W::v2f delta = p - dest;
+  float mod_delta = delta.a*delta.a + delta.b*delta.b;
+
+  return mod_delta <= (step * step);
+}
+
 bool Unit::incrementLocation() {
-  if (rct.pos == dest) {
+  float step = 0.10;
+  W::v2f &pos = rct.position;
+  W::v2i pos_next = route[0];
+
+  if (arrived(pos_next, pos, step)) {
+    route.erase(route.begin());
+    pos = pos_next;
+  }
+
+  // Route completed
+  if (route.size() == 0) {
+    rct.position = dest;
     mode = UnitMode::IDLE;
     controllerPtr()->success(this);
     return true;
   }
 
-  W::position &pos = rct.pos;
+  pos_next = route[0];
 
-  float step = 0.10;
-  float a_diff = 0, b_diff = 0;
+  // Inch toward pos_next
+  bool diagonal = pos.a != pos_next.a && pos.b != pos_next.b;
 
-  bool diagonal = (pos.a != 0 && pos.b != 0);
+  float a_diff = 0;
+  float b_diff = 0;
 
-  // Check if we've reached the next loc. This happens:
-  //  - for linears, when |a| < step or |b| < step
-  //  - for diagonals, when a^2 + b^2 < 2 * step^2
-  bool reached_next = false;
-  if (diagonal) {
-    reached_next = pos.a*pos.a + pos.b*pos.b < 2*step*step;
-  }
-  else {
-    float t = (pos.a == 0 ? pos.b : pos.a);
-    reached_next = t*t < step*step;
-  }
+  if (pos.a < pos_next.a)      { a_diff = step; }
+  else if (pos.a > pos_next.a) { a_diff = -step; }
+  if (pos.b < pos_next.b)      { b_diff = step; }
+  else if (pos.b > pos_next.b) { b_diff = -step; }
 
-  if (reached_next) {
-    if (route.empty())
-      pos.a = pos.b = 0;    // Arrived!
-    else {
-      // Get next in route
-      W::position next_pos = route[0];
-      if (navmap->isPassableAt(next_pos)) {
-        W::position prev_pos = pos;
-        pos = next_pos;
-        pos.a = prev_pos.x == pos.x ? 0 : prev_pos.x < pos.x ? -1 : 1;
-        pos.b = prev_pos.y == pos.y ? 0 : prev_pos.y < pos.y ? -1 : 1;
-        route.erase(route.begin());
-      }
-      else {
-        return navmap->getRoute(pos.x, pos.y, dest.x, dest.y, route);
-      }
-    }
+  if (diagonal) {  // For diagonal traveling, normalise the motion vector by dividing by √2
+    a_diff *= 0.707107;
+    b_diff *= 0.707107;
   }
-  else {
-    // Decrement a & b toward current x,y position
-    if (pos.a <= -step)     a_diff = step;
-    else if (pos.a >= step) a_diff = -step;
-    if (pos.b <= -step)     b_diff = step;
-    else if (pos.b >= step) b_diff = -step;
-    if (diagonal) a_diff *= 0.7071, b_diff *= 0.7071; // For diagonal traveling, normalise the motion vector by dividing by √2
-    pos.a += a_diff, pos.b += b_diff;
-  }
-  drawnUnit->setPosn(rct.pos);
+  pos.a += a_diff;
+  pos.b += b_diff;
+
   return true;
 }
 bool Unit::inHinterland() {
-  return (
-          rct.pos.x < HINTERLAND_WIDTH || rct.pos.x >= navmap->width()-HINTERLAND_WIDTH ||
-          rct.pos.y < HINTERLAND_WIDTH || rct.pos.y >= navmap->height()-HINTERLAND_WIDTH
-          );
+  return (rct.position.a < HINTERLAND_WIDTH || rct.position.a >= navmap->width()-HINTERLAND_WIDTH ||
+          rct.position.b < HINTERLAND_WIDTH || rct.position.b >= navmap->height()-HINTERLAND_WIDTH);
 }
 
 
@@ -286,8 +280,8 @@ bool Unit::initialize() {
     W::log << "Could not get unitTypes table from units.lua" << std::endl;
     return false;
   }
-  for (auto it = o.descendants.begin(); it != o.descendants.end(); ++it) {
-    unitTypeInfo[it->first] = new unitInfo(it->second);
+  for (auto it : o.descendants()) {
+    unitTypeInfo[it.first] = new unitInfo(it.second);
   }
 
   /* 2. Set up Serialization Descriptor */
@@ -304,8 +298,8 @@ bool Unit::initialize() {
 /* Unit: Other */
 
 void Unit::printDebugInfo() {
-  printf("\nUnit %p - x,y:%d,%d a,b:%.1f,%.1f dest:%d,%d mode:%s\n\n",
-         this, rct.pos.x, rct.pos.y, rct.pos.a, rct.pos.b, dest.x, dest.y,
+  printf("\nUnit %p - x,y:%.1f,%.1f dest:%d,%d mode:%s\n\n",
+         this, rct.position.a, rct.position.b, dest.a, dest.b,
          mode == UnitMode::VOYAGING ? "VOYAGING" :
          mode == UnitMode::ANIMATING ? "ANIMATING" :
          mode == UnitMode::IDLE ? "IDLE" : "UNKNOWN");
@@ -316,15 +310,15 @@ void Unit::printDebugInfo() {
 
 Unit::DrawnUnit::DrawnUnit(View__Game *_lv) : lv(_lv)
 {
-  r = new W::DRect(lv,
-                   W::position(),
-                   lv->convertGridToPixelCoords(W::size(1,1)),
-                   W::Colour::Black);
+  r = new W::Rectangle(lv,
+                       W::v2f(),
+                       lv->convertGridToPixelCoords({1,1}),
+                       W::Colour::Black);
 }
 Unit::DrawnUnit::~DrawnUnit() {
   delete r;
 }
-void Unit::DrawnUnit::setPosn(W::position p) {
+void Unit::DrawnUnit::setPosn(W::v2f p) {
   r->setPos(lv->convertGridToPixelCoords(p));
 }
 void Unit::DrawnUnit::setOpac(float x) {
@@ -336,6 +330,6 @@ void Unit::DrawnUnit::setCol(W::Colour c) {
   r->setCol(c);
 }
 void Unit::DrawnUnit::incRot() {
-  r->setRot(r->rotation + 3);
+  r->setRot(r->rot + 3);
 }
 

@@ -24,7 +24,7 @@ class Unit;
 struct furnishingInfo {
 	furnishingInfo(LuaObj &);
 	int cost;
-	std::vector<W::rect> plan;
+	std::vector<W::iRect> plan;
 	std::vector<SeekTarget::Type> seekables;
 };
 
@@ -57,7 +57,7 @@ protected:
 	void placementLoopUpdate();
 	void placementLoopCancelled();
 	void placementLoopSucceeded();
-	bool canPlace(const W::position &);
+	bool canPlace(W::v2f);
   bool placed;
 	
 	// Serialization
@@ -81,12 +81,12 @@ class Furnishing::DrawnFurnishing {
 public:
 	DrawnFurnishing(View__Game *);
 	~DrawnFurnishing();
-	void setPosn(const W::position &);
+	void setPosn(W::v2f);
 	void setOpac(float);
 	void setColour(W::Colour);
 private:
 	View__Game *lv;
-	W::DRect *r;
+	W::Rectangle *r;
 };
 
 

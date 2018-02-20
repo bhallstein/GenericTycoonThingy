@@ -48,7 +48,7 @@ public:
 	
 	// Utility methods
 	bool wanderToRandomMapDestination();
-	bool voyage(const W::position &_dest);
+	bool voyage(W::v2i);
 	
 	static bool initialize(); 	// Populate static unitTypes from units.lua
 	static bool initialized;
@@ -65,11 +65,11 @@ protected:
 	void placementLoopUpdate();
 	void placementLoopCancelled();
 	void placementLoopSucceeded();
-	bool canPlace(const W::position &);
+	bool canPlace(W::v2f);
 	
 	// Voyaging-related
-	W::position dest;
-	std::vector<W::position> route;
+	W::v2i dest;
+	std::vector<W::v2i> route;
 	bool incrementLocation();	// Move along route. Returns false if obstacle encountered.
 	bool inHinterland();
 	
@@ -99,14 +99,14 @@ class Unit::DrawnUnit {
 public:
 	DrawnUnit(View__Game *);
 	~DrawnUnit();
-	void setPosn(W::position);
+	void setPosn(W::v2f);
 	void setOpac(float x);
   void setCol(W::Colour);
 	void incRot();
 	
 private:
 	View__Game *lv;
-	W::DRect *r;
+	W::Rectangle *r;
 };
 
 #endif
