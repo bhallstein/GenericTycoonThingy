@@ -14,7 +14,7 @@
 #include "State__Game.hpp"
 #include "View__TopMenuBG.hpp"
 #include "View__TwoBtns.hpp"
-#include "MrKlangy.hpp"
+#include "Audio.hpp"
 #include "MrPaths.hpp"
 
 State__TopMenu::State__TopMenu() : W::GameState(W::GS_OPAQUE)
@@ -34,7 +34,7 @@ State__TopMenu::State__TopMenu() : W::GameState(W::GS_OPAQUE)
   W::Messenger::subscribeToUIEvent("start-game", W::EventType::ButtonClick, W::Callback(&State__TopMenu::uiEvent, this));
   W::Messenger::subscribeToUIEvent("quit", W::EventType::ButtonClick, W::Callback(&State__TopMenu::uiEvent, this));
 
-//  MrKlangy::playBGM("menu.xm");
+  play_music();
 }
 State__TopMenu::~State__TopMenu()
 {
@@ -44,11 +44,10 @@ State__TopMenu::~State__TopMenu()
   removeView(view__twoBtns);
   delete view__twoBtns;
 
-//	MrKlangy::stopBGM();
+  Audio::stopBGM();
 }
 
 void State__TopMenu::resume(W::Returny *ret) {
-//  MrKlangy::playBGM("menu.xm");
   if (ret->type == W::ReturnyType::Killer) {
     quit();
   }
@@ -57,9 +56,9 @@ void State__TopMenu::resume(W::Returny *ret) {
       startLevel("qj-level");
     }
   }
-}
-void State__TopMenu::update() {
-	
+  else {
+    play_music();
+  }
 }
 
 W::EventPropagation::T State__TopMenu::keyEvent(W::Event *ev) {
@@ -86,11 +85,18 @@ void State__TopMenu::startLevel(const std::string &levelName) {
 	W::log << "Starting level: " << levelName << std::endl;
 	try {
 		state__game = new State__Game();
-		if (state__game->loadLevel(levelName))
+    if (state__game->loadLevel(levelName)) {
+      Audio::stopBGM();
 			W::pushState(state__game);
-		else
+    }
+    else {
 			delete state__game;
+    }
 	} catch (W::Exception &exc) {
 		W::log << "Error: " << exc.what() << std::endl;
 	}
+}
+
+void State__TopMenu::play_music() {
+  Audio::playBGM("menu.xm");
 }

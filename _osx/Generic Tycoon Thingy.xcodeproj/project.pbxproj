@@ -85,7 +85,7 @@
 		B5C6AC872022404A00E750AE /* Data in Resources */ = {isa = PBXBuildFile; fileRef = B5C6AC862022404A00E750AE /* Data */; };
 		B5C6ACAB2022405E00E750AE /* State__TopMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC892022405E00E750AE /* State__TopMenu.cpp */; };
 		B5C6ACAC2022405E00E750AE /* types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC8C2022405E00E750AE /* types.cpp */; };
-		B5C6ACAD2022405E00E750AE /* MrKlangy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC8F2022405E00E750AE /* MrKlangy.cpp */; };
+		B5C6ACAD2022405E00E750AE /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC8F2022405E00E750AE /* Audio.cpp */; };
 		B5C6ACAE2022405E00E750AE /* View__Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC902022405E00E750AE /* View__Game.cpp */; };
 		B5C6ACAF2022405E00E750AE /* Building.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC912022405E00E750AE /* Building.cpp */; };
 		B5C6ACB02022405E00E750AE /* Furnishing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6AC922022405E00E750AE /* Furnishing.cpp */; };
@@ -277,7 +277,7 @@
 		B5C6AC8C2022405E00E750AE /* types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = types.cpp; sourceTree = "<group>"; };
 		B5C6AC8D2022405E00E750AE /* Serializer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Serializer.hpp; sourceTree = "<group>"; };
 		B5C6AC8E2022405E00E750AE /* Placeable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Placeable.hpp; sourceTree = "<group>"; };
-		B5C6AC8F2022405E00E750AE /* MrKlangy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MrKlangy.cpp; sourceTree = "<group>"; };
+		B5C6AC8F2022405E00E750AE /* Audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Audio.cpp; sourceTree = "<group>"; };
 		B5C6AC902022405E00E750AE /* View__Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View__Game.cpp; sourceTree = "<group>"; };
 		B5C6AC912022405E00E750AE /* Building.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Building.cpp; sourceTree = "<group>"; };
 		B5C6AC922022405E00E750AE /* Furnishing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Furnishing.cpp; sourceTree = "<group>"; };
@@ -303,7 +303,7 @@
 		B5C6ACA62022405E00E750AE /* LevelMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LevelMap.cpp; sourceTree = "<group>"; };
 		B5C6ACA72022405E00E750AE /* types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = types.hpp; sourceTree = "<group>"; };
 		B5C6ACA82022405E00E750AE /* Serializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serializer.cpp; sourceTree = "<group>"; };
-		B5C6ACA92022405E00E750AE /* MrKlangy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MrKlangy.hpp; sourceTree = "<group>"; };
+		B5C6ACA92022405E00E750AE /* Audio.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Audio.hpp; sourceTree = "<group>"; };
 		B5C6ACAA2022405E00E750AE /* Placeable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Placeable.cpp; sourceTree = "<group>"; };
 		B5C6ACBD2022408900E750AE /* ik_EStreamModes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_EStreamModes.h; sourceTree = "<group>"; };
 		B5C6ACBE2022408900E750AE /* ik_vec3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_vec3d.h; sourceTree = "<group>"; };
@@ -582,6 +582,8 @@
 		B5C6AC882022405E00E750AE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				B5C6AC8F2022405E00E750AE /* Audio.cpp */,
+				B5C6ACA92022405E00E750AE /* Audio.hpp */,
 				B5C6AC912022405E00E750AE /* Building.cpp */,
 				B5C6AC9C2022405E00E750AE /* Building.hpp */,
 				B5C6ACA52022405E00E750AE /* Controller.cpp */,
@@ -596,8 +598,6 @@
 				B5C6ACA42022405E00E750AE /* State__TopMenu.hpp */,
 				B531F2B12035B7BE005A41FD /* State__WinLose.cpp */,
 				B531F2B02035B7BE005A41FD /* State__WinLose.hpp */,
-				B5C6AC8F2022405E00E750AE /* MrKlangy.cpp */,
-				B5C6ACA92022405E00E750AE /* MrKlangy.hpp */,
 				B5C6AC9F2022405E00E750AE /* MrPaths.cpp */,
 				B5C6AC952022405E00E750AE /* MrPaths.hpp */,
 				B5C6ACAA2022405E00E750AE /* Placeable.cpp */,
@@ -765,7 +765,7 @@
 				B5602137203C1CD900107086 /* Texture.cpp in Sources */,
 				B560215F203C1CD900107086 /* lmem.c in Sources */,
 				B531F2B52039DC6C005A41FD /* View__TopMenuBG.cpp in Sources */,
-				B5C6ACAD2022405E00E750AE /* MrKlangy.cpp in Sources */,
+				B5C6ACAD2022405E00E750AE /* Audio.cpp in Sources */,
 				B5C6ACB82022405E00E750AE /* Controller.cpp in Sources */,
 				B5602163203C1CD900107086 /* lbitlib.c in Sources */,
 				B560217F203C1CD900107086 /* Rand.cpp in Sources */,

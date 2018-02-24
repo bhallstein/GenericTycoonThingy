@@ -68,6 +68,10 @@ private:
   W::Timer *timer;
 	float time_elapsed_s;
 
+  bool first_frame;
+  size_t frame;  // Cycles up to 100
+
+  void play_music();
 };
 
 #endif

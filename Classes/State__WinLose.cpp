@@ -13,7 +13,7 @@
 #include "State__WinLose.hpp"
 #include "State__Game.hpp"
 #include "View__TwoBtns.hpp"
-#include "MrKlangy.hpp"
+#include "Audio.hpp"
 #include "MrPaths.hpp"
 
 State__WinLose::State__WinLose(bool _victory) :
@@ -30,6 +30,8 @@ State__WinLose::State__WinLose(bool _victory) :
   W::Messenger::subscribe(W::EventType::KeyDown, W::Callback(&State__WinLose::keyEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__replay", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__exit_to_menu", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
+
+  Audio::stopBGM();
 }
 State__WinLose::~State__WinLose()
 {

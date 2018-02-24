@@ -14,7 +14,7 @@
 #include "View__Game.hpp"
 #include "LevelMap.hpp"
 #include "MrPaths.hpp"
-#include "MrKlangy.hpp"
+#include "Audio.hpp"
 
 #include "TLO.hpp"
 #include "Building.hpp"
@@ -33,7 +33,9 @@ State__Game::State__Game() :
 	paused(false),
   view__help(NULL),
   view__hiring(NULL),
-  view__furnishingPurchasing(NULL)
+  view__furnishingPurchasing(NULL),
+  first_frame(true),
+  frame(0)
 {
 	// Create game view
 	view__game = new View__Game();
@@ -52,8 +54,6 @@ State__Game::State__Game() :
 	time_elapsed_s = 0.0;
 	timer = new W::Timer();
 	
-//	MrKlangy::playBGM("level.mod");
-	
 	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__Game::keyEvent, this));
 
   // UI triggered events
@@ -69,8 +69,17 @@ State__Game::~State__Game()
 	removeView(view__game);
 	delete view__game;
 	delete levelMap;
-	
-//	MrKlangy::stopBGM();
+}
+
+void State__Game::play_music() {
+  Audio::playBGM_multi({
+    "level/1942.xm",
+    "level/cant-be-rubicon.xm",
+    "level/dubieduw.xm",
+    "level/eye-to-eye.xm",
+    "level/happy-shopping.xm",
+    "level/introtune.xm",
+  });
 }
 
 W::EventPropagation::T State__Game::keyEvent(W::Event *ev) {
@@ -127,11 +136,24 @@ W::EventPropagation::T State__Game::buttonEvent(W::Event *ev) {
 }
 
 void State__Game::update() {
-	// Time
-	if (paused) {
-		return;
-	}
-	
+  if (first_frame) {
+    play_music();
+    first_frame = false;
+  }
+
+  if (frame%60 == 0) {
+    Audio::updateBGM_multi();
+  }
+
+  if (++frame >= 100) {
+    frame = 0;
+  }
+
+  if (paused) {
+    return;
+  }
+
+  // Time
 	int frame_microseconds = (int) timer->getMicroseconds();
 	if (frame_microseconds > 100000) {
 		frame_microseconds = 100000;

@@ -28,7 +28,7 @@ public:
 
   // Methods
   void resume(W::Returny *);
-  void update();
+  void update() { }
 
   W::EventPropagation::T keyEvent(W::Event *);
   W::EventPropagation::T uiEvent(W::Event *);
@@ -45,6 +45,8 @@ protected:
   void quit() {
     W::popState(W::KillerReturny);
   }
+
+  void play_music();
 };
 
 
