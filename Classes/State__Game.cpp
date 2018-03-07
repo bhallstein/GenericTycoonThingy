@@ -110,25 +110,25 @@ W::EventPropagation::T State__Game::keyEvent(W::Event *ev) {
 }
 
 W::EventPropagation::T State__Game::buttonEvent(W::Event *ev) {
-  std::string *name = (std::string*) ev->_payload;
+  std::string name = ev->payload;
 
-  if (*name == "close_help_view") {
+  if (name == "close_help_view") {
     closeView_help();
   }
 
   // Hiring view
-  else if (*name == "open_hiring_view") {
+  else if (name == "open_hiring_view") {
     openView_hiring();
   }
-  else if (*name == "close_hiring_view") {
+  else if (name == "close_hiring_view") {
     closeView_hiring();
   }
 
   // Furnishing view
-  else if (*name == "open_furnishing_purchasing_view") {
+  else if (name == "open_furnishing_purchasing_view") {
     openView_furnishingPurchasing();
   }
-  else if (*name == "close_furnishing_purchasing_view") {
+  else if (name == "close_furnishing_purchasing_view") {
     closeView_furnishingPurchasing();
   }
 
@@ -261,6 +261,7 @@ void State__Game::openView_help() {
   view__help = new View__Help();
   addView(view__help);
   view__help->setTimeRemaining(levelMap->get_time_remaining_s());
+  view__help->setMonetaryTarget(levelMap->get_level_financial_target());
 }
 void State__Game::closeView_help() {
   if (!view__help) {

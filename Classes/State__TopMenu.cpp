@@ -69,12 +69,12 @@ W::EventPropagation::T State__TopMenu::keyEvent(W::Event *ev) {
 }
 
 W::EventPropagation::T State__TopMenu::uiEvent(W::Event *ev) {
-  std::string *payload = (std::string*) ev->_payload;
+  std::string s = ev->payload;
 
-  if (*payload == "quit") {
+  if (s == "quit") {
     quit();
   }
-  else if (*payload == "start-game") {
+  else if (s == "start-game") {
     startLevel("qj-level");
   }
 

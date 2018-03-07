@@ -54,12 +54,12 @@ W::EventPropagation::T State__WinLose::keyEvent(W::Event *ev) {
 }
 
 W::EventPropagation::T State__WinLose::btnEvent(W::Event *ev) {
-  std::string *s = (std::string*) ev->_payload;
+  std::string s = ev->payload;
 
-  if (*s == "winlose__replay") {
+  if (s == "winlose__replay") {
     replay();
   }
-  else if (*s == "winlose__exit_to_menu") {
+  else if (s == "winlose__exit_to_menu") {
     exit_to_menu();
   }
 

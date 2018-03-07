@@ -212,7 +212,7 @@ W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
   static W::Event *btn_ev = NULL;
   if (btn_ev == NULL) {
     btn_ev = new W::Event(W::EventType::ButtonClick);
-    btn_ev->_payload = new std::string("open_furnishing_purchasing_view");
+    btn_ev->payload = "open_furnishing_purchasing_view";
   }
 
   W::Messenger::dispatchEvent(btn_ev);

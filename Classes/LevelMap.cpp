@@ -107,15 +107,15 @@ W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
 }
 
 W::EventPropagation::T LevelMap::buttonEvent(W::Event *ev) {
-  std::string *name = (std::string*) ev->_payload;
+  std::string name = ev->payload;
 
-  if (*name == "hire_staff") {
+  if (name == "hire_staff") {
     createUnit(true, "shopkeeper", {-1,-1});
   }
-  else if (*name == "buy_furnishing:barberschair") {
+  else if (name == "buy_furnishing:barberschair") {
     createFurnishing(true, "barberschair", {-1,-1});
   }
-  else if (*name == "buy_furnishing:piecounter") {
+  else if (name == "buy_furnishing:piecounter") {
     createFurnishing(true, "piecounter", {-1,-1});
   }
 
