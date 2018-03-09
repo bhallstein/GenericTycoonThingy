@@ -44,17 +44,17 @@ void View__Game::updatePosition(W::v2i winsize) {
   bgrect->setSz(rct.size);
 }
 
-void View__Game::convertEventCoords(W::Event *ev) {
-	ev->pos = convertPixelToGridCoords(ev->pos);
+void View__Game::convertEventCoords(W::Event &ev) {
+	ev.pos = convertPixelToGridCoords(ev.pos);
 }
-W::EventPropagation::T View__Game::scrollEvent(W::Event *ev) {
+W::EventPropagation::T View__Game::scrollEvent(W::Event ev) {
 	using namespace W::EventType;
   int scrollDist = 10;
 
-  if (ev->type == ScreenEdgeLeft)        { scroll(-scrollDist, 0); }
-  else if (ev->type == ScreenEdgeRight)  { scroll(scrollDist, 0); }
-  if (ev->type == ScreenEdgeTop)         { scroll(0, -scrollDist); }
-  else if (ev->type == ScreenEdgeBottom) { scroll(0, scrollDist); }
+  if (ev.type == ScreenEdgeLeft)        { scroll(-scrollDist, 0); }
+  else if (ev.type == ScreenEdgeRight)  { scroll(scrollDist, 0); }
+  if (ev.type == ScreenEdgeTop)         { scroll(0, -scrollDist); }
+  else if (ev.type == ScreenEdgeBottom) { scroll(0, scrollDist); }
 
 	return W::EventPropagation::ShouldContinue;
 }

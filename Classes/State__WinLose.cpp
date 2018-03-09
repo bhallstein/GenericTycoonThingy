@@ -39,22 +39,22 @@ State__WinLose::~State__WinLose()
   delete view;
 }
 
-W::EventPropagation::T State__WinLose::keyEvent(W::Event *ev) {
-  if (ev->key == W::KeyCode::_R) {
+W::EventPropagation::T State__WinLose::keyEvent(W::Event ev) {
+  if (ev.key == W::KeyCode::_R) {
     replay();
   }
-  else if (ev->key == W::KeyCode::ESC) {
+  else if (ev.key == W::KeyCode::ESC) {
     exit_to_menu();
   }
-  else if (ev->key == W::KeyCode::_Q) {
+  else if (ev.key == W::KeyCode::_Q) {
     exit_completely();
   }
 
   return W::EventPropagation::ShouldStop;
 }
 
-W::EventPropagation::T State__WinLose::btnEvent(W::Event *ev) {
-  std::string s = ev->payload;
+W::EventPropagation::T State__WinLose::btnEvent(W::Event ev) {
+  std::string s = ev.payload;
 
   if (s == "winlose__replay") {
     replay();

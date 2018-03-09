@@ -55,7 +55,7 @@ public:
   bool contains_point(W::v2f);
   W::v2i centrePoint();
 
-  W::EventPropagation::T mouseEvent(W::Event*);
+  W::EventPropagation::T mouseEvent(W::Event);
 
   void remove_controller(UID);
   void add_controller(UID);

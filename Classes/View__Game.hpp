@@ -22,8 +22,8 @@ public:
 	
 	void updatePosition(W::v2i);
 	
-	void convertEventCoords(W::Event *);
-	W::EventPropagation::T scrollEvent(W::Event *);
+	void convertEventCoords(W::Event&);
+	W::EventPropagation::T scrollEvent(W::Event);
 	
 	void setLevelSize(W::v2i sz) {
 		level_width = sz.a;

@@ -42,7 +42,7 @@ public:
 		// Note: then also need to init() the Unit, since it is a PlaceableManager.
 	
 	// Event callbacks
-	W::EventPropagation::T mouseEvent(W::Event *);
+	W::EventPropagation::T mouseEvent(W::Event);
 	
 	void update();
 	

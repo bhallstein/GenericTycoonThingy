@@ -208,14 +208,11 @@ W::v2i Building::centrePoint() {
   return best;
 }
 
-W::EventPropagation::T Building::mouseEvent(W::Event *ev) {
-  static W::Event *btn_ev = NULL;
-  if (btn_ev == NULL) {
-    btn_ev = new W::Event(W::EventType::ButtonClick);
-    btn_ev->payload = "open_furnishing_purchasing_view";
-  }
-
+W::EventPropagation::T Building::mouseEvent(W::Event ev) {
+  W::Event btn_ev(W::EventType::ButtonClick);
+  btn_ev.payload = "open_furnishing_purchasing_view";
   W::Messenger::dispatchEvent(btn_ev);
+
   return W::EventPropagation::ShouldStop;
 }
 

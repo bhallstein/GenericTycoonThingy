@@ -122,11 +122,11 @@ void Furnishing::_setUp() {
 	}
 }
 
-W::EventPropagation::T Furnishing::mouseEvent(W::Event *ev) {
+W::EventPropagation::T Furnishing::mouseEvent(W::Event ev) {
 	using namespace W::EventType;
 	
-	if (ev->type == MouseMove) { /* hover = true; */ }
-	else if (ev->type == LMouseUp) {
+	if (ev.type == MouseMove) { /* hover = true; */ }
+	else if (ev.type == LMouseUp) {
 		std::cout << "furnishing " << uid.id << " detected left mouse up" << std::endl;
 	}
 	

@@ -259,10 +259,12 @@ void CustomerController::unitPutDown(Unit *u) {
 /****************************/
 
 Serializable::serialization_descriptor ShopkeeperController::sd;
-W::Event *sk_event_haircut = NULL;
-W::Event *sk_event_piesale = NULL;
+
 int W::EventType::Haircut = W::Event::registerType();
 int W::EventType::PieSale = W::Event::registerType();
+
+W::Event sk_event_haircut(W::EventType::Haircut);
+W::Event sk_event_piesale(W::EventType::PieSale);
 
 ShopkeeperController::ShopkeeperController(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	Controller(_lm, _lv, _nm),
@@ -270,10 +272,6 @@ ShopkeeperController::ShopkeeperController(LevelMap *_lm, View__Game *_lv, W::Na
 	failureStage(0)
 {
 	type = "ShopkeeperController";
-  if (sk_event_haircut == NULL) {
-    sk_event_haircut = new W::Event(W::EventType::Haircut);
-    sk_event_piesale = new W::Event(W::EventType::PieSale);
-  }
 }
 void ShopkeeperController::initialize() {
 	sd["stage"] = makeSerializer(&ShopkeeperController::stage);

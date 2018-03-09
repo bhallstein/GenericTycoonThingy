@@ -94,16 +94,16 @@ void Unit::_setUp() {
   }
 }
 
-W::EventPropagation::T Unit::mouseEvent(W::Event *ev) {
+W::EventPropagation::T Unit::mouseEvent(W::Event ev) {
   if (mode == UnitMode::ANIMATING) {
     return W::EventPropagation::ShouldStop;
   }
 
-  if (ev->type == W::EventType::MouseMove) {
+  if (ev.type == W::EventType::MouseMove) {
     //    hover = true;
   }
 
-  else if (ev->type == W::EventType::LMouseUp) {
+  else if (ev.type == W::EventType::LMouseUp) {
     if (typeInfo->isStaff) {
       pickUp();
 

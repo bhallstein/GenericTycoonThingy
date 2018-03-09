@@ -61,15 +61,15 @@ void State__TopMenu::resume(W::Returny *ret) {
   }
 }
 
-W::EventPropagation::T State__TopMenu::keyEvent(W::Event *ev) {
-  if (ev->key == W::KeyCode::_Q || ev->key == W::KeyCode::ESC) {
+W::EventPropagation::T State__TopMenu::keyEvent(W::Event ev) {
+  if (ev.key == W::KeyCode::_Q || ev.key == W::KeyCode::ESC) {
     W::popState(W::KillerReturny);
   }
   return W::EventPropagation::ShouldContinue;
 }
 
-W::EventPropagation::T State__TopMenu::uiEvent(W::Event *ev) {
-  std::string s = ev->payload;
+W::EventPropagation::T State__TopMenu::uiEvent(W::Event ev) {
+  std::string s = ev.payload;
 
   if (s == "quit") {
     quit();

@@ -37,9 +37,9 @@ public:
 	bool load(lua_State*);
 	std::string save();
 	
-	W::EventPropagation::T keyEvent(W::Event*);
-  W::EventPropagation::T buttonEvent(W::Event*);
-  W::EventPropagation::T economicEvent(W::Event*);
+	W::EventPropagation::T keyEvent(W::Event);
+  W::EventPropagation::T buttonEvent(W::Event);
+  W::EventPropagation::T economicEvent(W::Event);
 	
 	int width() { return mapSize.a; }
 	int height() { return mapSize.b; }

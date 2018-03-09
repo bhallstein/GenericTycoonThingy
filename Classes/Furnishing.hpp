@@ -36,7 +36,7 @@ public:
 		// See note in Unit.hpp on creation & setup
 	
 	// Event callbacks
-	W::EventPropagation::T mouseEvent(W::Event *);
+	W::EventPropagation::T mouseEvent(W::Event);
 
 	void update();
 	

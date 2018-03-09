@@ -26,8 +26,8 @@ public:
   void resume(W::Returny *) { }
   void update() { }
 
-  W::EventPropagation::T keyEvent(W::Event*);
-  W::EventPropagation::T btnEvent(W::Event*);
+  W::EventPropagation::T keyEvent(W::Event);
+  W::EventPropagation::T btnEvent(W::Event);
 	
 protected:
   View__TwoBtns *view;

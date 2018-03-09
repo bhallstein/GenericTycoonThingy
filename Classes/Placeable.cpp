@@ -24,21 +24,22 @@ Placeable::~Placeable()
 	deactivate();
 }
 
-W::EventPropagation::T Placeable::mouseEvent(W::Event *ev) {
+W::EventPropagation::T Placeable::mouseEvent(W::Event ev) {
 	using namespace W::EventType;
-	W::v2f p = ev->pos;
+	W::v2f p = ev.pos;
   p.a = (int) p.a;
   p.b = (int) p.b;
 
-	if (ev->type == MouseMove) {
+	if (ev.type == MouseMove) {
 		pos = p;
 		mngr->placementLoopUpdate();
 	}
-	else if (ev->type == LMouseUp) {
-		if (mngr->attemptToPlace(p))
+	else if (ev.type == LMouseUp) {
+    if (mngr->attemptToPlace(p)) {
 			deactivate();
+    }
 	}
-	else if (ev->type == RMouseUp) {
+	else if (ev.type == RMouseUp) {
 		deactivate();
 		mngr->cancel();
 	}

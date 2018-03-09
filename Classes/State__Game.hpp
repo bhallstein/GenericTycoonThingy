@@ -31,8 +31,8 @@ public:
 	State__Game();
 	~State__Game();
 	
-	W::EventPropagation::T keyEvent(W::Event *);
-	W::EventPropagation::T buttonEvent(W::Event *);
+	W::EventPropagation::T keyEvent(W::Event);
+	W::EventPropagation::T buttonEvent(W::Event);
 	
 	void update();
 	void resume(W::Returny *);

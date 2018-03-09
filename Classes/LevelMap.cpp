@@ -24,16 +24,16 @@
 LevelMap::LevelMap(State__Game *_ls, View__Game *_lv, View__BottomBar *_view__btmBar) :
 	state__game(_ls),
 	view__level(_lv),
-  view__btmBar(_view__btmBar),
+	view__btmBar(_view__btmBar),
 	loaded(false)
 {
 	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&LevelMap::keyEvent, this));
 
-  W::Messenger::subscribeToUIEvent("hire_staff", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("buy_furnishing:barberschair", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
-  W::Messenger::subscribeToUIEvent("buy_furnishing:piecounter", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
+	W::Messenger::subscribeToUIEvent("hire_staff", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
+	W::Messenger::subscribeToUIEvent("buy_furnishing:barberschair", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
+	W::Messenger::subscribeToUIEvent("buy_furnishing:piecounter", W::EventType::ButtonClick, W::Callback(&LevelMap::buttonEvent, this));
 
-  W::Messenger::subscribe(W::EventType::Haircut, W::Callback(&LevelMap::economicEvent, this));
+	W::Messenger::subscribe(W::EventType::Haircut, W::Callback(&LevelMap::economicEvent, this));
 }
 LevelMap::~LevelMap()
 {
@@ -96,18 +96,18 @@ void LevelMap::update(int frame_microseconds, float _time_in_level_s) {
   }
 }
 
-W::EventPropagation::T LevelMap::keyEvent(W::Event *ev) {
-	if (ev->key == W::KeyCode::_U) createUnit(true, "customer", W::v2f());
-	else if (ev->key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::v2f());
-	else if (ev->key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::v2f());
-	else if (ev->key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::v2f());
-  else if (ev->key == W::KeyCode::_W) W::pushState(new State__WinLose(true));
-  else if (ev->key == W::KeyCode::_L) W::pushState(new State__WinLose(false));
+W::EventPropagation::T LevelMap::keyEvent(W::Event ev) {
+	if (ev.key == W::KeyCode::_U) createUnit(true, "customer", W::v2f());
+	else if (ev.key == W::KeyCode::_K) createUnit(true, "shopkeeper", W::v2f());
+	else if (ev.key == W::KeyCode::_A) createFurnishing(true, "barberschair", W::v2f());
+	else if (ev.key == W::KeyCode::_B) createFurnishing(true, "piecounter", W::v2f());
+	else if (ev.key == W::KeyCode::_W) W::pushState(new State__WinLose(true));
+	else if (ev.key == W::KeyCode::_L) W::pushState(new State__WinLose(false));
 	return W::EventPropagation::ShouldContinue;
 }
 
-W::EventPropagation::T LevelMap::buttonEvent(W::Event *ev) {
-  std::string name = ev->payload;
+W::EventPropagation::T LevelMap::buttonEvent(W::Event ev) {
+  std::string name = ev.payload;
 
   if (name == "hire_staff") {
     createUnit(true, "shopkeeper", {-1,-1});
@@ -122,11 +122,11 @@ W::EventPropagation::T LevelMap::buttonEvent(W::Event *ev) {
   return W::EventPropagation::ShouldContinue;
 }
 
-W::EventPropagation::T LevelMap::economicEvent(W::Event *ev) {
-  if (ev->type == W::EventType::Haircut) {
+W::EventPropagation::T LevelMap::economicEvent(W::Event ev) {
+  if (ev.type == W::EventType::Haircut) {
     addPlayerMoneys(Furnishing::costForType("barberschair"));
   }
-  else if (ev->type == W::EventType::PieSale) {
+  else if (ev.type == W::EventType::PieSale) {
     addPlayerMoneys(Furnishing::costForType("piecounter"));
   }
 

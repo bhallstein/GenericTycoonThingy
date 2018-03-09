@@ -82,24 +82,24 @@ void State__Game::play_music() {
   });
 }
 
-W::EventPropagation::T State__Game::keyEvent(W::Event *ev) {
+W::EventPropagation::T State__Game::keyEvent(W::Event ev) {
   // Quit
-  if (ev->key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
-  else if (ev->key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
+  if (ev.key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
+  else if (ev.key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
 
   // Save
-  else if (ev->key == W::KeyCode::_S) {
+  else if (ev.key == W::KeyCode::_S) {
     saveLevel("a save game " + std::to_string(W::Rand::intUpTo(10000000)));
   }
 
   // Help view open/close
-  else if (ev->key == W::KeyCode::_H)  {
+  else if (ev.key == W::KeyCode::_H)  {
     if (view__help) { closeView_help(); }
     else { openView_help(); }
   }
 
   // Pause/unpause
-  else if (ev->key == W::KeyCode::_P) {
+  else if (ev.key == W::KeyCode::_P) {
     if (!view__help) {
       if (paused) { unpause(); }
       else { pause(); }
@@ -109,8 +109,8 @@ W::EventPropagation::T State__Game::keyEvent(W::Event *ev) {
   return W::EventPropagation::ShouldContinue;
 }
 
-W::EventPropagation::T State__Game::buttonEvent(W::Event *ev) {
-  std::string name = ev->payload;
+W::EventPropagation::T State__Game::buttonEvent(W::Event ev) {
+  std::string name = ev.payload;
 
   if (name == "close_help_view") {
     closeView_help();

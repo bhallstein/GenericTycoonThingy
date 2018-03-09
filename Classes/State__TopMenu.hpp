@@ -30,8 +30,8 @@ public:
   void resume(W::Returny *);
   void update() { }
 
-  W::EventPropagation::T keyEvent(W::Event *);
-  W::EventPropagation::T uiEvent(W::Event *);
+  W::EventPropagation::T keyEvent(W::Event);
+  W::EventPropagation::T uiEvent(W::Event);
 
   void startLevel(const std::string &levelName);
   void startLevelOne();
