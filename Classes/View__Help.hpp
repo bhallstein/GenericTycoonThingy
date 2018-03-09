@@ -24,21 +24,21 @@ public:
 
     // Add positioner & close button
     landscape_positioning_limits.push_back(100);
-    landscape_positioners.push_back(new W::Positioner(W::Corner::TopLeft,
-                                                      W::PosType::Fixed,
-                                                      W::PosType::Fixed,
-                                                      W::PosType::Fixed,
-                                                      W::PosType::Fixed,
-                                                      10, 10, 500, 340,
-                                                      true));
+    landscape_positioners.push_back(W::Positioner(W::Corner::TopLeft,
+                                                  W::PosType::Fixed,
+                                                  W::PosType::Fixed,
+                                                  W::PosType::Fixed,
+                                                  W::PosType::Fixed,
+                                                  10, 10, 500, 340,
+                                                  true));
     auto elements = element_list();
     elements.push_back(new W::Button("close_help_view",
-                                     new W::Positioner(W::Corner::TopLeft,
-                                                       W::PosType::Fixed,
-                                                       W::PosType::Fixed,
-                                                       W::PosType::Fixed,
-                                                       W::PosType::Fixed,
-                                                       10, 10, 10, 10),
+                                     W::Positioner(W::Corner::TopLeft,
+                                                   W::PosType::Fixed,
+                                                   W::PosType::Fixed,
+                                                   W::PosType::Fixed,
+                                                   W::PosType::Fixed,
+                                                   10, 10, 10, 10),
                                      this));
     landscape_elements.push_back(elements);
 

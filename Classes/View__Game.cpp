@@ -13,12 +13,12 @@
 #include "View__Game.hpp"
 
 View__Game::View__Game() :
-	View(new W::Positioner(W::Corner::TopLeft,
-                         W::PosType::Fixed,
-                         W::PosType::Fixed,
-                         W::PosType::Proportional,
-                         W::PosType::Proportional,
-                         0, 0, 1, 1)),
+	View(W::Positioner(W::Corner::TopLeft,
+                     W::PosType::Fixed,
+                     W::PosType::Fixed,
+                     W::PosType::Proportional,
+                     W::PosType::Proportional,
+                     0, 0, 1, 1)),
 	gridsize(20),
 	level_width(-1), level_height(-1),
   remaining_time_txt(NULL)

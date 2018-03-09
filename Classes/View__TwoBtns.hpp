@@ -34,29 +34,29 @@ public:
 
     // Add positioner & replay/exit btns
     landscape_positioning_limits.push_back(100);
-    landscape_positioners.push_back(new W::Positioner(W::Corner::TopLeft,
-                                                      W::PosType::Proportional,
-                                                      W::PosType::Proportional,
-                                                      W::PosType::Proportional,
-                                                      W::PosType::Proportional,
-                                                      0.2, 0.2, 0.6, 0.6,
-                                                      false));
+    landscape_positioners.push_back(W::Positioner(W::Corner::TopLeft,
+                                                  W::PosType::Proportional,
+                                                  W::PosType::Proportional,
+                                                  W::PosType::Proportional,
+                                                  W::PosType::Proportional,
+                                                  0.2, 0.2, 0.6, 0.6,
+                                                  false));
     auto elements = element_list();
     elements.push_back(new W::Button(btn1_action,
-                                     new W::Positioner(W::Corner::TopLeft,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       0.5 - offset_from_center - btn_w, 0.5, btn_w, 0.05),
+                                     W::Positioner(W::Corner::TopLeft,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   0.5 - offset_from_center - btn_w, 0.5, btn_w, 0.05),
                                      this));
     elements.push_back(new W::Button(btn2_action,
-                                     new W::Positioner(W::Corner::TopLeft,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       W::PosType::Proportional,
-                                                       0.5 + offset_from_center, 0.5, btn_w, 0.05),
+                                     W::Positioner(W::Corner::TopLeft,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   W::PosType::Proportional,
+                                                   0.5 + offset_from_center, 0.5, btn_w, 0.05),
                                      this));
 
     landscape_elements.push_back(elements);

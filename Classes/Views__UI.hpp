@@ -58,13 +58,13 @@ public:
     for (auto t : furnishingTypes) {
       std::string s = std::string("buy_furnishing:") + t;
       W::Button *b = new W::Button(s.c_str(),
-                                   new W::Positioner(W::Corner::TopLeft,
-                                                     W::PosType::Fixed,
-                                                     W::PosType::Fixed,
-                                                     W::PosType::Fixed,
-                                                     W::PosType::Fixed,
-                                                     7 + (20+10)*i, 30,
-                                                     20, 20),
+                                   W::Positioner(W::Corner::TopLeft,
+                                                 W::PosType::Fixed,
+                                                 W::PosType::Fixed,
+                                                 W::PosType::Fixed,
+                                                 W::PosType::Fixed,
+                                                 7 + (20+10)*i, 30,
+                                                 20, 20),
                                    this);
       landscape_elements[0].push_back(b);
       b->activate();
