@@ -88,7 +88,7 @@ void LevelMap::update(int frame_microseconds, float _time_in_level_s) {
 	tlovec__clearDestroyeds(buildings);
 
   // Check for win & lose condition
-  if (cash >= 1000) {
+  if (cash >= level_financial_target) {
     W::pushState(new State__WinLose(true));
   }
   else if (_time_in_level_s > level_time_limit_s) {

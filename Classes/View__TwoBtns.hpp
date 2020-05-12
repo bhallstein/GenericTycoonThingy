@@ -32,6 +32,10 @@ public:
     orientation_check = false;
     orientation = O_LANDSCAPE;
 
+    // Add other elements
+    bgrect = new W::Rectangle(this, {0,0}, {0,0}, {0,0,0,0.8});
+    txt_title = new W::RetroText(this, {0,0}, msg, W::Colour::White, W::TextAlign::Centre);
+
     // Add positioner & replay/exit btns
     landscape_positioning_limits.push_back(100);
     landscape_positioners.push_back(W::Positioner(W::Corner::TopLeft,
@@ -42,52 +46,40 @@ public:
                                                   0.2, 0.2, 0.6, 0.6,
                                                   false));
     auto elements = element_list();
-    elements.push_back(new W::Button(btn1_action,
-                                     W::Positioner(W::Corner::TopLeft,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   0.5 - offset_from_center - btn_w, 0.5, btn_w, 0.05),
-                                     this));
-    elements.push_back(new W::Button(btn2_action,
-                                     W::Positioner(W::Corner::TopLeft,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   W::PosType::Proportional,
-                                                   0.5 + offset_from_center, 0.5, btn_w, 0.05),
-                                     this));
+    elements.push_back(new W::TextButton(btn1_label,
+                                         btn1_action,
+                                         W::Positioner(W::Corner::TopLeft,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       0.5 - offset_from_center - btn_w, 0.5, btn_w, 0.05),
+                                         this));
+    elements.push_back(new W::TextButton(btn2_label,
+                                         btn2_action,
+                                         W::Positioner(W::Corner::TopLeft,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       W::PosType::Proportional,
+                                                       0.5 + offset_from_center, 0.5, btn_w, 0.05),
+                                         this));
 
     landscape_elements.push_back(elements);
-
-    // Add other elements
-    bgrect = new W::Rectangle(this, {0,0}, {0,0}, {0,0,0,0.8});
-
-    win_lose_msg = new W::RetroText(this, {0,0}, msg, W::Colour::White, W::TextAlign::Centre);
-    txt_replay = new W::RetroText(this, {0,0}, btn1_label, W::Colour::White, W::TextAlign::Centre);
-    txt_quit   = new W::RetroText(this, {0,0}, btn2_label, W::Colour::White, W::TextAlign::Centre);
 
     updatePosition(W::windowSize());
   }
   virtual ~View__TwoBtns()
   {
-    delete win_lose_msg;
-    delete txt_replay;
-    delete txt_quit;
+    delete txt_title;
   }
 
   void updatePosition__uiview(W::v2i winsize) {
-    win_lose_msg->setPos({float(rct.size.a/2), 40.});
-
-    txt_replay->setPos(W::v2f(float((0.5 - offset_from_center - btn_w/2.)*rct.size.a), rct.size.b * 0.6));
-    txt_quit  ->setPos(W::v2f(float((0.5 + offset_from_center + btn_w/2.)*rct.size.a), rct.size.b * 0.6));
+    txt_title->setPos({float(rct.size.a/2), 40.});
   }
 
 private:
-  W::RetroText *win_lose_msg;
-  W::RetroText *txt_replay;
-  W::RetroText *txt_quit;
+  W::RetroText *txt_title;
 
   std::string msg;
   std::string btn1_label;

@@ -237,8 +237,11 @@ bool State__Game::saveLevel(const std::string &saveName) {
 	// Save file to save games directory
 	string saveDir = MrPaths::settingsPath + "Saved games/";
 	string saveFileName = saveDir + saveName + ".lua";
-	if (!W::isValidDir(MrPaths::settingsPath))
-		if (!W::createDir(MrPaths::settingsPath)) return false;
+	if (!W::isValidDir(MrPaths::settingsPath)) {
+		if (!W::createDir(MrPaths::settingsPath)) {
+			return false;
+		}
+	}
 	if (!W::isValidDir(saveDir)) {
 		bool dir_created = W::createDir(saveDir);
 		if (!dir_created) {
