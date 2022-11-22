@@ -1,16 +1,4 @@
 /*
- * Generic Tycoon Thingy
- *
- * ===============
- *  Building.hpp
- * ===============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * Building.hpp
  *
  * Building is a TLO subclass, since Buildings are saved in levels
@@ -18,8 +6,8 @@
  *
  */
 
-#ifndef BUILDING_H
-#define BUILDING_H
+#ifndef Building_h
+#define Building_h
 
 #include <iostream>
 #include <map>

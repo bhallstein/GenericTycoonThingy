@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==========
- *  TLO.hpp
- * ==========
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef TLO_H
-#define TLO_H
+#ifndef TLO_h
+#define TLO_h
 
 #include "W.h"
 #include "UIDManager.hpp"

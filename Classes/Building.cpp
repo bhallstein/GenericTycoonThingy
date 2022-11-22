@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===============
- *  Building.cpp
- * ===============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Building.hpp"
 #include "View__Game.hpp"
 #include "Furnishing.hpp"

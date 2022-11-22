@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =====================
- *  State__WinLose.cpp
- * =====================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "State__WinLose.hpp"
 #include "State__Game.hpp"
 #include "View__TwoBtns.hpp"
@@ -31,8 +19,10 @@ State__WinLose::State__WinLose(bool _victory) :
   W::Messenger::subscribeToUIEvent("winlose__replay", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
   W::Messenger::subscribeToUIEvent("winlose__exit_to_menu", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
 
-  Audio::stopBGM();
+  Audio::stopMusic();
+  Audio::playSound(victory ? "fx/winlose-win.mp3" : "fx/winlose-lose.mp3");
 }
+
 State__WinLose::~State__WinLose()
 {
 	removeView(view);
@@ -71,11 +61,13 @@ void State__WinLose::replay() {
   r.payload = "replay";
   popState(r);
 }
+
 void State__WinLose::exit_to_menu() {
   W::Returny r(W::ReturnyType::Payload);
   r.payload = "exit to menu";
   popState(r);
 }
+
 void State__WinLose::exit_completely() {
   popState(W::KillerReturny);
 }

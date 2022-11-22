@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===================
- *  Serializable.cpp
- * ===================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Serializable.hpp"
 #include "Serializer.hpp"
 

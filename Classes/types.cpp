@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ============
- *  types.cpp
- * ============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "types.hpp"
 
 bool streq(const char *a, const char *b) {

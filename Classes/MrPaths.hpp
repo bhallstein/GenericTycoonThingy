@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==============
- *  MrPaths.hpp
- * ==============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef MrPaths_H
-#define MrPaths_H
+#ifndef MrPaths_h
+#define MrPaths_h
 
 #define MRPATHS_MAX_PATH 300
 #define TYCOON_NAME "Generic Tycoon Thingy"

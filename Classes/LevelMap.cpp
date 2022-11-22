@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===============
- *  LevelMap.cpp
- * ===============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "LevelMap.hpp"
 #include "View__Game.hpp"
 #include "Views__UI.hpp"

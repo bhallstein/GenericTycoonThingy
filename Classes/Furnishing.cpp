@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =================
- *  Furnishing.cpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Furnishing.hpp"
 #include "Building.hpp"
 #include "Unit.hpp"

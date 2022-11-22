@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * =====================
- *  State__WinLose.hpp
- * =====================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
- 
-#ifndef State__WinLose_H
-#define State__WinLose_H
+#ifndef StateWinLose_h
+#define StateWinLose_h
 
 #include "W.h"
 

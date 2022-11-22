@@ -1,3 +1,12 @@
 [submodule "W"]
 	path = W
 	url = git@github.com:bhallstein/W.git
+[submodule "audio/miniaudio"]
+	path = audio/miniaudio
+	url = https://github.com/mackron/miniaudio.git
+[submodule "audio/jar"]
+	path = audio/jar
+	url = https://github.com/bhallstein/jar.git
+[submodule "audio/miniaudio-xm"]
+	path = audio/miniaudio-xm
+	url = https://github.com/bhallstein/miniaudio-xm.git

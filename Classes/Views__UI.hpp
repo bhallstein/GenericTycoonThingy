@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ================
- *  Views__UI.hpp
- * ================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef Views__UI_h
-#define Views__UI_h
+#ifndef ViewsUI_h
+#define ViewsUI_h
 
 #include "W.h"
 #include "MrPaths.hpp"

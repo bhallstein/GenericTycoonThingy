@@ -1,16 +1,4 @@
 /*
- * Generic Tycoon Thingy
- *
- * =================
- *  Serializer.hpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * Serializer.hpp
  *
  * - A Serializer is a templated class created to wrap properties of a Serializable or one of its subclasses.
@@ -22,8 +10,8 @@
  * 
  */
 
-#ifndef __DBT__Serializer
-#define __DBT__Serializer
+#ifndef Serializer_h
+#define Serializer_h
 
 #include "LuaObj.h"
 #include "W.h"

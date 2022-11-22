@@ -100,8 +100,6 @@
 		B5C6ACB92022405E00E750AE /* LevelMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6ACA62022405E00E750AE /* LevelMap.cpp */; };
 		B5C6ACBA2022405E00E750AE /* Serializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6ACA82022405E00E750AE /* Serializer.cpp */; };
 		B5C6ACBB2022405E00E750AE /* Placeable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C6ACAA2022405E00E750AE /* Placeable.cpp */; };
-		B5C6ADA3202241ED00E750AE /* libirrklang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B5C6ADA2202241ED00E750AE /* libirrklang.dylib */; };
-		B5C6ADA42022423000E750AE /* libirrklang.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = B5C6ADA2202241ED00E750AE /* libirrklang.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -111,7 +109,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B5C6ADA42022423000E750AE /* libirrklang.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,29 +302,6 @@
 		B5C6ACA82022405E00E750AE /* Serializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Serializer.cpp; sourceTree = "<group>"; };
 		B5C6ACA92022405E00E750AE /* Audio.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Audio.hpp; sourceTree = "<group>"; };
 		B5C6ACAA2022405E00E750AE /* Placeable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Placeable.cpp; sourceTree = "<group>"; };
-		B5C6ACBD2022408900E750AE /* ik_EStreamModes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_EStreamModes.h; sourceTree = "<group>"; };
-		B5C6ACBE2022408900E750AE /* ik_vec3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_vec3d.h; sourceTree = "<group>"; };
-		B5C6ACBF2022408900E750AE /* ik_IVirtualRefCounted.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IVirtualRefCounted.h; sourceTree = "<group>"; };
-		B5C6ACC02022408900E750AE /* ik_ISoundMixedOutputReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundMixedOutputReceiver.h; sourceTree = "<group>"; };
-		B5C6ACC22022408900E750AE /* ik_IFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IFileReader.h; sourceTree = "<group>"; };
-		B5C6ACC32022408900E750AE /* ik_IRefCounted.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IRefCounted.h; sourceTree = "<group>"; };
-		B5C6ACC42022408900E750AE /* ik_IAudioRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IAudioRecorder.h; sourceTree = "<group>"; };
-		B5C6ACC52022408900E750AE /* ik_IAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IAudioStream.h; sourceTree = "<group>"; };
-		B5C6ACC62022408900E750AE /* ik_ISound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISound.h; sourceTree = "<group>"; };
-		B5C6ACC72022408900E750AE /* irrKlang.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = irrKlang.h; sourceTree = "<group>"; };
-		B5C6ACC82022408900E750AE /* ik_ISoundStopEventReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundStopEventReceiver.h; sourceTree = "<group>"; };
-		B5C6ACC92022408900E750AE /* ik_ESoundOutputDrivers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ESoundOutputDrivers.h; sourceTree = "<group>"; };
-		B5C6ACCA2022408900E750AE /* ik_ISoundSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundSource.h; sourceTree = "<group>"; };
-		B5C6ACCB2022408900E750AE /* ik_IAudioStreamLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IAudioStreamLoader.h; sourceTree = "<group>"; };
-		B5C6ACCC2022408900E750AE /* ik_ESoundEngineOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ESoundEngineOptions.h; sourceTree = "<group>"; };
-		B5C6ACCD2022408900E750AE /* ik_irrKlangTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_irrKlangTypes.h; sourceTree = "<group>"; };
-		B5C6ACCE2022408900E750AE /* ik_ISoundEffectControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundEffectControl.h; sourceTree = "<group>"; };
-		B5C6ACCF2022408900E750AE /* ik_ISoundDeviceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundDeviceList.h; sourceTree = "<group>"; };
-		B5C6ACD02022408900E750AE /* ik_SAudioStreamFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_SAudioStreamFormat.h; sourceTree = "<group>"; };
-		B5C6ACD12022408900E750AE /* ik_IFileFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_IFileFactory.h; sourceTree = "<group>"; };
-		B5C6ACD22022408900E750AE /* ik_ISoundEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ik_ISoundEngine.h; sourceTree = "<group>"; };
-		B5C6AD9E202241A100E750AE /* libirrklang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libirrklang.dylib; path = "../irrKlang-64bit-1.5.0/bin/macosx-gcc/libirrklang.dylib"; sourceTree = "<group>"; };
-		B5C6ADA2202241ED00E750AE /* libirrklang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libirrklang.dylib; path = ../irrKlang/libirrklang.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -335,7 +309,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5C6ADA3202241ED00E750AE /* libirrklang.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,10 +507,7 @@
 				B58827471F40E44100C07AEB /* Generic Tycoon Thingy */,
 				B5C6AC862022404A00E750AE /* Data */,
 				B5C6AC882022405E00E750AE /* Classes */,
-				B5882A8A1F42316300C07AEB /* Dylibs */,
 				B58827461F40E44100C07AEB /* Products */,
-				B5C6ACBC2022408900E750AE /* irrKlang */,
-				B5C6AD9D202241A000E750AE /* Frameworks */,
 				B560207C203C1CD900107086 /* W */,
 			);
 			sourceTree = "<group>";
@@ -569,14 +539,6 @@
 				B588274C1F40E44100C07AEB /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		B5882A8A1F42316300C07AEB /* Dylibs */ = {
-			isa = PBXGroup;
-			children = (
-				B5C6ADA2202241ED00E750AE /* libirrklang.dylib */,
-			);
-			name = Dylibs;
 			sourceTree = "<group>";
 		};
 		B5C6AC882022405E00E750AE /* Classes */ = {
@@ -628,43 +590,6 @@
 			path = ../Classes;
 			sourceTree = "<group>";
 		};
-		B5C6ACBC2022408900E750AE /* irrKlang */ = {
-			isa = PBXGroup;
-			children = (
-				B5C6ACBD2022408900E750AE /* ik_EStreamModes.h */,
-				B5C6ACBE2022408900E750AE /* ik_vec3d.h */,
-				B5C6ACBF2022408900E750AE /* ik_IVirtualRefCounted.h */,
-				B5C6ACC02022408900E750AE /* ik_ISoundMixedOutputReceiver.h */,
-				B5C6ACC22022408900E750AE /* ik_IFileReader.h */,
-				B5C6ACC32022408900E750AE /* ik_IRefCounted.h */,
-				B5C6ACC42022408900E750AE /* ik_IAudioRecorder.h */,
-				B5C6ACC52022408900E750AE /* ik_IAudioStream.h */,
-				B5C6ACC62022408900E750AE /* ik_ISound.h */,
-				B5C6ACC72022408900E750AE /* irrKlang.h */,
-				B5C6ACC82022408900E750AE /* ik_ISoundStopEventReceiver.h */,
-				B5C6ACC92022408900E750AE /* ik_ESoundOutputDrivers.h */,
-				B5C6ACCA2022408900E750AE /* ik_ISoundSource.h */,
-				B5C6ACCB2022408900E750AE /* ik_IAudioStreamLoader.h */,
-				B5C6ACCC2022408900E750AE /* ik_ESoundEngineOptions.h */,
-				B5C6ACCD2022408900E750AE /* ik_irrKlangTypes.h */,
-				B5C6ACCE2022408900E750AE /* ik_ISoundEffectControl.h */,
-				B5C6ACCF2022408900E750AE /* ik_ISoundDeviceList.h */,
-				B5C6ACD02022408900E750AE /* ik_SAudioStreamFormat.h */,
-				B5C6ACD12022408900E750AE /* ik_IFileFactory.h */,
-				B5C6ACD22022408900E750AE /* ik_ISoundEngine.h */,
-			);
-			name = irrKlang;
-			path = ../irrKlang;
-			sourceTree = "<group>";
-		};
-		B5C6AD9D202241A000E750AE /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B5C6AD9E202241A100E750AE /* libirrklang.dylib */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -705,6 +630,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -880,6 +806,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../audio/miniaudio\"",
+					"\"$(SRCROOT)/../audio/miniaudio-xm\"",
+					"\"$(SRCROOT)/../audio/jar\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -918,6 +849,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../audio/miniaudio\"",
+					"\"$(SRCROOT)/../audio/miniaudio-xm\"",
+					"\"$(SRCROOT)/../audio/jar\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -933,7 +869,7 @@
 				INFOPLIST_FILE = "Generic Tycoon Thingy/Info.plist";
 				LD_DYLIB_INSTALL_NAME = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../irrKlang\"";
+				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ben.Generic-Tycoon-Thingy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REEXPORTED_LIBRARY_NAMES = "";
@@ -948,7 +884,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Generic Tycoon Thingy/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../irrKlang\"";
+				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ben.Generic-Tycoon-Thingy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REEXPORTED_LIBRARY_NAMES = "";

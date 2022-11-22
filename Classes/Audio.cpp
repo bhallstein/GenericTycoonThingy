@@ -1,140 +1,130 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===============
- *  Audio.cpp
- * ===============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Audio.hpp"
 #include "MrPaths.hpp"
 #include <exception>
 #include "W.h"
-
-using std::string;
-
+#define MINIAUDIO_IMPLEMENTATION
+#define JAR_XM_IMPLEMENTATION
+#define XMDS_IMPLEMENTATION
+#include "xm-data-source.h"
 
 namespace Audio {
+  std::string full_path(std::string audio_path) {
+    return MrPaths::resourcesPath + std::string("Data/Audio/") + audio_path;
+  }
+}
 
-  string full_path(string audio_path) {
-    return MrPaths::resourcesPath + string("Data/Audio/") + audio_path;
+
+// Engine init
+// ------------------------------
+
+ma_engine engine;
+bool have_engine = false;
+
+void engine_init() {
+  if (have_engine) {
+    return;
   }
 
-
-  // Player (singleton - get with get_player()
-  // -----------------------------------
-
-  struct Player {
-    Player() :
-    sound_engine(NULL),
-    background_music(NULL)
-    {
-      irrklang::ISoundDeviceList *deviceList = irrklang::createSoundDeviceList();
-      int n_devices = deviceList->getDeviceCount() > 0;
-      deviceList->drop();
-
-      if (n_devices == 0) {
-        throw new std::exception();
-      }
-
-      sound_engine = irrklang::createIrrKlangDevice();
-    }
-
-    irrklang::ISoundEngine *sound_engine;
-    irrklang::ISound *background_music;
-
-    // For when playing in multiple song mode
-    bool playing_multi;
-    std::vector<string> songs;
-    string cur_song;
-  };
-
-  Player* get_player() {  // -> KlangState or null
-    static bool inited = false;
-    static Player *p = NULL;
-    if (!inited) {
-      try {
-        p = new Player;
-      }
-      catch (std::exception exc) { }
-      inited = true;
-    }
-    return p;
+  W::log << "EngineInit()" << "\n";
+  ma_result engine_init = ma_engine_init(NULL, &engine);
+  have_engine = engine_init == MA_SUCCESS;
+  if (!have_engine) {
+    W::log << "Failed to initialize audio engine";
   }
+}
 
 
-  // Single song mode
-  // -----------------------------------
+// Track
+// ------------------------------
 
-  void playSound(string filename) {
-    auto p = get_player();
-    if (p) {
-      string path = full_path(filename);
-      p->sound_engine->play2D(path.c_str(), false);
+struct Track {
+  std::string filename;
+  xm_data_source* xmds;
+  ma_sound* sound;
+
+  Track(std::string filename) {
+    engine_init();
+
+    ma_result result;
+    std::string path = Audio::full_path(filename);
+
+    xmds = new xm_data_source;
+    sound = new ma_sound;
+
+    result = xm_data_source_init_file(path.c_str(), xmds);
+    if (result != MA_SUCCESS) {
+      W::log << "Failed to initialize data source for file: " << path << "\n";
+      W::log << "Error: " << ma_result_description(result) << "\n";
+      delete xmds;
+      xmds = NULL;
+      return;
     }
-  }
 
-  void playBGM(string filename, bool loop, bool stop_cur) {
-    auto p = get_player();
-    if (p) {
-      if (stop_cur) {
-        stopBGM();
-        p->playing_multi = false;
-      }
-
-      string path = MrPaths::resourcesPath + string("Data/Audio/") + filename;
-      p->background_music = p->sound_engine->play2D(path.c_str(), loop, false, true);
+    result = ma_sound_init_from_data_source(&engine, xmds, 0, NULL, sound);
+    if (result != MA_SUCCESS) {
+      W::log << "Failed to initialize sound for file: " << path << "\n";
+      W::log << "Error: " << ma_result_description(result) << "\n";
+      delete sound;
+      sound = NULL;
+      return;
     }
   }
 
-  void stopBGM() {
-    auto p = get_player();
-    if (p && p->background_music) {
-      p->background_music->stop();
-      p->background_music->drop();
-      p->background_music = NULL;
+  ~Track() {
+    if (sound) {
+      ma_sound_stop(sound);
+      ma_sound_uninit(sound);
+      delete sound;
+    }
+    if (xmds) {
+      xm_data_source_uninit(xmds);
+      delete xmds;
     }
   }
+};
+
+Track *current_track = NULL;
 
 
-  // Simple random playlist functionality
-  // -----------------------------------
+// Interface
+// ------------------------------
 
-  void next() {
-    auto p = get_player();
-    if (p) {
-      stopBGM();
-      size_t i = size_t(W::Rand::intUpTo(int(p->songs.size())));
+namespace Audio {
+  void playSound(std::string filename) {
+    engine_init();
 
-      p->cur_song = p->songs[i];
-      p->playing_multi = true;
-      playBGM(p->cur_song, false, false);
-    }
-  }
-
-  void playBGM_multi(std::vector<string> filenames) {
-    auto p = get_player();
-    if (p) {
-      stopBGM();
-
-      p->songs = filenames;
-      next();
-    }
-  }
-
-  void updateBGM_multi() {
-    auto p = get_player();
-    if (p && p->playing_multi) {
-      string path = full_path(p->cur_song);
-      if (!p->sound_engine->isCurrentlyPlaying(path.c_str())) {
-        next();
+    if (have_engine) {
+      std::string path = full_path(filename);
+      ma_result result = ma_engine_play_sound(&engine, path.c_str(), NULL);
+      if (result != MA_SUCCESS) {
+        W::log << "Failed to play sound file: " << filename << "\n";
       }
     }
   }
 
+  void playMusic(std::string filename) {
+    engine_init();
+    if (have_engine) {
+      stopMusic();
+      current_track = new Track(filename);
+      if (current_track->sound) {
+        ma_sound_start(current_track->sound);
+      }
+    }
+  }
+
+  bool musicIsPlaying() {
+    return (have_engine &&
+            current_track != NULL &&
+            current_track->sound &&
+            !ma_sound_at_end(current_track->sound));
+  }
+
+  void stopMusic() {
+    if (have_engine && current_track != NULL) {
+      delete current_track;
+      current_track = NULL;
+    }
+  }
 }
 

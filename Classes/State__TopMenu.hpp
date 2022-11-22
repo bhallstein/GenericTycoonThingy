@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * =====================
- *  State__TopMenu.hpp
- * =====================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef State__TopMenu_H
-#define State__TopMenu_H
+#ifndef StateTopMenu_h
+#define StateTopMenu_h
 
 #include "W.h"
 
@@ -26,9 +14,8 @@ public:
   State__TopMenu();
   ~State__TopMenu();
 
-  // Methods
   void resume(W::Returny *);
-  void update() { }
+  void update();
 
   W::EventPropagation::T keyEvent(W::Event);
   W::EventPropagation::T uiEvent(W::Event);
@@ -42,13 +29,13 @@ protected:
 
   State__Game *state__game;
 
+  size_t frame;
+
+  static void update_music();
+
   void quit() {
     W::popState(W::KillerReturny);
   }
-
-  void play_music();
 };
 
-
 #endif
-

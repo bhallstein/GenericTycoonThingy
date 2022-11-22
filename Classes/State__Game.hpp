@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==================
- *  State__Game.hpp
- * ==================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef __DBT__State__Game
-#define __DBT__State__Game
+#ifndef StateGame_h
+#define StateGame_h
 
 #include "W.h"
 
@@ -68,10 +56,9 @@ private:
   W::Timer *timer;
 	float time_elapsed_s;
 
-  bool first_frame;
-  size_t frame;  // Cycles up to 100
+  size_t frame;
 
-  void play_music();
+  static void update_music();
 };
 
 #endif

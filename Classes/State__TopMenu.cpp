@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =====================
- *  State__TopMenu.cpp
- * =====================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "State__TopMenu.hpp"
 #include "State__Game.hpp"
 #include "View__TopMenuBG.hpp"
@@ -33,8 +21,6 @@ State__TopMenu::State__TopMenu() : W::GameState(W::GS_OPAQUE)
   W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__TopMenu::keyEvent, this));
   W::Messenger::subscribeToUIEvent("start-game", W::EventType::ButtonClick, W::Callback(&State__TopMenu::uiEvent, this));
   W::Messenger::subscribeToUIEvent("quit", W::EventType::ButtonClick, W::Callback(&State__TopMenu::uiEvent, this));
-
-  play_music();
 }
 State__TopMenu::~State__TopMenu()
 {
@@ -44,7 +30,14 @@ State__TopMenu::~State__TopMenu()
   removeView(view__twoBtns);
   delete view__twoBtns;
 
-  Audio::stopBGM();
+  Audio::stopMusic();
+}
+
+void State__TopMenu::update() {
+  if (frame%60 == 0) {
+    State__TopMenu::update_music();
+  }
+  frame += 1;
 }
 
 void State__TopMenu::resume(W::Returny *ret) {
@@ -55,9 +48,6 @@ void State__TopMenu::resume(W::Returny *ret) {
     if (ret->payload == "replay") {
       startLevel("qj-level");
     }
-  }
-  else {
-    play_music();
   }
 }
 
@@ -86,7 +76,7 @@ void State__TopMenu::startLevel(const std::string &levelName) {
 	try {
 		state__game = new State__Game();
     if (state__game->loadLevel(levelName)) {
-      Audio::stopBGM();
+      Audio::stopMusic();
 			W::pushState(state__game);
     }
     else {
@@ -97,6 +87,8 @@ void State__TopMenu::startLevel(const std::string &levelName) {
 	}
 }
 
-void State__TopMenu::play_music() {
-  Audio::playBGM("menu.xm");
+void State__TopMenu::update_music() {
+  if (!Audio::musicIsPlaying()) {
+    Audio::playMusic("menu/dark-room.xm");
+  }
 }

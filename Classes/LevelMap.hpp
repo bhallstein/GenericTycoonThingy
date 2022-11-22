@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===============
- *  LevelMap.hpp
- * ===============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef __DBT__LevelMap__
-#define __DBT__LevelMap__
+#ifndef LevelMap_h
+#define LevelMap_h
 
 #include <string>
 #include <vector>
@@ -96,8 +84,6 @@ private:
 	tlovec controllers_to_deactivate;
 	tlovec controllers_to_reactivate;
 	tlovec inactiveControllers;
-
-  bool first_frame = true;
 	
 	// Level goal data
 	int level_financial_target;

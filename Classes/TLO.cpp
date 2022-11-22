@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==========
- *  TLO.cpp
- * ==========
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "TLO.hpp"
 #include "Serializer.hpp"
 

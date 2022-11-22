@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * =================
- *  Furnishing.hpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef FURNITURE_H
-#define FURNITURE_H
+#ifndef Furnishing_h
+#define Furnishing_h
 
 #include <iostream>
 

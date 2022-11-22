@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ============
- *  types.hpp
- * ============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef __DBT__Types_h
-#define __DBT__Types_h
+#ifndef Types_h
+#define Types_h
 
 #include <string>
 #include "W.h"

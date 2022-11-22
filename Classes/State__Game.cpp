@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==================
- *  State__Game.cpp
- * ==================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "State__Game.hpp"
 #include "View__Game.hpp"
 #include "LevelMap.hpp"
@@ -27,6 +15,21 @@
 #include "Views__UI.hpp"
 #include "View__Help.hpp"
 
+std::vector<std::string> music_files{
+  "level/1942.xm",
+  "level/cant-be-rubicon.xm",
+  "level/dubieduw.xm",
+  "level/eye-to-eye.xm",
+  "level/happy-shopping.xm",
+  "level/introtune.xm",
+};
+
+void play_random_music_track() {
+  int nTracks = (int) music_files.size();
+  size_t i = (size_t) W::Rand::intUpTo(nTracks);
+  Audio::playMusic(music_files[i]);
+}
+
 State__Game::State__Game() :
 	view__game(NULL),
 	levelMap(NULL),
@@ -34,7 +37,6 @@ State__Game::State__Game() :
   view__help(NULL),
   view__hiring(NULL),
   view__furnishingPurchasing(NULL),
-  first_frame(true),
   frame(0)
 {
 	// Create game view
@@ -64,6 +66,7 @@ State__Game::State__Game() :
   W::Messenger::subscribeToUIEvent("open_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
   W::Messenger::subscribeToUIEvent("close_furnishing_purchasing_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
 }
+
 State__Game::~State__Game()
 {
 	removeView(view__game);
@@ -71,21 +74,16 @@ State__Game::~State__Game()
 	delete levelMap;
 }
 
-void State__Game::play_music() {
-  Audio::playBGM_multi({
-    "level/1942.xm",
-    "level/cant-be-rubicon.xm",
-    "level/dubieduw.xm",
-    "level/eye-to-eye.xm",
-    "level/happy-shopping.xm",
-    "level/introtune.xm",
-  });
-}
-
 W::EventPropagation::T State__Game::keyEvent(W::Event ev) {
   // Quit
-  if (ev.key == W::KeyCode::ESC) { W::popState(W::EmptyReturny); }
-  else if (ev.key == W::KeyCode::_Q)  { W::popState(W::KillerReturny); }
+  if (ev.key == W::KeyCode::ESC) {
+    Audio::stopMusic();
+    W::popState(W::EmptyReturny);
+  }
+  else if (ev.key == W::KeyCode::_Q) {
+    Audio::stopMusic();
+    W::popState(W::KillerReturny);
+  }
 
   // Save
   else if (ev.key == W::KeyCode::_S) {
@@ -136,17 +134,8 @@ W::EventPropagation::T State__Game::buttonEvent(W::Event ev) {
 }
 
 void State__Game::update() {
-  if (first_frame) {
-    play_music();
-    first_frame = false;
-  }
-
   if (frame%60 == 0) {
-    Audio::updateBGM_multi();
-  }
-
-  if (++frame >= 100) {
-    frame = 0;
+    update_music();
   }
 
   if (paused) {
@@ -166,6 +155,8 @@ void State__Game::update() {
 	if (levelMap) {
 		levelMap->update(frame_microseconds, time_elapsed_s);
 	}
+
+  frame += 1;
 }
 void State__Game::resume(W::Returny *ret) {
   if (ret->type == W::ReturnyType::Killer) {
@@ -180,6 +171,7 @@ void State__Game::resume(W::Returny *ret) {
 void State__Game::pause() {
 	paused = true;
 }
+
 void State__Game::unpause() {
 	timer->reset();
 	paused = false;
@@ -266,6 +258,7 @@ void State__Game::openView_help() {
   view__help->setTimeRemaining(levelMap->get_time_remaining_s());
   view__help->setMonetaryTarget(levelMap->get_level_financial_target());
 }
+
 void State__Game::closeView_help() {
   if (!view__help) {
     return;
@@ -283,6 +276,7 @@ void State__Game::openView_hiring() {
   view__hiring = new View__Hiring();
   addView(view__hiring);
 }
+
 void State__Game::closeView_hiring() {
   if (!view__hiring) {
     return;
@@ -299,6 +293,7 @@ void State__Game::openView_furnishingPurchasing() {
   view__furnishingPurchasing = new View__FurnishingPurchasing(Furnishing::get_furnishing_types());
   addView(view__furnishingPurchasing);
 }
+
 void State__Game::closeView_furnishingPurchasing() {
   if (!view__furnishingPurchasing) {
     return;
@@ -306,4 +301,10 @@ void State__Game::closeView_furnishingPurchasing() {
   removeView(view__furnishingPurchasing);
   delete view__furnishingPurchasing;
   view__furnishingPurchasing = NULL;
+}
+
+void State__Game::update_music() {
+  if (!Audio::musicIsPlaying()) {
+    play_random_music_track();
+  }
 }

@@ -1,22 +1,10 @@
 /*
- * Generic Tycoon Thingy
- *
- * ===================
- *  Serializable.hpp
- * ===================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * Serializable.hpp - base class providing auto-serialization
  *
  */
 
-#ifndef __DBT__Serializable
-#define __DBT__Serializable
+#ifndef Serializable_h
+#define Serializable_h
 
 #include <map>
 #include <vector>

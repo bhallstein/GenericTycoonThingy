@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =================
- *  UIDManager.cpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "UIDManager.hpp"
 #include "TLO.hpp"
 

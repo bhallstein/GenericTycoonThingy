@@ -1,25 +1,12 @@
 /*
- * Generic Tycoon Thingy
- *
- * =================
- *  Controller.hpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * Controller.hpp
  *
- * A Controller issues tasks to Units and Furnishings for its own devious
- * aims & purposes
+ * A Controller issues tasks to Units and Furnishings
  *
  */
  
-#ifndef __DBT__Controller
-#define __DBT__Controller
+#ifndef Controller_h
+#define Controller_h
 
 #include <map>
 

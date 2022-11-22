@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===========
- *  Unit.hpp
- * ===========
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef __DBT__Unit_h
-#define __DBT__Unit_h
+#ifndef Unit_h
+#define Unit_h
 
 #include "types.hpp"
 #include "PlaceableManager.hpp"

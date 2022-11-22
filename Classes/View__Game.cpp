@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =================
- *  View__Game.cpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "View__Game.hpp"
 
 View__Game::View__Game() :

@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * =================
- *  Controller.cpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Controller.hpp"
 #include "Unit.hpp"
 #include "UIDManager.hpp"
@@ -18,17 +6,14 @@
 #include "Furnishing.hpp"
 #include "Serializer.hpp"
 #include "Messenger.h"
-
-/********************/
-/* Controller impl. */
-/********************/
+#include "Audio.hpp"
 
 Serializable::serialization_descriptor Controller::sd;
 
 Controller::Controller(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 	TLO(_lm, _lv, _nm)
 {
-	// Hai mr controlley
+
 }
 Controller::~Controller()
 {
@@ -350,6 +335,7 @@ void ShopkeeperController::update() {
 	else if (stage == 204) {
 		// Do the interaction
 		if (++timeWaited >= 60) {
+      Audio::playSound("fx/cha-ching.wav");
 			releaseUnit((Unit*) customer.get());
 			++stage;
 		}

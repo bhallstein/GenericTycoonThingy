@@ -1,22 +1,10 @@
 /*
- * Generic Tycoon Thingy
- *
- * ================
- *  Placeable.hpp
- * ================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * Placeable.hpp - sort of an abstract placement manager for TLOs
  *
  */
 
-#ifndef PLACEABLE_H
-#define PLACEABLE_H
+#ifndef Placeable_h
+#define Placeable_h
 
 #include <iostream>
 #include <map>

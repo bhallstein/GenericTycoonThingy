@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ================
- *  Placeable.cpp
- * ================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Placeable.hpp"
 #include "PlaceableManager.hpp"
 #include "View__Game.hpp"

@@ -1,17 +1,5 @@
-/*
- * Generic Tycoon Thingy
- *
- * ====================
- *  View__TwoBtns.hpp
- * ====================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-#ifndef View__TwoBtns_h
-#define View__TwoBtns_h
+#ifndef ViewTwoBtns_h
+#define ViewTwoBtns_h
 
 #include "W.h"
 

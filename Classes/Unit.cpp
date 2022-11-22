@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ===========
- *  Unit.cpp
- * ===========
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "Unit.hpp"
 #include "Building.hpp"
 #include "LevelMap.hpp"

@@ -1,15 +1,3 @@
-/*
- * Generic Tycoon Thingy
- *
- * ==============
- *  MrPaths.cpp
- * ==============
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
 #include "MrPaths.hpp"
 
 #ifdef __APPLE__

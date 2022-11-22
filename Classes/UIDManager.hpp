@@ -1,24 +1,12 @@
 /*
- * Generic Tycoon Thingy
- *
- * =================
- *  UIDManager.hpp
- * =================
- *
- * Copyright (C) 2012 - Ben Hallstein
- * All rights reserved
- *
- */
-
-/*
  * UIDManager.hpp
  *
  * Static class allowing TLOs to refer to each other by UID
  *
  */
 
-#ifndef __DBT__UIDManager__
-#define __DBT__UIDManager__
+#ifndef UIDManager_h
+#define UIDManager_h
 
 #include "types.hpp"
 #include <map>
