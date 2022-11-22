@@ -76,7 +76,7 @@ private:
   std::string btn2_action;
 
   const float btn_w = 0.1;
-  const float offset_from_center = 0.05;
+  const float offset_from_center = 0.1;
 };
 
 #endif

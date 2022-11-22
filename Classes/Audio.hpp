@@ -5,8 +5,10 @@
 #include <string>
 
 namespace Audio {
-  void playSound(std::string filename);
-  void playMusic(std::string filename);
+  void* playSound(std::string filename); // Any supported sound type
+  void stopSound(void* sound);           // Stops (and frees) a sound
+
+  void playMusic(std::string filename);  // .xm files only
   bool musicIsPlaying();
   void stopMusic();
 };

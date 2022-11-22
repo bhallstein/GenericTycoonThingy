@@ -104,6 +104,11 @@ W::EventPropagation::T State__Game::keyEvent(W::Event ev) {
     }
   }
 
+  // Next track
+  else if (ev.key == W::KeyCode::_N) {
+    play_random_music_track();
+  }
+
   return W::EventPropagation::ShouldContinue;
 }
 
@@ -158,6 +163,7 @@ void State__Game::update() {
 
   frame += 1;
 }
+
 void State__Game::resume(W::Returny *ret) {
   if (ret->type == W::ReturnyType::Killer) {
     W::popState(W::KillerReturny);

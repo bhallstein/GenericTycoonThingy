@@ -90,16 +90,38 @@ Track *current_track = NULL;
 // ------------------------------
 
 namespace Audio {
-  void playSound(std::string filename) {
+  void* playSound(std::string filename) {
     engine_init();
 
     if (have_engine) {
       std::string path = full_path(filename);
-      ma_result result = ma_engine_play_sound(&engine, path.c_str(), NULL);
+      ma_sound *sound = new ma_sound;
+      ma_result result;
+
+      result = ma_sound_init_from_file(&engine, path.c_str(), 0, NULL, NULL, sound);
+      if (result != MA_SUCCESS) {
+        W::log << "Failed to load sound file: " << filename << "\n";
+        delete sound;
+        return NULL;
+      }
+
+      result = ma_sound_start(sound);
       if (result != MA_SUCCESS) {
         W::log << "Failed to play sound file: " << filename << "\n";
+        return sound;  // Since the sound did initialize, return it
       }
+
+      return sound;
     }
+
+    return NULL;
+  }
+
+  void stopSound(void* _sound) {
+    ma_sound *sound = (ma_sound*) _sound;
+    ma_sound_stop(sound);
+    ma_sound_uninit(sound);
+    delete sound;
   }
 
   void playMusic(std::string filename) {

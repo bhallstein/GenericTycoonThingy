@@ -23,6 +23,8 @@ protected:
   void exit_to_menu();
   void exit_completely();
 
+  void *winlose_sound;
+
   bool victory;
 };
 

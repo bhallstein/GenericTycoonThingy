@@ -11,7 +11,7 @@ State__WinLose::State__WinLose(bool _victory) :
   view = new View__TwoBtns(victory ? "You win!" : "You lose!",
                            "Replay",
                            "winlose__replay",
-                           "Quit",
+                           "Menu",
                            "winlose__exit_to_menu");
   addView(view);
 
@@ -20,11 +20,14 @@ State__WinLose::State__WinLose(bool _victory) :
   W::Messenger::subscribeToUIEvent("winlose__exit_to_menu", W::EventType::ButtonClick, W::Callback(&State__WinLose::btnEvent, this));
 
   Audio::stopMusic();
-  Audio::playSound(victory ? "fx/winlose-win.mp3" : "fx/winlose-lose.mp3");
+  winlose_sound = Audio::playSound(victory ? "fx/winlose-win.mp3" : "fx/winlose-lose.mp3");
 }
 
 State__WinLose::~State__WinLose()
 {
+  if (winlose_sound) {
+    Audio::stopSound(winlose_sound);
+  }
   removeView(view);
   delete view;
 }
