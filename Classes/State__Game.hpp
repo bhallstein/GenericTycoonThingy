@@ -16,45 +16,45 @@ class View__FurnishingPurchasing;
 
 class State__Game : public W::GameState {
 public:
-	State__Game();
-	~State__Game();
-	
-	W::EventPropagation::T keyEvent(W::Event);
-	W::EventPropagation::T buttonEvent(W::Event);
-	
-	void update();
-	void resume(W::Returny *);
+  State__Game();
+  ~State__Game();
 
-	void pause();
-	void unpause();
-	
-	bool loadLevel(const std::string &levelName);
-	bool saveLevel(const std::string &saveName);
+  W::EventPropagation::T keyEvent(W::Event);
+  W::EventPropagation::T buttonEvent(W::Event);
 
-	void openView_help();
-	void closeView_help();
+  void update();
+  void resume(W::Returny *);
 
-	void openView_hiring();
-	void closeView_hiring();
+  void pause();
+  void unpause();
+
+  bool loadLevel(const std::string &levelName);
+  bool saveLevel(const std::string &saveName);
+
+  void openView_help();
+  void closeView_help();
+
+  void openView_hiring();
+  void closeView_hiring();
 
   void openView_furnishingPurchasing();
   void closeView_furnishingPurchasing();
-	
+
 private:
-	// Views
-	View__Game *view__game;
-	View__BottomBar *view__btmBar;
-	View__Help      *view__help;
-	View__Hiring    *view__hiring;
+  // Views
+  View__Game *view__game;
+  View__BottomBar *view__btmBar;
+  View__Help      *view__help;
+  View__Hiring    *view__hiring;
   View__FurnishingPurchasing *view__furnishingPurchasing;
-	
-	// Map
-	LevelMap *levelMap;
-	
-	// Time
-	bool paused;
+
+  // Map
+  LevelMap *levelMap;
+
+  // Time
+  bool paused;
   W::Timer *timer;
-	float time_elapsed_s;
+  float time_elapsed_s;
 
   size_t frame;
 

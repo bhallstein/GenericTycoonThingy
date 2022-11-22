@@ -25,7 +25,7 @@ State__WinLose::State__WinLose(bool _victory) :
 
 State__WinLose::~State__WinLose()
 {
-	removeView(view);
+  removeView(view);
   delete view;
 }
 

@@ -45,5 +45,4 @@ private:
   void switchMode();
 };
 
-
 #endif

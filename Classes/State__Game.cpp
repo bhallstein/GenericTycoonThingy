@@ -31,17 +31,17 @@ void play_random_music_track() {
 }
 
 State__Game::State__Game() :
-	view__game(NULL),
-	levelMap(NULL),
-	paused(false),
+  view__game(NULL),
+  levelMap(NULL),
+  paused(false),
   view__help(NULL),
   view__hiring(NULL),
   view__furnishingPurchasing(NULL),
   frame(0)
 {
-	// Create game view
-	view__game = new View__Game();
-	addView(view__game);
+  // Create game view
+  view__game = new View__Game();
+  addView(view__game);
 
   // Create bottom bar view
   view__btmBar = new View__BottomBar();
@@ -51,12 +51,12 @@ State__Game::State__Game() :
   levelMap = new LevelMap(this, view__game, view__btmBar);
 
   openView_help();
-	
-	// Time
-	time_elapsed_s = 0.0;
-	timer = new W::Timer();
-	
-	W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__Game::keyEvent, this));
+
+  // Time
+  time_elapsed_s = 0.0;
+  timer = new W::Timer();
+
+  W::Messenger::subscribe(W::EventType::KeyUp, W::Callback(&State__Game::keyEvent, this));
 
   // UI triggered events
   W::Messenger::subscribeToUIEvent("close_help_view", W::EventType::ButtonClick, W::Callback(&State__Game::buttonEvent, this));
@@ -69,9 +69,9 @@ State__Game::State__Game() :
 
 State__Game::~State__Game()
 {
-	removeView(view__game);
-	delete view__game;
-	delete levelMap;
+  removeView(view__game);
+  delete view__game;
+  delete levelMap;
 }
 
 W::EventPropagation::T State__Game::keyEvent(W::Event ev) {
@@ -143,18 +143,18 @@ void State__Game::update() {
   }
 
   // Time
-	int frame_microseconds = (int) timer->getMicroseconds();
-	if (frame_microseconds > 100000) {
-		frame_microseconds = 100000;
-	}
+  int frame_microseconds = (int) timer->getMicroseconds();
+  if (frame_microseconds > 100000) {
+    frame_microseconds = 100000;
+  }
 
   time_elapsed_s += frame_microseconds / 1000000.0;
   timer->reset();
-	
-	// Update
-	if (levelMap) {
-		levelMap->update(frame_microseconds, time_elapsed_s);
-	}
+
+  // Update
+  if (levelMap) {
+    levelMap->update(frame_microseconds, time_elapsed_s);
+  }
 
   frame += 1;
 }
@@ -163,89 +163,89 @@ void State__Game::resume(W::Returny *ret) {
     W::popState(W::KillerReturny);
   }
   else if (ret->type == W::ReturnyType::Payload) {
-		if (ret->payload == "exit to menu") W::popState(W::EmptyReturny);
-		else if (ret->payload == "replay")  W::popState(*ret);
-	}
+    if (ret->payload == "exit to menu") W::popState(W::EmptyReturny);
+    else if (ret->payload == "replay")  W::popState(*ret);
+  }
 }
 
 void State__Game::pause() {
-	paused = true;
+  paused = true;
 }
 
 void State__Game::unpause() {
-	timer->reset();
-	paused = false;
+  timer->reset();
+  paused = false;
 }
 
 bool State__Game::loadLevel(const std::string &levelName) {
-	using std::string;
-	
-	W::log << "State__Game: loading level '" << levelName << "'..." << std::endl;
-	
-	// Game entity class initialization
-	// - loads type info
-	// - creates serialization descriptors
-	TLO::initialize();
-	if (!Building::initialize())   { W::log << "Couldn't initialize Building class"   << std::endl; return false; }
-	if (!Unit::initialize())       { W::log << "Couldn't initialize Unit class"       << std::endl; return false; }
-	if (!Furnishing::initialize()) { W::log << "Couldn't initialize Furnishing class" << std::endl; return false; }
-	Controller::initialize();
-	CustomerController::initialize();
-	ShopkeeperController::initialize();
-	
-	// Load level lua file
-	string path = MrPaths::resourcesPath + string("Data/Levels/") + levelName + ".lua";
-	lua_State *L;
-	if (!luaLoad(path, &L)) {
-		W::log << "Couldn't load file '" << path << "'" << std::endl;
-		return false;
-	}
-	
-	// Map contents
-	bool mapload_success = levelMap->load(L);
-	// Note: since the level's size info is loaded by levelMap,
-	// levelMap also calls view__game.setLevelSize, and creates the NavMap.
-	if (!mapload_success) {
-		W::log << "Error loading map" << std::endl;
-		return false;
-	}
-	
-	W::log << "...loaded." << std::endl;
+  using std::string;
+
+  W::log << "State__Game: loading level '" << levelName << "'..." << std::endl;
+
+  // Game entity class initialization
+  // - loads type info
+  // - creates serialization descriptors
+  TLO::initialize();
+  if (!Building::initialize())   { W::log << "Couldn't initialize Building class"   << std::endl; return false; }
+  if (!Unit::initialize())       { W::log << "Couldn't initialize Unit class"       << std::endl; return false; }
+  if (!Furnishing::initialize()) { W::log << "Couldn't initialize Furnishing class" << std::endl; return false; }
+  Controller::initialize();
+  CustomerController::initialize();
+  ShopkeeperController::initialize();
+
+  // Load level lua file
+  string path = MrPaths::resourcesPath + string("Data/Levels/") + levelName + ".lua";
+  lua_State *L;
+  if (!luaLoad(path, &L)) {
+    W::log << "Couldn't load file '" << path << "'" << std::endl;
+    return false;
+  }
+
+  // Map contents
+  bool mapload_success = levelMap->load(L);
+  // Note: since the level's size info is loaded by levelMap,
+  // levelMap also calls view__game.setLevelSize, and creates the NavMap.
+  if (!mapload_success) {
+    W::log << "Error loading map" << std::endl;
+    return false;
+  }
+
+  W::log << "...loaded." << std::endl;
 
   view__help->setTimeRemaining(levelMap->get_time_remaining_s());
   view__help->setMonetaryTarget(levelMap->get_level_financial_target());
 
-	return true;
+  return true;
 }
 
 bool State__Game::saveLevel(const std::string &saveName) {
-	using std::string;
-	
-	string s = levelMap->save();
-	
-	// Prepend title
-	s = string("-- ") + saveName + string("\n\n") + s;
-	
-	// Save file to save games directory
-	string saveDir = MrPaths::settingsPath + "Saved games/";
-	string saveFileName = saveDir + saveName + ".lua";
-	if (!W::isValidDir(MrPaths::settingsPath)) {
-		if (!W::createDir(MrPaths::settingsPath)) {
-			return false;
-		}
-	}
-	if (!W::isValidDir(saveDir)) {
-		bool dir_created = W::createDir(saveDir);
-		if (!dir_created) {
-			return false;
-		}
-	}
-	std::ofstream f(saveFileName.c_str());
-	reindentLuaString(s);
-	f << s;
-	f.close();
-	
-	return true;
+  using std::string;
+
+  string s = levelMap->save();
+
+  // Prepend title
+  s = string("-- ") + saveName + string("\n\n") + s;
+
+  // Save file to save games directory
+  string saveDir = MrPaths::settingsPath + "Saved games/";
+  string saveFileName = saveDir + saveName + ".lua";
+  if (!W::isValidDir(MrPaths::settingsPath)) {
+    if (!W::createDir(MrPaths::settingsPath)) {
+      return false;
+    }
+  }
+  if (!W::isValidDir(saveDir)) {
+    bool dir_created = W::createDir(saveDir);
+    if (!dir_created) {
+      return false;
+    }
+  }
+  std::ofstream f(saveFileName.c_str());
+  reindentLuaString(s);
+  f << s;
+  f.close();
+
+  return true;
 }
 
 void State__Game::openView_help() {

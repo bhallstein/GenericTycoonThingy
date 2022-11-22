@@ -1,5 +1,5 @@
 /*
- * main.cpp - entry point for Linux & Windows Me
+ * main.cpp - Linux/Windows entry point
  *
  */
 
@@ -16,10 +16,10 @@ int APIENTRY WinMain(HINSTANCE _appInstance, HINSTANCE _prev, LPTSTR _cmdline, i
 	W::log << "settings file path: " << MrPaths::settingsPath  << std::endl;
 	W::log << "resources path: "     << MrPaths::resourcesPath << std::endl;
 	W::log << "desktop path: "       << MrPaths::desktopPath   << std::endl;
-	
+
 	W::createWindow(W::size(800,600), "Generic Tycoon Thingy");
 	W::pushState(new MenuState());
-	W::start();
+  W::start();
 
-	return 1;
+  return 1;
 }

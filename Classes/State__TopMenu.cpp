@@ -72,19 +72,19 @@ W::EventPropagation::T State__TopMenu::uiEvent(W::Event ev) {
 }
 
 void State__TopMenu::startLevel(const std::string &levelName) {
-	W::log << "Starting level: " << levelName << std::endl;
-	try {
-		state__game = new State__Game();
+  W::log << "Starting level: " << levelName << std::endl;
+  try {
+    state__game = new State__Game();
     if (state__game->loadLevel(levelName)) {
       Audio::stopMusic();
-			W::pushState(state__game);
+      W::pushState(state__game);
     }
     else {
-			delete state__game;
+      delete state__game;
     }
-	} catch (W::Exception &exc) {
-		W::log << "Error: " << exc.what() << std::endl;
-	}
+  } catch (W::Exception &exc) {
+    W::log << "Error: " << exc.what() << std::endl;
+  }
 }
 
 void State__TopMenu::update_music() {

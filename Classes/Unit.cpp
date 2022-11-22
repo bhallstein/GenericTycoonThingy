@@ -320,4 +320,3 @@ void Unit::DrawnUnit::setCol(W::Colour c) {
 void Unit::DrawnUnit::incRot() {
   r->setRot(r->rot + 3);
 }
-

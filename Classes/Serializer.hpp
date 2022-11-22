@@ -27,10 +27,10 @@
 
 template <typename T>
 std::string _numericalSerialize(T &x) {
-	std::stringstream ss;
-	ss.precision(8);
-	ss << std::boolalpha << x;
-	return ss.str();
+  std::stringstream ss;
+  ss.precision(8);
+  ss << std::boolalpha << x;
+  return ss.str();
 }
 std::string _serialize(int &x);
 std::string _serialize(float &x);
@@ -44,13 +44,13 @@ std::string _serialize(const UID &uid);
 std::string _serialize(const UnitMode::T &);
 template <typename T>
 std::string _serialize(const std::vector<T> &x) {
-	std::string s = "{ ";
-	for (typename std::vector<T>::const_iterator it = x.begin(); it < x.end(); ++it) {
-		T v = *it;
-		s += _serialize(v) + (it == x.end() - 1 ? "" : ", ");
-	}
-	s += " }";
-	return s;
+  std::string s = "{ ";
+  for (typename std::vector<T>::const_iterator it = x.begin(); it < x.end(); ++it) {
+    T v = *it;
+    s += _serialize(v) + (it == x.end() - 1 ? "" : ", ");
+  }
+  s += " }";
+  return s;
 }
 std::string _serialize(const std::map<UID,UID> &);
 
@@ -84,8 +84,8 @@ void _deserialize(LuaObj &o, SeekTarget::Type &);
 
 class SerializerBase {
 public:
-	virtual std::string serialize(Serializable *) = 0;
-	virtual void deserialize(LuaObj &, Serializable *) = 0;
+  virtual std::string serialize(Serializable *) = 0;
+  virtual void deserialize(LuaObj &, Serializable *) = 0;
 };
 
 
@@ -93,19 +93,19 @@ public:
 
 template<class T, typename mtype>
 class Serializer : public SerializerBase {
-	typedef mtype T::*ptype;
-	ptype ptr;
+  typedef mtype T::*ptype;
+  ptype ptr;
 public:
-	Serializer(ptype _ptr) : ptr(_ptr) { }
-	
-	std::string serialize(Serializable *_o) {
-		T *o = (T*) _o;
-		return _serialize(o->*ptr);
-	}
-	void deserialize(LuaObj &luaObj, Serializable *_o) {
-		T *o = (T*) _o;
-		_deserialize(luaObj, o->*ptr);
-	}
+  Serializer(ptype _ptr) : ptr(_ptr) { }
+
+  std::string serialize(Serializable *_o) {
+    T *o = (T*) _o;
+    return _serialize(o->*ptr);
+  }
+  void deserialize(LuaObj &luaObj, Serializable *_o) {
+    T *o = (T*) _o;
+    _deserialize(luaObj, o->*ptr);
+  }
 };
 
 
@@ -113,7 +113,7 @@ public:
 
 template<class T, typename mtype>
 SerializerBase* makeSerializer(mtype T::*ptr) {
-	return new Serializer<T, mtype>(ptr);
+  return new Serializer<T, mtype>(ptr);
 }
 
 

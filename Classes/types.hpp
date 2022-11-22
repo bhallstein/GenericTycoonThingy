@@ -12,26 +12,26 @@
 #define HINTERLAND_WIDTH 2
 
 namespace Direction {
-	enum T { LEFTWARD, RIGHTWARD, UPWARD, DOWNWARD };
+  enum T { LEFTWARD, RIGHTWARD, UPWARD, DOWNWARD };
 }
 
 namespace UnitMode {
-	enum T { IDLE, VOYAGING, ANIMATING };
+  enum T { IDLE, VOYAGING, ANIMATING };
 }
 
 namespace SeekTarget {
-	enum Type {
-		Pie,
-		Haircut,
-		
-		__N
-	};
-	extern std::map<Type, std::string> Targets;
+  enum Type {
+    Pie,
+    Haircut,
+
+    __N
+  };
+  extern std::map<Type, std::string> Targets;
 };
 
 typedef struct door {
-	W::v2i pos;
-	Direction::T orientation;
+  W::v2i pos;
+  Direction::T orientation;
 } door;
 
 bool streq(const char *a, const char *b);

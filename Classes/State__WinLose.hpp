@@ -5,18 +5,17 @@
 
 class View__TwoBtns;
 
-
 class State__WinLose : public W::GameState {
 public:
   State__WinLose(bool victory);
-	~State__WinLose();
+  ~State__WinLose();
 
   void resume(W::Returny *) { }
   void update() { }
 
   W::EventPropagation::T keyEvent(W::Event);
   W::EventPropagation::T btnEvent(W::Event);
-	
+
 protected:
   View__TwoBtns *view;
 

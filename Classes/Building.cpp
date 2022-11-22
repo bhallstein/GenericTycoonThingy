@@ -9,15 +9,15 @@
 /* buildingInfo constructor impl */
 
 buildingInfo::buildingInfo(LuaObj &o) {
-	LuaObj *l;
-	
-	// Allowed furnishings
-	l = &o["allowedFurnishings"];
+  LuaObj *l;
+
+  // Allowed furnishings
+  l = &o["allowedFurnishings"];
   for (auto it : l->descendants()) {
-		LuaObj &d = it.second;
-		if (!d.isString()) throw W::Exception("Error creating buildingInfo: allowedBuilding entries must be strings");
-		allowedFurnishings.push_back(d.str_value());
-	}
+    LuaObj &d = it.second;
+    if (!d.isString()) throw W::Exception("Error creating buildingInfo: allowedBuilding entries must be strings");
+    allowedFurnishings.push_back(d.str_value());
+  }
 }
 
 
@@ -34,7 +34,7 @@ std::map<std::string, W::Colour> building_colors;
 /*** Building ***/
 
 Building::Building(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
-	TLO(_lm, _lv, _nm)
+  TLO(_lm, _lv, _nm)
 {
   if (building_colors.size() == 0) {
     building_colors = {
@@ -46,33 +46,33 @@ Building::Building(LevelMap *_lm, View__Game *_lv, W::NavMap *_nm) :
 
   drawnBuilding = new DrawnBuilding(view__game, W::v2f());
 
-//	if (!navmap->isPassableUnder(rct)) {
-//		throw W::Exception("Navmap was not passable under Building plan.");
-//	}
+//  if (!navmap->isPassableUnder(rct)) {
+//    throw W::Exception("Navmap was not passable under Building plan.");
+//  }
 }
 Building::~Building()
 {
-	std::cout << "building destruct" << std::endl;
+  std::cout << "building destruct" << std::endl;
 //  navmap->unisolate(rct);    // NOTE: W::NavMap::unisolate() is not yet functional
-	delete drawnBuilding;
+  delete drawnBuilding;
 }
 
 void Building::_setUp() {
-	if (type == NO_TYPE) {
-		throw W::Exception("setUp() called on Building with type NO_TYPE. Call setType() or deserialize first.");
-	}
-	
-	// Set typeInfo pointer
-	auto it = buildingTypeInfo.find(type);
-	if (it == buildingTypeInfo.end()) {
-		throw W::Exception(std::string("Info for building type \"") + type + "\" not found");
-	}
-	typeInfo = Building::buildingTypeInfo[type];
-	
-	// Perform set-up for buildings constructed programmatically
-	if (!deserialized) {
-		// ...
-	}
+  if (type == NO_TYPE) {
+    throw W::Exception("setUp() called on Building with type NO_TYPE. Call setType() or deserialize first.");
+  }
+
+  // Set typeInfo pointer
+  auto it = buildingTypeInfo.find(type);
+  if (it == buildingTypeInfo.end()) {
+    throw W::Exception(std::string("Info for building type \"") + type + "\" not found");
+  }
+  typeInfo = Building::buildingTypeInfo[type];
+
+  // Perform set-up for buildings constructed programmatically
+  if (!deserialized) {
+    // ...
+  }
 
   // Create groundplan_rects
   groundplan_rects.clear();
@@ -92,8 +92,8 @@ void Building::_setUp() {
                                   W::Callback(&Building::mouseEvent, this),
                                   &r);
   }
-	
-	// Set up state of DrawnBuilding
+
+  // Set up state of DrawnBuilding
   drawnBuilding->setPos(rct.position);
   drawnBuilding->setGroundplan(groundplan);
   auto col = building_colors.find(type);
@@ -124,36 +124,36 @@ void Building::_setUp() {
 
 
 bool Building::initialize() {
-	if (Building::initialized) return true;
-	
-	// 1. Get buildingTypeInfo LuaObj
-	std::string path = MrPaths::resourcesPath + "Data/Object info/buildings.lua";
-	lua_State *L;
-	if (!luaLoad(path, &L)) {
-		W::log << "Could not read buildings.lua" << std::endl;
-		return false;
-	}
-	lua_getglobal(L, "buildingTypes"); LuaObj o(L);
-	lua_close(L);
-	if (!o.isTable()) {
-		W::log << "Could not get buildingTypes table from buildings.lua" << std::endl;
-		return false;
-	}
-  for (auto it : o.descendants()) {
-		buildingTypeInfo[it.first] = new buildingInfo(it.second);
+  if (Building::initialized) return true;
+
+  // 1. Get buildingTypeInfo LuaObj
+  std::string path = MrPaths::resourcesPath + "Data/Object info/buildings.lua";
+  lua_State *L;
+  if (!luaLoad(path, &L)) {
+    W::log << "Could not read buildings.lua" << std::endl;
+    return false;
   }
-	
-	// 2. Set up Serialization Descriptor
+  lua_getglobal(L, "buildingTypes"); LuaObj o(L);
+  lua_close(L);
+  if (!o.isTable()) {
+    W::log << "Could not get buildingTypes table from buildings.lua" << std::endl;
+    return false;
+  }
+  for (auto it : o.descendants()) {
+    buildingTypeInfo[it.first] = new buildingInfo(it.second);
+  }
+
+  // 2. Set up Serialization Descriptor
   sd["groundplan"] = makeSerializer(&Building::groundplan);
   sd["doors"] = makeSerializer(&Building::doors);
 
-	Building::initialized = true;
-	return true;
+  Building::initialized = true;
+  return true;
 }
 
 void Building::setPos(W::v2f _pos) {
-	rct.position = _pos;
-	drawnBuilding->setPos(_pos);
+  rct.position = _pos;
+  drawnBuilding->setPos(_pos);
 }
 
 bool Building::contains_point(W::v2f _p) {

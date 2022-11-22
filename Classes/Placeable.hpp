@@ -16,14 +16,14 @@ class View__Game;
 
 class Placeable {
 public:
-	Placeable(PlaceableManager *, View__Game *);
-	~Placeable();
-	bool activate();
-	void deactivate();
-	W::EventPropagation::T mouseEvent(W::Event);
-	PlaceableManager *mngr;
-	W::v2f pos;
-	View__Game *view__game;
+  Placeable(PlaceableManager *, View__Game *);
+  ~Placeable();
+  bool activate();
+  void deactivate();
+  W::EventPropagation::T mouseEvent(W::Event);
+  PlaceableManager *mngr;
+  W::v2f pos;
+  View__Game *view__game;
 };
 
 #endif
