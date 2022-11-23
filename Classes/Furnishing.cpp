@@ -259,9 +259,7 @@ void Furnishing::DrawnFurnishing::setColour(W::Colour _col) {
 //  // ello
 //}
 //Door::~Door()
-//{
-//  // bai doory
-//}
+//{ }
 //
 //bool Door::canPlace(int _x, int _y) {
 //  return true;

@@ -17,7 +17,7 @@ public:
                                                   W::PosType::Fixed,
                                                   W::PosType::Fixed,
                                                   W::PosType::Fixed,
-                                                  10, 10, 500, 340,
+                                                  10, 10, 540, 340,
                                                   true));
     auto elements = element_list();
     elements.push_back(new W::Button("close_help_view",

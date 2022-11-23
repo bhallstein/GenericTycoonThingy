@@ -1,7 +1,7 @@
 -- GTT level from QJ, restored
 
 levelData = {
-  financialTarget = 1200,
+  financialTarget = 16500,
   timeLimit = 300
 }
 

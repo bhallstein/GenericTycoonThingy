@@ -24,9 +24,7 @@ LevelMap::LevelMap(State__Game *_ls, View__Game *_lv, View__BottomBar *_view__bt
   W::Messenger::subscribe(W::EventType::Haircut, W::Callback(&LevelMap::economicEvent, this));
 }
 LevelMap::~LevelMap()
-{
-  // bai
-}
+{ }
 
 void LevelMap::update(int frame_microseconds, float _time_in_level_s) {
   // Set time remaining
