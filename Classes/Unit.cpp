@@ -300,14 +300,15 @@ Unit::DrawnUnit::DrawnUnit(View__Game *_lv) : lv(_lv)
 {
   r = new W::Rectangle(lv,
                        W::v2f(),
-                       lv->convertGridToPixelCoords({1,1}),
+                       lv->convertGridToPixelCoords({1,1}) - W::v2f(6,6),
                        W::Colour::Black);
 }
 Unit::DrawnUnit::~DrawnUnit() {
   delete r;
 }
 void Unit::DrawnUnit::setPosn(W::v2f p) {
-  r->setPos(lv->convertGridToPixelCoords(p));
+  W::v2f q = lv->convertGridToPixelCoords(p) + W::v2f{3,3};
+  r->setPos(q);
 }
 void Unit::DrawnUnit::setOpac(float x) {
   W::Colour c = r->col;
